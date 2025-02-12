@@ -6,7 +6,5 @@ namespace FikaServer.Models.Fika.Config
     {
         [JsonPropertyName("enable")]
         public bool Enable { get; set; } = true;
-        [JsonPropertyName("easterEgg")]
-        public bool EasterEgg { get; set; } = false;
     }
 }

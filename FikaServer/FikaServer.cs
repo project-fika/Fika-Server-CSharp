@@ -36,7 +36,7 @@ namespace FikaServer
 
             if (config.Background.Enable)
             {
-                string imagePath = config.Background.EasterEgg ? "assets/images/launcher/bg-senko.png" : "assets/images/launcher/bg.png";
+                string imagePath = "assets/images/launcher/bg.png";
                 imageRouter.AddRoute("/files/launcher/bg", Path.Join(fikaConfig.GetModPath(), imagePath));
             }
         }
