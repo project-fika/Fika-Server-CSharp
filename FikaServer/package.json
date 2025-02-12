@@ -1,0 +1,13 @@
+{
+  "Name": "server",
+  "Version": "3.0.0",
+  "SptVersion": "~4.0",
+  "LoadBefore": [],
+  "LoadAfter": [],
+  "IncompatibileMods": [],
+  "Url": "https://github.com/project-fika/Fika-Server",
+  "IsBundleMod": false,
+  "Author": "Fika",
+  "Contributors": [],
+  "Licence": "CC-BY-NC-SA-4.0"
+}

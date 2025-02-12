@@ -1,0 +1,84 @@
+﻿using Core.Helpers;
+using Core.Models.Spt.Config;
+using Core.Models.Utils;
+using Core.Servers;
+using FikaServer.Models.Fika.Config;
+using SptCommon.Annotations;
+using System.Reflection;
+using System.Text.Json;
+
+namespace FikaServer.Utils
+{
+    [Injectable(InjectionType.Singleton)]
+    public class Config(ISptLogger<Config> logger, ConfigServer configServer,
+        ModHelper modHelper)
+    {
+        private FikaConfig loadedFikaConfig = new();
+        public static readonly JsonSerializerOptions serializerOptions = new() { WriteIndented = true };
+
+        public FikaConfig GetConfig()
+        {
+            return loadedFikaConfig;
+        }
+
+        public string GetModPath()
+        {
+            return modHelper.GetAbsolutePathToModFolder(Assembly.GetExecutingAssembly());
+        }
+
+        public string GetVersion()
+        {
+            //Todo: Implement
+            return "3.0.0";
+        }
+
+        public void PreSptLoad()
+        {
+            string configFolderPath = Path.Join(modHelper.GetAbsolutePathToModFolder(Assembly.GetExecutingAssembly()), "assets/configs");
+
+            //This is debug, probably wont exist in the final release.
+            if (!Directory.Exists(configFolderPath))
+            {
+                Directory.CreateDirectory(configFolderPath);
+            }
+
+            if (File.Exists($"{configFolderPath}/fika.jsonc"))
+            {
+                loadedFikaConfig = modHelper.GetFileFromModFolder<FikaConfig>(configFolderPath, "fika.jsonc");
+            }
+
+            // No need to do any fancyness around sorting properties and writing them if they weren't set before here
+            // We store default values in the config models, and if one is missing this will write it to the file in the correct place
+            WriteConfig(configFolderPath);
+
+            ApplySPTConfig(loadedFikaConfig.Server.SPT);
+        }
+
+        private void WriteConfig(string ConfigFolderPath)
+        {
+            File.WriteAllText($"{ConfigFolderPath}/fika.jsonc", JsonSerializer.Serialize(loadedFikaConfig, serializerOptions));
+        }
+
+        private void ApplySPTConfig(FikaSPTServerConfig config)
+        {
+            logger.Info("[Fika Server] Overriding SPT configuration");
+
+            CoreConfig coreConfig = configServer.GetConfig<CoreConfig>();
+            HttpConfig httpConfig = configServer.GetConfig<HttpConfig>();
+
+            if (config.DisableSPTChatBots)
+            {
+                string commandoId = coreConfig.Features.ChatbotFeatures.Ids["commando"];
+                string sptFriendId = coreConfig.Features.ChatbotFeatures.Ids["spt"];
+
+                coreConfig.Features.ChatbotFeatures.EnabledBots[commandoId] = false;
+                coreConfig.Features.ChatbotFeatures.EnabledBots[sptFriendId] = false;
+            }
+
+            httpConfig.Ip = config.HTTP.Ip;
+            httpConfig.Port = config.HTTP.Port;
+            httpConfig.BackendIp = config.HTTP.BackendIp;
+            httpConfig.BackendPort = config.HTTP.BackendPort;
+        }
+    }
+}
