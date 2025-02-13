@@ -9,6 +9,9 @@ namespace FikaServer.Controllers
     [Injectable(InjectionType.Transient)]
     public class ClientController(ClientService fikaClientService)
     {
+        /// <summary>
+        /// Handle /fika/client/config
+        /// </summary>
         public FikaConfigClient HandleClientConfig()
         {
             FikaConfigClient clientConfig = fikaClientService.GetClientConfig();
