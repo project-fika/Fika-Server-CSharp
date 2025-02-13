@@ -4,7 +4,7 @@
   "SptVersion": "~4.0",
   "LoadBefore": [],
   "LoadAfter": [],
-  "IncompatibileMods": [],
+  "IncompatibleMods": [],
   "Url": "https://github.com/project-fika/Fika-Server",
   "IsBundleMod": false,
   "Author": "Fika",
