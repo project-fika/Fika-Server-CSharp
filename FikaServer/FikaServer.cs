@@ -13,11 +13,12 @@ namespace FikaServer
     [Injectable(InjectionType.Singleton, InjectableTypeOverride = typeof(IPreSptLoadMod))]
     [Injectable(InjectionType.Singleton, InjectableTypeOverride = typeof(IPostSptLoadMod))]
     public class FikaServer(ConfigServer configServer, ImageRouter imageRouter,
-        HeadlessProfileService HeadlessProfileService, PlayerRelationsCacheService playerRelationsCacheService, Utils.Config fikaConfig) : IPreSptLoadMod, IPostSptLoadMod
+        HeadlessProfileService HeadlessProfileService, PlayerRelationsCacheService playerRelationsCacheService, ClientService clientService, Utils.Config fikaConfig) : IPreSptLoadMod, IPostSptLoadMod
     {
         public void PreSptLoad()
         {
             fikaConfig.PreSptLoad();
+            clientService.PreSptLoad();
             playerRelationsCacheService.PreSptLoad();
         }
 
