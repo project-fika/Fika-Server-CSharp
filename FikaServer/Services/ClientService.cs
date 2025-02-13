@@ -102,12 +102,14 @@ namespace FikaServer.Services
             {
                 int hash = request[pluginId];
 
+                // check if the mod isn't allowed
                 if (!allowedMods.Contains(pluginId))
                 {
                     mismatchedMods.Forbidden.Add(pluginId);
                     continue;
                 }
 
+                // first request made will fill in at the very least all the required mods hashes, following requests made by different clients will add any optional mod not added by the first request, otherwise will check against the first request data
                 if (!fikaClientModHashesService.Exists(pluginId))
                 {
                     fikaClientModHashesService.AddHash(pluginId, hash);
