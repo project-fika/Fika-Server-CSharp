@@ -36,7 +36,7 @@ namespace FikaServer.Controllers
         /// <summary>
         /// Handle /fika/client/check/mods
         /// </summary>
-        public FikaCheckModResponse HandleCheckMods(Dictionary<string, int> request)
+        public FikaCheckModResponse HandleCheckMods(FikaCheckModRequestData request)
         {
             return fikaClientService.GetCheckModsResponse(request);
         }
@@ -44,7 +44,7 @@ namespace FikaServer.Controllers
         /// <summary>
         /// Handle /fika/client/check/mods
         /// </summary>
-        public SptProfile HandleProfileDownload(string sessionId)
+        public SptProfile? HandleProfileDownload(string sessionId)
         {
             return fikaClientService.GetProfileBySessionID(sessionId);
         }

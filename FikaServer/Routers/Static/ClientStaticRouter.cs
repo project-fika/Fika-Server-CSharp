@@ -1,6 +1,7 @@
 ﻿using Core.DI;
 using Core.Utils;
 using FikaServer.Callbacks;
+using FikaServer.Models.Fika.Routes.Client.Check;
 using SptCommon.Annotations;
 
 namespace FikaServer.Routers.Static
@@ -21,7 +22,31 @@ namespace FikaServer.Routers.Static
                     info,
                     sessionId,
                     output
-                ) => fikaClientCallbacks.HandleNatPunchConfig(url, info, sessionId))])
+                ) => fikaClientCallbacks.HandleNatPunchConfig(url, info, sessionId)),
+            new RouteAction(
+                "/fika/client/check/mods",
+                (
+                    url,
+                    info,
+                    sessionId,
+                    output
+                ) => fikaClientCallbacks.HandleCheckMods(url, info as FikaCheckModRequestData, sessionId)),
+            new RouteAction(
+                "/fika/profile/download",
+                (
+                    url,
+                    info,
+                    sessionId,
+                    output
+                ) => fikaClientCallbacks.HandleProfileDownload(url, info, sessionId)),
+            new RouteAction(
+                "/fika/client/check/version",
+                (
+                    url,
+                    info,
+                    sessionId,
+                    output
+                ) => fikaClientCallbacks.HandleVersionCheck(url, info, sessionId))])
     {
     }
 }

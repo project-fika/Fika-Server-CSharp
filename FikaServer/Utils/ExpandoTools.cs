@@ -37,7 +37,7 @@ namespace FikaServer.Utils
 
             IDictionary<string, object> expandoDictionary = obj as IDictionary<string, object>;
 
-            if (expandoDictionary.ContainsKey(key)) 
+            if (expandoDictionary.ContainsKey(key))
             {
                 expandoDictionary[key] = value;
             }

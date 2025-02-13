@@ -9,11 +9,35 @@ using SptCommon.Annotations;
 namespace FikaServer.Services
 {
     [Injectable(InjectionType.Singleton)]
-    public class ClientService(ISptLogger<ClientService> logger, SaveServer saveServer, Config fikaConfig)
+    public class ClientService(ISptLogger<ClientService> logger, SaveServer saveServer, ClientModHashesService fikaClientModHashesService, Config fikaConfig)
     {
+        private List<string> requiredMods = ["com.fika.core", "com.SPT.custom", "com.SPT.singleplayer", "com.SPT.core", "com.SPT.debugging"];
+        private List<string> allowedMods = ["com.bepis.bepinex.configurationmanager", "com.fika.headless"];
+        private bool hasRequiredOrOptionalMods = false;
+
+
         public void PreSptLoad()
         {
-            //todo: stub, implement
+            FikaConfig config = fikaConfig.GetConfig();
+
+            List<string> sanitizedRequiredMods = this.FilterEmptyMods(config.Client.Mods.Required);
+            List<string> sanitizedOptionalMods = this.FilterEmptyMods(config.Client.Mods.Optional);
+
+            if (sanitizedRequiredMods.Count == 0 && sanitizedOptionalMods.Count == 0)
+            {
+                hasRequiredOrOptionalMods = false;
+            }
+
+            foreach (string mod in sanitizedRequiredMods)
+            {
+                requiredMods.Add(mod);
+                allowedMods.Add(mod);
+            }
+
+            foreach (string mod in sanitizedOptionalMods)
+            {
+                allowedMods.Add(mod);
+            }
         }
 
         protected List<string> FilterEmptyMods(List<string> list)
@@ -44,10 +68,59 @@ namespace FikaServer.Services
             };
         }
 
-        public FikaCheckModResponse GetCheckModsResponse(Dictionary<string, int> request)
+        public FikaCheckModResponse GetCheckModsResponse(FikaCheckModRequestData request)
         {
-            //todo: stub, implement
-            return null;
+            FikaCheckModResponse mismatchedMods = new()
+            {
+                Forbidden = [],
+                MissingRequired = [],
+                HashMismatch = []
+            };
+
+            // if no configuration was made, allow all mods
+            if (!hasRequiredOrOptionalMods)
+            {
+                return mismatchedMods;
+            }
+
+            // check for missing required mods first
+            foreach (string pluginId in requiredMods)
+            {
+                if (!request.ContainsKey(pluginId))
+                {
+                    mismatchedMods.MissingRequired.Add(pluginId);
+                }
+            }
+
+            // no need to check anything else since it's missing required mods
+            if (mismatchedMods.MissingRequired.Count > 0)
+            {
+                return mismatchedMods;
+            }
+
+            foreach (string pluginId in request.Keys)
+            {
+                int hash = request[pluginId];
+
+                if (!allowedMods.Contains(pluginId))
+                {
+                    mismatchedMods.Forbidden.Add(pluginId);
+                    continue;
+                }
+
+                if (!fikaClientModHashesService.Exists(pluginId))
+                {
+                    fikaClientModHashesService.AddHash(pluginId, hash);
+                    continue;
+                }
+
+                if (fikaClientModHashesService.GetHash(pluginId) != hash)
+                {
+                    mismatchedMods.HashMismatch.Add(pluginId);
+                }
+            }
+
+            return mismatchedMods;
         }
 
         public SptProfile? GetProfileBySessionID(string sessionId)

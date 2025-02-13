@@ -1,6 +1,7 @@
 ﻿using Core.Models.Utils;
 using Core.Utils;
 using FikaServer.Controllers;
+using FikaServer.Models.Fika.Routes.Client.Check;
 using SptCommon.Annotations;
 
 namespace FikaServer.Callbacks
@@ -27,9 +28,25 @@ namespace FikaServer.Callbacks
         /// <summary>
         /// Handle /fika/client/check/mods
         /// </summary>
-        public string HandleCheckMods(string url, Dictionary<string, int> info, string sessionID)
+        public string HandleCheckMods(string url, FikaCheckModRequestData info, string sessionID)
         {
             return httpResponseUtil.NoBody(fikaClientController.HandleCheckMods(info));
+        }
+
+        /// <summary>
+        /// Handle /fika/profile/download
+        /// </summary>
+        public string HandleProfileDownload(string url, IRequestData info, string sessionID)
+        {
+            return httpResponseUtil.NoBody(fikaClientController.HandleProfileDownload(sessionID));
+        }
+
+        /// <summary>
+        /// Handle /fika/client/check/version
+        /// </summary>
+        public string HandleVersionCheck(string url, IRequestData info, string sessionID)
+        {
+            return httpResponseUtil.NoBody(fikaClientController.HandleVersionCheck());
         }
     }
 }
