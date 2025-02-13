@@ -6,7 +6,7 @@ using SptCommon.Annotations;
 
 namespace FikaServer.Controllers
 {
-    [Injectable(InjectionType.Transient)]
+    [Injectable]
     public class ClientController(ClientService fikaClientService)
     {
         /// <summary>

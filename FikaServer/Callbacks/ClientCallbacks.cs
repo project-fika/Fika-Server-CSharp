@@ -5,7 +5,7 @@ using SptCommon.Annotations;
 
 namespace FikaServer.Callbacks
 {
-    [Injectable(InjectionType.Transient)]
+    [Injectable]
     public class ClientCallbacks(HttpResponseUtil httpResponseUtil, ClientController fikaClientController)
     {
         /// <summary>
