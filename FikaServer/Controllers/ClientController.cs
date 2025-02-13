@@ -2,7 +2,9 @@
 using FikaServer.Models.Fika.Config;
 using FikaServer.Models.Fika.Routes.Client.Check;
 using FikaServer.Services;
+using FikaServer.Utils;
 using SptCommon.Annotations;
+using System.Dynamic;
 
 namespace FikaServer.Controllers
 {
@@ -12,11 +14,13 @@ namespace FikaServer.Controllers
         /// <summary>
         /// Handle /fika/client/config
         /// </summary>
-        public FikaConfigClient HandleClientConfig()
+        public ExpandoObject HandleClientConfig()
         {
-            FikaConfigClient clientConfig = fikaClientService.GetClientConfig();
+            ExpandoObject clientConfig = fikaClientService.GetClientConfig().ToDynamicObject();
 
-            //Todo: implement item sending here, maybe get rid of the scuff and just ship it with both?
+            //Todo: Maybe get rid of the scuff ExpandoObject and just ship it with both?
+
+            clientConfig.AddOrReplaceProperty("allowItemSending", fikaClientService.GetIsItemSendingAllowed());
 
             return clientConfig;
         }
