@@ -1,5 +1,4 @@
-﻿using Core.Models.Eft.Game;
-using Core.Models.Eft.Profile;
+﻿using Core.Models.Eft.Profile;
 using Core.Models.Utils;
 using Core.Servers;
 using FikaServer.Models.Fika.Config;
@@ -39,10 +38,9 @@ namespace FikaServer.Services
 
         public VersionCheckResponse GetVersion()
         {
-            var version = fikaConfig.GetVersion();
-
-            return new VersionCheckResponse {
-                Version = version
+            return new VersionCheckResponse
+            {
+                Version = fikaConfig.GetVersion()
             };
         }
 

@@ -1,6 +1,5 @@
 ﻿using Core.Models.External;
 using Core.Models.Spt.Config;
-using Core.Models.Utils;
 using Core.Routers;
 using Core.Servers;
 using FikaServer.Models.Fika.Config;
@@ -26,7 +25,7 @@ namespace FikaServer
         {
             FikaConfig config = fikaConfig.GetConfig();
 
-            if(config.Headless.Profiles.Amount > 0)
+            if (config.Headless.Profiles.Amount > 0)
             {
                 HeadlessProfileService.PostSptLoad();
             }

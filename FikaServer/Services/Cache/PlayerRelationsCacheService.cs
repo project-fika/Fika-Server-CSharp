@@ -15,12 +15,12 @@ namespace FikaServer.Services.Cache
 
         public void PreSptLoad()
         {
-            if(!Directory.Exists(playerRelationsFullPath))
+            if (!Directory.Exists(playerRelationsFullPath))
             {
                 Directory.CreateDirectory(playerRelationsFullPath);
             }
 
-            if(!File.Exists($"{playerRelationsFullPath}/playerRelations.json"))
+            if (!File.Exists($"{playerRelationsFullPath}/playerRelations.json"))
             {
                 SaveProfileRelations();
             }
@@ -30,10 +30,10 @@ namespace FikaServer.Services.Cache
         {
             Dictionary<string, SptProfile> profiles = profileHelper.GetProfiles();
             bool shouldSave = false;
-            
-            foreach(string profileId in profiles.Keys)
+
+            foreach (string profileId in profiles.Keys)
             {
-                if(!playerRelationsCache.ContainsKey(profileId))
+                if (!playerRelationsCache.ContainsKey(profileId))
                 {
                     playerRelationsCache.Add(profileId, new FikaPlayerRelations());
                     shouldSave = true;
@@ -43,9 +43,9 @@ namespace FikaServer.Services.Cache
 
                 List<string> Friends = this.playerRelationsCache[profileId].Friends;
 
-                foreach(string friend in Friends.ToList())
+                foreach (string friend in Friends.ToList())
                 {
-                    if(!profiles.ContainsKey(friend))
+                    if (!profiles.ContainsKey(friend))
                     {
                         Friends.Remove(friend);
                         shouldSave = true;
@@ -54,14 +54,14 @@ namespace FikaServer.Services.Cache
 
                 List<string> Ignored = this.playerRelationsCache[profileId].Ignore;
 
-                foreach(string ignore in Ignored.ToList())
+                foreach (string ignore in Ignored.ToList())
                 {
                     Ignored.Remove(ignore);
                     shouldSave = true;
                 }
             }
 
-            if(shouldSave)
+            if (shouldSave)
             {
                 SaveProfileRelations();
             }
@@ -79,7 +79,7 @@ namespace FikaServer.Services.Cache
 
         public FikaPlayerRelations GetStoredValue(string key)
         {
-            if(!playerRelationsCache.ContainsKey(key))
+            if (!playerRelationsCache.ContainsKey(key))
             {
                 StoreValue(key, new FikaPlayerRelations());
             }
