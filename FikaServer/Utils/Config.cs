@@ -1,5 +1,6 @@
 ﻿using Core.Helpers;
 using Core.Models.Spt.Config;
+using Core.Models.Spt.Mod;
 using Core.Models.Utils;
 using Core.Servers;
 using FikaServer.Models.Fika.Config;
@@ -14,6 +15,7 @@ namespace FikaServer.Utils
         ModHelper modHelper)
     {
         private FikaConfig loadedFikaConfig = new();
+        private readonly PackageJsonData packageJsonData = modHelper.GetFileFromModFolder<PackageJsonData>(modHelper.GetAbsolutePathToModFolder(Assembly.GetExecutingAssembly()), "package.json");
         public static readonly JsonSerializerOptions serializerOptions = new() { WriteIndented = true };
 
         public FikaConfig GetConfig()
@@ -26,10 +28,9 @@ namespace FikaServer.Utils
             return modHelper.GetAbsolutePathToModFolder(Assembly.GetExecutingAssembly());
         }
 
-        public string GetVersion()
+        public string? GetVersion()
         {
-            //Todo: Implement
-            return "3.0.0";
+            return packageJsonData.Version;
         }
 
         public void PreSptLoad()

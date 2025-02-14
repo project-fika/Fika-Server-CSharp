@@ -20,8 +20,8 @@ namespace FikaServer.Services
         {
             FikaConfig config = fikaConfig.GetConfig();
 
-            List<string> sanitizedRequiredMods = this.FilterEmptyMods(config.Client.Mods.Required);
-            List<string> sanitizedOptionalMods = this.FilterEmptyMods(config.Client.Mods.Optional);
+            List<string> sanitizedRequiredMods = FilterEmptyMods(config.Client.Mods.Required);
+            List<string> sanitizedOptionalMods = FilterEmptyMods(config.Client.Mods.Optional);
 
             if (sanitizedRequiredMods.Count == 0 && sanitizedOptionalMods.Count == 0)
             {

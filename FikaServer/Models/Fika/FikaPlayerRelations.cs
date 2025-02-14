@@ -4,9 +4,9 @@ namespace FikaServer.Models.Fika
 {
     public record FikaPlayerRelations
     {
-        [JsonPropertyName("Friends")]
+        [JsonPropertyName("friends")]
         public List<string> Friends { get; set; } = [];
-        [JsonPropertyName("Ignore")]
+        [JsonPropertyName("ignore")]
         public List<string> Ignore { get; set; } = [];
     }
 }
