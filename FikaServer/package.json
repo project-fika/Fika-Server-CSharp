@@ -1,13 +1,13 @@
 {
-  "Name": "server",
-  "Version": "3.0.0",
-  "SptVersion": "~4.0",
-  "LoadBefore": [],
-  "LoadAfter": [],
-  "IncompatibleMods": [],
-  "Url": "https://github.com/project-fika/Fika-Server",
-  "IsBundleMod": false,
-  "Author": "Fika",
-  "Contributors": [],
-  "Licence": "CC-BY-NC-SA-4.0"
+  "name": "server",
+  "version": "3.0.0",
+  "author": "Fika",
+  "sptVersion": "~4.0",
+  "loadBefore": [],
+  "loadAfter": [],
+  "incompatibilities": [],
+  "url": "https://github.com/project-fika/Fika-Server",
+  "isBundleMod": false,
+  "contributors": [],
+  "licence": "CC-BY-NC-SA-4.0"
 }
