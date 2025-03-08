@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace FikaServer.Models.Fika.Presence
 {
-    public record FikaSetPresence
+    public record FikaSetPresence : IRequestData
     {
         [JsonPropertyName("activity")]
         public EFikaPlayerPresences Activity { get; set; }
