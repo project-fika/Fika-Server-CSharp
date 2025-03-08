@@ -14,6 +14,7 @@ namespace FikaServer.Models.Fika.Presence
         [JsonPropertyName("activityStartedTimestamp")]
         public long ActivityStartedTimestamp { get; set; }
         [JsonPropertyName("raidInformation")]
+        [JsonIgnore(Condition = JsonIgnoreCondition.Never)]
         public FikaRaidPresence? RaidInformation { get; set; }
     }
 }
