@@ -11,11 +11,13 @@
       <EnableDefaultContentItems>false</EnableDefaultContentItems>
   </PropertyGroup>
 
+	<!--
 	<ItemGroup>
 		<PackageReference Include="SPTarkov.Common" Version="4.0.0-prerelease2" />
 		<PackageReference Include="SPTarkov.DI" Version="4.0.0-prerelease2" />
 		<PackageReference Include="SPTarkov.Server.Core" Version="4.0.0-prerelease2" />
 	</ItemGroup>
+	-->
 
   <ItemGroup>
       <Content Include="Assets\**">
@@ -24,5 +26,17 @@
       <Content Include="package.json">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="SPTarkov.Common">
+      <HintPath>..\References\SPTarkov.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="SPTarkov.DI">
+      <HintPath>..\References\SPTarkov.DI.dll</HintPath>
+    </Reference>
+    <Reference Include="SPTarkov.Server.Core">
+      <HintPath>..\References\SPTarkov.Server.Core.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>

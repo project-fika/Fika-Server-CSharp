@@ -7,16 +7,26 @@ using FikaServer.Services;
 using FikaServer.Services.Cache;
 using FikaServer.Services.Headless;
 using SPTarkov.Common.Annotations;
+using SPTarkov.Server.Core.Utils;
+using SPTarkov.Server.Core.Utils.Json.Converters;
+using FikaServer.Models.Enums;
 
 namespace FikaServer
 {
     [Injectable(InjectionType.Singleton, InjectableTypeOverride = typeof(IPreSptLoadMod))]
     [Injectable(InjectionType.Singleton, InjectableTypeOverride = typeof(IPostSptLoadMod))]
     public class FikaServer(ConfigServer configServer, ImageRouter imageRouter,
-        HeadlessProfileService HeadlessProfileService, PlayerRelationsCacheService playerRelationsCacheService, ClientService clientService, Utils.Config fikaConfig) : IPreSptLoadMod, IPostSptLoadMod
+        HeadlessProfileService HeadlessProfileService, PlayerRelationsCacheService playerRelationsCacheService, ClientService clientService, JsonUtil jsonUtil, Utils.Config fikaConfig) : IPreSptLoadMod, IPostSptLoadMod
     {
         public void PreSptLoad()
         {
+            jsonUtil.RegisterJsonConverter(new EftEnumConverter<EFikaSide>());
+            jsonUtil.RegisterJsonConverter(new EftEnumConverter<EFikaTime>());
+            jsonUtil.RegisterJsonConverter(new EftEnumConverter<EFikaMatchStatus>());
+            jsonUtil.RegisterJsonConverter(new EftEnumConverter<EFikaPlayerPresences>());
+            jsonUtil.RegisterJsonConverter(new EftEnumConverter<EFikaNotifications>());
+            jsonUtil.RegisterJsonConverter(new EftEnumConverter<EEFTNotificationIconType>());
+
             fikaConfig.PreSptLoad();
             clientService.PreSptLoad();
             playerRelationsCacheService.PreSptLoad();
