@@ -1,10 +1,10 @@
-﻿using SPTarkov.Server.Core.Models.Eft.Profile;
-using SPTarkov.Server.Core.Models.Utils;
-using SPTarkov.Server.Core.Servers;
-using FikaServer.Models.Fika.Config;
+﻿using FikaServer.Models.Fika.Config;
 using FikaServer.Models.Fika.Routes.Client.Check;
 using FikaServer.Utils;
 using SPTarkov.Common.Annotations;
+using SPTarkov.Server.Core.Models.Eft.Profile;
+using SPTarkov.Server.Core.Models.Utils;
+using SPTarkov.Server.Core.Servers;
 
 namespace FikaServer.Services
 {

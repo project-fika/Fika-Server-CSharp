@@ -1,8 +1,8 @@
-﻿using SPTarkov.Server.Core.DI;
-using SPTarkov.Server.Core.Utils;
-using FikaServer.Callbacks;
+﻿using FikaServer.Callbacks;
 using FikaServer.Models.Fika.Routes.Client.Check;
 using SPTarkov.Common.Annotations;
+using SPTarkov.Server.Core.DI;
+using SPTarkov.Server.Core.Utils;
 
 namespace FikaServer.Routers.Static
 {

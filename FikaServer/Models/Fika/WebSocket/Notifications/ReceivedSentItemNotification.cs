@@ -12,6 +12,6 @@ namespace FikaServer.Models.Fika.WebSocket.Notifications
         [JsonPropertyName("targetId")]
         public string TargetId { get; set; } = string.Empty;
         [JsonPropertyName("itemName")]
-        public string ItemName { get;set; } = string.Empty;
+        public string ItemName { get; set; } = string.Empty;
     }
 }

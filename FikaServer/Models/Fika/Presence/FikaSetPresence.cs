@@ -1,5 +1,5 @@
-﻿using SPTarkov.Server.Core.Models.Utils;
-using FikaServer.Models.Enums;
+﻿using FikaServer.Models.Enums;
+using SPTarkov.Server.Core.Models.Utils;
 using System.Text.Json.Serialization;
 
 namespace FikaServer.Models.Fika.Presence

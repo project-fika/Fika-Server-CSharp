@@ -1,8 +1,8 @@
-﻿using SPTarkov.Server.Core.Models.Utils;
-using SPTarkov.Server.Core.Utils;
-using SPTarkov.Common.Annotations;
-using FikaServer.Models.Fika.Presence;
+﻿using FikaServer.Models.Fika.Presence;
 using FikaServer.Services;
+using SPTarkov.Common.Annotations;
+using SPTarkov.Server.Core.Models.Utils;
+using SPTarkov.Server.Core.Utils;
 
 namespace FikaServer.Callbacks
 {

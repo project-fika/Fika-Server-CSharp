@@ -1,7 +1,7 @@
-﻿using SPTarkov.Server.Core.Models.Eft.Common;
+﻿using SPTarkov.Common.Annotations;
+using SPTarkov.Server.Core.Models.Eft.Common;
 using SPTarkov.Server.Core.Models.Eft.Common.Tables;
 using SPTarkov.Server.Core.Models.Eft.Profile;
-using SPTarkov.Common.Annotations;
 
 namespace FikaServer.Services.Headless
 {
