@@ -1,12 +1,11 @@
 ﻿using FikaServer.Models.Enums;
-using System.Net.WebSockets;
 
 namespace FikaServer.Models.Fika.Headless
 {
     public record HeadlessClientInfo
     {
         /** Websocket of the headless client */
-        public required WebSocket WebSocket { get; set; }
+        public required System.Net.WebSockets.WebSocket WebSocket { get; set; }
         /** State of the headless client */
         public required EHeadlessStatus State { get; set; }
         /** The players that are playing on this headless client, only set if the state is IN_RAID */

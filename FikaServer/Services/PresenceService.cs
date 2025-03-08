@@ -3,9 +3,9 @@ using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Utils;
 using FikaServer.Models.Fika.Presence;
+using FikaServer.Models.Enums;
 using SPTarkov.Common.Annotations;
 using System.Collections.Concurrent;
-using System.Text.Json;
 
 namespace FikaServer.Services
 {
@@ -27,9 +27,8 @@ namespace FikaServer.Services
             {
                 Nickname = profile.CharacterData.PmcData.Info.Nickname,
                 Level = profile.CharacterData.PmcData.Info.Level ?? 0,
-                Activity = Models.Enums.EFikaPlayerPresences.IN_MENU,
-                ActivityStartedTimestamp = timeUtil.GetTimeStamp(),
-                RaidInformation = null
+                Activity = EFikaPlayerPresences.IN_MENU,
+                ActivityStartedTimestamp = timeUtil.GetTimeStamp()
             };
 
             logger.Debug($"[Fika Presence] Adding player: {data.Nickname}");
@@ -44,7 +43,7 @@ namespace FikaServer.Services
 
         public void UpdatePlayerPresence(string sessionID, FikaSetPresence NewPresence)
         {
-            if(!onlinePlayers.TryGetValue(sessionID, out FikaPlayerPresence currentPresence))
+            if (!onlinePlayers.TryGetValue(sessionID, out FikaPlayerPresence currentPresence))
             {
                 return;
             }
@@ -63,7 +62,7 @@ namespace FikaServer.Services
 
         public void RemovePlayerPresence(string sessionID)
         {
-            if(!onlinePlayers.ContainsKey(sessionID))
+            if (!onlinePlayers.ContainsKey(sessionID))
             {
                 return;
             }
