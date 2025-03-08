@@ -7,7 +7,8 @@ using SPTarkov.Common.Annotations;
 namespace FikaServer.Routers.Static
 {
     [Injectable(InjectableTypeOverride = typeof(StaticRouter))]
-    public class ClientStaticRouter(ClientCallbacks fikaClientCallbacks, JsonUtil jsonUtil) : StaticRouter(jsonUtil, [new RouteAction(
+    public class ClientStaticRouter(ClientCallbacks fikaClientCallbacks, JsonUtil jsonUtil) : StaticRouter(jsonUtil, [
+            new RouteAction(
                 "/fika/client/config",
                 (
                     url,
@@ -46,7 +47,8 @@ namespace FikaServer.Routers.Static
                     info,
                     sessionId,
                     output
-                ) => fikaClientCallbacks.HandleVersionCheck(url, info, sessionId))])
+                ) => fikaClientCallbacks.HandleVersionCheck(url, info, sessionId))
+        ])
     {
     }
 }
