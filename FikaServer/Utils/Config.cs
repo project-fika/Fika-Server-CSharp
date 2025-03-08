@@ -1,10 +1,10 @@
-﻿using Core.Helpers;
-using Core.Models.Spt.Config;
-using Core.Models.Spt.Mod;
-using Core.Models.Utils;
-using Core.Servers;
+﻿using SPTarkov.Server.Core.Helpers;
+using SPTarkov.Server.Core.Models.Spt.Config;
+using SPTarkov.Server.Core.Models.Spt.Mod;
+using SPTarkov.Server.Core.Models.Utils;
+using SPTarkov.Server.Core.Servers;
 using FikaServer.Models.Fika.Config;
-using SptCommon.Annotations;
+using SPTarkov.Common.Annotations;
 using System.Reflection;
 using System.Text.Json;
 
@@ -15,7 +15,7 @@ namespace FikaServer.Utils
         ModHelper modHelper)
     {
         private FikaConfig loadedFikaConfig = new();
-        private readonly PackageJsonData packageJsonData = modHelper.GetFileFromModFolder<PackageJsonData>(modHelper.GetAbsolutePathToModFolder(Assembly.GetExecutingAssembly()), "package.json");
+        private readonly PackageJsonData packageJsonData = modHelper.GetJsonDataFromFile<PackageJsonData>(modHelper.GetAbsolutePathToModFolder(Assembly.GetExecutingAssembly()), "package.json");
         public static readonly JsonSerializerOptions serializerOptions = new() { WriteIndented = true };
 
         public FikaConfig GetConfig()
@@ -45,7 +45,7 @@ namespace FikaServer.Utils
 
             if (File.Exists($"{configFolderPath}/fika.jsonc"))
             {
-                loadedFikaConfig = modHelper.GetFileFromModFolder<FikaConfig>(configFolderPath, "fika.jsonc");
+                loadedFikaConfig = modHelper.GetJsonDataFromFile<FikaConfig>(configFolderPath, "fika.jsonc");
             }
 
             // No need to do any fancyness around sorting properties and writing them if they weren't set before here

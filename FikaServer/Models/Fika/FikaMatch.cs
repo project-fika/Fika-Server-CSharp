@@ -1,5 +1,5 @@
-﻿using Core.Models.Eft.Common;
-using Core.Models.Eft.Match;
+﻿using SPTarkov.Server.Core.Models.Eft.Common;
+using SPTarkov.Server.Core.Models.Eft.Match;
 using FikaServer.Models.Enums;
 using System.Text.Json.Serialization;
 

@@ -11,17 +11,11 @@
       <EnableDefaultContentItems>false</EnableDefaultContentItems>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Reference Include="Core">
-      <HintPath>..\References\Core.dll</HintPath>
-    </Reference>
-    <Reference Include="SptCommon">
-      <HintPath>..\References\SptCommon.dll</HintPath>
-    </Reference>
-    <Reference Include="SptDependencyInjection">
-      <HintPath>..\References\SptDependencyInjection.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="SPTarkov.Common" Version="4.0.0-prerelease2" />
+		<PackageReference Include="SPTarkov.DI" Version="4.0.0-prerelease2" />
+		<PackageReference Include="SPTarkov.Server.Core" Version="4.0.0-prerelease2" />
+	</ItemGroup>
 
   <ItemGroup>
       <Content Include="Assets\**">

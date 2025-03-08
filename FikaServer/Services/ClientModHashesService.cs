@@ -1,4 +1,4 @@
-﻿using SptCommon.Annotations;
+﻿using SPTarkov.Common.Annotations;
 
 namespace FikaServer.Services
 {

@@ -1,11 +1,12 @@
-﻿using Core.Models.External;
-using Core.Models.Spt.Config;
-using Core.Routers;
-using Core.Servers;
+﻿using SPTarkov.Server.Core.Models.External;
+using SPTarkov.Server.Core.Models.Spt.Config;
+using SPTarkov.Server.Core.Routers;
+using SPTarkov.Server.Core.Servers;
 using FikaServer.Models.Fika.Config;
 using FikaServer.Services;
 using FikaServer.Services.Cache;
-using SptCommon.Annotations;
+using FikaServer.Services.Headless;
+using SPTarkov.Common.Annotations;
 
 namespace FikaServer
 {
@@ -49,7 +50,7 @@ namespace FikaServer
         private void BlacklistSpecialProfiles()
         {
             CoreConfig coreConfig = configServer.GetConfig<CoreConfig>();
-            List<string> profileBlacklist = coreConfig.Features.CreateNewProfileTypesBlacklist;
+            HashSet<string> profileBlacklist = coreConfig.Features.CreateNewProfileTypesBlacklist;
 
             if (!fikaConfig.GetConfig().Server.ShowDevProfile)
             {
