@@ -8,7 +8,7 @@ namespace FikaServer.Models.Fika
     public record FikaMatch
     {
         [JsonPropertyName("ips")]
-        public List<string> Ips { get; set; } = [];
+        public string[] Ips { get; set; } = [];
         [JsonPropertyName("port")]
         public int Port { get; set; }
         [JsonPropertyName("hostUsername")]
