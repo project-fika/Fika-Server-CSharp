@@ -14,15 +14,18 @@ namespace FikaServer.Controllers
         /// <summary>
         /// Handle /fika/client/config
         /// </summary>
-        public ExpandoObject HandleClientConfig()
+        public string HandleClientConfig()
         {
-            ExpandoObject clientConfig = fikaClientService.GetClientConfig().ToDynamicObject();
+            FikaConfigClient clientConfig = fikaClientService.GetClientConfig();
 
-            //Todo: Maybe get rid of the scuff ExpandoObject and just ship it with both?
+            // Here be dragons, this is technically not in the client config, or well it was.. But it was decided it was better for this configuration
+            // To be together with 'sentItemsLoseFIR' so users could find both options easier.
+            // Keep this here as this is really only supposed to be a 'client' config and it's really only used on the client.
+            string config = JsonSerializer.Serialize(clientConfig);
+            JsonNode configObject = JsonNode.Parse(config)!.AsObject();
+            configObject["allowItemSending"] = fikaClientService.GetIsItemSendingAllowed();
 
-            clientConfig.AddOrReplaceProperty("allowItemSending", fikaClientService.GetIsItemSendingAllowed());
-
-            return clientConfig;
+            return configObject.ToJsonString();
         }
 
         /// <summary>

@@ -14,7 +14,8 @@ namespace FikaServer.Callbacks
         /// </summary>
         public string HandleClientConfig(string url, IRequestData info, string sessionID)
         {
-            return httpResponseUtil.NoBody(fikaClientController.HandleClientConfig());
+            //return httpResponseUtil.NoBody(fikaClientController.HandleClientConfig());
+            return fikaClientController.HandleClientConfig();
         }
 
         /// <summary>
