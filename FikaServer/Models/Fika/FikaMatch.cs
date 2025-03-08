@@ -19,8 +19,8 @@ namespace FikaServer.Models.Fika
         public string FikaVersion { get; set; } = string.Empty;
         [JsonPropertyName("gameVersion")]
         public string GameVersion { get; set; } = string.Empty;
-        [JsonPropertyName("raidSettings")]
-        public required RaidSettings RaidSettings { get; set; }
+        [JsonPropertyName("raidConfig")]
+        public required GetRaidConfigurationRequestData RaidConfig { get; set; }
         [JsonPropertyName("locationData")]
         public required LocationBase LocationData { get; set; }
         [JsonPropertyName("status")]
