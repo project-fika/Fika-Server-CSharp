@@ -1,6 +1,6 @@
-﻿using FikaServer.Models.Fika.Config;
-using FikaServer.Models.Fika.Headless;
+﻿using FikaServer.Models.Fika.Headless;
 using FikaServer.Services.Headless;
+using FikaServer.Utils;
 using SPTarkov.Common.Annotations;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
@@ -9,7 +9,7 @@ using System.Collections.Concurrent;
 namespace FikaServer.Helpers
 {
     [Injectable]
-    public class HeadlessHelper(FikaConfig fikaConfig, SaveServer saveServer, ConfigServer configServer, HeadlessService headlessService, HeadlessProfileService headlessProfileService, ISptLogger<HeadlessHelper> logger)
+    public class HeadlessHelper(Config fikaConfig, SaveServer saveServer, ConfigServer configServer, HeadlessService headlessService, HeadlessProfileService headlessProfileService, ISptLogger<HeadlessHelper> logger)
     {
         /// <summary>
         /// Gets all currently logged in headlesses

@@ -1,9 +1,9 @@
 ﻿using FikaServer.Helpers;
 using FikaServer.Models.Enums;
 using FikaServer.Models.Fika;
-using FikaServer.Models.Fika.Config;
 using FikaServer.Models.Fika.Routes.Raid.Create;
 using FikaServer.Services.Headless;
+using FikaServer.Utils;
 using SPTarkov.Common.Annotations;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Utils;
@@ -14,7 +14,7 @@ using System.Collections.Concurrent;
 namespace FikaServer.Services
 {
     [Injectable(InjectionType.Singleton)]
-    public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleService locationLifecycleService, SaveServer saveServer, FikaConfig fikaConfig, HeadlessHelper headlessHelper, HeadlessService headlessService, InsuranceService insuranceService, PresenceService presenceService)
+    public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleService locationLifecycleService, SaveServer saveServer, Config fikaConfig, HeadlessHelper headlessHelper, HeadlessService headlessService, InsuranceService insuranceService, PresenceService presenceService)
     {
         public readonly ConcurrentDictionary<string, FikaMatch> Matches = [];
         protected readonly ConcurrentDictionary<string, System.Timers.Timer> TimeoutIntervals = [];
@@ -39,7 +39,7 @@ namespace FikaServer.Services
                 {
                     match.Timeout++;
 
-                    if (match.Timeout >= fikaConfig.Server.SessionTimeout)
+                    if (match.Timeout >= fikaConfig.GetConfig().Server.SessionTimeout)
                     {
                         EndMatch(matchId, EFikaMatchEndSessionMessage.PingTimeout);
                     }
