@@ -7,7 +7,7 @@ namespace FikaServer.Models.Fika.Routes.Raid.Join
         [JsonPropertyName("serverId")]
         public string ServerId { get; set; } = string.Empty;
         [JsonPropertyName("timestamp")]
-        public string Timestamp { get; set; } = string.Empty;
+        public long Timestamp { get; set; }
         [JsonPropertyName("gameVersion")]
         public string GameVersion { get; set; } = string.Empty;
         [JsonPropertyName("fikaVersion")]

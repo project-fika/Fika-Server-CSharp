@@ -13,9 +13,8 @@ namespace FikaServer.Models.Fika.Routes.Raid.Create
         public string ServerId { get; set; } = string.Empty;
         [JsonPropertyName("hostUsername")]
         public string HostUsername { get; set; } = string.Empty;
-        //Todo(Archangel): Ulong??
         [JsonPropertyName("timestamp")]
-        public string Timestamp { get; set; } = string.Empty;
+        public long Timestamp { get; set; }
         [JsonPropertyName("settings")]
         public GetRaidConfigurationRequestData? Settings { get; set; }
         [JsonPropertyName("gameVersion")]

@@ -14,7 +14,7 @@ namespace FikaServer.Models.Fika
         [JsonPropertyName("hostUsername")]
         public string HostUsername { get; set; } = string.Empty;
         [JsonPropertyName("timestamp")]
-        public string Timestamp { get; set; } = string.Empty;
+        public long Timestamp { get; set; }
         [JsonPropertyName("fikaVersion")]
         public string FikaVersion { get; set; } = string.Empty;
         [JsonPropertyName("gameVersion")]
