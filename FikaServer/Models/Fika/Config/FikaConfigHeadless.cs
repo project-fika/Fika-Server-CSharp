@@ -10,6 +10,8 @@ namespace FikaServer.Models.Fika.Config
         public FikaConfigHeadlessScripts Scripts { get; set; } = new();
         [JsonPropertyName("setLevelToAverageOfLobby")]
         public bool SetLevelToAverageOfLobby { get; set; } = true;
+        [JsonPropertyName("restartAfterAmountOfRaids")]
+        public int RestartAfterAmountOfRaids { get; set; } = 0;
     }
 
     public record FikaConfigHeadlessProfiles
