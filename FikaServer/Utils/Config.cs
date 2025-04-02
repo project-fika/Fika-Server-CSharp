@@ -76,10 +76,10 @@ namespace FikaServer.Utils
                 coreConfig.Features.ChatbotFeatures.EnabledBots[sptFriendId] = false;
             }
 
-            httpConfig.Ip = config.HTTP.Ip;
-            httpConfig.Port = config.HTTP.Port;
-            httpConfig.BackendIp = config.HTTP.BackendIp;
-            httpConfig.BackendPort = config.HTTP.BackendPort;
+            httpConfig.Ip = config.Http.Ip;
+            httpConfig.Port = config.Http.Port;
+            httpConfig.BackendIp = config.Http.BackendIp;
+            httpConfig.BackendPort = config.Http.BackendPort;
         }
     }
 }

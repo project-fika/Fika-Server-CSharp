@@ -23,7 +23,7 @@ namespace FikaServer.Models.Fika.Config
     public record FikaSPTServerConfig
     {
         [JsonPropertyName("http")]
-        public FikaSPTHttpServerConfig HTTP { get; set; } = new();
+        public FikaSPTHttpServerConfig Http { get; set; } = new();
         [JsonPropertyName("disableSPTChatBots")]
         public bool DisableSPTChatBots { get; set; } = true;
     }

@@ -15,7 +15,6 @@ namespace FikaServer.Services
         private List<string> allowedMods = ["com.bepis.bepinex.configurationmanager", "com.fika.headless"];
         private bool hasRequiredOrOptionalMods = false;
 
-
         public void PreSptLoad()
         {
             FikaConfig config = fikaConfig.GetConfig();
