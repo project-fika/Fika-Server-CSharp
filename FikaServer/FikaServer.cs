@@ -6,6 +6,8 @@ using FikaServer.Services.Headless;
 using SPTarkov.Common.Annotations;
 using SPTarkov.Server.Core.Models.External;
 using SPTarkov.Server.Core.Models.Spt.Config;
+using SPTarkov.Server.Core.Models.Spt.Server;
+using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Routers;
 using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Utils;
@@ -15,8 +17,8 @@ namespace FikaServer
 {
     [Injectable(InjectionType.Singleton, InjectableTypeOverride = typeof(IPreSptLoadMod))]
     [Injectable(InjectionType.Singleton, InjectableTypeOverride = typeof(IPostSptLoadMod))]
-    public class FikaServer(ConfigServer configServer, ImageRouter imageRouter,
-        HeadlessProfileService HeadlessProfileService, PlayerRelationsCacheService playerRelationsCacheService, ClientService clientService, JsonUtil jsonUtil, Utils.Config fikaConfig) : IPreSptLoadMod, IPostSptLoadMod
+    public class FikaServer(ISptLogger<FikaServer> logger, ConfigServer configServer, ImageRouter imageRouter,
+        HeadlessProfileService HeadlessProfileService, LocaleService localeService, PlayerRelationsCacheService playerRelationsCacheService, ClientService clientService, JsonUtil jsonUtil, Utils.Config fikaConfig) : IPreSptLoadMod, IPostSptLoadMod
     {
         public void PreSptLoad()
         {
@@ -41,7 +43,7 @@ namespace FikaServer
                 HeadlessProfileService.PostSptLoad();
             }
 
-            AddFikaClientLocales();
+            localeService.PostSptLoad();
             BlacklistSpecialProfiles();
             playerRelationsCacheService.PostSptLoad();
 
@@ -50,11 +52,6 @@ namespace FikaServer
                 string imagePath = "assets/images/launcher/bg.png";
                 imageRouter.AddRoute("/files/launcher/bg", Path.Join(fikaConfig.GetModPath(), imagePath));
             }
-        }
-
-        private void AddFikaClientLocales()
-        {
-            //Todo: Need to implement, not currently available in C# SPT.
         }
 
         private void BlacklistSpecialProfiles()
