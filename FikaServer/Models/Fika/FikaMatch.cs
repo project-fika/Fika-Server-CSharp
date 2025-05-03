@@ -15,8 +15,8 @@ namespace FikaServer.Models.Fika
         public string HostUsername { get; set; } = string.Empty;
         [JsonPropertyName("timestamp")]
         public long Timestamp { get; set; }
-        [JsonPropertyName("fikaVersion")]
-        public string FikaVersion { get; set; } = string.Empty;
+        [JsonPropertyName("crc32")]
+        public uint CRC32 { get; set; }
         [JsonPropertyName("gameVersion")]
         public string GameVersion { get; set; } = string.Empty;
         [JsonPropertyName("raidConfig")]

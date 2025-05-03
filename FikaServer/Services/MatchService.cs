@@ -162,7 +162,7 @@ namespace FikaServer.Services
                 Timeout = 0,
                 Players = [],
                 GameVersion = data.GameVersion,
-                FikaVersion = data.FikaVersion,
+                CRC32 = data.CRC32,
                 Side = data.Side,
                 Time = data.Time,
                 RaidCode = data.RaidCode,

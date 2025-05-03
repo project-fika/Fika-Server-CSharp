@@ -19,8 +19,8 @@ namespace FikaServer.Models.Fika.Routes.Raid.Create
         public GetRaidConfigurationRequestData? Settings { get; set; }
         [JsonPropertyName("gameVersion")]
         public string GameVersion { get; set; } = string.Empty;
-        [JsonPropertyName("fikaVersion")]
-        public string FikaVersion { get; set; } = string.Empty;
+        [JsonPropertyName("crc32")]
+        public uint CRC32 { get; set; }
         [JsonPropertyName("side")]
         public EFikaSide Side { get; set; }
         [JsonPropertyName("time")]

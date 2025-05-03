@@ -35,7 +35,7 @@ namespace FikaServer.Models.Fika.Config
         [JsonPropertyName("port")]
         public int Port { get; set; } = 6969;
         [JsonPropertyName("backendIp")]
-        public string BackendIp { get; set; } = "127.0.0.1";
+        public string BackendIp { get; set; } = "0.0.0.0";
         [JsonPropertyName("backendPort")]
         public int BackendPort { get; set; } = 6969;
     }

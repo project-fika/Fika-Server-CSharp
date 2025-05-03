@@ -15,5 +15,7 @@ namespace FikaServer.Models.Fika.WebSocket.Notifications
         public bool IsHeadlessRaid { get; set; }
         [JsonPropertyName("headlessRequesterName")]
         public string HeadlessRequesterName { get; set; } = string.Empty;
+        [JsonPropertyName("raidTime")]
+        public EFikaTime RaidTime { get; set; }
     }
 }

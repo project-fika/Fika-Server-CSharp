@@ -10,8 +10,8 @@ namespace FikaServer.Models.Fika.Routes.Raid.Join
         public long Timestamp { get; set; }
         [JsonPropertyName("gameVersion")]
         public string GameVersion { get; set; } = string.Empty;
-        [JsonPropertyName("fikaVersion")]
-        public string FikaVersion { get; set; } = string.Empty;
+        [JsonPropertyName("crc32")]
+        public uint CRC32 { get; set; }
         [JsonPropertyName("raidCode")]
         public string RaidCode { get; set; } = string.Empty;
     }

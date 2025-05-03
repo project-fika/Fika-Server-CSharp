@@ -45,7 +45,8 @@ namespace FikaServer.Controllers
                 Nickname = hostUsername,
                 Location = request.Settings.Location,
                 IsHeadlessRaid = headlessHelper.IsHeadlessClient(request.ServerId),
-                HeadlessRequesterName = headlessHelper.GetRequesterUsername(request.ServerId) ?? ""
+                HeadlessRequesterName = headlessHelper.GetRequesterUsername(request.ServerId) ?? "",
+                RaidTime = request.Time
             });
 
             return new FikaRaidCreateResponse
@@ -68,7 +69,7 @@ namespace FikaServer.Controllers
                 ServerId = request.ServerId,
                 Timestamp = match.Timestamp,
                 GameVersion = match.GameVersion,
-                FikaVersion = match.FikaVersion,
+                CRC32 = match.CRC32,
                 RaidCode = match.RaidCode,
             };
         }
