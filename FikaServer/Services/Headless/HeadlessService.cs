@@ -17,7 +17,7 @@ namespace FikaServer.Services.Headless
         private readonly ISptLogger<HeadlessService> _logger = logger;
         public ConcurrentDictionary<string, HeadlessClientInfo> HeadlessClients { get; private set; } = [];
 
-        public async Task<string?> StartHeadlessRaid(string headlessSessionID, string requesterSessionID, StartHeadlessRequest info)
+        public string? StartHeadlessRaid(string headlessSessionID, string requesterSessionID, StartHeadlessRequest info)
         {
             if (!HeadlessClients.TryGetValue(headlessSessionID, out HeadlessClientInfo? headlessClientInfo))
             {
@@ -44,8 +44,8 @@ namespace FikaServer.Services.Headless
 
             StartHeadlessRaid startHeadlessRequest = new(EFikaHeadlessWSMessageType.HeadlessStartRaid, info);
             string data = jsonUtil.Serialize(startHeadlessRequest) ?? throw new NullReferenceException("StartHeadlessRaid:: Data was null after serializing");
-            await webSocket.SendAsync(Encoding.UTF8.GetBytes(data),
-                WebSocketMessageType.Text, true, CancellationToken.None);
+            webSocket.SendAsync(Encoding.UTF8.GetBytes(data),
+                WebSocketMessageType.Text, true, CancellationToken.None).Wait();
 
             return headlessSessionID;
         }
