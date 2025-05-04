@@ -93,6 +93,19 @@ namespace FikaServer.Services.Headless
                 }
 
                 headlessClientInfo.Players?.Add(sessionID);
+
+                if (!fikaConfigService.Config.Headless.SetLevelToAverageOfLobby)
+                {
+                    // Doing this everytime is unecessary if we're not setting the average level so only set it once the original requester of the headless joins.
+                    if (headlessClientInfo.RequesterSessionID == sessionID)
+                    {
+                        SetHeadlessLevel(headlessClientId);
+                    }
+                }
+                else
+                {
+                    SetHeadlessLevel(headlessClientId);
+                }
             }
         }
 
