@@ -84,7 +84,7 @@ namespace FikaServer.Overrides.Services
                 {
                     result.Transition.TransitionRaidId = transitionData.TransitionRaidId;
                     result.Transition.TransitionCount += 1;
-                    
+
                     if (result.Transition.VisitedLocations == null)
                     {
                         result.Transition.VisitedLocations = [transitionData.SptLastVisitedLocation];

@@ -1,5 +1,4 @@
-﻿using SPTarkov.Server.Core.Models.Eft.Common.Request;
-using SPTarkov.Server.Core.Models.Utils;
+﻿using SPTarkov.Server.Core.Models.Utils;
 using System.Text.Json.Serialization;
 
 namespace FikaServer.Models.Fika.SendItem.AvailableReceivers

@@ -88,7 +88,7 @@ namespace FikaServer.Controllers
 
             Dictionary<string, SptProfile> profiles = saveServer.GetProfiles();
 
-            foreach(var profileKvP in profiles)
+            foreach (var profileKvP in profiles)
             {
                 SptProfile profile = profileKvP.Value;
 

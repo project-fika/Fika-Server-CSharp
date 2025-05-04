@@ -15,12 +15,12 @@ namespace FikaServer.Services
 
         public string GetMatchId(string sessionID)
         {
-            foreach(var matchKvP in _matchInsuranceInfo)
+            foreach (var matchKvP in _matchInsuranceInfo)
             {
                 var matchId = matchKvP.Key;
                 var players = matchKvP.Value;
 
-                if(players.Any(player =>  player.SessionID == sessionID))
+                if (players.Any(player => player.SessionID == sessionID))
                 {
                     return matchId;
                 }
@@ -32,7 +32,7 @@ namespace FikaServer.Services
 
         public void AddPlayerToMatchId(string matchId, string sessionID)
         {
-            if(!_matchInsuranceInfo.TryGetValue(matchId, out var players))
+            if (!_matchInsuranceInfo.TryGetValue(matchId, out var players))
             {
                 players = [];
 
@@ -58,13 +58,13 @@ namespace FikaServer.Services
 
         public void OnEndLocalRaidRequest(string sessionID, string matchId, EndLocalRaidRequestData endLocalRaidRequest)
         {
-            if(!_matchInsuranceInfo.TryGetValue(matchId, out var players))
+            if (!_matchInsuranceInfo.TryGetValue(matchId, out var players))
             {
                 logger.Error("[Fika Insurance] onEndLocalRaidRequest: matchId not found!");
                 return;
             }
 
-            foreach(var player in players)
+            foreach (var player in players)
             {
                 if (player.SessionID == sessionID)
                 {
@@ -114,7 +114,7 @@ namespace FikaServer.Services
                     player.FoundItems.AddRange(overlap);
                 }
 
-                if(player.FoundItems.Count > 0)
+                if (player.FoundItems.Count > 0)
                 {
                     logger.Debug($"{player.SessionID} will lose ${player.FoundItems.Count}/${player.LostItems.Count} items in insurance`");
                     RemoveItemsFromInsurance(player.SessionID, player.FoundItems);

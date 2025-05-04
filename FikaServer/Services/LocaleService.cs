@@ -32,7 +32,7 @@ namespace FikaServer.Services
                 }
             }
         }
-        
+
         private void LoadServerLocales()
         {
             // This is not necessary.. For now..
@@ -44,7 +44,7 @@ namespace FikaServer.Services
 
             Dictionary<string, Dictionary<string, string>> locales = [];
 
-            foreach(string file in files)
+            foreach (string file in files)
             {
                 using (var fs = new FileStream(file, FileMode.Open, FileAccess.Read))
                 {

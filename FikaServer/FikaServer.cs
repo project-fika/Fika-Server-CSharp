@@ -6,7 +6,6 @@ using FikaServer.Services.Headless;
 using SPTarkov.Common.Annotations;
 using SPTarkov.Server.Core.Models.External;
 using SPTarkov.Server.Core.Models.Spt.Config;
-using SPTarkov.Server.Core.Models.Spt.Server;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Routers;
 using SPTarkov.Server.Core.Servers;
