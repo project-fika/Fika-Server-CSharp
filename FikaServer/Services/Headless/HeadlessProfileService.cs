@@ -83,8 +83,8 @@ namespace FikaServer.Services.Headless
 
         private string CreateMiniProfile(string username, string password, string edition)
         {
-            var profileId = _hashUtil.Generate();
-            var scavId = _hashUtil.Generate();
+            string profileId = _hashUtil.Generate();
+            string scavId = _hashUtil.Generate();
 
             SPTarkov.Server.Core.Models.Eft.Profile.Info newProfile = new()
             {
@@ -141,9 +141,9 @@ namespace FikaServer.Services.Headless
 
         private List<string?> GetAllHeadlessItems(PmcData pmcProfile)
         {
-            var inventoryItems = pmcProfile.Inventory?.Items ?? [];
-            var equipmentRootId = pmcProfile.Inventory?.Equipment;
-            var stashRootId = pmcProfile.Inventory?.Stash;
+            List<Item> inventoryItems = pmcProfile.Inventory?.Items ?? [];
+            string? equipmentRootId = pmcProfile.Inventory?.Equipment;
+            string? stashRootId = pmcProfile.Inventory?.Stash;
 
             return [.. inventoryItems
                 .Where(x => x.ParentId == equipmentRootId || x.ParentId == stashRootId)
