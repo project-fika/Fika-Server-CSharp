@@ -15,8 +15,7 @@ namespace FikaServer.Overrides.Services
     {
         public static bool Prefix(string sessionId, StartLocalRaidRequestData request, ref StartLocalRaidResponseData __result)
         {
-            //Todo: This changed, check?
-            ServiceProvider? sp = ApplicationContext.GetInstance()?.GetLatestValue(ContextVariableType.APP_BUILDER)?.GetValue<ServiceProvider>();
+            ServiceProvider? sp = ApplicationContext.GetInstance()?.GetLatestValue(ContextVariableType.SERVICE_PROVIDER)?.GetValue<ServiceProvider>();
 
             if (sp != null)
             {
