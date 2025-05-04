@@ -8,20 +8,15 @@ using SPTarkov.Server.Core.Servers;
 using System.Reflection;
 using System.Text.Json;
 
-namespace FikaServer.Utils
+namespace FikaServer.Services
 {
     [Injectable(InjectionType.Singleton)]
-    public class Config(ISptLogger<Config> logger, ConfigServer configServer,
+    public class ConfigService(ISptLogger<ConfigService> logger, ConfigServer configServer,
         ModHelper modHelper)
     {
-        private FikaConfig loadedFikaConfig = new();
+        public FikaConfig Config { get; private set; } = new();
         private readonly PackageJsonData packageJsonData = modHelper.GetJsonDataFromFile<PackageJsonData>(modHelper.GetAbsolutePathToModFolder(Assembly.GetExecutingAssembly()), "package.json");
         public static readonly JsonSerializerOptions serializerOptions = new() { WriteIndented = true };
-
-        public FikaConfig GetConfig()
-        {
-            return loadedFikaConfig;
-        }
 
         public string GetModPath()
         {
@@ -45,19 +40,19 @@ namespace FikaServer.Utils
 
             if (File.Exists($"{configFolderPath}/fika.jsonc"))
             {
-                loadedFikaConfig = modHelper.GetJsonDataFromFile<FikaConfig>(configFolderPath, "fika.jsonc");
+                Config = modHelper.GetJsonDataFromFile<FikaConfig>(configFolderPath, "fika.jsonc");
             }
 
             // No need to do any fancyness around sorting properties and writing them if they weren't set before here
             // We store default values in the config models, and if one is missing this will write it to the file in the correct place
             WriteConfig(configFolderPath);
 
-            ApplySPTConfig(loadedFikaConfig.Server.SPT);
+            ApplySPTConfig(Config.Server.SPT);
         }
 
         private void WriteConfig(string ConfigFolderPath)
         {
-            File.WriteAllText($"{ConfigFolderPath}/fika.jsonc", JsonSerializer.Serialize(loadedFikaConfig, serializerOptions));
+            File.WriteAllText($"{ConfigFolderPath}/fika.jsonc", JsonSerializer.Serialize(Config, serializerOptions));
         }
 
         private void ApplySPTConfig(FikaSPTServerConfig config)

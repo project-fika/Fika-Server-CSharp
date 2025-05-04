@@ -6,7 +6,8 @@ using System.Text.Json;
 namespace FikaServer.Services
 {
     [Injectable(InjectionType.Singleton)]
-    public class LocaleService(ISptLogger<LocaleService> logger, SPTarkov.Server.Core.Services.LocaleService localeService, JsonUtil jsonUtil, FileUtil fileUtil, Utils.Config fikaConfig)
+    public class LocaleService(ISptLogger<LocaleService> logger, SPTarkov.Server.Core.Services.LocaleService localeService,
+        JsonUtil jsonUtil, FileUtil fileUtil, ConfigService fikaConfig)
     {
         private readonly string globalLocaleDir = Path.Join(fikaConfig.GetModPath(), "assets", "database", "locales", "global");
         //private readonly string serverLocaleDir = Path.Join(fikaConfig.GetModPath(), "assets", "database", "locales", "server");

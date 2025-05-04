@@ -1,6 +1,5 @@
 ﻿using FikaServer.Models.Fika.Config;
 using FikaServer.Models.Fika.Routes.Client.Check;
-using FikaServer.Utils;
 using SPTarkov.Common.Annotations;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Utils;
@@ -9,7 +8,7 @@ using SPTarkov.Server.Core.Servers;
 namespace FikaServer.Services
 {
     [Injectable(InjectionType.Singleton)]
-    public class ClientService(ISptLogger<ClientService> logger, SaveServer saveServer, ClientModHashesService fikaClientModHashesService, Config fikaConfig)
+    public class ClientService(ISptLogger<ClientService> logger, SaveServer saveServer, ClientModHashesService fikaClientModHashesService, ConfigService fikaConfig)
     {
         private List<string> requiredMods = ["com.fika.core", "com.SPT.custom", "com.SPT.singleplayer", "com.SPT.core", "com.SPT.debugging"];
         private List<string> allowedMods = ["com.bepis.bepinex.configurationmanager", "com.fika.headless"];
@@ -17,7 +16,7 @@ namespace FikaServer.Services
 
         public void PreSptLoad()
         {
-            FikaConfig config = fikaConfig.GetConfig();
+            FikaConfig config = fikaConfig.Config;
 
             List<string> sanitizedRequiredMods = FilterEmptyMods(config.Client.Mods.Required);
             List<string> sanitizedOptionalMods = FilterEmptyMods(config.Client.Mods.Optional);
@@ -46,17 +45,17 @@ namespace FikaServer.Services
 
         public FikaConfigClient GetClientConfig()
         {
-            return fikaConfig.GetConfig().Client;
+            return fikaConfig.Config.Client;
         }
 
         public bool GetIsItemSendingAllowed()
         {
-            return fikaConfig.GetConfig().Server.AllowItemSending;
+            return fikaConfig.Config.Server.AllowItemSending;
         }
 
         public FikaConfigNatPunchServer GetNatPunchServerConfig()
         {
-            return fikaConfig.GetConfig().NatPunchServer;
+            return fikaConfig.Config.NatPunchServer;
         }
 
         public VersionCheckResponse GetVersion()

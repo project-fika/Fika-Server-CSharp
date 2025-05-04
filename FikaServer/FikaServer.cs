@@ -18,7 +18,8 @@ namespace FikaServer
     [Injectable(InjectionType.Singleton, InjectableTypeOverride = typeof(IPreSptLoadMod))]
     [Injectable(InjectionType.Singleton, InjectableTypeOverride = typeof(IPostSptLoadMod))]
     public class FikaServer(ISptLogger<FikaServer> logger, ConfigServer configServer, ImageRouter imageRouter,
-        HeadlessProfileService HeadlessProfileService, LocaleService localeService, PlayerRelationsCacheService playerRelationsCacheService, ClientService clientService, JsonUtil jsonUtil, Utils.Config fikaConfig) : IPreSptLoadMod, IPostSptLoadMod
+        HeadlessProfileService HeadlessProfileService, LocaleService localeService, PlayerRelationsCacheService playerRelationsCacheService,
+        ClientService clientService, JsonUtil jsonUtil, ConfigService fikaConfig) : IPreSptLoadMod, IPostSptLoadMod
     {
         public void PreSptLoad()
         {
@@ -36,7 +37,7 @@ namespace FikaServer
 
         public void PostSptLoad()
         {
-            FikaConfig config = fikaConfig.GetConfig();
+            FikaConfig config = fikaConfig.Config;
 
             if (config.Headless.Profiles.Amount > 0)
             {
@@ -59,12 +60,12 @@ namespace FikaServer
             CoreConfig coreConfig = configServer.GetConfig<CoreConfig>();
             HashSet<string> profileBlacklist = coreConfig.Features.CreateNewProfileTypesBlacklist;
 
-            if (!fikaConfig.GetConfig().Server.ShowDevProfile)
+            if (!fikaConfig.Config.Server.ShowDevProfile)
             {
                 profileBlacklist.Add("SPT Developer");
             }
 
-            if (!fikaConfig.GetConfig().Server.ShowNonStandardProfile)
+            if (!fikaConfig.Config.Server.ShowNonStandardProfile)
             {
                 List<string> disallowedProfiles = ["Tournament", "SPT Easy start", "SPT Zero to hero"];
 

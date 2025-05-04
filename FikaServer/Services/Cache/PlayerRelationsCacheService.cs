@@ -1,5 +1,4 @@
 ﻿using FikaServer.Models.Fika;
-using FikaServer.Utils;
 using SPTarkov.Common.Annotations;
 using SPTarkov.Server.Core.Helpers;
 using SPTarkov.Server.Core.Models.Eft.Profile;
@@ -8,7 +7,7 @@ using System.Text.Json;
 namespace FikaServer.Services.Cache
 {
     [Injectable(InjectionType.Singleton)]
-    public class PlayerRelationsCacheService(ProfileHelper profileHelper, Config FikaConfig)
+    public class PlayerRelationsCacheService(ProfileHelper profileHelper, ConfigService FikaConfig)
     {
         private string playerRelationsFullPath = Path.Join(FikaConfig.GetModPath(), "cache");
         private Dictionary<string, FikaPlayerRelations> playerRelationsCache = [];
@@ -69,7 +68,7 @@ namespace FikaServer.Services.Cache
 
         private void SaveProfileRelations()
         {
-            File.WriteAllText($"{playerRelationsFullPath}/playerRelations.json", JsonSerializer.Serialize(playerRelationsCache, Config.serializerOptions));
+            File.WriteAllText($"{playerRelationsFullPath}/playerRelations.json", JsonSerializer.Serialize(playerRelationsCache, ConfigService.serializerOptions));
         }
 
         public List<string> GetKeys()

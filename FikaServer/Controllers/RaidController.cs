@@ -161,7 +161,8 @@ namespace FikaServer.Controllers
                 };
             }
 
-            string headlessClientId = headlessService.StartHeadlessRaid(info.HeadlessSessionID, sessionID, info);
+            // TODO: Fix async
+            string headlessClientId = headlessService.StartHeadlessRaid(info.HeadlessSessionID, sessionID, info).Result;
 
             logger.Info($"Sent WS FikaHeadlessStartRaid to {headlessClientId}");
 
