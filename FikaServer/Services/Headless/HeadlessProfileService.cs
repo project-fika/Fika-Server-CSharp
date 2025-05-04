@@ -17,8 +17,8 @@ namespace FikaServer.Services.Headless
     {
         public List<SptProfile> HeadlessProfiles { get; set; } = [];
 
-        private const string HEAD_USEC_4 = "5fdb4139e4ed5b5ea251e4ed";
-        private const string VOICE_USEC_4 = "6284d6a28e4092597733b7a6";
+        private const string HEAD_USEC_4 = "5fdb4139e4ed5b5ea251e4ed"; // _parent: 5cc085e214c02e000c6bea67
+        private const string VOICE_USEC_4 = "6284d6a28e4092597733b7a6"; // _parent: 5fc100cf95572123ae738483
 
         public void PostSptLoad()
         {
@@ -57,16 +57,21 @@ namespace FikaServer.Services.Headless
 
         private SptProfile CreateHeadlessProfile()
         {
+            // Generate a unique username
             string username = $"headless_{hashUtil.Generate()}";
+            // Using a password allows us to know which profiles are headless client profiles.
             string password = "fika-headless";
+            // Random edition. Doesn't matter
             string edition = "Standard";
 
+            // Create mini profile
             string profileId = CreateMiniProfile(username, password, edition);
 
+            // Random character configs. Doesn't matter.
             ProfileCreateRequestData newProfileData = new()
             {
                 Side = "usec",
-                Nickname = username,
+                Nickname = username, // Use the username as the nickname to ensure it is unique.
                 HeadId = HEAD_USEC_4,
                 VoiceId = VOICE_USEC_4
             };

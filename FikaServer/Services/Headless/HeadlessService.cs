@@ -21,6 +21,10 @@ namespace FikaServer.Services.Headless
         private readonly ISptLogger<HeadlessService> _logger = logger;
 
 
+        /// <summary>
+        /// Begin setting up a raid for a headless client
+        /// </summary>
+        /// <returns>returns the SessionID of the headless client that is starting this raid, returns null if no client could be found or there was an error.</returns>
         public string? StartHeadlessRaid(string headlessSessionID, string requesterSessionID, StartHeadlessRequest info)
         {
             if (!HeadlessClients.TryGetValue(headlessSessionID, out HeadlessClientInfo? headlessClientInfo))
@@ -54,6 +58,9 @@ namespace FikaServer.Services.Headless
             return headlessSessionID;
         }
 
+        /// <summary>
+        /// Sends a join message to the requester of a headless client
+        /// </summary>
         public void SendJoinMessageToRequester(string headlessClientId)
         {
             if (!HeadlessClients.TryGetValue(headlessClientId, out HeadlessClientInfo? headlessClientInfo))
@@ -126,6 +133,9 @@ namespace FikaServer.Services.Headless
             headlessProfile.CharacterData.PmcData.Info.Level = baseHeadlessLevel;
         }
 
+        /// <summary>
+        /// End the raid for the specified headless client, sets the state back to READY so that he can be requested to host again.
+        /// </summary>
         public void EndHeadlessRaid(string headlessClientId)
         {
             if (!HeadlessClients.TryGetValue(headlessClientId, out HeadlessClientInfo? headlessClientInfo))
