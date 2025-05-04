@@ -1,11 +1,13 @@
 ﻿using FikaServer.Models.Enums;
 using FikaServer.Models.Fika.Headless;
 using FikaServer.Models.Fika.Routes.Headless;
+using FikaServer.WebSockets;
 using SPTarkov.Common.Annotations;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Logging;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
+using SPTarkov.Server.Core.Servers.Ws;
 using SPTarkov.Server.Core.Utils;
 using System.Collections.Concurrent;
 using System.Net.WebSockets;
@@ -14,9 +16,12 @@ using System.Text;
 namespace FikaServer.Services.Headless
 {
     [Injectable(InjectionType.Singleton)]
-    public class HeadlessService(ISptLogger<HeadlessService> logger, JsonUtil jsonUtil, ConfigService fikaConfigService, SaveServer saveServer)
+    public class HeadlessService(ISptLogger<HeadlessService> logger, IEnumerable<IWebSocketConnectionHandler> sptWebSocketConnectionHandlers, JsonUtil jsonUtil, ConfigService fikaConfigService, SaveServer saveServer)
     {
         public ConcurrentDictionary<string, HeadlessClientInfo> HeadlessClients { get; private set; } = [];
+        private readonly HeadlessRequesterWebSocket? HeadlessRequesterWebSocket = sptWebSocketConnectionHandlers
+                .OfType<HeadlessRequesterWebSocket>()
+                .FirstOrDefault(wsh => wsh.GetSocketId() == "Fika Headless Requester");
 
         /// <summary>
         /// Begin setting up a raid for a headless client
@@ -72,12 +77,8 @@ namespace FikaServer.Services.Headless
                 return;
             }
 
-            HeadlessRequesterJoinRaid headlessRequesterJoinRaid = new(EFikaHeadlessWSMessageType.RequesterJoinMatch, headlessClientId);
-            string data = jsonUtil.Serialize(headlessRequesterJoinRaid) ?? throw new NullReferenceException("SendJoinMessageToRequester:: Data was null after serializing");
-            // TODO: Implement FikaHeadlessRequesterWebSocket
-
-            /*await webSocket.SendAsync(Encoding.UTF8.GetBytes(data),
-                WebSocketMessageType.Text, true, CancellationToken.None);*/
+            HeadlessRequesterWebSocket?.SendAsync(headlessClientInfo.RequesterSessionID, 
+                new HeadlessRequesterJoinRaid(EFikaHeadlessWSMessageType.RequesterJoinMatch, headlessClientId)).Wait();
         }
 
         public void AddPlayerToHeadlessMatch(string headlessClientId, string sessionID)
