@@ -2,8 +2,10 @@
 using FikaServer.Models.Fika.Headless;
 using FikaServer.Models.Fika.Routes.Headless;
 using SPTarkov.Common.Annotations;
+using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Logging;
 using SPTarkov.Server.Core.Models.Utils;
+using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Utils;
 using System.Collections.Concurrent;
 using System.Net.WebSockets;
@@ -12,10 +14,12 @@ using System.Text;
 namespace FikaServer.Services.Headless
 {
     [Injectable(InjectionType.Singleton)]
-    public class HeadlessService(ISptLogger<HeadlessService> logger, JsonUtil jsonUtil)
+    public class HeadlessService(ISptLogger<HeadlessService> logger, JsonUtil jsonUtil, SaveServer saveServer)
     {
-        private readonly ISptLogger<HeadlessService> _logger = logger;
         public ConcurrentDictionary<string, HeadlessClientInfo> HeadlessClients { get; private set; } = [];
+
+        private readonly ISptLogger<HeadlessService> _logger = logger;
+
 
         public string? StartHeadlessRaid(string headlessSessionID, string requesterSessionID, StartHeadlessRequest info)
         {
@@ -87,7 +91,39 @@ namespace FikaServer.Services.Headless
 
         public void SetHeadlessLevel(string headlessClientId)
         {
-            //Todo: Stub for now, implement method.
+            if (!HeadlessClients.TryGetValue(headlessClientId,out HeadlessClientInfo? headlessClientInfo))
+            {
+                throw new NullReferenceException($"SetHeadlessLevel:: Could not find headlessClientId '{headlessClientId}'");
+            }
+
+            if (headlessClientInfo.State is not EHeadlessStatus.IN_RAID)
+            {
+                return;
+            }
+
+            var headlessProfile = saveServer.GetProfile(headlessClientId)
+                ?? throw new NullReferenceException($"Could not find headlessProfile {headlessClientId}");
+
+            int baseHeadlessLevel = 0;
+            int players = headlessClientInfo.Players.Count;
+
+            foreach (string profileId in headlessClientInfo.Players)
+            {
+                SptProfile profile = saveServer.GetProfile(profileId);
+                if (profile == null)
+                {
+                    continue;
+                }
+
+                baseHeadlessLevel += profile.CharacterData.PmcData.Info.Level.GetValueOrDefault(1);
+            }
+
+            baseHeadlessLevel /= players;
+
+            logger.Log(SPTarkov.Server.Core.Models.Spt.Logging.LogLevel.Debug,
+                $"[{headlessClientId}] Settings headless level to: {baseHeadlessLevel} | Players: {players}");
+
+            headlessProfile.CharacterData.PmcData.Info.Level = baseHeadlessLevel;
         }
 
         public void EndHeadlessRaid(string headlessClientId)
