@@ -14,12 +14,9 @@ using System.Text;
 namespace FikaServer.Services.Headless
 {
     [Injectable(InjectionType.Singleton)]
-    public class HeadlessService(ISptLogger<HeadlessService> logger, JsonUtil jsonUtil, SaveServer saveServer)
+    public class HeadlessService(ISptLogger<HeadlessService> logger, JsonUtil jsonUtil, ConfigService fikaConfigService, SaveServer saveServer)
     {
         public ConcurrentDictionary<string, HeadlessClientInfo> HeadlessClients { get; private set; } = [];
-
-        private readonly ISptLogger<HeadlessService> _logger = logger;
-
 
         /// <summary>
         /// Begin setting up a raid for a headless client
@@ -29,25 +26,25 @@ namespace FikaServer.Services.Headless
         {
             if (!HeadlessClients.TryGetValue(headlessSessionID, out HeadlessClientInfo? headlessClientInfo))
             {
-                _logger.LogWithColor($"Could not find HeadlessSessionID '{headlessSessionID}'", LogTextColor.Red);
-                return string.Empty;
+                logger.LogWithColor($"Could not find HeadlessSessionID '{headlessSessionID}'", LogTextColor.Red);
+                return null;
             }
 
             if (headlessClientInfo.State is not EHeadlessStatus.READY)
             {
-                _logger.LogWithColor($"HeadlessSessionID '{headlessSessionID}' was not ready, was {headlessClientInfo.State}", LogTextColor.Yellow);
-                return string.Empty;
+                logger.LogWithColor($"HeadlessSessionID '{headlessSessionID}' was not ready, was {headlessClientInfo.State}", LogTextColor.Yellow);
+                return null;
             }
 
             WebSocket webSocket = headlessClientInfo.WebSocket;
             if (webSocket == null)
             {
-                return string.Empty;
+                return null;
             }
 
             if (webSocket.State is WebSocketState.Closed)
             {
-                return string.Empty;
+                return null;
             }
 
             StartHeadlessRaid startHeadlessRequest = new(EFikaHeadlessWSMessageType.HeadlessStartRaid, info);
@@ -65,13 +62,13 @@ namespace FikaServer.Services.Headless
         {
             if (!HeadlessClients.TryGetValue(headlessClientId, out HeadlessClientInfo? headlessClientInfo))
             {
-                _logger.LogWithColor($"Could not find HeadlessSessionID '{headlessClientId}'", LogTextColor.Red);
+                logger.LogWithColor($"Could not find HeadlessSessionID '{headlessClientId}'", LogTextColor.Red);
                 return;
             }
 
             if (headlessClientInfo.State is not EHeadlessStatus.READY)
             {
-                _logger.LogWithColor($"HeadlessSessionID '{headlessClientId}' was not ready, was {headlessClientInfo.State}", LogTextColor.Yellow);
+                logger.LogWithColor($"HeadlessSessionID '{headlessClientId}' was not ready, was {headlessClientInfo.State}", LogTextColor.Yellow);
                 return;
             }
 
@@ -153,7 +150,7 @@ namespace FikaServer.Services.Headless
         {
             if (!HeadlessClients.TryGetValue(headlessClientId, out HeadlessClientInfo? headlessClientInfo))
             {
-                _logger.LogWithColor($"EndHeadlessRaid:: Could not find '{headlessClientId}' to remove");
+                logger.LogWithColor($"EndHeadlessRaid:: Could not find '{headlessClientId}' to remove");
                 return;
             }
 
