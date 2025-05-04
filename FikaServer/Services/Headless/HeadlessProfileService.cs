@@ -17,33 +17,26 @@ namespace FikaServer.Services.Headless
     {
         public List<SptProfile> HeadlessProfiles { get; set; } = [];
 
-        private readonly ISptLogger<HeadlessProfileService> _logger = logger;
-        private readonly SaveServer _saveServer = saveServer;
-        private readonly FikaConfig _fikaConfig = configService.Config;
-        private readonly HashUtil _hashUtil = hashUtil;
-        private readonly ProfileController _profileController = profileController;
-        private readonly InventoryHelper _inventoryHelper = inventoryHelper;
-
         private const string HEAD_USEC_4 = "5fdb4139e4ed5b5ea251e4ed";
         private const string VOICE_USEC_4 = "6284d6a28e4092597733b7a6";
 
         public void PostSptLoad()
         {
             LoadHeadlessProfiles();
-            _logger.Log(SPTarkov.Server.Core.Models.Spt.Logging.LogLevel.Info, $"Found {HeadlessProfiles.Count} headless profiles");
+            logger.Log(SPTarkov.Server.Core.Models.Spt.Logging.LogLevel.Info, $"Found {HeadlessProfiles.Count} headless profiles");
 
-            int profileAmount = _fikaConfig.Headless.Profiles.Amount;
+            int profileAmount = configService.Config.Headless.Profiles.Amount;
 
             if (HeadlessProfiles.Count < profileAmount)
             {
                 List<SptProfile> createdProfiles = CreateHeadlessProfiles(profileAmount);
-                _logger.Log(SPTarkov.Server.Core.Models.Spt.Logging.LogLevel.Info, $"Created {createdProfiles.Count} headless client profiles!");
+                logger.Log(SPTarkov.Server.Core.Models.Spt.Logging.LogLevel.Info, $"Created {createdProfiles.Count} headless client profiles!");
             }
         }
 
         private void LoadHeadlessProfiles()
         {
-            HeadlessProfiles = [.. _saveServer.GetProfiles().Values
+            HeadlessProfiles = [.. saveServer.GetProfiles().Values
                 .Where(x => x.ProfileInfo?.Password == "fika-headless")];
         }
 
@@ -64,7 +57,7 @@ namespace FikaServer.Services.Headless
 
         private SptProfile CreateHeadlessProfile()
         {
-            string username = $"headless_{_hashUtil.Generate()}";
+            string username = $"headless_{hashUtil.Generate()}";
             string password = "fika-headless";
             string edition = "Standard";
 
@@ -83,33 +76,33 @@ namespace FikaServer.Services.Headless
 
         private string CreateMiniProfile(string username, string password, string edition)
         {
-            string profileId = _hashUtil.Generate();
-            string scavId = _hashUtil.Generate();
+            string profileId = hashUtil.Generate();
+            string scavId = hashUtil.Generate();
 
             SPTarkov.Server.Core.Models.Eft.Profile.Info newProfile = new()
             {
                 ProfileId = profileId,
                 ScavengerId = scavId,
-                Aid = _hashUtil.GenerateAccountId(),
+                Aid = hashUtil.GenerateAccountId(),
                 Username = username,
                 Password = password,
                 IsWiped = true,
                 Edition = edition
             };
 
-            _saveServer.CreateProfile(newProfile);
+            saveServer.CreateProfile(newProfile);
 
-            _saveServer.LoadProfile(profileId);
-            _saveServer.SaveProfile(profileId);
+            saveServer.LoadProfile(profileId);
+            saveServer.SaveProfile(profileId);
 
             return profileId;
         }
 
         private SptProfile CreateFullProfile(ProfileCreateRequestData profileData, string profileId)
         {
-            _profileController.CreateProfile(profileData, profileId);
+            profileController.CreateProfile(profileData, profileId);
 
-            SptProfile profile = _saveServer.GetProfile(profileId)
+            SptProfile profile = saveServer.GetProfile(profileId)
                 ?? throw new NullReferenceException("CreateFullProfile:: Could not find profile");
 
             ClearUnecessaryHeadlessItems(profile.CharacterData.PmcData, profileId);
@@ -133,7 +126,7 @@ namespace FikaServer.Services.Headless
             List<string?> itemsToDelete = GetAllHeadlessItems(pmcProfile);
             foreach (string? item in itemsToDelete)
             {
-                _inventoryHelper.RemoveItem(pmcProfile, item, sessionId);
+                inventoryHelper.RemoveItem(pmcProfile, item, sessionId);
             }
 
             pmcProfile.Inventory.FastPanel = [];
