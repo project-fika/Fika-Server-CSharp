@@ -1,5 +1,6 @@
 ﻿using FikaServer.Models.Fika.SendItem;
 using FikaServer.Models.Fika.WebSocket.Notifications;
+using FikaServer.Services;
 using FikaServer.WebSockets;
 using SPTarkov.Common.Annotations;
 using SPTarkov.Server.Core.Helpers;
@@ -19,7 +20,7 @@ namespace FikaServer.Controllers
     [Injectable]
     public class SendItemController(ISptLogger<SendItemController> logger, EventOutputHolder eventOutputHolder,
         MailSendService mailSendService, InventoryHelper inventoryHelper, SaveServer saveServer,
-        ItemHelper itemHelper, HttpResponseUtil httpResponseUtil, Utils.Config fikaConfig, IEnumerable<IWebSocketConnectionHandler> sptWebSocketConnectionHandlers)
+        ItemHelper itemHelper, HttpResponseUtil httpResponseUtil, ConfigService fikaConfigService, IEnumerable<IWebSocketConnectionHandler> sptWebSocketConnectionHandlers)
     {
         public ItemEventRouterResponse SendItem(PmcData pmcData, SendItemRequestData body, string sessionId)
         {
@@ -47,7 +48,7 @@ namespace FikaServer.Controllers
                 return httpResponseUtil.AppendErrorToOutput(output, "Item not found in inventory");
             }
 
-            if (fikaConfig.GetConfig().Server.SentItemsLoseFIR)
+            if (fikaConfigService.Config.Server.SentItemsLoseFIR)
             {
                 foreach (Item item in itemsToSend)
                 {
