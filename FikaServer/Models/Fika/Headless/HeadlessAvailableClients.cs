@@ -4,6 +4,12 @@ namespace FikaServer.Models.Fika.Headless
 {
     public record HeadlessAvailableClients
     {
+        public HeadlessAvailableClients(string sessionId, string alias)
+        {
+            HeadlessSessionID = sessionId;
+            Alias = alias;
+        }
+
         /// <summary>
         /// SessionID of the headless client
         /// </summary>

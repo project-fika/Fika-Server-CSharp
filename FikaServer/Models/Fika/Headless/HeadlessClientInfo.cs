@@ -1,18 +1,50 @@
 ﻿using FikaServer.Models.Enums;
+using System.Diagnostics.CodeAnalysis;
 
 namespace FikaServer.Models.Fika.Headless
 {
+    /// <summary>
+    /// Record containing data for a headless client
+    /// </summary>
     public record HeadlessClientInfo
     {
-        /** Websocket of the headless client */
+        [SetsRequiredMembers]
+        public HeadlessClientInfo(System.Net.WebSockets.WebSocket webSocket, EHeadlessStatus state)
+        {
+            WebSocket = webSocket;
+            State = state;
+        }
+
+        /// <summary>
+        /// Websocket of the headless client
+        /// </summary>
         public required System.Net.WebSockets.WebSocket WebSocket { get; set; }
-        /** State of the headless client */
+        /// <summary>
+        /// State of the headless client
+        /// </summary>
         public required EHeadlessStatus State { get; set; }
-        /** The players that are playing on this headless client, only set if the state is IN_RAID */
+        /// <summary>
+        /// The players that are playing on this headless client, only set if the state is IN_RAID
+        /// </summary>
         public List<string>? Players { get; set; }
-        /** SessionID of the person who has requested the headless client, it will only ever be set if the status is IN_RAID */
+        /// <summary>
+        /// SessionID of the person who has requested the headless client, it will only ever be set if the status is IN_RAID
+        /// </summary>
         public string? RequesterSessionID { get; set; }
-        /** Allows for checking if the requester has been notified the match has started through the requester WebSocket so he can auto-join */
+        /// <summary>
+        /// Allows for checking if the requester has been notified the match has started through the requester WebSocket so he can auto-join
+        /// </summary>
         public string? HasNotifiedRequester { get; set; }
+
+        /// <summary>
+        /// Resets the data of the <see cref="HeadlessClientInfo"/>
+        /// </summary>
+        public void Reset()
+        {
+            State = EHeadlessStatus.READY;
+            Players = null;
+            RequesterSessionID = null;
+            HasNotifiedRequester = null;
+        }
     }
 }

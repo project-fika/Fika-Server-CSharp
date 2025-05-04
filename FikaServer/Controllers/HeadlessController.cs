@@ -17,7 +17,7 @@ namespace FikaServer.Controllers
         {
             return new GetHeadlessesResponse
             {
-                Headlesses = headlessHelper.GetHeadlessClients().ToDictionary(),
+                Headlesses = headlessHelper.HeadlessClients.ToDictionary()
             };
         }
 

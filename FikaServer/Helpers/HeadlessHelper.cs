@@ -1,4 +1,6 @@
-﻿using FikaServer.Models.Fika.Headless;
+﻿using FikaServer.Models.Enums;
+using FikaServer.Models.Fika.Config;
+using FikaServer.Models.Fika.Headless;
 using FikaServer.Services.Headless;
 using FikaServer.Utils;
 using SPTarkov.Common.Annotations;
@@ -9,16 +11,19 @@ using System.Collections.Concurrent;
 namespace FikaServer.Helpers
 {
     [Injectable]
-    public class HeadlessHelper(Config fikaConfig, SaveServer saveServer, ConfigServer configServer, HeadlessService headlessService, HeadlessProfileService headlessProfileService, ISptLogger<HeadlessHelper> logger)
+    public class HeadlessHelper(Config fikaConfig, SaveServer saveServer, ConfigServer configServer,
+        HeadlessService headlessService, HeadlessProfileService headlessProfileService, ISptLogger<HeadlessHelper> logger)
     {
         /// <summary>
         /// Gets all currently logged in headlesses
         /// </summary>
-        /// <returns>A ConcurrentDictionary where the key is the sessionID and the value is an IHeadlessClientInfo object</returns>
-        public ConcurrentDictionary<string, HeadlessClientInfo> GetHeadlessClients()
+        /// <returns>A <see cref="ConcurrentDictionary{TKey, TValue}"/> where the key is the sessionID and the value is an IHeadlessClientInfo object</returns>
+        public ConcurrentDictionary<string, HeadlessClientInfo> HeadlessClients
         {
-            //Todo: Stub for now, implement method.
-            return [];
+            get
+            {
+                return headlessService.HeadlessClients;
+            }
         }
 
         /// <summary>
@@ -28,8 +33,9 @@ namespace FikaServer.Helpers
         /// <returns>Returns true if the passed sessionID is a headless, returns false if not.</returns>
         public bool IsHeadlessClient(string sessionId)
         {
-            //Todo: Stub for now, implement method.
-            return false;
+            return headlessProfileService.GetHeadlessProfiles()
+                .Where(x => x.ProfileInfo?.ProfileId == sessionId)
+                .Any();
         }
 
         /// <summary>
@@ -39,30 +45,60 @@ namespace FikaServer.Helpers
         /// <returns>Returns true if it's available, returns false if it isn't available.</returns>
         public bool IsHeadlessClientAvailable(string headlessSessionID)
         {
-            //Todo: Stub for now, implement method.
+            if (headlessService.HeadlessClients.TryGetValue(headlessSessionID, out HeadlessClientInfo? headlessClientInfo))
+            {
+                return headlessClientInfo.State is EHeadlessStatus.READY;
+            }
+
             return false;
         }
 
         /// <summary>
         /// Gets the requester's username for a headless client if there is any.
         /// </summary>
-        /// <param name="HeadlessSessionID"></param>
+        /// <param name="headlessSessionID"></param>
         /// <returns>The nickname if the headless has been requested by a user, returns null if not.</returns>
-        public string? GetRequesterUsername(string HeadlessSessionID)
+        public string? GetRequesterUsername(string headlessSessionID)
         {
-            //Todo: Stub for now, implement method.
+            if (headlessService.HeadlessClients.TryGetValue(headlessSessionID, out HeadlessClientInfo? headlessClientInfo))
+            {
+                if (string.IsNullOrEmpty(headlessClientInfo.RequesterSessionID))
+                {
+                    return null;
+                }
+
+                string? nickname = saveServer.GetProfile(headlessClientInfo.RequesterSessionID).CharacterData?.PmcData?.Info?.Nickname;
+                if (string.IsNullOrEmpty(nickname))
+                {
+                    return null;
+                }
+
+                return nickname;
+            }
+
             return null;
         }
 
         /// <summary>
         /// Gets the alias (If it has been given one) or nickname of the headless client
         /// </summary>
-        /// <param name="HeadlessSessionID"></param>
+        /// <param name="headlessSessionID"></param>
         /// <returns>the alias, or nickname or the headless client.</returns>
-        public string GetHeadlessNickname(string HeadlessSessionID)
+        public string GetHeadlessNickname(string headlessSessionID)
         {
-            //Todo: Stub for now, implement method.
-            return string.Empty;
+            FikaConfig config = fikaConfig.GetConfig();
+            if (config.Headless.Profiles.Aliases.TryGetValue(headlessSessionID, out string? alias))
+            {
+                return alias;
+            }
+
+            string? nickname = saveServer.GetProfile(headlessSessionID).CharacterData?.PmcData?.Info?.Nickname;
+            if (string.IsNullOrEmpty(nickname))
+            {
+                return "ERROR";
+            }
+
+            return nickname;
         }
 
         /// <summary>
@@ -71,8 +107,17 @@ namespace FikaServer.Helpers
         /// <returns>Returns an array of available headless clients</returns>
         public HeadlessAvailableClients[] GetAvailableHeadlessClients()
         {
-            //Todo: Stub for now, implement method.
-            return [];
+            List<string> availableClients = [.. HeadlessClients
+                .Where(x => x.Value.State == EHeadlessStatus.READY)
+                .Select(x => x.Key)];
+
+            List<HeadlessAvailableClients> result = [];
+            foreach (string sessionId in availableClients)
+            {
+                result.Add(new(sessionId, GetHeadlessNickname(sessionId)));
+            }
+
+            return [.. result];
         }
     }
 }
