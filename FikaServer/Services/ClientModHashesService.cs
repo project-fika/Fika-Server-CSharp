@@ -5,6 +5,7 @@ namespace FikaServer.Services
     [Injectable(InjectionType.Singleton)]
     public class ClientModHashesService
     {
+        //Todo: ConcurrentDictionary
         private readonly Dictionary<string, int> hashes = [];
 
         public int GetLength()

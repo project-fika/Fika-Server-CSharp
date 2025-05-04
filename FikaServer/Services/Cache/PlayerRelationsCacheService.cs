@@ -10,6 +10,7 @@ namespace FikaServer.Services.Cache
     public class PlayerRelationsCacheService(ProfileHelper profileHelper, ConfigService FikaConfig)
     {
         private string playerRelationsFullPath = Path.Join(FikaConfig.GetModPath(), "cache");
+        //Todo: ConcurrentDictionary
         private Dictionary<string, FikaPlayerRelations> playerRelationsCache = [];
 
         public void PreSptLoad()
