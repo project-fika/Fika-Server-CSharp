@@ -2,25 +2,26 @@
 using SPTarkov.Common.Annotations;
 using SPTarkov.Server.Core.Helpers;
 using SPTarkov.Server.Core.Models.Eft.Profile;
+using SPTarkov.Server.Core.Models.Utils;
+using System.Collections.Concurrent;
 using System.Text.Json;
 
 namespace FikaServer.Services.Cache
 {
     [Injectable(InjectionType.Singleton)]
-    public class PlayerRelationsCacheService(ProfileHelper profileHelper, ConfigService FikaConfig)
+    public class PlayerRelationsCacheService(ProfileHelper profileHelper, ConfigService FikaConfig, ISptLogger<PlayerRelationsCacheService> logger)
     {
-        private string playerRelationsFullPath = Path.Join(FikaConfig.GetModPath(), "cache");
-        //Todo: ConcurrentDictionary
-        private Dictionary<string, FikaPlayerRelations> playerRelationsCache = [];
+        private readonly string _playerRelationsFullPath = Path.Join(FikaConfig.GetModPath(), "database");
+        private readonly ConcurrentDictionary<string, FikaPlayerRelations> _playerRelationsCache = [];
 
         public void PreSptLoad()
         {
-            if (!Directory.Exists(playerRelationsFullPath))
+            if (!Directory.Exists(_playerRelationsFullPath))
             {
-                Directory.CreateDirectory(playerRelationsFullPath);
+                Directory.CreateDirectory(_playerRelationsFullPath);
             }
 
-            if (!File.Exists($"{playerRelationsFullPath}/playerRelations.json"))
+            if (!File.Exists($"{_playerRelationsFullPath}/playerRelations.json"))
             {
                 SaveProfileRelations();
             }
@@ -33,15 +34,20 @@ namespace FikaServer.Services.Cache
 
             foreach (string profileId in profiles.Keys)
             {
-                if (!playerRelationsCache.ContainsKey(profileId))
+                if (!_playerRelationsCache.TryGetValue(profileId, out FikaPlayerRelations? value))
                 {
-                    playerRelationsCache.Add(profileId, new FikaPlayerRelations());
+                    value = new FikaPlayerRelations();
+                    if (!_playerRelationsCache.TryAdd(profileId, value))
+                    {
+                        logger.Error($"Failed to add {profileId} to relations database");
+                        continue;
+                    }
                     shouldSave = true;
 
                     continue;
                 }
 
-                List<string> Friends = this.playerRelationsCache[profileId].Friends;
+                List<string> Friends = value.Friends;
 
                 foreach (string friend in Friends.ToList())
                 {
@@ -52,7 +58,7 @@ namespace FikaServer.Services.Cache
                     }
                 }
 
-                List<string> Ignored = this.playerRelationsCache[profileId].Ignore;
+                List<string> Ignored = value.Ignore;
 
                 foreach (string ignore in Ignored.ToList())
                 {
@@ -69,27 +75,31 @@ namespace FikaServer.Services.Cache
 
         private void SaveProfileRelations()
         {
-            File.WriteAllText($"{playerRelationsFullPath}/playerRelations.json", JsonSerializer.Serialize(playerRelationsCache, ConfigService.serializerOptions));
+            File.WriteAllText($"{_playerRelationsFullPath}/playerRelations.json", JsonSerializer.Serialize(_playerRelationsCache, ConfigService.serializerOptions));
         }
 
         public List<string> GetKeys()
         {
-            return [.. playerRelationsCache.Keys];
+            return [.. _playerRelationsCache.Keys];
         }
 
         public FikaPlayerRelations GetStoredValue(string key)
         {
-            if (!playerRelationsCache.ContainsKey(key))
+            if (!_playerRelationsCache.ContainsKey(key))
             {
                 StoreValue(key, new FikaPlayerRelations());
             }
 
-            return playerRelationsCache[key];
+            return _playerRelationsCache[key];
         }
 
         public void StoreValue(string key, FikaPlayerRelations value)
         {
-            this.playerRelationsCache.Add(key, value);
+            if (!_playerRelationsCache.TryAdd(key, value))
+            {
+                logger.Error($"Failed to add {key} to relations database");
+                return;
+            }
 
             SaveProfileRelations();
         }
