@@ -12,7 +12,7 @@ namespace FikaServer.Services.Cache
     public class PlayerRelationsService(ProfileHelper profileHelper, ConfigService FikaConfig, ISptLogger<PlayerRelationsService> logger)
     {
         private readonly string _playerRelationsFullPath = Path.Join(FikaConfig.GetModPath(), "database");
-        private readonly ConcurrentDictionary<string, FikaPlayerRelations> _playerRelationsCache = [];
+        private readonly ConcurrentDictionary<string, FikaPlayerRelations> _playerRelations = [];
 
         public void PreSptLoad()
         {
@@ -34,10 +34,10 @@ namespace FikaServer.Services.Cache
 
             foreach (string profileId in profiles.Keys)
             {
-                if (!_playerRelationsCache.TryGetValue(profileId, out FikaPlayerRelations? value))
+                if (!_playerRelations.TryGetValue(profileId, out FikaPlayerRelations? value))
                 {
                     value = new FikaPlayerRelations();
-                    if (!_playerRelationsCache.TryAdd(profileId, value))
+                    if (!_playerRelations.TryAdd(profileId, value))
                     {
                         logger.Error($"Failed to add {profileId} to relations database");
                         continue;
@@ -75,27 +75,27 @@ namespace FikaServer.Services.Cache
 
         private void SaveProfileRelations()
         {
-            File.WriteAllText($"{_playerRelationsFullPath}/playerRelations.json", JsonSerializer.Serialize(_playerRelationsCache, ConfigService.serializerOptions));
+            File.WriteAllText($"{_playerRelationsFullPath}/playerRelations.json", JsonSerializer.Serialize(_playerRelations, ConfigService.serializerOptions));
         }
 
         public List<string> GetKeys()
         {
-            return [.. _playerRelationsCache.Keys];
+            return [.. _playerRelations.Keys];
         }
 
         public FikaPlayerRelations GetStoredValue(string key)
         {
-            if (!_playerRelationsCache.ContainsKey(key))
+            if (!_playerRelations.ContainsKey(key))
             {
                 StoreValue(key, new FikaPlayerRelations());
             }
 
-            return _playerRelationsCache[key];
+            return _playerRelations[key];
         }
 
         public void StoreValue(string key, FikaPlayerRelations value)
         {
-            if (!_playerRelationsCache.TryAdd(key, value))
+            if (!_playerRelations.TryAdd(key, value))
             {
                 logger.Error($"Failed to add {key} to relations database");
                 return;
