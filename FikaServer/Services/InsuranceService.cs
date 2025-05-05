@@ -1,7 +1,10 @@
 ﻿using FikaServer.Models.Fika.Insurance;
 using SPTarkov.Common.Annotations;
 using SPTarkov.Server.Core.Helpers;
+using SPTarkov.Server.Core.Models.Eft.Common.Tables;
 using SPTarkov.Server.Core.Models.Eft.Match;
+using SPTarkov.Server.Core.Models.Eft.Profile;
+using SPTarkov.Server.Core.Models.Enums;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
 using System.Collections.Concurrent;
@@ -13,13 +16,15 @@ namespace FikaServer.Services
     {
         private ConcurrentDictionary<string, List<FikaInsurancePlayer>> _matchInsuranceInfo = [];
 
+        /// <summary>
+        /// Gets the match the player is part of
+        /// </summary>
+        /// <param name="sessionID">The profile id to search for</param>
+        /// <returns></returns>
         public string GetMatchId(string sessionID)
         {
-            foreach (var matchKvP in _matchInsuranceInfo)
+            foreach ((string matchId, List<FikaInsurancePlayer> players) in _matchInsuranceInfo)
             {
-                var matchId = matchKvP.Key;
-                var players = matchKvP.Value;
-
                 if (players.Any(player => player.SessionID == sessionID))
                 {
                     return matchId;
@@ -30,9 +35,14 @@ namespace FikaServer.Services
             return string.Empty;
         }
 
+        /// <summary>
+        /// Adds a player to the a match
+        /// </summary>
+        /// <param name="matchId">The id of the match</param>
+        /// <param name="sessionID">The profile id to add</param>
         public void AddPlayerToMatchId(string matchId, string sessionID)
         {
-            if (!_matchInsuranceInfo.TryGetValue(matchId, out var players))
+            if (!_matchInsuranceInfo.TryGetValue(matchId, out List<FikaInsurancePlayer>? players))
             {
                 players = [];
 
@@ -56,15 +66,21 @@ namespace FikaServer.Services
                });
         }
 
+        /// <summary>
+        /// Executed when a clients requests to end a raid
+        /// </summary>
+        /// <param name="sessionID">The profile id that requested the end</param>
+        /// <param name="matchId">The id of the match</param>
+        /// <param name="endLocalRaidRequest">The request data</param>
         public void OnEndLocalRaidRequest(string sessionID, string matchId, EndLocalRaidRequestData endLocalRaidRequest)
         {
-            if (!_matchInsuranceInfo.TryGetValue(matchId, out var players))
+            if (!_matchInsuranceInfo.TryGetValue(matchId, out List<FikaInsurancePlayer>? players))
             {
                 logger.Error("[Fika Insurance] onEndLocalRaidRequest: matchId not found!");
                 return;
             }
 
-            foreach (var player in players)
+            foreach (FikaInsurancePlayer player in players)
             {
                 if (player.SessionID == sessionID)
                 {
@@ -78,14 +94,18 @@ namespace FikaServer.Services
             }
         }
 
+        /// <summary>
+        /// Executed when a match ends
+        /// </summary>
+        /// <param name="matchId">The id of the match</param>
         public void OnMatchEnd(string matchId)
         {
-            if (!_matchInsuranceInfo.TryGetValue(matchId, out var players))
+            if (!_matchInsuranceInfo.TryGetValue(matchId, out List<FikaInsurancePlayer>? players))
             {
                 return;
             }
 
-            foreach (var player in players)
+            foreach (FikaInsurancePlayer player in players)
             {
                 // This player either crashed or the raid ended prematurely, eitherway we skip him.
                 if (!player.EndedRaid)
@@ -93,7 +113,7 @@ namespace FikaServer.Services
                     continue;
                 }
 
-                foreach (var nextPlayer in players)
+                foreach (FikaInsurancePlayer nextPlayer in players)
                 {
                     // Don't need to check the player we have in the base loop
                     if (player.SessionID == nextPlayer.SessionID)
@@ -108,7 +128,7 @@ namespace FikaServer.Services
                     }
 
                     // Find overlap between players other than the initial player we're looping over, if it contains the lost item id of the initial player we add it to foundItems
-                    var overlap = nextPlayer.Inventory.Where(player.LostItems.Contains).ToList() ?? [];
+                    List<string?> overlap = nextPlayer.Inventory.Where(player.LostItems.Contains).ToList() ?? [];
 
                     // Add said overlap to player's found items
                     player.FoundItems.AddRange(overlap);
@@ -124,9 +144,76 @@ namespace FikaServer.Services
             _matchInsuranceInfo.TryRemove(matchId, out _);
         }
 
+        /// <summary>
+        /// Removes all provided itemIds from a profile's <see cref="Insurance"/>
+        /// </summary>
+        /// <param name="sessionID">The profile to remove from</param>
+        /// <param name="ids">The item ids to search for and remove</param>
+        /// <exception cref="NullReferenceException"></exception>
         private void RemoveItemsFromInsurance(string sessionID, List<string?> ids)
         {
-            //Todo: Stub for now, implement method.
+            SptProfile profile = saveServer.GetProfile(sessionID)
+                ?? throw new NullReferenceException("[Fika Insurance] Profile was null");
+
+            List<Item> toRemove = [];
+            for (int i = 0; i < profile.InsuranceList?.Count; i++)
+            {
+                Insurance insurance = profile.InsuranceList[i];
+                if (insurance.Items == null)
+                {
+                    continue;
+                }
+
+                foreach (string? itemId in ids)
+                {
+                    Item? item = insurance.Items
+                        .Where(x => x.Id == itemId)
+                        .FirstOrDefault();
+
+                    if (item is null)
+                    {
+                        continue;
+                    }
+
+                    // Remove soft inserts out of armor and helmets
+                    if (itemHelper.IsOfBaseclasses(item.Template, [BaseClasses.ARMOR, BaseClasses.HEADWEAR]))
+                    {
+                        logger.Debug($"[Fika Insurance] {itemId} is armor or helmet");
+                        IEnumerable<Item> children = insurance.Items
+                            .Where(x => x.ParentId == itemId && itemHelper.IsOfBaseclass(x.Template, BaseClasses.BUILT_IN_INSERTS));
+
+                        foreach (Item? childItem in children)
+                        {
+                            // Soft inserts are not insured
+                            if (!ids.Contains(childItem.Id))
+                            {
+                                toRemove.Add(childItem);
+                            }
+                        }
+                    }
+
+                    // Remove children of the item
+                    foreach (Item itemToRemove in toRemove)
+                    {
+                        if (!insurance.Items.Remove(itemToRemove))
+                        {
+                            logger.Debug($"[Fika Insurance] Unable to remove the item {itemToRemove.Id}");
+                        }
+                    }
+
+                    // Clear list for next iteration
+                    toRemove.Clear();
+
+                    // Remove the original item (parent)
+                    insurance.Items?.Remove(item);
+                }
+
+                // If all insured items are gone, remove the entry
+                if (insurance.Items?.Count == 0)
+                {
+                    profile.InsuranceList.Remove(insurance);
+                }
+            }
         }
     }
 }
