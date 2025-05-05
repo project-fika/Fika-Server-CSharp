@@ -11,6 +11,7 @@ using System.Text;
 
 namespace FikaServer.WebSockets
 {
+    /*
     [Injectable(InjectionType.Singleton)]
     public class HeadlessClientWebSocket(HeadlessHelper headlessHelper, HeadlessService headlessService, MatchService matchService, ISptLogger<HeadlessClientWebSocket> logger) : IWebSocketConnectionHandler
     {
@@ -80,4 +81,5 @@ namespace FikaServer.WebSockets
             return Task.CompletedTask;
         }
     }
+    */
 }

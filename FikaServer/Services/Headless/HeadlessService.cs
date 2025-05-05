@@ -19,9 +19,11 @@ namespace FikaServer.Services.Headless
     public class HeadlessService(ISptLogger<HeadlessService> logger, IEnumerable<IWebSocketConnectionHandler> sptWebSocketConnectionHandlers, JsonUtil jsonUtil, ConfigService fikaConfigService, SaveServer saveServer)
     {
         public ConcurrentDictionary<string, HeadlessClientInfo> HeadlessClients { get; private set; } = [];
+        /*
         private readonly HeadlessRequesterWebSocket? HeadlessRequesterWebSocket = sptWebSocketConnectionHandlers
                 .OfType<HeadlessRequesterWebSocket>()
                 .FirstOrDefault(wsh => wsh.GetSocketId() == "Fika Headless Requester");
+        */
 
         /// <summary>
         /// Begin setting up a raid for a headless client
@@ -77,8 +79,10 @@ namespace FikaServer.Services.Headless
                 return;
             }
 
+            /*
             HeadlessRequesterWebSocket?.SendAsync(headlessClientInfo.RequesterSessionID, 
                 new HeadlessRequesterJoinRaid(EFikaHeadlessWSMessageType.RequesterJoinMatch, headlessClientId)).Wait();
+            */
         }
 
         public void AddPlayerToHeadlessMatch(string headlessClientId, string sessionID)
