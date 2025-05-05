@@ -9,7 +9,7 @@ using System.Text.Json;
 namespace FikaServer.Services.Cache
 {
     [Injectable(InjectionType.Singleton)]
-    public class PlayerRelationsCacheService(ProfileHelper profileHelper, ConfigService FikaConfig, ISptLogger<PlayerRelationsCacheService> logger)
+    public class PlayerRelationsService(ProfileHelper profileHelper, ConfigService FikaConfig, ISptLogger<PlayerRelationsService> logger)
     {
         private readonly string _playerRelationsFullPath = Path.Join(FikaConfig.GetModPath(), "database");
         private readonly ConcurrentDictionary<string, FikaPlayerRelations> _playerRelationsCache = [];
