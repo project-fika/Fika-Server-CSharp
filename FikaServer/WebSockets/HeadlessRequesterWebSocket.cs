@@ -11,7 +11,7 @@ using System.Text;
 namespace FikaServer.WebSockets
 {
     [Injectable(InjectionType.Singleton)]
-    public class HeadlessRequesterWebSocket(SaveServer saveServer, JsonUtil jsonUtil, ISptLogger<HeadlessClientWebSocket> logger) : IWebSocketConnectionHandler
+    public class HeadlessRequesterWebSocket(SaveServer saveServer, JsonUtil jsonUtil, ISptLogger<HeadlessRequesterWebSocket> logger) : IWebSocketConnectionHandler
     {
         private readonly ConcurrentDictionary<string, WebSocket> requesterWebSockets = [];
 
