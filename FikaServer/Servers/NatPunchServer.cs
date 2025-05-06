@@ -8,7 +8,7 @@ using SPTarkov.Server.Core.Models.Utils;
 
 namespace FikaServer.Servers
 {
-    [Injectable]
+    [Injectable(InjectionType.Singleton)]
     public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer> logger) : INatPunchListener, INetEventListener
     {
         private readonly Dictionary<string, NatPunchServerPeer> _servers = [];
