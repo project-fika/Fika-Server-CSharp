@@ -1,13 +1,13 @@
 ﻿using FikaServer.Callbacks;
 using FikaServer.Models.Fika.Routes.Raid.Join;
 using FikaServer.Models.Fika.Routes.Update;
-using SPTarkov.Common.Annotations;
+using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Utils;
 
 namespace FikaServer.Routers.Static
 {
-    [Injectable(InjectableTypeOverride = typeof(StaticRouter))]
+    [Injectable]
     public class UpdateStaticRouter(UpdateCallbacks fikaUpdateCallbacks, JsonUtil jsonUtil) : StaticRouter(jsonUtil, [
             new RouteAction(
                 "/fika/update/ping",

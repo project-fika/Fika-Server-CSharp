@@ -1,7 +1,7 @@
 ﻿using FikaServer.Callbacks;
 using FikaServer.Models.Fika;
 using FikaServer.Models.Fika.SendItem;
-using SPTarkov.Common.Annotations;
+using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Models.Eft.Common;
 using SPTarkov.Server.Core.Models.Eft.Common.Request;
@@ -9,7 +9,7 @@ using SPTarkov.Server.Core.Models.Eft.ItemEvent;
 
 namespace FikaServer.Routers.ItemEvents
 {
-    [Injectable(InjectableTypeOverride = typeof(ItemEventRouterDefinition))]
+    [Injectable]
     public class SendItemEventRouter(SendItemCallbacks sendItemCallbacks) : ItemEventRouterDefinition
     {
         public override ItemEventRouterResponse? HandleItemEvent(string url, PmcData pmcData, BaseInteractionRequestData body, string sessionID, ItemEventRouterResponse output)

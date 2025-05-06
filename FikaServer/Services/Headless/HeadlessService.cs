@@ -2,7 +2,7 @@
 using FikaServer.Models.Fika.Headless;
 using FikaServer.Models.Fika.Routes.Headless;
 using FikaServer.WebSockets;
-using SPTarkov.Common.Annotations;
+using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Logging;
 using SPTarkov.Server.Core.Models.Utils;

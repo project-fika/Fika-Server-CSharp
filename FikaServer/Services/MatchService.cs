@@ -3,7 +3,7 @@ using FikaServer.Models.Enums;
 using FikaServer.Models.Fika;
 using FikaServer.Models.Fika.Routes.Raid.Create;
 using FikaServer.Services.Headless;
-using SPTarkov.Common.Annotations;
+using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;

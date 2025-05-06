@@ -1,6 +1,6 @@
 ﻿using FikaServer.Models.Fika;
 using FikaServer.Services.Cache;
-using SPTarkov.Common.Annotations;
+using SPTarkov.DI.Annotations;
 
 namespace FikaServer.Helpers
 {

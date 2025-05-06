@@ -3,7 +3,7 @@ using FikaServer.Models.Fika.Config;
 using FikaServer.Services;
 using FikaServer.Services.Cache;
 using FikaServer.Services.Headless;
-using SPTarkov.Common.Annotations;
+using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.External;
 using SPTarkov.Server.Core.Models.Spt.Config;
 using SPTarkov.Server.Core.Models.Utils;
@@ -14,8 +14,7 @@ using SPTarkov.Server.Core.Utils.Json.Converters;
 
 namespace FikaServer
 {
-    [Injectable(InjectionType.Singleton, InjectableTypeOverride = typeof(IPreSptLoadMod))]
-    [Injectable(InjectionType.Singleton, InjectableTypeOverride = typeof(IPostSptLoadMod))]
+    [Injectable(InjectionType.Singleton)]
     public class FikaServer(ISptLogger<FikaServer> logger, ConfigServer configServer, ImageRouter imageRouter,
         HeadlessProfileService HeadlessProfileService, LocaleService localeService, PlayerRelationsService playerRelationsCacheService,
         ClientService clientService, JsonUtil jsonUtil, ConfigService fikaConfig) : IPreSptLoadMod, IPostSptLoadMod

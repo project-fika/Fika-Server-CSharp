@@ -1,5 +1,5 @@
 ﻿using FikaServer.Controllers;
-using SPTarkov.Common.Annotations;
+using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Eft.Match;
 using SPTarkov.Server.Core.Utils;
 

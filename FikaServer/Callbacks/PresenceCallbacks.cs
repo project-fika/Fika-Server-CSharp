@@ -1,6 +1,6 @@
 ﻿using FikaServer.Models.Fika.Presence;
 using FikaServer.Services;
-using SPTarkov.Common.Annotations;
+using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Utils;
 

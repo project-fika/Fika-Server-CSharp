@@ -1,7 +1,7 @@
 ﻿using FikaServer.Models.Fika.Routes.Raid.Join;
 using FikaServer.Models.Fika.Routes.Update;
 using FikaServer.Services;
-using SPTarkov.Common.Annotations;
+using SPTarkov.DI.Annotations;
 
 namespace FikaServer.Controllers
 {
