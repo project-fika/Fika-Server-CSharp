@@ -1,5 +1,7 @@
 ﻿using FikaServer.Models.Enums;
+using FikaServer.Models.Fika;
 using FikaServer.Models.Fika.Config;
+using FikaServer.Models.Fika.SendItem;
 using FikaServer.Servers;
 using FikaServer.Services;
 using FikaServer.Services.Cache;
@@ -28,6 +30,7 @@ namespace FikaServer
             jsonUtil.RegisterJsonConverter(new EftEnumConverter<EFikaPlayerPresences>());
             jsonUtil.RegisterJsonConverter(new EftEnumConverter<EFikaNotifications>());
             jsonUtil.RegisterJsonConverter(new EftEnumConverter<EEFTNotificationIconType>());
+            BaseInteractionRequestDataConverter.RegisterModDataHandler(FikaItemEventRouter.SENDTOPLAYER, jsonUtil.Deserialize<SendItemRequestData>);
 
             fikaConfig.PreSptLoad();
             clientService.PreSptLoad();

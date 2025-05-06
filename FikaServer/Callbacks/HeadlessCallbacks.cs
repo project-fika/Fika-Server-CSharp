@@ -41,7 +41,7 @@ namespace FikaServer.Callbacks
         /// <returns></returns>
         public string HandleRestartAfterRaidAmount(string url, FikaRaidServerIdRequestData info, string sessionID)
         {
-            return httpResponseUtil.NoBody(headlessController.HandleRestartAfterRaidAmount);
+            return httpResponseUtil.NoBody(headlessController.HandleRestartAfterRaidAmount());
         }
     }
 }
