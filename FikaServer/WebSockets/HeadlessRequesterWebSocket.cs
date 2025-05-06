@@ -10,7 +10,6 @@ using System.Text;
 
 namespace FikaServer.WebSockets
 {
-    /*
     [Injectable(InjectionType.Singleton)]
     public class HeadlessRequesterWebSocket(SaveServer saveServer, JsonUtil jsonUtil, ISptLogger<HeadlessRequesterWebSocket> logger) : IWebSocketConnectionHandler
     {
@@ -91,5 +90,4 @@ namespace FikaServer.WebSockets
             await ws.SendAsync(Encoding.UTF8.GetBytes(jsonUtil.Serialize(message)), WebSocketMessageType.Text, true, CancellationToken.None);
         }
     }
-    */
 }
