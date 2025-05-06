@@ -3,6 +3,9 @@
 # CS0618: Type or member is obsolete
 dotnet_diagnostic.CS0618.severity = none
 
+# CS8621: Nullability of reference types in return type doesn't match the target delegate (possibly because of nullability attributes).
+dotnet_diagnostic.CS8621.severity = none
+
 # Custom config
 tab_width = 4
 indent_size = 4
