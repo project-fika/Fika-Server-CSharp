@@ -33,7 +33,7 @@ namespace FikaServer.Controllers
 
             SptProfile senderProfile = saveServer.GetProfile(sessionId);
 
-            if (saveServer.ProfileExists(body.Target))
+            if (!saveServer.ProfileExists(body.Target))
             {
                 return httpResponseUtil.AppendErrorToOutput(output, "Target profile not found");
             }
