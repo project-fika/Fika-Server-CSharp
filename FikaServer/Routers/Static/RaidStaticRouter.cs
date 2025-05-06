@@ -4,14 +4,14 @@ using FikaServer.Models.Fika.Routes.Raid;
 using FikaServer.Models.Fika.Routes.Raid.Create;
 using FikaServer.Models.Fika.Routes.Raid.Join;
 using FikaServer.Models.Fika.Routes.Raid.Leave;
-using SPTarkov.Common.Annotations;
+using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Models.Eft.InRaid;
 using SPTarkov.Server.Core.Utils;
 
 namespace FikaServer.Routers.Static
 {
-    [Injectable(InjectableTypeOverride = typeof(StaticRouter))]
+    [Injectable]
     public class RaidStaticRouter(RaidCallbacks fikaRaidCallbacks, JsonUtil jsonUtil) : StaticRouter(jsonUtil, [
             new RouteAction(
                 "/fika/raid/create",

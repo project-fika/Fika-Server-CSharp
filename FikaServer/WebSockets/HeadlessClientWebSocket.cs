@@ -2,7 +2,7 @@
 using FikaServer.Models.Fika.Headless;
 using FikaServer.Services;
 using FikaServer.Services.Headless;
-using SPTarkov.Common.Annotations;
+using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers.Ws;
 using System.Collections.Concurrent;
@@ -11,7 +11,6 @@ using System.Text;
 
 namespace FikaServer.WebSockets
 {
-    /*
     [Injectable(InjectionType.Singleton)]
     public class HeadlessClientWebSocket(HeadlessHelper headlessHelper, HeadlessService headlessService, MatchService matchService, ISptLogger<HeadlessClientWebSocket> logger) : IWebSocketConnectionHandler
     {
@@ -81,5 +80,4 @@ namespace FikaServer.WebSockets
             return Task.CompletedTask;
         }
     }
-    */
 }

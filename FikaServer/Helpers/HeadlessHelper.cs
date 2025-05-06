@@ -3,7 +3,7 @@ using FikaServer.Models.Fika.Config;
 using FikaServer.Models.Fika.Headless;
 using FikaServer.Services;
 using FikaServer.Services.Headless;
-using SPTarkov.Common.Annotations;
+using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
 using System.Collections.Concurrent;

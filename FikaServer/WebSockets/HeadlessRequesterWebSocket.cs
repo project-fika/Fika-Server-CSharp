@@ -1,5 +1,5 @@
 ﻿using FikaServer.Models.Fika.Headless;
-using SPTarkov.Common.Annotations;
+using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Servers.Ws;
@@ -10,7 +10,6 @@ using System.Text;
 
 namespace FikaServer.WebSockets
 {
-    /*
     [Injectable(InjectionType.Singleton)]
     public class HeadlessRequesterWebSocket(SaveServer saveServer, JsonUtil jsonUtil, ISptLogger<HeadlessRequesterWebSocket> logger) : IWebSocketConnectionHandler
     {
@@ -91,5 +90,4 @@ namespace FikaServer.WebSockets
             await ws.SendAsync(Encoding.UTF8.GetBytes(jsonUtil.Serialize(message)), WebSocketMessageType.Text, true, CancellationToken.None);
         }
     }
-    */
 }

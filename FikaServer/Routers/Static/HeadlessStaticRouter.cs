@@ -1,12 +1,12 @@
 ﻿using FikaServer.Callbacks;
 using FikaServer.Models.Fika.Routes.Raid;
-using SPTarkov.Common.Annotations;
+using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Utils;
 
 namespace FikaServer.Routers.Static
 {
-    [Injectable(InjectableTypeOverride = typeof(StaticRouter))]
+    [Injectable]
     public class HeadlessStaticRouter(HeadlessCallbacks fikaHeadlessCallbacks, JsonUtil jsonUtil) : StaticRouter(jsonUtil, [
             new RouteAction(
                 "/fika/headless/get",

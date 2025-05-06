@@ -1,6 +1,6 @@
 ﻿using FikaServer.Controllers;
 using FikaServer.Models.Fika.Routes.Raid;
-using SPTarkov.Common.Annotations;
+using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Utils;
 
 namespace FikaServer.Callbacks

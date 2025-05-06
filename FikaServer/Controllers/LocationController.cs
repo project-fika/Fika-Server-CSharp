@@ -1,7 +1,7 @@
 ﻿using FikaServer.Helpers;
 using FikaServer.Models.Fika.Routes.Location;
 using FikaServer.Services;
-using SPTarkov.Common.Annotations;
+using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Eft.Match;
 
 namespace FikaServer.Controllers
