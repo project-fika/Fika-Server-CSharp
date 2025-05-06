@@ -1,5 +1,6 @@
 ﻿using FikaServer.Models.Enums;
 using FikaServer.Models.Fika.Config;
+using FikaServer.Servers;
 using FikaServer.Services;
 using FikaServer.Services.Cache;
 using FikaServer.Services.Headless;
@@ -15,7 +16,7 @@ using SPTarkov.Server.Core.Utils.Json.Converters;
 namespace FikaServer
 {
     [Injectable(InjectionType.Singleton)]
-    public class FikaServer(ISptLogger<FikaServer> logger, ConfigServer configServer, ImageRouter imageRouter,
+    public class FikaServer(ISptLogger<FikaServer> logger, ConfigServer configServer, NatPunchServer natPunchServer, ImageRouter imageRouter,
         HeadlessProfileService HeadlessProfileService, LocaleService localeService, PlayerRelationsService playerRelationsCacheService,
         ClientService clientService, JsonUtil jsonUtil, ConfigService fikaConfig) : IPreSptLoadMod, IPostSptLoadMod
     {
@@ -36,6 +37,11 @@ namespace FikaServer
         public void PostSptLoad()
         {
             FikaConfig config = fikaConfig.Config;
+
+            if (config.NatPunchServer.Enable)
+            {
+                natPunchServer.Start();
+            }
 
             if (config.Headless.Profiles.Amount > 0)
             {
