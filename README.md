@@ -26,5 +26,6 @@ This project is licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/lic
 **Project** | **License**
 ----------- | -----------------------------------------------------------------------
 SPT.Server | [NCSA](https://github.com/sp-tarkov/server-csharp/blob/main/LICENSE)
+LiteNetLib | [MIT](https://github.com/RevenantX/LiteNetLib/blob/master/LICENSE.txt) (for NatPunch implementation)
 
 <a href="https://crowdin.com/?utm_term=click-badge-add-on" rel="nofollow"><img style="width:140;height:40px" src="https://badges.crowdin.net/badge/light/crowdin-on-dark.png" srcset="https://badges.crowdin.net/badge/light/crowdin-on-dark.png 1x,https://badges.crowdin.net/badge/light/crowdin-on-dark@2x.png 2x" alt="Crowdin | Agile localization for tech companies" /></a>
