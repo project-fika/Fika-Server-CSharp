@@ -15,7 +15,7 @@ namespace FikaServer.Services
         ModHelper modHelper)
     {
         public FikaConfig Config { get; private set; } = new();
-        private readonly PackageJsonData packageJsonData = modHelper.GetJsonDataFromFile<PackageJsonData>(modHelper.GetAbsolutePathToModFolder(Assembly.GetExecutingAssembly()), "package.json");
+        private readonly FikaModMetaData fikaModMetaData = new();
         public static readonly JsonSerializerOptions serializerOptions = new() { WriteIndented = true };
 
         public string GetModPath()
@@ -25,7 +25,7 @@ namespace FikaServer.Services
 
         public string? GetVersion()
         {
-            return packageJsonData.Version;
+            return fikaModMetaData.Version;
         }
 
         public void PreSptLoad()

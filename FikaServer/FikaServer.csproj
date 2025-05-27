@@ -30,9 +30,6 @@
       <Content Include="Assets\**">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
-      <Content Include="package.json">
-          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
   </ItemGroup>
 
   <ItemGroup>

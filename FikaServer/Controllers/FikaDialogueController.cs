@@ -85,7 +85,7 @@ namespace FikaServer.Controllers
                     AttachmentsNew = 0,
                     New = 0,
                     Pinned = false,
-                    Type = SPTarkov.Server.Core.Models.Enums.MessageType.USER_MESSAGE,
+                    Type = SPTarkov.Server.Core.Models.Enums.MessageType.UserMessage,
                     Messages = [],
                     Users = [],
                     Id = request.DialogId
@@ -129,7 +129,7 @@ namespace FikaServer.Controllers
                     AttachmentsNew = 0,
                     New = 0,
                     Pinned = false,
-                    Type = SPTarkov.Server.Core.Models.Enums.MessageType.USER_MESSAGE,
+                    Type = SPTarkov.Server.Core.Models.Enums.MessageType.UserMessage,
                     Messages = [],
                     Users = [],
                     Id = sessionId
