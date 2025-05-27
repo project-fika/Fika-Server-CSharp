@@ -2,7 +2,7 @@ using SPTarkov.Server.Core.Models.Spt.Mod;
 
 namespace FikaServer
 {
-    public record FikaModMetaData : AbstractModMetadata
+    public record FikaModMetadata : AbstractModMetadata
     {
         public override string? Name { get; set; } = "server";
         public override string? Author { get; set; } = "Fika";
