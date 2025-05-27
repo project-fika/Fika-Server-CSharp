@@ -2,7 +2,6 @@
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Helpers;
 using SPTarkov.Server.Core.Models.Spt.Config;
-using SPTarkov.Server.Core.Models.Spt.Mod;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
 using System.Reflection;
@@ -15,7 +14,7 @@ namespace FikaServer.Services
         ModHelper modHelper)
     {
         public FikaConfig Config { get; private set; } = new();
-        private readonly FikaModMetaData fikaModMetaData = new();
+        private readonly FikaModMetadata fikaModMetaData = new();
         public static readonly JsonSerializerOptions serializerOptions = new() { WriteIndented = true };
 
         public string GetModPath()
