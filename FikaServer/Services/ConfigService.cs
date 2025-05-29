@@ -46,7 +46,7 @@ namespace FikaServer.Services
             // We store default values in the config models, and if one is missing this will write it to the file in the correct place
             WriteConfig(configFolderPath);
 
-            //ApplySPTConfig(Config.Server.SPT);
+            ApplySPTConfig(Config.Server.SPT);
         }
 
         private void WriteConfig(string ConfigFolderPath)
