@@ -26,7 +26,7 @@ namespace FikaServer.WebSockets
             return "Fika Notification Manager";
         }
 
-        public async Task OnConnection(WebSocket ws, HttpContext context)
+        public async Task OnConnection(WebSocket ws, HttpContext context, string sessionIdContext)
         {
             string authHeader = context.Request.Headers.Authorization.ToString();
 
@@ -58,7 +58,7 @@ namespace FikaServer.WebSockets
             return Task.CompletedTask;
         }
 
-        public Task OnClose(WebSocket ws, HttpContext context)
+        public Task OnClose(WebSocket ws, HttpContext context, string sessionIdContext)
         {
             var client = clientWebSockets.Where(x => x.Value == ws).FirstOrDefault();
 

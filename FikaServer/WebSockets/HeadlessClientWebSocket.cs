@@ -26,7 +26,7 @@ namespace FikaServer.WebSockets
             return "Fika Headless Client";
         }
 
-        public async Task OnConnection(WebSocket ws, HttpContext context)
+        public async Task OnConnection(WebSocket ws, HttpContext context, string sessionIdContext)
         {
             string authHeader = context.Request.Headers.Authorization.ToString();
 
@@ -65,7 +65,7 @@ namespace FikaServer.WebSockets
             return Task.CompletedTask;
         }
 
-        public Task OnClose(WebSocket ws, HttpContext context)
+        public Task OnClose(WebSocket ws, HttpContext context, string sessionIdContext)
         {
             string userSessionID = headlessWebSockets.FirstOrDefault(x => x.Value == ws).Key;
 
