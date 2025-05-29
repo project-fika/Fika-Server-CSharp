@@ -33,7 +33,6 @@ namespace FikaServer.Helpers
         /// <exception cref="NotImplementedException"></exception>
         public void RemoveFriend(string fromProfileId, string toProfileId)
         {
-            // TODO: Add
             FikaPlayerRelations requesterRelation = playerRelationsService.GetStoredValue(fromProfileId);
             if (requesterRelation == null)
             {
@@ -100,9 +99,8 @@ namespace FikaServer.Helpers
         /// <exception cref="NotImplementedException"></exception>
         public List<string> GetInIgnoreList(string profileId)
         {
-            List<string> keys = playerRelationsService.Keys;
-
-            return [.. keys.Where(x => playerRelationsService.GetStoredValue(x).Ignore.Contains(profileId))];
+            return [.. playerRelationsService.Keys
+                .Where(x => playerRelationsService.GetStoredValue(x).Ignore.Contains(profileId))];
         }
     }
 }
