@@ -14,6 +14,22 @@ namespace FikaServer.Services.Cache
         private readonly string _playerRelationsFullPath = Path.Join(FikaConfig.GetModPath(), "database");
         private readonly ConcurrentDictionary<string, FikaPlayerRelations> _playerRelations = [];
 
+        public List<string> Keys
+        {
+            get
+            {
+                return [.. _playerRelations.Keys];
+            }
+        }
+
+        public List<FikaPlayerRelations> Values
+        {
+            get
+            {
+                return [.._playerRelations.Values];
+            }
+        }
+
         public void PreSptLoad()
         {
             if (!Directory.Exists(_playerRelationsFullPath))
@@ -76,12 +92,7 @@ namespace FikaServer.Services.Cache
         private void SaveProfileRelations()
         {
             File.WriteAllText($"{_playerRelationsFullPath}/playerRelations.json", JsonSerializer.Serialize(_playerRelations, ConfigService.serializerOptions));
-        }
-
-        public List<string> GetKeys()
-        {
-            return [.. _playerRelations.Keys];
-        }
+        }        
 
         public FikaPlayerRelations GetStoredValue(string key)
         {

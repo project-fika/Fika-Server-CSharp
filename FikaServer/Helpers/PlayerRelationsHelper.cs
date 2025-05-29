@@ -2,6 +2,7 @@
 using FikaServer.Models.Fika.WebSocket;
 using FikaServer.Services.Cache;
 using SPTarkov.DI.Annotations;
+using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Eft.Ws;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
@@ -14,22 +15,33 @@ namespace FikaServer.Helpers
         PlayerRelationsService playerRelationsService, SaveServer saveServer,
         SptWebSocketConnectionHandler webSocketHandler)
     {
+        /// <summary>
+        /// Gets the friends list of a player
+        /// </summary>
+        /// <param name="profileId"></param>
+        /// <returns>Friends list</returns>
         public List<string> GetFriendsList(string profileId)
         {
             return playerRelationsService.GetStoredValue(profileId).Friends;
         }
 
+        /// <summary>
+        /// Removes a friend relation
+        /// </summary>
+        /// <param name="fromProfileId">Requesting profileId</param>
+        /// <param name="toProfileId">Target profileId</param>
+        /// <exception cref="NotImplementedException"></exception>
         public void RemoveFriend(string fromProfileId, string toProfileId)
         {
             // TODO: Add
-            var requesterRelation = playerRelationsService.GetStoredValue(fromProfileId);
+            FikaPlayerRelations requesterRelation = playerRelationsService.GetStoredValue(fromProfileId);
             if (requesterRelation == null)
             {
                 logger.Debug($"Could not find relations for {fromProfileId}");
                 return;
             }
 
-            var friendRelation = playerRelationsService.GetStoredValue(toProfileId);
+            FikaPlayerRelations friendRelation = playerRelationsService.GetStoredValue(toProfileId);
             if (friendRelation == null)
             {
                 logger.Debug($"Could not find relations for target {toProfileId}");
@@ -46,8 +58,8 @@ namespace FikaServer.Helpers
                 logger.Warning($"{toProfileId} tried to remove {fromProfileId} from their friend list unsuccessfully");
             }
 
-            var profile = saveServer.GetProfile(fromProfileId);
-            if (profile != null)
+            SptProfile profile = saveServer.GetProfile(fromProfileId);
+            if (profile != null && profile.ProfileInfo != null && profile.CharacterData?.PmcData?.Info != null)
             {
                 webSocketHandler.SendMessage(toProfileId, new WsFriendListRemove()
                 {
@@ -68,20 +80,29 @@ namespace FikaServer.Helpers
                     }
                 });
             }
-
-            throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Gets the ignore list of a player
+        /// </summary>
+        /// <param name="profileId"></param>
+        /// <returns>Ignore list</returns>
         public List<string> GetIgnoreList(string profileId)
         {
-            // TODO: Add
-            throw new NotImplementedException();
+            return playerRelationsService.GetStoredValue(profileId).Ignore;
         }
 
+        /// <summary>
+        /// Returns a list of players ignoring this player
+        /// </summary>
+        /// <param name="profileId">The player to check for</param>
+        /// <returns>List of players ignoring the player</returns>
+        /// <exception cref="NotImplementedException"></exception>
         public List<string> GetInIgnoreList(string profileId)
         {
-            // TODO: Add
-            throw new NotImplementedException();
+            List<string> keys = playerRelationsService.Keys;
+
+            return [.. keys.Where(x => playerRelationsService.GetStoredValue(x).Ignore.Contains(profileId))];
         }
     }
 }
