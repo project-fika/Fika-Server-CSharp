@@ -22,11 +22,6 @@
 		<PackageReference Include="SPTarkov.Server.Core" Version="4.0.0-prerelease7" />
 	</ItemGroup>
 	-->
-
-	<ItemGroup>
-		<PackageReference Include="HarmonyX" Version="2.14.0" />
-	</ItemGroup>
-
   <ItemGroup>
       <Content Include="Assets\**">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
