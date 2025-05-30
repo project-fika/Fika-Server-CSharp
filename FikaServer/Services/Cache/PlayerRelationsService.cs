@@ -30,7 +30,7 @@ namespace FikaServer.Services.Cache
             }
         }
 
-        public void PreSptLoad()
+        public void OnPreLoad()
         {
             if (!Directory.Exists(_playerRelationsFullPath))
             {
@@ -43,7 +43,7 @@ namespace FikaServer.Services.Cache
             }
         }
 
-        public void PostSptLoad()
+        public void OnPostLoad()
         {
             Dictionary<string, SptProfile> profiles = profileHelper.GetProfiles();
             bool shouldSave = false;

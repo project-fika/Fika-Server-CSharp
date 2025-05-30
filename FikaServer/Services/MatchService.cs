@@ -140,14 +140,14 @@ namespace FikaServer.Services
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public bool CreateMatch(FikaRaidCreateRequestData data)
+        public bool CreateMatch(FikaRaidCreateRequestData data, string sessionId)
         {
             if (Matches.ContainsKey(data.ServerId))
             {
                 DeleteMatch(data.ServerId);
             }
 
-            var locationData = locationLifecycleService.GenerateLocationAndLoot(data.Settings.Location);
+            var locationData = locationLifecycleService.GenerateLocationAndLoot(sessionId, data.Settings.Location);
 
             Matches.TryAdd(data.ServerId, new FikaMatch
             {

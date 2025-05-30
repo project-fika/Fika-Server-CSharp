@@ -27,7 +27,7 @@ namespace FikaServer.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public FikaRaidCreateResponse HandleRaidCreate(FikaRaidCreateRequestData request)
+        public FikaRaidCreateResponse HandleRaidCreate(FikaRaidCreateRequestData request, string sessionId)
         {
             string hostUsername = request.HostUsername;
 
@@ -51,7 +51,7 @@ namespace FikaServer.Controllers
 
             return new FikaRaidCreateResponse
             {
-                Success = matchService.CreateMatch(request)
+                Success = matchService.CreateMatch(request, sessionId)
             };
         }
 

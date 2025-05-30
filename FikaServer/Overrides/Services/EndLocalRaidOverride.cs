@@ -1,6 +1,6 @@
 ﻿using FikaServer.Services;
 using HarmonyLib;
-using SPTarkov.Server.Core.Context;
+using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Models.Eft.Match;
 
 namespace FikaServer.Overrides.Services
@@ -11,9 +11,8 @@ namespace FikaServer.Overrides.Services
     {
         public static bool Prefix(string sessionId, EndLocalRaidRequestData request)
         {
-            ServiceProvider? sp = ApplicationContext.GetInstance()?.GetLatestValue(ContextVariableType.SERVICE_PROVIDER)?.GetValue<ServiceProvider>();
-            MatchService matchService = sp?.GetService<MatchService>();
-            InsuranceService insuranceService = sp?.GetService<InsuranceService>();
+            MatchService matchService = ServiceLocator.ServiceProvider.GetService<MatchService>();
+            InsuranceService insuranceService = ServiceLocator.ServiceProvider.GetService<InsuranceService>();
 
             // Get match id from player session id
             var matchId = matchService.GetMatchIdByPlayer(sessionId);

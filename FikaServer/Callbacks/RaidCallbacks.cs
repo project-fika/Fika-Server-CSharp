@@ -22,7 +22,7 @@ namespace FikaServer.Callbacks
         /// <returns></returns>
         public string HandleRaidCreate(string url, FikaRaidCreateRequestData info, string sessionID)
         {
-            return httpResponseUtil.NoBody(raidController.HandleRaidCreate(info));
+            return httpResponseUtil.NoBody(raidController.HandleRaidCreate(info, sessionID));
         }
 
         /// <summary>

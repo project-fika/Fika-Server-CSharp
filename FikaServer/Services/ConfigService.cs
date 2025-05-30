@@ -4,6 +4,7 @@ using SPTarkov.Server.Core.Helpers;
 using SPTarkov.Server.Core.Models.Spt.Config;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
+using SPTarkov.Server.Core.Utils;
 using System.Reflection;
 using System.Text.Json;
 
@@ -11,8 +12,9 @@ namespace FikaServer.Services
 {
     [Injectable(InjectionType.Singleton)]
     public class ConfigService(ISptLogger<ConfigService> logger, ConfigServer configServer,
-        ModHelper modHelper)
+        ModHelper modHelper, JsonUtil jsonUtil)
     {
+        private readonly string configFolderPath = Path.Join(modHelper.GetAbsolutePathToModFolder(Assembly.GetExecutingAssembly()), "assets/configs");
         public FikaConfig Config { get; private set; } = new();
         private readonly FikaModMetadata fikaModMetaData = new();
         public static readonly JsonSerializerOptions serializerOptions = new() { WriteIndented = true };
@@ -27,31 +29,28 @@ namespace FikaServer.Services
             return fikaModMetaData.Version;
         }
 
-        public void PreSptLoad()
+        public async Task OnPreLoad()
         {
-            string configFolderPath = Path.Join(modHelper.GetAbsolutePathToModFolder(Assembly.GetExecutingAssembly()), "assets/configs");
-
             //This is debug, probably wont exist in the final release.
             if (!Directory.Exists(configFolderPath))
             {
                 Directory.CreateDirectory(configFolderPath);
             }
 
-            if (File.Exists($"{configFolderPath}/fika.jsonc"))
-            {
-                Config = modHelper.GetJsonDataFromFile<FikaConfig>(configFolderPath, "fika.jsonc");
-            }
+            string configPath = Path.Combine(configFolderPath, "fika.jsonc");
+
+            Config = await jsonUtil.DeserializeFromFileAsync<FikaConfig>(configPath) ?? new();
 
             // No need to do any fancyness around sorting properties and writing them if they weren't set before here
             // We store default values in the config models, and if one is missing this will write it to the file in the correct place
-            WriteConfig(configFolderPath);
+            await WriteConfig(configFolderPath);
 
             ApplySPTConfig(Config.Server.SPT);
         }
 
-        private void WriteConfig(string ConfigFolderPath)
+        private async Task WriteConfig(string ConfigFolderPath)
         {
-            File.WriteAllText($"{ConfigFolderPath}/fika.jsonc", JsonSerializer.Serialize(Config, serializerOptions));
+            await File.WriteAllTextAsync($"{ConfigFolderPath}/fika.jsonc", JsonSerializer.Serialize(Config, serializerOptions));
         }
 
         private void ApplySPTConfig(FikaSPTServerConfig config)
