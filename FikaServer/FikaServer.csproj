@@ -16,9 +16,10 @@
 
 	<!--
 	<ItemGroup>
-		<PackageReference Include="SPTarkov.Common" Version="4.0.0-prerelease2" />
-		<PackageReference Include="SPTarkov.DI" Version="4.0.0-prerelease2" />
-		<PackageReference Include="SPTarkov.Server.Core" Version="4.0.0-prerelease2" />
+		<PackageReference Include="SPTarkov.Common" Version="4.0.0-prerelease7" />
+		<PackageReference Include="SPTarkov.DI" Version="4.0.0-prerelease7" />
+		<PackageReference Include="SPTarkov.Reflection" Version="4.0.0-prerelease7" />
+		<PackageReference Include="SPTarkov.Server.Core" Version="4.0.0-prerelease7" />
 	</ItemGroup>
 	-->
 
@@ -38,6 +39,9 @@
     </Reference>
     <Reference Include="SPTarkov.DI">
       <HintPath>..\References\SPTarkov.DI.dll</HintPath>
+    </Reference>
+    <Reference Include="SPTarkov.Reflection">
+      <HintPath>..\References\SPTarkov.Reflection.dll</HintPath>
     </Reference>
     <Reference Include="SPTarkov.Server.Core">
       <HintPath>..\References\SPTarkov.Server.Core.dll</HintPath>

@@ -1,14 +1,20 @@
 ﻿using FikaServer.Services;
-using HarmonyLib;
+using SPTarkov.Reflection.Patching;
 using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Models.Eft.Match;
+using SPTarkov.Server.Core.Services;
+using System.Reflection;
+using InsuranceService = FikaServer.Services.InsuranceService;
 
 namespace FikaServer.Overrides.Services
 {
-    [HarmonyPatch(typeof(SPTarkov.Server.Core.Services.LocationLifecycleService))]
-    [HarmonyPatch(nameof(SPTarkov.Server.Core.Services.LocationLifecycleService.EndLocalRaid))]
-    public class EndLocalRaidOverride
+    public class EndLocalRaidOverride : AbstractPatch
     {
+        protected override MethodBase GetTargetMethod()
+        {
+            return typeof(LocationLifecycleService).GetMethod(nameof(LocationLifecycleService.EndLocalRaid));
+        }
+
         public static bool Prefix(string sessionId, EndLocalRaidRequestData request)
         {
             MatchService matchService = ServiceLocator.ServiceProvider.GetService<MatchService>();

@@ -1,18 +1,22 @@
 ﻿using FikaServer.Services;
-using HarmonyLib;
+using SPTarkov.Reflection.Patching;
 using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Helpers;
 using SPTarkov.Server.Core.Models.Eft.Common;
 using SPTarkov.Server.Core.Models.Eft.Match;
 using SPTarkov.Server.Core.Services;
 using SPTarkov.Server.Core.Utils;
+using System.Reflection;
 
 namespace FikaServer.Overrides.Services
 {
-    [HarmonyPatch(typeof(LocationLifecycleService))]
-    [HarmonyPatch(nameof(LocationLifecycleService.StartLocalRaid))]
-    public class StartLocalRaidOverride
+    public class StartLocalRaidOverride : AbstractPatch
     {
+        protected override MethodBase GetTargetMethod()
+        {
+            return typeof(LocationLifecycleService).GetMethod(nameof(LocationLifecycleService.StartLocalRaid));
+        }
+
         public static bool Prefix(string sessionId, StartLocalRaidRequestData request, ref StartLocalRaidResponseData __result)
         {
             LocationBase locationLoot;
