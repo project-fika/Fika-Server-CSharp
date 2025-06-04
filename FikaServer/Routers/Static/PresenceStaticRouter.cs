@@ -10,30 +10,30 @@ namespace FikaServer.Routers.Static
     public class PresenceStaticRouter(PresenceCallbacks fikaPresenceCallbacks, JsonUtil jsonUtil) : StaticRouter(jsonUtil, [
             new RouteAction(
                 "/fika/presence/get",
-                (
+                async (
                     url,
                     info,
                     sessionId,
                     output
-                ) => fikaPresenceCallbacks.HandleGetPresence(url, info, sessionId)),
+                ) => await fikaPresenceCallbacks.HandleGetPresence(url, info, sessionId)),
             new RouteAction(
                 "/fika/presence/set",
-                (
+                async (
                     url,
                     info,
                     sessionId,
                     output
-                ) => fikaPresenceCallbacks.HandleSetPresence(url, info as FikaSetPresence, sessionId),
+                ) => await fikaPresenceCallbacks.HandleSetPresence(url, info as FikaSetPresence, sessionId),
                 typeof(FikaSetPresence)
                 ),
             new RouteAction(
                 "/fika/presence/setget",
-                (
+                async (
                     url,
                     info,
                     sessionId,
                     output
-                ) => fikaPresenceCallbacks.HandleSetGetPresence(url, info as FikaSetPresence, sessionId),
+                ) => await fikaPresenceCallbacks.HandleSetGetPresence(url, info as FikaSetPresence, sessionId),
                 typeof(FikaSetPresence)
                 ),
         ])

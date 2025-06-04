@@ -10,32 +10,32 @@ namespace FikaServer.Routers.Static
     public class HeadlessStaticRouter(HeadlessCallbacks fikaHeadlessCallbacks, JsonUtil jsonUtil) : StaticRouter(jsonUtil, [
             new RouteAction(
                 "/fika/headless/get",
-                (
+                async (
                     url,
                     info,
                     sessionId,
                     output
-                ) => fikaHeadlessCallbacks.HandleGetHeadlesses(url, info as FikaRaidServerIdRequestData, sessionId),
+                ) => await fikaHeadlessCallbacks.HandleGetHeadlesses(url, info as FikaRaidServerIdRequestData, sessionId),
                 typeof(FikaRaidServerIdRequestData)
                 ),
             new RouteAction(
                 "/fika/headless/available",
-                (
+                async (
                     url,
                     info,
                     sessionId,
                     output
-                ) => fikaHeadlessCallbacks.HandleAvailableHeadlesses(url, info as FikaRaidServerIdRequestData, sessionId),
+                ) => await fikaHeadlessCallbacks.HandleAvailableHeadlesses(url, info as FikaRaidServerIdRequestData, sessionId),
                 typeof(FikaRaidServerIdRequestData)
                 ),
              new RouteAction(
                 "/fika/headless/restartafterraidamount",
-                (
+                async (
                     url,
                     info,
                     sessionId,
                     output
-                ) => fikaHeadlessCallbacks.HandleRestartAfterRaidAmount(url, info as FikaRaidServerIdRequestData, sessionId),
+                ) => await fikaHeadlessCallbacks.HandleRestartAfterRaidAmount(url, info as FikaRaidServerIdRequestData, sessionId),
                 typeof(FikaRaidServerIdRequestData)
                 ),
         ])

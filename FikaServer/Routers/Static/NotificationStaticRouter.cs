@@ -10,12 +10,12 @@ namespace FikaServer.Routers.Static
     public class NotificationStaticRouter(NotificationCallbacks fikaNotificationCallbacks, JsonUtil jsonUtil) : StaticRouter(jsonUtil, [
             new RouteAction(
                 "/fika/notification/push",
-                (
+                async (
                     url,
                     info,
                     sessionId,
                     output
-                ) => fikaNotificationCallbacks.HandlePushNotification(url, info as PushNotification, sessionId),
+                ) => await fikaNotificationCallbacks.HandlePushNotification(url, info as PushNotification, sessionId),
                 typeof(PushNotification)
                 )
         ])

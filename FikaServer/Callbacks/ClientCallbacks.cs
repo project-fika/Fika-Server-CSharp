@@ -12,42 +12,42 @@ namespace FikaServer.Callbacks
         /// <summary>
         /// Handle /fika/client/config
         /// </summary>
-        public string HandleClientConfig(string url, IRequestData info, string sessionID)
+        public ValueTask<string> HandleClientConfig(string url, IRequestData info, string sessionID)
         {
             //return httpResponseUtil.NoBody(fikaClientController.HandleClientConfig());
-            return fikaClientController.HandleClientConfig();
+            return new ValueTask<string>(fikaClientController.HandleClientConfig());
         }
 
         /// <summary>
         /// Handle /fika/natpunchserver/config
         /// </summary>
-        public string HandleNatPunchConfig(string url, IRequestData info, string sessionID)
+        public ValueTask<string> HandleNatPunchConfig(string url, IRequestData info, string sessionID)
         {
-            return httpResponseUtil.NoBody(fikaClientController.HandleNatPunchServerConfig());
+            return new ValueTask<string>(httpResponseUtil.NoBody(fikaClientController.HandleNatPunchServerConfig()));
         }
 
         /// <summary>
         /// Handle /fika/client/check/mods
         /// </summary>
-        public string HandleCheckMods(string url, FikaCheckModRequestData info, string sessionID)
+        public ValueTask<string> HandleCheckMods(string url, FikaCheckModRequestData info, string sessionID)
         {
-            return httpResponseUtil.NoBody(fikaClientController.HandleCheckMods(info));
+            return new ValueTask<string>(httpResponseUtil.NoBody(fikaClientController.HandleCheckMods(info)));
         }
 
         /// <summary>
         /// Handle /fika/profile/download
         /// </summary>
-        public string HandleProfileDownload(string url, IRequestData info, string sessionID)
+        public ValueTask<string> HandleProfileDownload(string url, IRequestData info, string sessionID)
         {
-            return httpResponseUtil.NoBody(fikaClientController.HandleProfileDownload(sessionID));
+            return new ValueTask<string>(httpResponseUtil.NoBody(fikaClientController.HandleProfileDownload(sessionID)));
         }
 
         /// <summary>
         /// Handle /fika/client/check/version
         /// </summary>
-        public string HandleVersionCheck(string url, IRequestData info, string sessionID)
+        public ValueTask<string> HandleVersionCheck(string url, IRequestData info, string sessionID)
         {
-            return httpResponseUtil.NoBody(fikaClientController.HandleVersionCheck());
+            return new ValueTask<string>(httpResponseUtil.NoBody(fikaClientController.HandleVersionCheck()));
         }
     }
 }

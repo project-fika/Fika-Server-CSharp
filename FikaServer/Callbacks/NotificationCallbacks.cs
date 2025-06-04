@@ -16,7 +16,7 @@ namespace FikaServer.Callbacks
         /// <summary>
         /// Handle /fika/notification/push
         /// </summary>
-        public string HandlePushNotification(string url, PushNotification info, string sessionID)
+        public async ValueTask<string> HandlePushNotification(string url, PushNotification info, string sessionID)
         {
             // Yes, technically this needs a controller to fit into this format. But I cant be bothered setting up a whole controller for a few checks.
             if (NotificationWebSocket == null)
@@ -37,8 +37,9 @@ namespace FikaServer.Callbacks
                 info.NotificationIcon = EEFTNotificationIconType.Default;
             }
 
+            //Todo: Debug log
             logger.Error("broadcasting");
-            NotificationWebSocket.BroadcastAsync(info);
+            await NotificationWebSocket.BroadcastAsync(info);
 
             return httpResponseUtil.NullResponse();
         }

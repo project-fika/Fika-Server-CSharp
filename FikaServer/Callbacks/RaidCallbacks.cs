@@ -20,9 +20,9 @@ namespace FikaServer.Callbacks
         /// <param name="info"></param>
         /// <param name="sessionID"></param>
         /// <returns></returns>
-        public string HandleRaidCreate(string url, FikaRaidCreateRequestData info, string sessionID)
+        public ValueTask<string> HandleRaidCreate(string url, FikaRaidCreateRequestData info, string sessionID)
         {
-            return httpResponseUtil.NoBody(raidController.HandleRaidCreate(info, sessionID));
+            return new ValueTask<string>(httpResponseUtil.NoBody(raidController.HandleRaidCreate(info, sessionID)));
         }
 
         /// <summary>
@@ -32,9 +32,9 @@ namespace FikaServer.Callbacks
         /// <param name="info"></param>
         /// <param name="sessionID"></param>
         /// <returns></returns>
-        public string HandleRaidJoin(string url, FikaRaidJoinRequestData info, string sessionID)
+        public ValueTask<string> HandleRaidJoin(string url, FikaRaidJoinRequestData info, string sessionID)
         {
-            return httpResponseUtil.NoBody(raidController.HandleRaidJoin(info));
+            return new ValueTask<string>(httpResponseUtil.NoBody(raidController.HandleRaidJoin(info)));
         }
 
         /// <summary>
@@ -44,11 +44,11 @@ namespace FikaServer.Callbacks
         /// <param name="info"></param>
         /// <param name="sessionID"></param>
         /// <returns></returns>
-        public string HandleRaidLeave(string url, FikaRaidLeaveRequestData info, string sessionID)
+        public ValueTask<string> HandleRaidLeave(string url, FikaRaidLeaveRequestData info, string sessionID)
         {
             raidController.HandleRaidLeave(info);
 
-            return httpResponseUtil.NullResponse();
+            return new ValueTask<string>(httpResponseUtil.NullResponse());
         }
 
         /// <summary>
@@ -58,9 +58,9 @@ namespace FikaServer.Callbacks
         /// <param name="info"></param>
         /// <param name="sessionID"></param>
         /// <returns></returns>
-        public string HandleRaidGetHost(string url, FikaRaidServerIdRequestData info, string sessionID)
+        public ValueTask<string> HandleRaidGetHost(string url, FikaRaidServerIdRequestData info, string sessionID)
         {
-            return httpResponseUtil.NoBody(raidController.HandleRaidGetHost(info));
+            return new ValueTask<string>(httpResponseUtil.NoBody(raidController.HandleRaidGetHost(info)));
         }
 
         /// <summary>
@@ -70,9 +70,9 @@ namespace FikaServer.Callbacks
         /// <param name="info"></param>
         /// <param name="sessionID"></param>
         /// <returns></returns>
-        public string HandleRaidGetSettings(string url, FikaRaidServerIdRequestData info, string sessionID)
+        public ValueTask<string> HandleRaidGetSettings(string url, FikaRaidServerIdRequestData info, string sessionID)
         {
-            return httpResponseUtil.NoBody(raidController.HandleRaidGetSettings(info));
+            return new ValueTask<string>(httpResponseUtil.NoBody(raidController.HandleRaidGetSettings(info)));
         }
 
         /// <summary>
@@ -82,9 +82,9 @@ namespace FikaServer.Callbacks
         /// <param name="info"></param>
         /// <param name="sessionID"></param>
         /// <returns></returns>
-        public string HandleRaidStartHeadless(string url, StartHeadlessRequest info, string sessionID)
+        public ValueTask<string> HandleRaidStartHeadless(string url, StartHeadlessRequest info, string sessionID)
         {
-            return httpResponseUtil.NoBody(raidController.HandleRaidStartHeadless(sessionID, info));
+            return new ValueTask<string>(httpResponseUtil.NoBody(raidController.HandleRaidStartHeadless(sessionID, info)));
         }
 
         /// <summary>
@@ -94,11 +94,11 @@ namespace FikaServer.Callbacks
         /// <param name="info"></param>
         /// <param name="sessionID"></param>
         /// <returns></returns>
-        public string HandleRaidRegisterPlayer(string url, RegisterPlayerRequestData info, string sessionID)
+        public ValueTask<string> HandleRaidRegisterPlayer(string url, RegisterPlayerRequestData info, string sessionID)
         {
             raidController.HandleRaidRegisterPlayer(sessionID, info);
 
-            return httpResponseUtil.NullResponse();
+            return new ValueTask<string>(httpResponseUtil.NullResponse());
         }
     }
 }

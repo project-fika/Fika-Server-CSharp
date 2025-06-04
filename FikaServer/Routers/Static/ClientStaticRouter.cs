@@ -10,44 +10,44 @@ namespace FikaServer.Routers.Static
     public class ClientStaticRouter(ClientCallbacks fikaClientCallbacks, JsonUtil jsonUtil) : StaticRouter(jsonUtil, [
             new RouteAction(
                 "/fika/client/config",
-                (
+                async (
                     url,
                     info,
                     sessionId,
                     output
-                ) => fikaClientCallbacks.HandleClientConfig(url, info, sessionId)),
+                ) => await fikaClientCallbacks.HandleClientConfig(url, info, sessionId)),
             new RouteAction(
                 "/fika/natpunchserver/config",
-                (
+                async (
                     url,
                     info,
                     sessionId,
                     output
-                ) => fikaClientCallbacks.HandleNatPunchConfig(url, info, sessionId)),
+                ) => await fikaClientCallbacks.HandleNatPunchConfig(url, info, sessionId)),
             new RouteAction(
                 "/fika/client/check/mods",
-                (
+                async (
                     url,
                     info,
                     sessionId,
                     output
-                ) => fikaClientCallbacks.HandleCheckMods(url, info as FikaCheckModRequestData, sessionId)),
+                ) => await fikaClientCallbacks.HandleCheckMods(url, info as FikaCheckModRequestData, sessionId)),
             new RouteAction(
                 "/fika/profile/download",
-                (
+                async (
                     url,
                     info,
                     sessionId,
                     output
-                ) => fikaClientCallbacks.HandleProfileDownload(url, info, sessionId)),
+                ) => await fikaClientCallbacks.HandleProfileDownload(url, info, sessionId)),
             new RouteAction(
                 "/fika/client/check/version",
-                (
+                async (
                     url,
                     info,
                     sessionId,
                     output
-                ) => fikaClientCallbacks.HandleVersionCheck(url, info, sessionId))
+                ) => await fikaClientCallbacks.HandleVersionCheck(url, info, sessionId))
         ])
     {
     }

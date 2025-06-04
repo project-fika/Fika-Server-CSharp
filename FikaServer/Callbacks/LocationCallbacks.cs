@@ -15,9 +15,9 @@ namespace FikaServer.Callbacks
         /// <param name="info"></param>
         /// <param name="sessionID"></param>
         /// <returns></returns>
-        public string HandleGetRaids(string url, GetRaidConfigurationRequestData info, string sessionID)
+        public ValueTask<string> HandleGetRaids(string url, GetRaidConfigurationRequestData info, string sessionID)
         {
-            return httpResponseUtil.NoBody(locationController.HandleGetRaids(info));
+            return new ValueTask<string>(httpResponseUtil.NoBody(locationController.HandleGetRaids(info)));
         }
     }
 }

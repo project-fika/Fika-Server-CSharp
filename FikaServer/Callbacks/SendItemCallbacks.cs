@@ -18,9 +18,9 @@ namespace FikaServer.Callbacks
         /// <summary>
         /// Handle /fika/senditem/availablereceivers
         /// </summary>
-        public string HandleAvailableReceivers(string sessionID)
+        public ValueTask<string> HandleAvailableReceivers(string sessionID)
         {
-            return httpResponseUtil.NoBody(sendItemController.HandleAvailableReceivers(sessionID));
+            return new ValueTask<string>(httpResponseUtil.NoBody(sendItemController.HandleAvailableReceivers(sessionID)));
         }
     }
 }

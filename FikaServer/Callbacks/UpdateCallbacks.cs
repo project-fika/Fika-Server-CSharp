@@ -16,11 +16,11 @@ namespace FikaServer.Callbacks
         /// <param name="info"></param>
         /// <param name="sessionID"></param>
         /// <returns></returns>
-        public string HandlePing(string url, FikaUpdatePingRequestData info, string sessionID)
+        public ValueTask<string> HandlePing(string url, FikaUpdatePingRequestData info, string sessionID)
         {
             updateController.HandlePing(info);
 
-            return httpResponseUtil.NullResponse();
+            return new ValueTask<string>(httpResponseUtil.NullResponse());
         }
 
         /// <summary>
@@ -30,11 +30,11 @@ namespace FikaServer.Callbacks
         /// <param name="info"></param>
         /// <param name="sessionID"></param>
         /// <returns></returns>
-        public string HandlePlayerSpawn(string url, FikaUpdatePlayerSpawnRequestData info, string sessionID)
+        public ValueTask<string> HandlePlayerSpawn(string url, FikaUpdatePlayerSpawnRequestData info, string sessionID)
         {
             updateController.HandlePlayerSpawn(info);
 
-            return httpResponseUtil.NullResponse();
+            return new ValueTask<string>(httpResponseUtil.NullResponse());
         }
 
         /// <summary>
@@ -44,11 +44,11 @@ namespace FikaServer.Callbacks
         /// <param name="info"></param>
         /// <param name="sessionID"></param>
         /// <returns></returns>
-        public string HandleSetHost(string url, FikaUpdateSethostRequestData info, string sessionID)
+        public ValueTask<string> HandleSetHost(string url, FikaUpdateSethostRequestData info, string sessionID)
         {
             updateController.HandleSetHost(info);
 
-            return httpResponseUtil.NullResponse();
+            return new ValueTask<string>(httpResponseUtil.NullResponse());
         }
 
         /// <summary>
@@ -58,11 +58,11 @@ namespace FikaServer.Callbacks
         /// <param name="info"></param>
         /// <param name="sessionID"></param>
         /// <returns></returns>
-        public string HandleSetStatus(string url, FikaUpdateSetStatusRequestData info, string sessionID)
+        public ValueTask<string> HandleSetStatus(string url, FikaUpdateSetStatusRequestData info, string sessionID)
         {
             updateController.HandleSetStatus(info);
 
-            return httpResponseUtil.NullResponse();
+            return new ValueTask<string>(httpResponseUtil.NullResponse());
         }
 
         /// <summary>
@@ -72,11 +72,11 @@ namespace FikaServer.Callbacks
         /// <param name="info"></param>
         /// <param name="sessionID"></param>
         /// <returns></returns>
-        public string HandleRaidAddPlayer(string url, FikaUpdateRaidAddPlayerData info, string sessionID)
+        public ValueTask<string> HandleRaidAddPlayer(string url, FikaUpdateRaidAddPlayerData info, string sessionID)
         {
             updateController.HandleRaidAddPlayer(info);
 
-            return httpResponseUtil.NullResponse();
+            return new ValueTask<string>(httpResponseUtil.NullResponse());
         }
 
         /// <summary>
@@ -86,11 +86,11 @@ namespace FikaServer.Callbacks
         /// <param name="info"></param>
         /// <param name="sessionID"></param>
         /// <returns></returns>
-        public string HandlePlayerDied(string url, FikaUpdateRaidAddPlayerData info, string sessionID)
+        public ValueTask<string> HandlePlayerDied(string url, FikaUpdateRaidAddPlayerData info, string sessionID)
         {
             updateController.HandleRaidPlayerDied(info);
 
-            return httpResponseUtil.NullResponse();
+            return new ValueTask<string>(httpResponseUtil.NullResponse());
         }
     }
 }

@@ -12,29 +12,29 @@ namespace FikaServer.Callbacks
         /// <summary>
         /// Handle /fika/presence/get
         /// </summary>
-        public string HandleGetPresence(string url, IRequestData info, string sessionID)
+        public ValueTask<string> HandleGetPresence(string url, IRequestData info, string sessionID)
         {
-            return httpResponseUtil.NoBody(fikaPresenceService.GetAllPlayersPresence());
+            return new ValueTask<string>(httpResponseUtil.NoBody(fikaPresenceService.GetAllPlayersPresence()));
         }
 
         /// <summary>
         /// Handle /fika/presence/set
         /// </summary>
-        public string HandleSetPresence(string url, FikaSetPresence info, string sessionID)
+        public ValueTask<string> HandleSetPresence(string url, FikaSetPresence info, string sessionID)
         {
             fikaPresenceService.UpdatePlayerPresence(sessionID, info);
 
-            return httpResponseUtil.NullResponse();
+            return new ValueTask<string>(httpResponseUtil.NullResponse());
         }
 
         /// <summary>
         /// Handle /fika/presence/setget
         /// </summary>
-        public string HandleSetGetPresence(string url, FikaSetPresence info, string sessionID)
+        public ValueTask<string> HandleSetGetPresence(string url, FikaSetPresence info, string sessionID)
         {
             fikaPresenceService.UpdatePlayerPresence(sessionID, info);
 
-            return httpResponseUtil.NoBody(fikaPresenceService.GetAllPlayersPresence());
+            return new ValueTask<string>(httpResponseUtil.NoBody(fikaPresenceService.GetAllPlayersPresence()));
         }
     }
 }

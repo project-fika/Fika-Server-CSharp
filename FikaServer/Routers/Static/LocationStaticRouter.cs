@@ -10,12 +10,12 @@ namespace FikaServer.Routers.Static
     public class LocationStaticRouter(LocationCallbacks locationCallbacks, JsonUtil jsonUtil) : StaticRouter(jsonUtil, [
             new RouteAction(
                 "/fika/location/raids",
-                (
+                async (
                     url,
                     info,
                     sessionId,
                     output
-                ) => locationCallbacks.HandleGetRaids(url, info as GetRaidConfigurationRequestData, sessionId),
+                ) => await locationCallbacks.HandleGetRaids(url, info as GetRaidConfigurationRequestData, sessionId),
                 typeof(GetRaidConfigurationRequestData)
                 )
         ])

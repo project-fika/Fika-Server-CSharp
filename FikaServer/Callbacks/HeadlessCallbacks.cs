@@ -15,9 +15,9 @@ namespace FikaServer.Callbacks
         /// <param name="info"></param>
         /// <param name="sessionID"></param>
         /// <returns></returns>
-        public string HandleGetHeadlesses(string url, FikaRaidServerIdRequestData info, string sessionID)
+        public ValueTask<string> HandleGetHeadlesses(string url, FikaRaidServerIdRequestData info, string sessionID)
         {
-            return httpResponseUtil.NoBody(headlessController.HandleGetHeadlesses());
+            return new ValueTask<string>(httpResponseUtil.NoBody(headlessController.HandleGetHeadlesses()));
         }
 
         /// <summary>
@@ -27,9 +27,9 @@ namespace FikaServer.Callbacks
         /// <param name="info"></param>
         /// <param name="sessionID"></param>
         /// <returns></returns>
-        public string HandleAvailableHeadlesses(string url, FikaRaidServerIdRequestData info, string sessionID)
+        public ValueTask<string> HandleAvailableHeadlesses(string url, FikaRaidServerIdRequestData info, string sessionID)
         {
-            return httpResponseUtil.NoBody(headlessController.HandleGetAvailableHeadlesses());
+            return new ValueTask<string>(httpResponseUtil.NoBody(headlessController.HandleGetAvailableHeadlesses()));
         }
 
         /// <summary>
@@ -39,9 +39,9 @@ namespace FikaServer.Callbacks
         /// <param name="info"></param>
         /// <param name="sessionID"></param>
         /// <returns></returns>
-        public string HandleRestartAfterRaidAmount(string url, FikaRaidServerIdRequestData info, string sessionID)
+        public ValueTask<string> HandleRestartAfterRaidAmount(string url, FikaRaidServerIdRequestData info, string sessionID)
         {
-            return httpResponseUtil.NoBody(headlessController.HandleRestartAfterRaidAmount());
+            return new ValueTask<string>(httpResponseUtil.NoBody(headlessController.HandleRestartAfterRaidAmount()));
         }
     }
 }
