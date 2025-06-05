@@ -73,7 +73,7 @@ namespace FikaServer.Services.Headless
                 return;
             }
 
-            await headlessRequesterWebSocket.SendAsync(headlessClientInfo.RequesterSessionID, 
+            await headlessRequesterWebSocket.SendAsync(headlessClientInfo.RequesterSessionID,
                 new HeadlessRequesterJoinRaid(EFikaHeadlessWSMessageType.RequesterJoinMatch, headlessClientId));
         }
 
@@ -105,7 +105,7 @@ namespace FikaServer.Services.Headless
 
         public void SetHeadlessLevel(string headlessClientId)
         {
-            if (!HeadlessClients.TryGetValue(headlessClientId,out HeadlessClientInfo? headlessClientInfo))
+            if (!HeadlessClients.TryGetValue(headlessClientId, out HeadlessClientInfo? headlessClientInfo))
             {
                 throw new NullReferenceException($"SetHeadlessLevel:: Could not find headlessClientId '{headlessClientId}'");
             }

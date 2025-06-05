@@ -15,14 +15,13 @@ using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Controllers;
 using SPTarkov.Server.Core.Models.Eft.InRaid;
 using SPTarkov.Server.Core.Models.Utils;
-using SPTarkov.Server.Core.Servers.Ws;
 
 namespace FikaServer.Controllers
 {
     [Injectable]
     public class RaidController(MatchService matchService, HeadlessHelper headlessHelper,
-        HeadlessService headlessService, 
-        ISptLogger<RaidController> logger, 
+        HeadlessService headlessService,
+        ISptLogger<RaidController> logger,
         InRaidController inraidController, NotificationWebSocket notificationWebSocket)
     {
         /// <summary>

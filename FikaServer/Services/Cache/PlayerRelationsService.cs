@@ -26,7 +26,7 @@ namespace FikaServer.Services.Cache
         {
             get
             {
-                return [.._playerRelations.Values];
+                return [.. _playerRelations.Values];
             }
         }
 
@@ -92,7 +92,7 @@ namespace FikaServer.Services.Cache
         private void SaveProfileRelations()
         {
             File.WriteAllText($"{_playerRelationsFullPath}/playerRelations.json", JsonSerializer.Serialize(_playerRelations, ConfigService.serializerOptions));
-        }        
+        }
 
         public FikaPlayerRelations GetStoredValue(string key)
         {
