@@ -39,9 +39,9 @@ namespace FikaServer.Controllers
         /// Handle /fika/update/setstatus
         /// </summary>
         /// <param name="request"></param>
-        public void HandleSetStatus(FikaUpdateSetStatusRequestData request)
+        public async Task HandleSetStatus(FikaUpdateSetStatusRequestData request)
         {
-            matchService.SetMatchStatus(request.ServerId, request.Status);
+            await matchService.SetMatchStatus(request.ServerId, request.Status);
         }
 
         /// <summary>

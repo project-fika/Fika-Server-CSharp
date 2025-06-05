@@ -20,9 +20,9 @@ namespace FikaServer.Callbacks
         /// <param name="info"></param>
         /// <param name="sessionID"></param>
         /// <returns></returns>
-        public ValueTask<string> HandleRaidCreate(string url, FikaRaidCreateRequestData info, string sessionID)
+        public async ValueTask<string> HandleRaidCreate(string url, FikaRaidCreateRequestData info, string sessionID)
         {
-            return new ValueTask<string>(httpResponseUtil.NoBody(raidController.HandleRaidCreate(info, sessionID)));
+            return httpResponseUtil.NoBody(await raidController.HandleRaidCreate(info, sessionID));
         }
 
         /// <summary>

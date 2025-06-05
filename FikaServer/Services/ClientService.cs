@@ -8,7 +8,8 @@ using SPTarkov.Server.Core.Servers;
 namespace FikaServer.Services
 {
     [Injectable(InjectionType.Singleton)]
-    public class ClientService(ISptLogger<ClientService> logger, SaveServer saveServer, ClientModHashesService fikaClientModHashesService, ConfigService fikaConfig)
+    public class ClientService(ISptLogger<ClientService> logger, SaveServer saveServer, 
+        ClientModHashesService fikaClientModHashesService, ConfigService fikaConfig)
     {
         private List<string> requiredMods = ["com.fika.core", "com.SPT.custom", "com.SPT.singleplayer", "com.SPT.core", "com.SPT.debugging"];
         private List<string> allowedMods = ["com.bepis.bepinex.configurationmanager", "com.fika.headless"];

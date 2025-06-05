@@ -58,11 +58,11 @@ namespace FikaServer.Callbacks
         /// <param name="info"></param>
         /// <param name="sessionID"></param>
         /// <returns></returns>
-        public ValueTask<string> HandleSetStatus(string url, FikaUpdateSetStatusRequestData info, string sessionID)
+        public async ValueTask<string> HandleSetStatus(string url, FikaUpdateSetStatusRequestData info, string sessionID)
         {
-            updateController.HandleSetStatus(info);
+            await updateController.HandleSetStatus(info);
 
-            return new ValueTask<string>(httpResponseUtil.NullResponse());
+            return httpResponseUtil.NullResponse();
         }
 
         /// <summary>

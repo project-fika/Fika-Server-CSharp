@@ -226,7 +226,7 @@ namespace FikaServer.Services
         /// </summary>
         /// <param name="matchId"></param>
         /// <param name="status"></param>
-        public void SetMatchStatus(string matchId, EFikaMatchStatus status)
+        public async Task SetMatchStatus(string matchId, EFikaMatchStatus status)
         {
             if (!Matches.ContainsKey(matchId))
             {
@@ -240,7 +240,7 @@ namespace FikaServer.Services
 
             if (status == EFikaMatchStatus.COMPLETE)
             {
-                headlessService.SendJoinMessageToRequester(matchId);
+                await headlessService.SendJoinMessageToRequester(matchId);
             }
         }
 

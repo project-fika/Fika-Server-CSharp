@@ -20,14 +20,17 @@ using SPTarkov.Server.Core.Servers.Ws;
 namespace FikaServer.Controllers
 {
     [Injectable]
-    public class RaidController(MatchService matchService, HeadlessHelper headlessHelper, HeadlessService headlessService, ISptLogger<RaidController> logger, InRaidController inraidController, IEnumerable<IWebSocketConnectionHandler> sptWebSocketConnectionHandlers)
+    public class RaidController(MatchService matchService, HeadlessHelper headlessHelper,
+        HeadlessService headlessService, 
+        ISptLogger<RaidController> logger, 
+        InRaidController inraidController, NotificationWebSocket notificationWebSocket)
     {
         /// <summary>
         /// Handle /fika/raid/create
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public FikaRaidCreateResponse HandleRaidCreate(FikaRaidCreateRequestData request, string sessionId)
+        public async Task<FikaRaidCreateResponse> HandleRaidCreate(FikaRaidCreateRequestData request, string sessionId)
         {
             string hostUsername = request.HostUsername;
 
@@ -36,11 +39,7 @@ namespace FikaServer.Controllers
                 hostUsername = headlessHelper.GetHeadlessNickname(request.ServerId);
             }
 
-            var NotificationWebSocket = sptWebSocketConnectionHandlers
-                .OfType<NotificationWebSocket>()
-                .FirstOrDefault(wsh => wsh.GetSocketId() == "Fika Notification Manager");
-
-            _ = NotificationWebSocket!.BroadcastAsync(new StartRaidNotification
+            await notificationWebSocket.BroadcastAsync(new StartRaidNotification
             {
                 Nickname = hostUsername,
                 Location = request.Settings.Location,
@@ -141,7 +140,7 @@ namespace FikaServer.Controllers
         /// <param name="sessionID"></param>
         /// <param name="info"></param>
         /// <returns></returns>
-        public StartHeadlessResponse HandleRaidStartHeadless(string sessionID, StartHeadlessRequest info)
+        public async Task<StartHeadlessResponse> HandleRaidStartHeadless(string sessionID, StartHeadlessRequest info)
         {
             if (!headlessHelper.IsHeadlessClientAvailable(info.HeadlessSessionID))
             {
@@ -161,8 +160,7 @@ namespace FikaServer.Controllers
                 };
             }
 
-            // TODO: Fix async
-            string? headlessClientId = headlessService.StartHeadlessRaid(info.HeadlessSessionID, sessionID, info);
+            string? headlessClientId = await headlessService.StartHeadlessRaid(info.HeadlessSessionID, sessionID, info);
 
             logger.Info($"Sent WS FikaHeadlessStartRaid to {headlessClientId}");
 
