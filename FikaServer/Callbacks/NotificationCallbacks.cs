@@ -3,29 +3,19 @@ using FikaServer.Models.Fika.WebSocket.Notifications;
 using FikaServer.WebSockets;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Utils;
-using SPTarkov.Server.Core.Servers.Ws;
 using SPTarkov.Server.Core.Utils;
 
 namespace FikaServer.Callbacks
 {
     [Injectable]
-    public class NotificationCallbacks(IEnumerable<IWebSocketConnectionHandler> sptWebSocketConnectionHandlers, ISptLogger<NotificationWebSocket> logger, HttpResponseUtil httpResponseUtil)
+    public class NotificationCallbacks(NotificationWebSocket notificationWebSocket, 
+        ISptLogger<NotificationWebSocket> logger, HttpResponseUtil httpResponseUtil)
     {
-        private static NotificationWebSocket? NotificationWebSocket = null;
-
         /// <summary>
         /// Handle /fika/notification/push
         /// </summary>
         public async ValueTask<string> HandlePushNotification(string url, PushNotification info, string sessionID)
         {
-            // Yes, technically this needs a controller to fit into this format. But I cant be bothered setting up a whole controller for a few checks.
-            if (NotificationWebSocket == null)
-            {
-                NotificationWebSocket = sptWebSocketConnectionHandlers
-                .OfType<NotificationWebSocket>()
-                .FirstOrDefault(wsh => wsh.GetSocketId() == "Fika Notification Manager");
-            }
-
             if (info.Notification == null)
             {
                 return httpResponseUtil.NullResponse();
@@ -39,7 +29,7 @@ namespace FikaServer.Callbacks
 
             //Todo: Debug log
             logger.Error("broadcasting");
-            await NotificationWebSocket.BroadcastAsync(info);
+            await notificationWebSocket.BroadcastAsync(info);
 
             return httpResponseUtil.NullResponse();
         }
