@@ -10,9 +10,9 @@ namespace FikaServer.Callbacks
     [Injectable]
     public class SendItemCallbacks(HttpResponseUtil httpResponseUtil, SendItemController sendItemController)
     {
-        public ItemEventRouterResponse HandleSendItem(PmcData pmcData, SendItemRequestData body, string sessionID)
+        public async ValueTask<ItemEventRouterResponse> HandleSendItem(PmcData pmcData, SendItemRequestData body, string sessionID)
         {
-            return sendItemController.SendItem(pmcData, body, sessionID);
+            return await sendItemController.SendItem(pmcData, body, sessionID);
         }
 
         /// <summary>

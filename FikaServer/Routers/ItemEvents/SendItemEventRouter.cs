@@ -12,11 +12,11 @@ namespace FikaServer.Routers.ItemEvents
     [Injectable]
     public class SendItemEventRouter(SendItemCallbacks sendItemCallbacks) : ItemEventRouterDefinition
     {
-        public override ItemEventRouterResponse? HandleItemEvent(string url, PmcData pmcData, BaseInteractionRequestData body, string sessionID, ItemEventRouterResponse output)
+        public override async ValueTask<ItemEventRouterResponse> HandleItemEvent(string url, PmcData pmcData, BaseInteractionRequestData body, string sessionID, ItemEventRouterResponse output)
         {
             return url switch
             {
-                FikaItemEventRouter.SENDTOPLAYER => sendItemCallbacks.HandleSendItem(pmcData, body as SendItemRequestData, sessionID),
+                FikaItemEventRouter.SENDTOPLAYER => await sendItemCallbacks.HandleSendItem(pmcData, body as SendItemRequestData, sessionID),
                 _ => throw new Exception($"SendItemEventRouter being used when it cant handle route {url}")
             };
         }

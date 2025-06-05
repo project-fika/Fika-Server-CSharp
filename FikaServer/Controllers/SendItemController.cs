@@ -22,7 +22,7 @@ namespace FikaServer.Controllers
         MailSendService mailSendService, InventoryHelper inventoryHelper, SaveServer saveServer,
         ItemHelper itemHelper, HttpResponseUtil httpResponseUtil, ConfigService fikaConfigService, IEnumerable<IWebSocketConnectionHandler> sptWebSocketConnectionHandlers)
     {
-        public ItemEventRouterResponse SendItem(PmcData pmcData, SendItemRequestData body, string sessionId)
+        public async ValueTask<ItemEventRouterResponse> SendItem(PmcData pmcData, SendItemRequestData body, string sessionId)
         {
             ItemEventRouterResponse output = eventOutputHolder.GetOutput(sessionId);
 
@@ -65,12 +65,12 @@ namespace FikaServer.Controllers
                 .OfType<NotificationWebSocket>()
                 .FirstOrDefault(wsh => wsh.GetSocketId() == "Fika Notification Manager");
 
-            NotificationWebSocket.SendAsync(body.Target, new ReceivedSentItemNotification
+            await NotificationWebSocket.SendAsync(body.Target, new ReceivedSentItemNotification
             {
                 Nickname = senderProfile?.CharacterData?.PmcData?.Info?.Nickname ?? "Unknown",
                 TargetId = body.Target,
                 ItemName = $"{itemsToSend[0].Template} ShortName"
-            }).Wait();
+            });
 
             return output;
         }
