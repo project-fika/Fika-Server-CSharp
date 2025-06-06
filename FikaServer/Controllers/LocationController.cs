@@ -30,10 +30,9 @@ namespace FikaServer.Controllers
                 }
 
                 string hostUsername = match.HostUsername;
-
                 if (match.IsHeadless)
                 {
-                    hostUsername = headlessHelper.GetHeadlessNickname(hostUsername);
+                    hostUsername = headlessHelper.GetHeadlessNickname(serverId);
                 }
 
                 matches.Add(new FikaRaidResponse
