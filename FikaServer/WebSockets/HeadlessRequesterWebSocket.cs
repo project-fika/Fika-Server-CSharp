@@ -71,7 +71,7 @@ namespace FikaServer.WebSockets
             return Task.CompletedTask;
         }
 
-        public async Task SendAsync(string sessionID, IHeadlessWSMessage message)
+        public async Task SendAsync<T>(string sessionID, T message) where T : IHeadlessWSMessage
         {
             // Client is not online or not currently connected to the websocket.
             if (!requesterWebSockets.TryGetValue(sessionID, out WebSocket ws))
