@@ -1,4 +1,5 @@
 ﻿using FikaServer.Helpers;
+using FikaServer.Models.Fika;
 using FikaServer.Models.Fika.Routes.Location;
 using FikaServer.Services;
 using SPTarkov.DI.Annotations;
@@ -19,33 +20,33 @@ namespace FikaServer.Controllers
         {
             List<FikaRaidResponse> matches = [];
 
-            foreach (var kvp in matchService.Matches)
+            foreach ((string serverId, FikaMatch match) in matchService.Matches)
             {
                 Dictionary<string, bool> players = [];
 
-                foreach (var playerkvp in kvp.Value.Players)
+                foreach ((string playerId, FikaPlayer player) in match.Players)
                 {
-                    players[playerkvp.Key] = playerkvp.Value.IsDead;
+                    players[playerId] = player.IsDead;
                 }
 
-                string hostUsername = kvp.Value.HostUsername;
+                string hostUsername = match.HostUsername;
 
-                if (kvp.Value.IsHeadless)
+                if (match.IsHeadless)
                 {
                     hostUsername = headlessHelper.GetHeadlessNickname(hostUsername);
                 }
 
                 matches.Add(new FikaRaidResponse
                 {
-                    ServerId = kvp.Key,
+                    ServerId = serverId,
                     HostUsername = hostUsername,
-                    PlayerCount = kvp.Value.Players.Count,
-                    Status = kvp.Value.Status,
-                    Location = kvp.Value.RaidConfig.Location,
-                    Side = kvp.Value.Side,
-                    Time = kvp.Value.Time,
+                    PlayerCount = match.Players.Count,
+                    Status = match.Status,
+                    Location = match.RaidConfig.Location,
+                    Side = match.Side,
+                    Time =  match.Time,
                     Players = players,
-                    IsHeadless = kvp.Value.IsHeadless,
+                    IsHeadless = match.IsHeadless,
                     HeadlessRequesterNickname = headlessHelper.GetRequesterUsername(hostUsername) ?? "" // Set this to an empty string if there is no requester.
                 });
 
