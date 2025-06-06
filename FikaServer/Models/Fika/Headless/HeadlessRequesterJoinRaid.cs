@@ -12,7 +12,6 @@ namespace FikaServer.Models.Fika.Headless
             MatchId = matchId;
         }
 
-        public override required EFikaHeadlessWSMessageType Type { get; set; }
-        public string? MatchId { get; set; }
+        public required string? MatchId { get; set; }
     }
 }

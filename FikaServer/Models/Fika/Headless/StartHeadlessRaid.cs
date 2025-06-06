@@ -13,8 +13,6 @@ namespace FikaServer.Models.Fika.Headless
             StartHeadlessRequest = request;
         }
 
-        public override required EFikaHeadlessWSMessageType Type { get; set; }
-
         public required StartHeadlessRequest? StartHeadlessRequest { get; set; }
     }
 }

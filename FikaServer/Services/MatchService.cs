@@ -228,11 +228,6 @@ namespace FikaServer.Services
         /// <param name="status"></param>
         public async Task SetMatchStatus(string matchId, EFikaMatchStatus status)
         {
-            if (!Matches.ContainsKey(matchId))
-            {
-                return;
-            }
-
             if (Matches.TryGetValue(matchId, out var match))
             {
                 match.Status = status;

@@ -48,6 +48,8 @@ namespace FikaServer.Services.Headless
                 return null;
             }
 
+            headlessClientInfo.StartRaid(requesterSessionID);
+
             StartHeadlessRaid startHeadlessRequest = new(EFikaHeadlessWSMessageType.HeadlessStartRaid, info);
             string data = jsonUtil.Serialize(startHeadlessRequest) ?? throw new NullReferenceException("StartHeadlessRaid:: Data was null after serializing");
             await webSocket.SendAsync(Encoding.UTF8.GetBytes(data),
@@ -72,6 +74,8 @@ namespace FikaServer.Services.Headless
                 logger.LogWithColor($"HeadlessSessionID '{headlessClientId}' was not ready, was {headlessClientInfo.State}", LogTextColor.Yellow);
                 return;
             }
+
+            headlessClientInfo.State = EHeadlessStatus.IN_RAID;
 
             await headlessRequesterWebSocket.SendAsync(headlessClientInfo.RequesterSessionID,
                 new HeadlessRequesterJoinRaid(EFikaHeadlessWSMessageType.RequesterJoinMatch, headlessClientId));

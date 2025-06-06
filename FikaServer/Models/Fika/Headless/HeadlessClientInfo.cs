@@ -34,7 +34,18 @@ namespace FikaServer.Models.Fika.Headless
         /// <summary>
         /// Allows for checking if the requester has been notified the match has started through the requester WebSocket so he can auto-join
         /// </summary>
-        public string? HasNotifiedRequester { get; set; }
+        public bool? HasNotifiedRequester { get; set; }
+
+        /// <summary>
+        /// Sets the info of the client after starting a raid
+        /// </summary>
+        /// <param name="requestId">The id who requested the raid</param>
+        public void StartRaid(string requestId)
+        {
+            Players = [];
+            RequesterSessionID = requestId;
+            HasNotifiedRequester = false;
+        }
 
         /// <summary>
         /// Resets the data of the <see cref="HeadlessClientInfo"/>

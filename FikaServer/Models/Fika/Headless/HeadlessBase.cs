@@ -4,6 +4,6 @@ namespace FikaServer.Models.Fika.Headless
 {
     public abstract record HeadlessBase
     {
-        public required abstract EFikaHeadlessWSMessageType Type { get; set; }
+        public required EFikaHeadlessWSMessageType Type { get; set; }
     }
 }
