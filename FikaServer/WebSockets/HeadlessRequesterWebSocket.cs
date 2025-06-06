@@ -87,9 +87,7 @@ namespace FikaServer.WebSockets
                 return;
             }
 
-            var data = jsonUtil.Serialize(message);
-            logger.Info(data);
-            await ws.SendAsync(Encoding.UTF8.GetBytes(data), WebSocketMessageType.Text, true, CancellationToken.None);
+            await ws.SendAsync(Encoding.UTF8.GetBytes(jsonUtil.Serialize(message)), WebSocketMessageType.Text, true, CancellationToken.None);
         }
     }
 }
