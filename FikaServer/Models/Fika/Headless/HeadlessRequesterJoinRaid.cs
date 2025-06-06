@@ -3,15 +3,20 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace FikaServer.Models.Fika.Headless
 {
-    public record HeadlessRequesterJoinRaid : HeadlessBase
+    public record HeadlessRequesterJoinRaid : IHeadlessWSMessage
     {
         [SetsRequiredMembers]
-        public HeadlessRequesterJoinRaid(EFikaHeadlessWSMessageType type, string matchId)
+        public HeadlessRequesterJoinRaid(string matchId)
         {
-            Type = type;
+            if (string.IsNullOrEmpty(matchId))
+            {
+                throw new NullReferenceException("matchId was missing");
+            }
+
             MatchId = matchId;
         }
 
+        public EFikaHeadlessWSMessageType Type { get; set; } = EFikaHeadlessWSMessageType.RequesterJoinMatch;
         public required string? MatchId { get; set; }
     }
 }

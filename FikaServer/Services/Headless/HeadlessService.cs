@@ -50,7 +50,7 @@ namespace FikaServer.Services.Headless
 
             headlessClientInfo.StartRaid(requesterSessionID);
 
-            StartHeadlessRaid startHeadlessRequest = new(EFikaHeadlessWSMessageType.HeadlessStartRaid, info);
+            StartHeadlessRaid startHeadlessRequest = new(info);
             string data = jsonUtil.Serialize(startHeadlessRequest) ?? throw new NullReferenceException("StartHeadlessRaid:: Data was null after serializing");
             await webSocket.SendAsync(Encoding.UTF8.GetBytes(data),
                 WebSocketMessageType.Text, true, CancellationToken.None);
@@ -78,7 +78,7 @@ namespace FikaServer.Services.Headless
             headlessClientInfo.State = EHeadlessStatus.IN_RAID;
 
             await headlessRequesterWebSocket.SendAsync(headlessClientInfo.RequesterSessionID,
-                new HeadlessRequesterJoinRaid(EFikaHeadlessWSMessageType.RequesterJoinMatch, headlessClientId));
+                new HeadlessRequesterJoinRaid(headlessClientId));
         }
 
         public void AddPlayerToHeadlessMatch(string headlessClientId, string sessionID)

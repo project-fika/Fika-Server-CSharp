@@ -4,15 +4,15 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace FikaServer.Models.Fika.Headless
 {
-    public record StartHeadlessRaid : HeadlessBase
+    public record StartHeadlessRaid : IHeadlessWSMessage
     {
         [SetsRequiredMembers]
-        public StartHeadlessRaid(EFikaHeadlessWSMessageType type, StartHeadlessRequest request)
+        public StartHeadlessRaid(StartHeadlessRequest request)
         {
-            Type = type;
             StartHeadlessRequest = request;
         }
 
+        public EFikaHeadlessWSMessageType Type {  get; set; } = EFikaHeadlessWSMessageType.HeadlessStartRaid;
         public required StartHeadlessRequest? StartHeadlessRequest { get; set; }
     }
 }

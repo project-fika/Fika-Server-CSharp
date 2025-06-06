@@ -71,7 +71,7 @@ namespace FikaServer.WebSockets
             return Task.CompletedTask;
         }
 
-        public async Task SendAsync(string sessionID, HeadlessBase message)
+        public async Task SendAsync(string sessionID, IHeadlessWSMessage message)
         {
             // Client is not online or not currently connected to the websocket.
             if (!requesterWebSockets.TryGetValue(sessionID, out WebSocket ws))
@@ -87,7 +87,9 @@ namespace FikaServer.WebSockets
                 return;
             }
 
-            await ws.SendAsync(Encoding.UTF8.GetBytes(jsonUtil.Serialize(message)), WebSocketMessageType.Text, true, CancellationToken.None);
+            var data = jsonUtil.Serialize(message);
+            logger.Info(data);
+            await ws.SendAsync(Encoding.UTF8.GetBytes(data), WebSocketMessageType.Text, true, CancellationToken.None);
         }
     }
 }
