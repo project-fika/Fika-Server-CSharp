@@ -59,7 +59,7 @@ namespace FikaServer.Controllers
             }
 
             mailSendService.SendSystemMessageToPlayer(body.Target, $"You have received a gift from {senderProfile?.CharacterData?.PmcData?.Info?.Nickname ?? "Unknown"}", itemsToSend, 604800);
-            inventoryHelper.RemoveItem(senderProfile.CharacterData.PmcData, body.ID, sessionId);
+            inventoryHelper.RemoveItem(senderProfile.CharacterData.PmcData, body.ID, sessionId, output);
 
             var NotificationWebSocket = sptWebSocketConnectionHandlers
                 .OfType<NotificationWebSocket>()
