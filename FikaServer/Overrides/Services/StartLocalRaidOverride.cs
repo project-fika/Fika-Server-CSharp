@@ -17,6 +17,7 @@ namespace FikaServer.Overrides.Services
             return typeof(LocationLifecycleService).GetMethod(nameof(LocationLifecycleService.StartLocalRaid));
         }
 
+        [PatchPrefix]
         public static bool Prefix(string sessionId, StartLocalRaidRequestData request, ref StartLocalRaidResponseData __result)
         {
             LocationBase locationLoot;

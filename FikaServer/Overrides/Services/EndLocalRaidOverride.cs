@@ -15,6 +15,7 @@ namespace FikaServer.Overrides.Services
             return typeof(LocationLifecycleService).GetMethod(nameof(LocationLifecycleService.EndLocalRaid));
         }
 
+        [PatchPrefix]
         public static bool Prefix(string sessionId, EndLocalRaidRequestData request)
         {
             MatchService matchService = ServiceLocator.ServiceProvider.GetService<MatchService>();

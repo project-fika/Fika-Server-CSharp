@@ -1,8 +1,11 @@
 ﻿using Microsoft.Extensions.Primitives;
 using SPTarkov.DI.Annotations;
+using SPTarkov.Reflection.Patching;
+using SPTarkov.Server.Core.Controllers;
 using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Helpers;
 using SPTarkov.Server.Core.Routers;
+using System.Reflection;
 
 namespace FikaServer.Overrides.Routers
 {
@@ -10,18 +13,21 @@ namespace FikaServer.Overrides.Routers
     /// This override is essential for setups where the backendIp or NAT port mapping differs from the SPT server’s backend port.
     /// Without it, SPT constructs an incorrect backend URL, causing connection issues (e.g., using 0.0.0.0 instead of the correct address).
     /// </summary>
-    [Injectable]
-    public class HttpRouterOverride(HttpServerHelper httpServerHelper,
-        IEnumerable<StaticRouter> staticRouters, 
-        IEnumerable<DynamicRouter> dynamicRoutes) : HttpRouter(staticRouters, dynamicRoutes)
+    public class GetResponseOverride : AbstractPatch
     {
-        public async override ValueTask<string?> GetResponse(HttpRequest req, string sessionID, string? body)
+        protected override MethodBase GetTargetMethod()
         {
-            var response = await base.GetResponse(req, sessionID, body);
+            return typeof(HttpRouter).GetMethod(nameof(HttpRouter.GetResponse));
+        }
+
+        [PatchPostfix]
+        public async static ValueTask<string?> Postfix(ValueTask<string?> __result, HttpRequest req, string sessionID, string? body)
+        {
+            string? response = await __result;
 
             if (!StringValues.IsNullOrEmpty(req.Headers.Host))
             {
-                string originalHost = httpServerHelper.BuildUrl();
+                string originalHost = ServiceLocator.ServiceProvider.GetService<HttpServerHelper>().BuildUrl();
                 string requestHost = req.Headers.Host.ToString();
 
                 response = response.Replace(originalHost, requestHost);

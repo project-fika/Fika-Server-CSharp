@@ -1,32 +1,45 @@
 ﻿using FikaServer.Controllers;
-using SPTarkov.DI.Annotations;
+using SPTarkov.Reflection.Patching;
 using SPTarkov.Server.Core.Controllers;
-using SPTarkov.Server.Core.Helpers;
-using SPTarkov.Server.Core.Helpers.Dialogue;
+using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Models.Eft.Dialog;
-using SPTarkov.Server.Core.Models.Utils;
-using SPTarkov.Server.Core.Servers;
-using SPTarkov.Server.Core.Services;
-using SPTarkov.Server.Core.Utils;
+using System.Reflection;
 
 namespace FikaServer.Overrides.Services
 {
-    [Injectable]
-    public class DialogueControllerOverrides(ISptLogger<DialogueController> _logger, TimeUtil _timeUtil, DialogueHelper _dialogueHelper,
-        NotificationSendHelper _notificationSendHelper, ProfileHelper _profileHelper, ConfigServer _configServer, SaveServer _saveServer,
-        LocalisationService _localisationService, MailSendService _mailSendService, IEnumerable<IDialogueChatBot> dialogueChatBots, 
-        FikaDialogueController fikaDialogueController) 
-        : DialogueController(_logger, _timeUtil, _dialogueHelper, _notificationSendHelper, _profileHelper, _configServer, _saveServer,
-            _localisationService, _mailSendService, dialogueChatBots)
+    public class GetFriendListOverride : AbstractPatch
     {
-        public override GetFriendListDataResponse GetFriendList(string sessionId)
+        protected override MethodBase GetTargetMethod()
         {
-            return fikaDialogueController.GetFriendsList(sessionId);
+            return typeof(DialogueController).GetMethod(nameof(DialogueController.GetFriendList));
         }
 
-        public override string SendMessage(string sessionId, SendMessageRequest request)
+        [PatchPrefix]
+        public static bool Prefix(string sessionId, ref GetFriendListDataResponse __result)
         {
-            return fikaDialogueController.SendMessage(sessionId, request);
+            FikaDialogueController? dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>();
+
+            __result = dialogueController.GetFriendsList(sessionId);
+
+            return false;
+        }
+    }
+
+    public class SendMessageOverride : AbstractPatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return typeof(DialogueController).GetMethod(nameof(DialogueController.SendMessage));
+        }
+
+        [PatchPrefix]
+        public static bool Prefix(string sessionId, SendMessageRequest request, ref string __result)
+        {
+            FikaDialogueController? dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>();
+
+            __result = dialogueController.SendMessage(sessionId, request);
+
+            return false;
         }
     }
 }
