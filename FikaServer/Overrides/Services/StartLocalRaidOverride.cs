@@ -1,34 +1,43 @@
 ﻿using FikaServer.Services;
-using SPTarkov.Reflection.Patching;
-using SPTarkov.Server.Core.DI;
+using SPTarkov.DI.Annotations;
+using SPTarkov.Server.Core.Generators;
 using SPTarkov.Server.Core.Helpers;
 using SPTarkov.Server.Core.Models.Eft.Common;
 using SPTarkov.Server.Core.Models.Eft.Match;
+using SPTarkov.Server.Core.Models.Utils;
+using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Services;
 using SPTarkov.Server.Core.Utils;
-using System.Reflection;
+using SPTarkov.Server.Core.Utils.Cloners;
 
 namespace FikaServer.Overrides.Services
 {
-    public class StartLocalRaidOverride : AbstractPatch
+    [Injectable]
+    public class StartLocalRaidOverride(ISptLogger<LocationLifecycleService> logger, RewardHelper rewardHelper,
+        ConfigServer configServer, TimeUtil timeUtil, DatabaseService databaseService,
+        ProfileHelper profileHelper, HashUtil hashUtil, ProfileActivityService profileActivityService,
+        BotGenerationCacheService botGenerationCacheService, BotNameService botNameService, ICloner cloner,
+        RaidTimeAdjustmentService raidTimeAdjustmentService, LocationLootGenerator locationLootGenerator
+        , LocalisationService localisationService, BotLootCacheService botLootCacheService, LootGenerator lootGenerator,
+        MailSendService mailSendService, TraderHelper traderHelper, RandomUtil randomUtil, InRaidHelper inRaidHelper,
+        PlayerScavGenerator playerScavGenerator, SaveServer saveServer, HealthHelper healthHelper, PmcChatResponseService pmcChatResponseService,
+        PmcWaveGenerator pmcWaveGenerator, QuestHelper questHelper, SPTarkov.Server.Core.Services.InsuranceService sptInsuranceService,
+        MatchBotDetailsCacheService matchBotDetailsCacheService, MatchService matchService)
+        : LocationLifecycleService(logger, rewardHelper, configServer, timeUtil, databaseService, profileHelper, hashUtil,
+            profileActivityService, botGenerationCacheService, botNameService, cloner, raidTimeAdjustmentService, locationLootGenerator,
+            localisationService, botLootCacheService, lootGenerator, mailSendService, traderHelper, randomUtil, inRaidHelper, playerScavGenerator,
+            saveServer, healthHelper, pmcChatResponseService, pmcWaveGenerator, questHelper, sptInsuranceService, matchBotDetailsCacheService)
     {
-        protected override MethodBase GetTargetMethod()
-        {
-            return typeof(LocationLifecycleService).GetMethod(nameof(LocationLifecycleService.StartLocalRaid));
-        }
-
-        public static bool Prefix(string sessionId, StartLocalRaidRequestData request, ref StartLocalRaidResponseData __result)
+        public override StartLocalRaidResponseData StartLocalRaid(string sessionId, StartLocalRaidRequestData request)
         {
             LocationBase locationLoot;
-            MatchService matchService = ServiceLocator.ServiceProvider.GetService<MatchService>()!;
-            LocationLifecycleService locationLifeCycleService = ServiceLocator.ServiceProvider.GetService<LocationLifecycleService>()!;
 
             var matchId = matchService!.GetMatchIdByProfile(sessionId);
 
             if (string.IsNullOrEmpty(matchId))
             {
                 // player isn't in a Fika match, generate new loot
-                locationLoot = locationLifeCycleService!.GenerateLocationAndLoot(sessionId, request.Location);
+                locationLoot = GenerateLocationAndLoot(sessionId, request.Location);
             }
             else
             {
@@ -40,20 +49,16 @@ namespace FikaServer.Overrides.Services
                     match.Raids++;
                     if (match.Raids > 1)
                     {
-                        match.LocationData = locationLifeCycleService!.GenerateLocationAndLoot(sessionId, request.Location);
+                        match.LocationData = GenerateLocationAndLoot(sessionId, request.Location);
                     }
                 }
 
                 locationLoot = match.LocationData;
             }
-
-            DatabaseService databaseService = ServiceLocator.ServiceProvider.GetService<DatabaseService>()!;
-            ProfileHelper profileHelper = ServiceLocator.ServiceProvider.GetService<ProfileHelper>()!;
-            TimeUtil timeUtil = ServiceLocator.ServiceProvider.GetService<TimeUtil>()!;
-
+             
             var playerProfile = profileHelper.GetPmcProfile(sessionId);
 
-            StartLocalRaidResponseData result = new StartLocalRaidResponseData
+            StartLocalRaidResponseData responseData = new()
             {
                 ServerId = $"{request.Location}.{request.PlayerSide}.{timeUtil.GetTimeStamp()}",
                 ServerSettings = databaseService.GetLocationServices(),
@@ -74,44 +79,42 @@ namespace FikaServer.Overrides.Services
             // Only has value when transitioning into map from previous one
             if (request.Transition != null)
             {
-                result.Transition = request.Transition;
+                responseData.Transition = request.Transition;
             }
 
             // Get data stored at end of previous raid (if any)
-            LocationTransit? transitionData = ServiceLocator.ServiceProvider.GetService<ProfileActivityService>()!.GetProfileActivityRaidData(sessionId).LocationTransit;
+            LocationTransit? transitionData = profileActivityService.GetProfileActivityRaidData(sessionId).LocationTransit;
 
             if (transitionData != null)
             {
-                result.Transition.TransitionRaidId = transitionData.TransitionRaidId;
-                result.Transition.TransitionCount += 1;
+                responseData.Transition.TransitionRaidId = transitionData.TransitionRaidId;
+                responseData.Transition.TransitionCount += 1;
 
-                if (result.Transition.VisitedLocations == null)
+                if (responseData.Transition.VisitedLocations == null)
                 {
-                    result.Transition.VisitedLocations = [transitionData.SptLastVisitedLocation];
+                    responseData.Transition.VisitedLocations = [transitionData.SptLastVisitedLocation];
                 }
                 else
                 {
-                    result.Transition.VisitedLocations.Add(transitionData.SptLastVisitedLocation);
+                    responseData.Transition.VisitedLocations.Add(transitionData.SptLastVisitedLocation);
                 }
 
                 // Complete, clean up
-                ServiceLocator.ServiceProvider.GetService<ProfileActivityService>()!.GetProfileActivityRaidData(sessionId).LocationTransit = null;
+                profileActivityService.GetProfileActivityRaidData(sessionId).LocationTransit = null;
             }
 
             if (string.IsNullOrEmpty(matchId) || sessionId == matchId)
             {
                 // Apply changes from pmcConfig to bot hostility values
-                typeof(LocationLifecycleService).GetMethod("AdjustBotHostilitySettings")?.Invoke(locationLifeCycleService, [result.LocationLoot]);
-                typeof(LocationLifecycleService).GetMethod("AdjustExtracts")?.Invoke(locationLifeCycleService, [request.PlayerSide, request.Location, result.LocationLoot]);
+                AdjustBotHostilitySettings(responseData.LocationLoot);
+                AdjustExtracts(request.PlayerSide, request.Location, responseData.LocationLoot);
 
                 // Clear bot cache ready for a fresh raid
-                ServiceLocator.ServiceProvider.GetService<BotGenerationCacheService>()!.ClearStoredBots();
-                ServiceLocator.ServiceProvider.GetService<BotNameService>()!.ClearNameCache();
+                botGenerationCacheService.ClearStoredBots();
+                botNameService.ClearNameCache();
             }
 
-            __result = result;
-
-            return false;
+            return responseData;
         }
     }
 }
