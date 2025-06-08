@@ -20,7 +20,7 @@ namespace FikaServer.Controllers
     [Injectable]
     public class SendItemController(ISptLogger<SendItemController> logger, EventOutputHolder eventOutputHolder,
         MailSendService mailSendService, InventoryHelper inventoryHelper, SaveServer saveServer,
-        ItemHelper itemHelper, HttpResponseUtil httpResponseUtil, ConfigService fikaConfigService, IEnumerable<IWebSocketConnectionHandler> sptWebSocketConnectionHandlers)
+        ItemHelper itemHelper, HttpResponseUtil httpResponseUtil, ConfigService fikaConfigService, NotificationWebSocket notificationWebSocket)
     {
         public async ValueTask<ItemEventRouterResponse> SendItem(PmcData pmcData, SendItemRequestData body, string sessionId)
         {
@@ -61,11 +61,7 @@ namespace FikaServer.Controllers
             mailSendService.SendSystemMessageToPlayer(body.Target, $"You have received a gift from {senderProfile?.CharacterData?.PmcData?.Info?.Nickname ?? "Unknown"}", itemsToSend, 604800);
             inventoryHelper.RemoveItem(senderProfile.CharacterData.PmcData, body.ID, sessionId, output);
 
-            var NotificationWebSocket = sptWebSocketConnectionHandlers
-                .OfType<NotificationWebSocket>()
-                .FirstOrDefault(wsh => wsh.GetSocketId() == "Fika Notification Manager");
-
-            await NotificationWebSocket.SendAsync(body.Target, new ReceivedSentItemNotification
+            await notificationWebSocket.SendAsync(body.Target, new ReceivedSentItemNotification
             {
                 Nickname = senderProfile?.CharacterData?.PmcData?.Info?.Nickname ?? "Unknown",
                 TargetId = body.Target,
