@@ -17,7 +17,7 @@ namespace FikaServer.OnLoad
 
     public class FikaPostLoad(ISptLogger<FikaPostLoad> logger, ConfigServer configServer, NatPunchServer natPunchServer, ImageRouter imageRouter,
         HeadlessProfileService HeadlessProfileService, LocaleService localeService, PlayerRelationsService playerRelationsCacheService,
-        ClientService clientService, JsonUtil jsonUtil, ConfigService fikaConfig) : IOnLoad
+        FriendRequestsService friendRequestsService, ClientService clientService, JsonUtil jsonUtil, ConfigService fikaConfig) : IOnLoad
     {
         public async Task OnLoad()
         {
@@ -36,6 +36,7 @@ namespace FikaServer.OnLoad
             await localeService.OnPostLoadAsync();
             BlacklistSpecialProfiles();
             playerRelationsCacheService.OnPostLoad();
+            friendRequestsService.OnPostLoad();
 
             if (config.Background.Enable)
             {

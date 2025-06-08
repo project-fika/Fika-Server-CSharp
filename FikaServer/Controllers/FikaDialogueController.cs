@@ -60,6 +60,11 @@ namespace FikaServer.Controllers
             };
         }
 
+        public void SendFriendRequest(string from, string to)
+        {
+
+        }
+
         /// <summary>
         /// Sends a message to another player
         /// </summary>

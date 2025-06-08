@@ -11,7 +11,8 @@ namespace FikaServer.OnLoad
 {
     [Injectable(TypePriority = OnLoadOrder.PreSptModLoader)]
     public class FikaPreLoad(ConfigService fikaConfig, ClientService clientService,
-        PlayerRelationsService playerRelationsCacheService, JsonUtil jsonUtil) : IOnLoad
+        PlayerRelationsService playerRelationsCacheService, FriendRequestsService friendRequestsService,
+        JsonUtil jsonUtil) : IOnLoad
     {
         public async Task OnLoad()
         {
@@ -20,6 +21,7 @@ namespace FikaServer.OnLoad
             await fikaConfig.OnPreLoad();
             clientService.OnPreLoad();
             playerRelationsCacheService.OnPreLoad();
+            friendRequestsService.OnPreLoad();
         }
     }
 }
