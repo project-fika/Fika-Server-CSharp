@@ -1,4 +1,5 @@
 ﻿using FikaServer.Helpers;
+using FikaServer.Models.Fika.WebSocket;
 using FikaServer.Services.Cache;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Controllers;
@@ -7,17 +8,21 @@ using SPTarkov.Server.Core.Models.Eft.Common;
 using SPTarkov.Server.Core.Models.Eft.Dialog;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Eft.Ws;
+using SPTarkov.Server.Core.Models.Enums;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Servers.Ws;
 using SPTarkov.Server.Core.Utils;
+using System.Reflection.Metadata.Ecma335;
+using static FikaServer.Helpers.PlayerRelationsHelper;
 
 namespace FikaServer.Controllers
 {
     [Injectable]
     public class FikaDialogueController(ISptLogger<FikaDialogueController> logger, PlayerRelationsService playerRelationsService, DialogueController dialogueController,
         ProfileHelper profileHelper, PlayerRelationsHelper playerRelationsHelper, SaveServer saveServer,
-        HashUtil hashUtil, TimeUtil timeUtil, DialogueHelper dialogueHelper, SptWebSocketConnectionHandler socketConnectionHandler)
+        HashUtil hashUtil, TimeUtil timeUtil, DialogueHelper dialogueHelper, SptWebSocketConnectionHandler socketConnectionHandler,
+        FriendRequestsService friendRequestsService, HttpResponseUtil httpResponseUtil)
     {
         /// <summary>
         /// Gets a list of all friends for the specified profileId
@@ -61,9 +66,59 @@ namespace FikaServer.Controllers
             };
         }
 
-        public void SendFriendRequest(string from, string to)
+        public FriendRequestSendResponse? AddFriendRequest(string from, string to)
         {
+            if (friendRequestsService.HasFriendRequest(from, to))
+            {
+                logger.Error($"{from} has already sent a request to {to}");
+                return null;
+            }
 
+            if (!saveServer.ProfileExists(to))
+            {
+                logger.Error($"{from} tried to send a friend request to {to} who doesn't exist");
+                return null;
+            }
+
+            friendRequestsService.AddFriendRequest(new()
+            {
+                Id = hashUtil.Generate(),
+                From = from,
+                To = to,
+                Date = timeUtil.GetTimeStamp()
+            });
+
+            SptProfile fromProfile = saveServer.GetProfile(from)
+                ?? throw new NullReferenceException($"{from} did not exist in the database");
+
+            socketConnectionHandler.SendMessage(to, new WsFriendListAdd()
+            {
+                EventIdentifier = "friendListNewRequest",
+                EventType = NotificationEventType.friendListNewRequest,
+                Id = from,
+                Profile = new()
+                {
+                    Id = fromProfile.ProfileInfo.ProfileId,
+                    Aid = fromProfile.ProfileInfo.Aid,
+                    Info = new()
+                    {
+                        Nickname = fromProfile.CharacterData.PmcData.Info.Nickname,
+                        Side = fromProfile.CharacterData.PmcData.Info.Side,
+                        Level = fromProfile.CharacterData.PmcData.Info.Level,
+                        MemberCategory = fromProfile.CharacterData.PmcData.Info.MemberCategory,
+                        SelectedMemberCategory = fromProfile.CharacterData.PmcData.Info.SelectedMemberCategory,
+                        Ignored = false,
+                        Banned = fromProfile.CharacterData.PmcData.Info.BannedState
+                    }
+                }
+            });
+
+            return new FriendRequestSendResponse
+            {
+                Status = BackendErrorCodes.None,
+                RequestId = from,
+                RetryAfter = 0
+            };
         }
 
         /// <summary>
@@ -242,6 +297,23 @@ namespace FikaServer.Controllers
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Accepts a friend request
+        /// </summary>
+        /// <param name="sessionID"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public ValueTask<string> AcceptFriendRequest(string sessionID, AcceptFriendRequestData request)
+        {
+            if (playerRelationsHelper.RemoveFriendRequest(sessionID, request.ProfileId, ERemoveFriendReason.Accept))
+            {
+                playerRelationsHelper.AddFriend(sessionID, request.ProfileId);
+                
+            }
+
+            return new(httpResponseUtil.GetBody(true));
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using FikaServer.Models.Fika;
+using FikaServer.Models.Fika.Dialog;
 using FikaServer.Models.Fika.WebSocket;
 using FikaServer.Services.Cache;
 using SPTarkov.DI.Annotations;
@@ -13,7 +14,7 @@ namespace FikaServer.Helpers
     [Injectable]
     public class PlayerRelationsHelper(ISptLogger<PlayerRelationsHelper> logger,
         PlayerRelationsService playerRelationsService, SaveServer saveServer,
-        SptWebSocketConnectionHandler webSocketHandler)
+        SptWebSocketConnectionHandler webSocketHandler, FriendRequestsService friendRequestsService)
     {
         /// <summary>
         /// Gets the friends list of a player
@@ -64,19 +65,7 @@ namespace FikaServer.Helpers
                 {
                     EventIdentifier = "youAreRemovedFromFriendList",
                     EventType = NotificationEventType.youAreRemovedFromFriendList,
-                    Profile = new()
-                    {
-                        Aid = profile.ProfileInfo.Aid,
-                        Id = profile.ProfileInfo.ProfileId,
-                        Info = new()
-                        {
-                            Level = profile.CharacterData.PmcData.Info.Level,
-                            MemberCategory = profile.CharacterData.PmcData.Info.MemberCategory,
-                            SelectedMemberCategory = profile.CharacterData.PmcData.Info.SelectedMemberCategory,
-                            Nickname = profile.CharacterData.PmcData.Info.Nickname,
-                            Side = profile.CharacterData.PmcData.Info.Side
-                        }
-                    }
+                    Profile = profile.ToFriendData()
                 });
             }
         }
@@ -101,6 +90,84 @@ namespace FikaServer.Helpers
         {
             return [.. playerRelationsService.Keys
                 .Where(x => playerRelationsService.GetStoredValue(x).Ignore.Contains(profileId))];
+        }
+
+        public bool RemoveFriendRequest(string from, string? to, ERemoveFriendReason reason)
+        {
+            if (!friendRequestsService.HasFriendRequest(from, to, out FriendRequestListResponse? response))
+            {
+                logger.Error($"{from} tried to remove a friend request from {to} but it doesn't exist. Reason: {reason}");
+                return false;
+            }
+
+            friendRequestsService.DeleteFriendRequest(response);
+            switch (reason)
+            {
+                case ERemoveFriendReason.Accept:
+                    {
+                        SptProfile profile = saveServer.GetProfile(to);
+                        webSocketHandler.SendMessage(from, new WsFriendListRemove()
+                        {
+                            EventIdentifier = "friendListRequestAccept",
+                            EventType = NotificationEventType.friendListRequestAccept,
+                            Profile = profile.ToFriendData()
+                        });
+                    }
+                    break;
+                case ERemoveFriendReason.Cancel:
+                    {
+                        /*SptProfile profile = saveServer.GetProfile(from);
+                        webSocketHandler.SendMessage(to, new WsFriendListRemove()
+                        {
+                            EventIdentifier = "friendListRequestCancel",
+                            EventType = NotificationEventType.friendListRequestCancel,
+                            Profile = profile.ToFriendData()
+                        });*/
+                    }
+                    break;
+                case ERemoveFriendReason.Decline:
+                    {
+                        SptProfile profile = saveServer.GetProfile(from);
+                        webSocketHandler.SendMessage(to, new WsFriendListRemove()
+                        {
+                            EventIdentifier = "friendListRequestDecline",
+                            EventType = NotificationEventType.friendListRequestDecline,
+                            Profile = profile.ToFriendData()
+                        });
+                    }
+                    break;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Adds new relations to the cache and saves
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        public void AddFriend(string from, string? to)
+        {
+            FikaPlayerRelations fromRelations = playerRelationsService.GetStoredValue(from);
+            if (!fromRelations.Friends.Contains(from))
+            {
+                fromRelations.Friends.Add(from);
+            }
+
+            FikaPlayerRelations toRelations = playerRelationsService.GetStoredValue(to);
+            if (!toRelations.Friends.Contains(from))
+            {
+                toRelations.Friends.Add(from);
+            }
+
+            playerRelationsService.SaveProfileRelations();
+        }
+
+        public enum ERemoveFriendReason
+        {
+            Accept,
+            Cancel,
+            Decline
         }
     }
 }

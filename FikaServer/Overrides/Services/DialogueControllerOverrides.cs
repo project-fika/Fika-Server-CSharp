@@ -1,5 +1,6 @@
 ﻿using FikaServer.Controllers;
 using SPTarkov.Reflection.Patching;
+using SPTarkov.Server.Core.Callbacks;
 using SPTarkov.Server.Core.Controllers;
 using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Models.Eft.Dialog;
@@ -23,6 +24,30 @@ namespace FikaServer.Overrides.Services
 
             __result = dialogueController.GetFriendsList(sessionId);
 
+            return false;
+        }
+    }
+
+    public class SendFriendRequestOverride : AbstractPatch
+    {
+        protected override MethodBase GetTargetMethod()
+        {
+            return typeof(DialogueController).GetMethod(nameof(DialogueController.SendFriendRequest));
+        }
+
+        [PatchPrefix]
+        public static bool Prefix(string sessionID, FriendRequestData request, ref FriendRequestSendResponse __result)
+        {
+            FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
+                ?? throw new NullReferenceException("Could not get DialogueController");
+
+            FriendRequestSendResponse? result = dialogueController.AddFriendRequest(sessionID, request.To);
+            if (__result == null)
+            {
+                return true;
+            }
+
+            __result = result;
             return false;
         }
     }
