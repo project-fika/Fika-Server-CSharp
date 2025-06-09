@@ -10,7 +10,7 @@ namespace FikaServer.Overrides.Callbacks
 {
     public class DialogueCallbacksOverride
     {
-        public class SendFriendRequestOverride : AbstractPatch
+        public class AcceptFriendRequest : AbstractPatch
         {
             protected override MethodBase GetTargetMethod()
             {
