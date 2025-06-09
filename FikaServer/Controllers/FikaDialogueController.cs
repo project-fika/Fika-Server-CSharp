@@ -3,6 +3,7 @@ using FikaServer.Services.Cache;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Controllers;
 using SPTarkov.Server.Core.Helpers;
+using SPTarkov.Server.Core.Models.Eft.Common;
 using SPTarkov.Server.Core.Models.Eft.Dialog;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Eft.Ws;
@@ -30,7 +31,7 @@ namespace FikaServer.Controllers
 
             foreach (string friend in friends)
             {
-                SPTarkov.Server.Core.Models.Eft.Common.PmcData? profile = profileHelper.GetPmcProfile(friend);
+                PmcData? profile = profileHelper.GetPmcProfile(friend);
                 if (profile == null)
                 {
                     playerRelationsHelper.RemoveFriend(sessionId, friend);
