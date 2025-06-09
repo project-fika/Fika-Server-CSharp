@@ -1,5 +1,6 @@
 ﻿using FikaServer.Models.Fika;
 using FikaServer.Models.Fika.SendItem;
+using FikaServer.Overrides.Callbacks;
 using FikaServer.Overrides.Routers;
 using FikaServer.Overrides.Services;
 using FikaServer.Services;
@@ -24,6 +25,7 @@ namespace FikaServer.OnLoad
             new GetResponseOverride(),
             new GetFriendListOverride(),
             new SendFriendRequestOverride(),
+            new AcceptFriendRequestOverride(),
             new SendMessageOverride(),
             new GetMiniProfilesOverride(),
             new GetFriendsOverride(),
