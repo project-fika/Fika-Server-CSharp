@@ -177,7 +177,9 @@ namespace FikaServer.Controllers
                     Side = senderProfile.CharacterData.PmcData.Info.Side,
                     Level = senderProfile.CharacterData.PmcData.Info.Level,
                     MemberCategory = senderProfile.CharacterData.PmcData.Info.MemberCategory,
-                    IsIgnored = playerRelationsHelper.GetInIgnoreList(sessionId).Contains(request.DialogId),
+                    IsIgnored = playerRelationsHelper
+                        .GetInIgnoreList(sessionId)
+                        .Contains(request.DialogId),
                     IsBanned = false
                 },
                 DateTime = timeUtil.GetTimeStamp(),
@@ -223,7 +225,8 @@ namespace FikaServer.Controllers
                 return null;
             }
 
-            Message? message = currentDialogue.Messages.Where(x => x.Id == replyToId)
+            Message? message = currentDialogue.Messages
+                .Where(x => x.Id == replyToId)
                 .FirstOrDefault();
 
             if (message != null)
