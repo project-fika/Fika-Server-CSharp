@@ -45,7 +45,7 @@ namespace FikaServer.WebSockets
 
             if (!headlessHelper.IsHeadlessClient(userSessionID))
             {
-                logger.Debug($"[{GetSocketId()}] Invalid headless client {userSessionID} tried to authenticate!");
+                logger.Error($"[{GetSocketId()}] Invalid headless client {userSessionID} tried to authenticate!");
                 return;
             }
 
