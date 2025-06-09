@@ -25,12 +25,12 @@ namespace FikaServer.Controllers
         /// <returns>A new <see cref="GetFriendListDataResponse"/></returns>
         public GetFriendListDataResponse GetFriendsList(string sessionId)
         {
-            var botsAndFriends = dialogueController.GetActiveChatBots();
-            var friends = playerRelationsHelper.GetFriendsList(sessionId);
+            List<UserDialogInfo> botsAndFriends = dialogueController.GetActiveChatBots();
+            List<string> friends = playerRelationsHelper.GetFriendsList(sessionId);
 
-            foreach (var friend in friends)
+            foreach (string friend in friends)
             {
-                var profile = profileHelper.GetPmcProfile(friend);
+                SPTarkov.Server.Core.Models.Eft.Common.PmcData? profile = profileHelper.GetPmcProfile(friend);
                 if (profile == null)
                 {
                     playerRelationsHelper.RemoveFriend(sessionId, friend);
@@ -71,17 +71,10 @@ namespace FikaServer.Controllers
         /// <param name="sessionId">The profile id to send from</param>
         /// <param name="request">The request to handle</param>
         /// <returns>The id of the message sent</returns>
-        public string SendMessage(string sessionId, SendMessageRequest request)
+        public string SendMessage(string sessionId, SendMessageRequest request, Dictionary<string, SptProfile> profiles)
         {
-            var profiles = saveServer.GetProfiles();
-            if (!profiles.TryGetValue(sessionId, out var profile))
-            {
-                // it's not a player, let SPT handle it
-                return dialogueController.SendMessage(sessionId, request);
-            }
-
-            var receiverProfile = profiles[request.DialogId];
-            var senderProfile = profiles[sessionId];
+            SptProfile receiverProfile = profiles[request.DialogId];
+            SptProfile senderProfile = profiles[sessionId];
 
             if (!senderProfile.DialogueRecords.ContainsKey(request.DialogId))
             {
@@ -97,7 +90,7 @@ namespace FikaServer.Controllers
                 });
             }
 
-            var senderDialog = senderProfile.DialogueRecords[request.DialogId];
+            Dialogue senderDialog = senderProfile.DialogueRecords[request.DialogId];
             senderDialog.Users = [
                 new()
                 {
@@ -127,7 +120,7 @@ namespace FikaServer.Controllers
                 }
             ];
 
-            if (!receiverProfile.DialogueRecords.ContainsKey(request.DialogId))
+            if (!receiverProfile.DialogueRecords.ContainsKey(sessionId))
             {
                 receiverProfile.DialogueRecords.Add(sessionId, new()
                 {
@@ -141,7 +134,7 @@ namespace FikaServer.Controllers
                 });
             }
 
-            var receiverDialog = receiverProfile.DialogueRecords[sessionId];
+            Dialogue receiverDialog = receiverProfile.DialogueRecords[sessionId];
             receiverDialog.New++;
             receiverDialog.Users = [
                 new()
@@ -193,7 +186,7 @@ namespace FikaServer.Controllers
 
             if (!string.IsNullOrEmpty(request.ReplyTo))
             {
-                var replyMessage = GetMessageToReplyTo(request.DialogId, request.ReplyTo, sessionId);
+                ReplyTo? replyMessage = GetMessageToReplyTo(request.DialogId, request.ReplyTo, sessionId);
                 if (replyMessage != null)
                 {
                     message.ReplyTo = replyMessage;
@@ -222,14 +215,14 @@ namespace FikaServer.Controllers
         /// <returns>A new <see cref="ReplyTo"/> containing data for the message to reply to</returns>
         private ReplyTo? GetMessageToReplyTo(string recipientId, string replyToId, string dialogueId)
         {
-            var currentDialogue = dialogueHelper.GetDialogueFromProfile(recipientId, dialogueId);
+            Dialogue? currentDialogue = dialogueHelper.GetDialogueFromProfile(recipientId, dialogueId);
             if (currentDialogue == null)
             {
                 logger.Warning($"Could not find dialogue {dialogueId} from sender");
                 return null;
             }
 
-            var message = currentDialogue.Messages.Where(x => x.Id == replyToId)
+            Message? message = currentDialogue.Messages.Where(x => x.Id == replyToId)
                 .FirstOrDefault();
 
             if (message != null)

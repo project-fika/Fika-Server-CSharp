@@ -3,6 +3,8 @@ using SPTarkov.Reflection.Patching;
 using SPTarkov.Server.Core.Controllers;
 using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Models.Eft.Dialog;
+using SPTarkov.Server.Core.Models.Eft.Profile;
+using SPTarkov.Server.Core.Servers;
 using System.Reflection;
 
 namespace FikaServer.Overrides.Services
@@ -35,10 +37,18 @@ namespace FikaServer.Overrides.Services
         [PatchPrefix]
         public static bool Prefix(string sessionId, SendMessageRequest request, ref string __result)
         {
-            FikaDialogueController? dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>();
+            FikaDialogueController? dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
+                ?? throw new NullReferenceException("Missing FikaDialogueController");
+            SaveServer? saveServer = ServiceLocator.ServiceProvider.GetService<SaveServer>()
+                ?? throw new NullReferenceException("Missing SaveServer");
 
-            __result = dialogueController.SendMessage(sessionId, request);
+            Dictionary<string, SptProfile> profiles = saveServer.GetProfiles();
+            if (!profiles.ContainsKey(sessionId) || !profiles.ContainsKey(request.DialogId))
+            {
+                return true;
+            }
 
+            __result = dialogueController.SendMessage(sessionId, request, profiles);
             return false;
         }
     }
