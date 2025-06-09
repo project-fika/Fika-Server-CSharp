@@ -44,7 +44,7 @@ namespace FikaServer.WebSockets
 
             if (!saveServer.ProfileExists(userSessionID))
             {
-                logger.Debug($"[{GetSocketId()}] Invalid user {userSessionID} tried to authenticate!");
+                logger.Error($"[{GetSocketId()}] Invalid user {userSessionID} tried to authenticate!");
                 return;
             }
 
