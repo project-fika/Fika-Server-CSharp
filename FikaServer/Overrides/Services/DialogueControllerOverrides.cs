@@ -28,30 +28,6 @@ namespace FikaServer.Overrides.Services
         }
     }
 
-    public class SendFriendRequestOverride : AbstractPatch
-    {
-        protected override MethodBase GetTargetMethod()
-        {
-            return typeof(DialogueController).GetMethod(nameof(DialogueController.SendFriendRequest));
-        }
-
-        [PatchPrefix]
-        public static bool Prefix(string sessionID, FriendRequestData request, ref FriendRequestSendResponse __result)
-        {
-            FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
-                ?? throw new NullReferenceException("Could not get DialogueController");
-
-            FriendRequestSendResponse? result = dialogueController.AddFriendRequest(sessionID, request.To);
-            if (__result == null)
-            {
-                return true;
-            }
-
-            __result = result;
-            return false;
-        }
-    }
-
     public class SendMessageOverride : AbstractPatch
     {
         protected override MethodBase GetTargetMethod()

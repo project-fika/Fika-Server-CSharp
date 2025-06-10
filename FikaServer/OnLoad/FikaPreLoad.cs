@@ -20,19 +20,26 @@ namespace FikaServer.OnLoad
         JsonUtil jsonUtil) : IOnLoad
     {
         private bool _overridesInjected = false;
-        private readonly List<AbstractPatch> _abstractPatches = new()
-        {
+        private readonly List<AbstractPatch> _abstractPatches =
+        [
             new GetResponseOverride(),
             new GetFriendListOverride(),
+            new ListInboxOverride(),
+            new ListOutboxOverride(),
             new SendFriendRequestOverride(),
+            new AcceptAllFriendRequeststOverride(),
             new AcceptFriendRequestOverride(),
+            new DeclineFriendRequestOverride(),
+            new CancelFriendRequestOverride(),
+            new DeleteFriendOverride(),
+            new IgnoreFriendOverride(),
+            new UnIgnoreFriendOverride(),
             new SendMessageOverride(),
             new GetMiniProfilesOverride(),
             new GetFriendsOverride(),
             new StartLocalRaidOverride(),
             new EndLocalRaidOverride(),
-        };
-
+        ];
 
         private void InjectOverrides()
         {

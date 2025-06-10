@@ -1,10 +1,12 @@
 ﻿using FikaServer.Helpers;
+using FikaServer.Models.Fika.Dialog;
 using FikaServer.Models.Fika.WebSocket;
 using FikaServer.Services.Cache;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Controllers;
 using SPTarkov.Server.Core.Helpers;
 using SPTarkov.Server.Core.Models.Eft.Common;
+using SPTarkov.Server.Core.Models.Eft.Common.Tables;
 using SPTarkov.Server.Core.Models.Eft.Dialog;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Eft.Ws;
@@ -183,7 +185,7 @@ namespace FikaServer.Controllers
                     AttachmentsNew = 0,
                     New = 0,
                     Pinned = false,
-                    Type = SPTarkov.Server.Core.Models.Enums.MessageType.UserMessage,
+                    Type = MessageType.UserMessage,
                     Messages = [],
                     Users = [],
                     Id = sessionId
@@ -299,6 +301,99 @@ namespace FikaServer.Controllers
             return null;
         }
 
+        public ValueTask<string> ListInbox(string sessionID)
+        {
+            List<FriendRequestListResponse> receivedFriendRequests = friendRequestsService.GetReceivedFriendRequests(sessionID);
+
+            foreach(var receivedFriendRequest in receivedFriendRequests)
+            {
+                PmcData? profile = profileHelper.GetPmcProfile(receivedFriendRequest.From);
+
+                if (profile == null)
+                {
+                    continue;
+                }
+
+                receivedFriendRequest.Profile = new()
+                {
+                    Id = profile.Id,
+                    Aid = profile.Aid,
+                    Info = new()
+                    {
+                        Nickname = profile.Info.Nickname,
+                        Side = profile.Info.Side,
+                        Level = profile.Info.Level,
+                        MemberCategory = profile.Info.MemberCategory,
+                        SelectedMemberCategory = profile.Info.SelectedMemberCategory,
+                        Banned = false,
+                        Ignored = false,
+                    }
+                };
+            }
+
+            return new(httpResponseUtil.GetBody(receivedFriendRequests));
+        }
+
+        public ValueTask<string> ListOutBox(string sessionID)
+        {
+            List<FriendRequestListResponse> sentFriendRequests = friendRequestsService.GetSentFriendRequests(sessionID);
+
+            foreach (var sentFriendRequest in sentFriendRequests)
+            {
+                PmcData? profile = profileHelper.GetPmcProfile(sentFriendRequest.To);
+
+                if (profile == null)
+                {
+                    continue;
+                }
+
+                sentFriendRequest.Profile = new()
+                {
+                    Id = profile.Id,
+                    Aid = profile.Aid,
+                    Info = new()
+                    {
+                        Nickname = profile.Info.Nickname,
+                        Side = profile.Info.Side,
+                        Level = profile.Info.Level,
+                        MemberCategory = profile.Info.MemberCategory,
+                        SelectedMemberCategory = profile.Info.SelectedMemberCategory,
+                        Banned = false,
+                        Ignored = false,
+                    }
+                };
+            }
+
+            return new(httpResponseUtil.GetBody(sentFriendRequests));
+        }
+
+        public ValueTask<string> SendFriendRequest(string fromProfileId, string toProfileId)
+        {
+            playerRelationsHelper.AddFriend(fromProfileId, toProfileId);
+
+            return new(httpResponseUtil.GetBody(new SendFriendRequestResponse()
+            {
+                Status = BackendErrorCodes.None,
+                RequestId = fromProfileId,
+                RetryAfter = 0,
+            }));
+        }
+
+        public ValueTask<string> AcceptAllFriendRequests(string sessionID)
+        {
+            var receivedFriendRequests = friendRequestsService.GetReceivedFriendRequests(sessionID);
+
+            foreach(var receivedFriendRequest in receivedFriendRequests)
+            {
+                if(playerRelationsHelper.RemoveFriendRequest(receivedFriendRequest.From, receivedFriendRequest.To, ERemoveFriendReason.Accept))
+                {
+                    playerRelationsHelper.AddFriend(receivedFriendRequest.From, receivedFriendRequest.To);
+                }
+            }
+
+            return new ValueTask<string>(httpResponseUtil.NullResponse());
+        }
+
         /// <summary>
         /// Accepts a friend request
         /// </summary>
@@ -313,7 +408,41 @@ namespace FikaServer.Controllers
                 
             }
 
-            return new(httpResponseUtil.GetBody(true));
+            return new(httpResponseUtil.NullResponse());
+        }
+
+        public ValueTask<string> CancelFriendRequest(string fromProfileId, string toProfileId)
+        {
+            playerRelationsHelper.RemoveFriendRequest(fromProfileId, toProfileId, ERemoveFriendReason.Cancel);
+
+            return new(httpResponseUtil.NullResponse());
+        }
+
+        public ValueTask<string> DeclineFriendRequest(string fromProfileId, string toProfileId)
+        {
+            playerRelationsHelper.RemoveFriendRequest(fromProfileId, toProfileId, ERemoveFriendReason.Decline);
+
+            return new(httpResponseUtil.NullResponse());
+        }
+
+        public ValueTask<string> DeleteFriend(string fromProfileId, string toProfileId)
+        {
+            playerRelationsHelper.RemoveFriend(fromProfileId, toProfileId);
+
+            return new(httpResponseUtil.NullResponse());
+        }
+
+        public ValueTask<string> IgnoreFriend(string fromProfileId, string toProfileId)
+        {
+            //Todo: stub, implement method
+            return new(httpResponseUtil.NullResponse());
+        }
+
+        public ValueTask<string> UnIgnoreFriend(string fromProfileId, string toProfileId)
+        {
+            //Todo: stub, implement method
+
+            return new(httpResponseUtil.NullResponse());
         }
     }
 }

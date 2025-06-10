@@ -15,5 +15,8 @@ namespace FikaServer.Models.Fika.Dialog
 
         [JsonPropertyName("date")]
         public long Date { get; set; }
+
+        [JsonPropertyName("profile")]
+        public FriendData Profile { get; set; }
     }
 }
