@@ -327,8 +327,6 @@ namespace FikaServer.Controllers
 
         public ValueTask<string> SendFriendRequest(string fromProfileId, string toProfileId)
         {
-            //playerRelationsHelper.AddFriend(fromProfileId, toProfileId);
-
             return new(httpResponseUtil.GetBody(AddFriendRequest(fromProfileId, toProfileId)));
         }
 
