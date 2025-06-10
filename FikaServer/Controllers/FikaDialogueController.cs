@@ -369,14 +369,9 @@ namespace FikaServer.Controllers
 
         public ValueTask<string> SendFriendRequest(string fromProfileId, string toProfileId)
         {
-            playerRelationsHelper.AddFriend(fromProfileId, toProfileId);
+            //playerRelationsHelper.AddFriend(fromProfileId, toProfileId);
 
-            return new(httpResponseUtil.GetBody(new SendFriendRequestResponse()
-            {
-                Status = BackendErrorCodes.None,
-                RequestId = fromProfileId,
-                RetryAfter = 0,
-            }));
+            return new(httpResponseUtil.GetBody(AddFriendRequest(fromProfileId, toProfileId)));
         }
 
         public ValueTask<string> AcceptAllFriendRequests(string sessionID)
@@ -405,7 +400,6 @@ namespace FikaServer.Controllers
             if (playerRelationsHelper.RemoveFriendRequest(sessionID, request.ProfileId, ERemoveFriendReason.Accept))
             {
                 playerRelationsHelper.AddFriend(sessionID, request.ProfileId);
-                
             }
 
             return new(httpResponseUtil.NullResponse());
