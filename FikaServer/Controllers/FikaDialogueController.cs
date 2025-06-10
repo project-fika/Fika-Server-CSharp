@@ -139,7 +139,7 @@ namespace FikaServer.Controllers
                     AttachmentsNew = 0,
                     New = 0,
                     Pinned = false,
-                    Type = SPTarkov.Server.Core.Models.Enums.MessageType.UserMessage,
+                    Type = MessageType.UserMessage,
                     Messages = [],
                     Users = [],
                     Id = request.DialogId

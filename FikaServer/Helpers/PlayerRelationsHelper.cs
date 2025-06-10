@@ -116,13 +116,13 @@ namespace FikaServer.Helpers
                     break;
                 case ERemoveFriendReason.Cancel:
                     {
-                        /*SptProfile profile = saveServer.GetProfile(from);
+                        SptProfile profile = saveServer.GetProfile(from);
                         webSocketHandler.SendMessage(to, new WsFriendListRemove()
                         {
                             EventIdentifier = "friendListRequestCancel",
                             EventType = NotificationEventType.friendListRequestCancel,
                             Profile = profile.ToFriendData()
-                        });*/
+                        });
                     }
                     break;
                 case ERemoveFriendReason.Decline:
