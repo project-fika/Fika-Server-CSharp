@@ -98,21 +98,7 @@ namespace FikaServer.Controllers
                 EventIdentifier = "friendListNewRequest",
                 EventType = NotificationEventType.friendListNewRequest,
                 Id = from,
-                Profile = new()
-                {
-                    Id = fromProfile.ProfileInfo.ProfileId,
-                    Aid = fromProfile.ProfileInfo.Aid,
-                    Info = new()
-                    {
-                        Nickname = fromProfile.CharacterData.PmcData.Info.Nickname,
-                        Side = fromProfile.CharacterData.PmcData.Info.Side,
-                        Level = fromProfile.CharacterData.PmcData.Info.Level,
-                        MemberCategory = fromProfile.CharacterData.PmcData.Info.MemberCategory,
-                        SelectedMemberCategory = fromProfile.CharacterData.PmcData.Info.SelectedMemberCategory,
-                        Ignored = false,
-                        Banned = fromProfile.CharacterData.PmcData.Info.BannedState
-                    }
-                }
+                Profile = fromProfile.ToFriendData()
             });
 
             return new FriendRequestSendResponse
@@ -314,21 +300,7 @@ namespace FikaServer.Controllers
                     continue;
                 }
 
-                receivedFriendRequest.Profile = new()
-                {
-                    Id = profile.Id,
-                    Aid = profile.Aid,
-                    Info = new()
-                    {
-                        Nickname = profile.Info.Nickname,
-                        Side = profile.Info.Side,
-                        Level = profile.Info.Level,
-                        MemberCategory = profile.Info.MemberCategory,
-                        SelectedMemberCategory = profile.Info.SelectedMemberCategory,
-                        Banned = false,
-                        Ignored = false,
-                    }
-                };
+                receivedFriendRequest.Profile = profile.ToFriendData();
             }
 
             return new(httpResponseUtil.GetBody(receivedFriendRequests));
@@ -347,21 +319,7 @@ namespace FikaServer.Controllers
                     continue;
                 }
 
-                sentFriendRequest.Profile = new()
-                {
-                    Id = profile.Id,
-                    Aid = profile.Aid,
-                    Info = new()
-                    {
-                        Nickname = profile.Info.Nickname,
-                        Side = profile.Info.Side,
-                        Level = profile.Info.Level,
-                        MemberCategory = profile.Info.MemberCategory,
-                        SelectedMemberCategory = profile.Info.SelectedMemberCategory,
-                        Banned = false,
-                        Ignored = false,
-                    }
-                };
+                sentFriendRequest.Profile = profile.ToFriendData();
             }
 
             return new(httpResponseUtil.GetBody(sentFriendRequests));
