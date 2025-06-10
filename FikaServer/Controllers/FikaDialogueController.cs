@@ -397,7 +397,7 @@ namespace FikaServer.Controllers
         /// <returns></returns>
         public ValueTask<string> AcceptFriendRequest(string sessionID, AcceptFriendRequestData request)
         {
-            if (playerRelationsHelper.RemoveFriendRequest(sessionID, request.ProfileId, ERemoveFriendReason.Accept))
+            if (playerRelationsHelper.RemoveFriendRequest(request.ProfileId, sessionID, ERemoveFriendReason.Accept))
             {
                 playerRelationsHelper.AddFriend(sessionID, request.ProfileId);
             }
