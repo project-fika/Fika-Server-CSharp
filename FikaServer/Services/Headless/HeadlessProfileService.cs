@@ -4,6 +4,7 @@ using SPTarkov.Server.Core.Helpers;
 using SPTarkov.Server.Core.Models.Eft.Common;
 using SPTarkov.Server.Core.Models.Eft.Common.Tables;
 using SPTarkov.Server.Core.Models.Eft.Profile;
+using SPTarkov.Server.Core.Models.Spt.Config;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Utils;
@@ -11,9 +12,10 @@ using SPTarkov.Server.Core.Utils;
 namespace FikaServer.Services.Headless
 {
     [Injectable(InjectionType.Singleton)]
-    public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, SaveServer saveServer, ConfigService configService, HashUtil hashUtil,
-        ProfileController profileController, InventoryHelper inventoryHelper)
+    public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, SaveServer saveServer, ConfigService configService,
+        ConfigServer configServer, HashUtil hashUtil, ProfileController profileController, InventoryHelper inventoryHelper)
     {
+        private readonly CoreConfig sptCoreConfig = configServer.GetConfig<CoreConfig>();
         public List<SptProfile> HeadlessProfiles { get; set; } = [];
 
         private const string HEAD_USEC_4 = "5fdb4139e4ed5b5ea251e4ed"; // _parent: 5cc085e214c02e000c6bea67
@@ -30,6 +32,12 @@ namespace FikaServer.Services.Headless
             {
                 List<SptProfile> createdProfiles = await CreateHeadlessProfiles(profileAmount);
                 logger.Log(SPTarkov.Server.Core.Models.Spt.Logging.LogLevel.Info, $"Created {createdProfiles.Count} headless client profiles!");
+            }
+
+            // Stop headless from adding up to the percentage of achievements unlocked
+            foreach (SptProfile headlessProfile in HeadlessProfiles)
+            {
+                sptCoreConfig.Features.AchievementProfileIdBlacklist.Add(headlessProfile.ProfileInfo.ProfileId);
             }
         }
 
