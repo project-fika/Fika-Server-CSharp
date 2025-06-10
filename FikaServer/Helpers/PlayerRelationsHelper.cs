@@ -127,8 +127,8 @@ namespace FikaServer.Helpers
                     break;
                 case ERemoveFriendReason.Decline:
                     {
-                        SptProfile profile = saveServer.GetProfile(from);
-                        webSocketHandler.SendMessage(to, new WsFriendListRemove()
+                        SptProfile profile = saveServer.GetProfile(to);
+                        webSocketHandler.SendMessage(from, new WsFriendListRemove()
                         {
                             EventIdentifier = "friendListRequestDecline",
                             EventType = NotificationEventType.friendListRequestDecline,
