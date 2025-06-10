@@ -6,6 +6,11 @@ namespace FikaServer
 {
     public static class ExtensionMethods
     {
+        /// <summary>
+        /// Generates from a <see cref="SptProfile"/>
+        /// </summary>
+        /// <param name="profile"></param>
+        /// <returns>A new <see cref="FriendData"/></returns>
         public static FriendData ToFriendData(this SptProfile profile)
         {
             return new()
@@ -23,6 +28,11 @@ namespace FikaServer
             };
         }
 
+        /// <summary>
+        /// Generates from a <see cref="PmcData"/>
+        /// </summary>
+        /// <param name="profile"></param>
+        /// <returns>A new <see cref="FriendData"/></returns>
         public static FriendData ToFriendData(this PmcData pmcData)
         {
             return new()
