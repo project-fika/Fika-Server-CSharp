@@ -30,7 +30,7 @@ namespace FikaServer.OnLoad
 
             if (config.Headless.Profiles.Amount > 0)
             {
-                HeadlessProfileService.PostSptLoad();
+                await HeadlessProfileService.OnPostLoadAsync();
             }
 
             await localeService.OnPostLoadAsync();

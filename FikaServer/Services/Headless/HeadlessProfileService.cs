@@ -19,7 +19,7 @@ namespace FikaServer.Services.Headless
         private const string HEAD_USEC_4 = "5fdb4139e4ed5b5ea251e4ed"; // _parent: 5cc085e214c02e000c6bea67
         private const string VOICE_USEC_4 = "6284d6a28e4092597733b7a6"; // _parent: 5fc100cf95572123ae738483
 
-        public void PostSptLoad()
+        public async Task OnPostLoadAsync()
         {
             LoadHeadlessProfiles();
             logger.Log(SPTarkov.Server.Core.Models.Spt.Logging.LogLevel.Info, $"Found {HeadlessProfiles.Count} headless profiles");
@@ -28,7 +28,7 @@ namespace FikaServer.Services.Headless
 
             if (HeadlessProfiles.Count < profileAmount)
             {
-                List<SptProfile> createdProfiles = CreateHeadlessProfiles(profileAmount);
+                List<SptProfile> createdProfiles = await CreateHeadlessProfiles(profileAmount);
                 logger.Log(SPTarkov.Server.Core.Models.Spt.Logging.LogLevel.Info, $"Created {createdProfiles.Count} headless client profiles!");
             }
         }
@@ -39,14 +39,14 @@ namespace FikaServer.Services.Headless
                 .Where(x => x.ProfileInfo?.Password == "fika-headless")];
         }
 
-        private List<SptProfile> CreateHeadlessProfiles(int amount)
+        private async Task<List<SptProfile>> CreateHeadlessProfiles(int amount)
         {
             int profileCount = HeadlessProfiles.Count;
             int profileAmountToCreate = amount - profileCount;
             List<SptProfile> createdProfiles = [];
             for (int i = 0; i < profileAmountToCreate; i++)
             {
-                SptProfile profile = CreateHeadlessProfile();
+                SptProfile profile = await CreateHeadlessProfile();
                 createdProfiles.Add(profile);
                 HeadlessProfiles.Add(profile);
             }
@@ -54,7 +54,7 @@ namespace FikaServer.Services.Headless
             return createdProfiles;
         }
 
-        private SptProfile CreateHeadlessProfile()
+        private async Task<SptProfile> CreateHeadlessProfile()
         {
             // Generate a unique username
             string username = $"headless_{hashUtil.Generate()}";
@@ -64,7 +64,7 @@ namespace FikaServer.Services.Headless
             string edition = "Standard";
 
             // Create mini profile
-            string profileId = CreateMiniProfile(username, password, edition);
+            string profileId = await CreateMiniProfile(username, password, edition);
 
             // Random character configs. Doesn't matter.
             ProfileCreateRequestData newProfileData = new()
@@ -75,10 +75,10 @@ namespace FikaServer.Services.Headless
                 VoiceId = VOICE_USEC_4
             };
 
-            return CreateFullProfile(newProfileData, profileId);
+            return await CreateFullProfile(newProfileData, profileId);
         }
 
-        private string CreateMiniProfile(string username, string password, string edition)
+        private async Task<string> CreateMiniProfile(string username, string password, string edition)
         {
             string profileId = hashUtil.Generate();
             string scavId = hashUtil.Generate();
@@ -96,15 +96,15 @@ namespace FikaServer.Services.Headless
 
             saveServer.CreateProfile(newProfile);
 
-            saveServer.LoadProfile(profileId);
-            saveServer.SaveProfile(profileId);
+            await saveServer.LoadProfileAsync(profileId);
+            await saveServer.SaveProfileAsync(profileId);
 
             return profileId;
         }
 
-        private SptProfile CreateFullProfile(ProfileCreateRequestData profileData, string profileId)
+        private async Task<SptProfile> CreateFullProfile(ProfileCreateRequestData profileData, string profileId)
         {
-            profileController.CreateProfile(profileData, profileId);
+            await profileController.CreateProfile(profileData, profileId);
 
             SptProfile profile = saveServer.GetProfile(profileId)
                 ?? throw new NullReferenceException("CreateFullProfile:: Could not find profile");
