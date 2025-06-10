@@ -1,5 +1,6 @@
 ﻿using FikaServer.Models.Fika;
 using FikaServer.Models.Fika.SendItem;
+using FikaServer.Overrides.Callbacks;
 using FikaServer.Overrides.Routers;
 using FikaServer.Overrides.Services;
 using FikaServer.Services;
@@ -19,10 +20,12 @@ namespace FikaServer.OnLoad
         JsonUtil jsonUtil) : IOnLoad
     {
         private bool _overridesInjected = false;
-        private readonly List<AbstractPatch> abstractPatches = new List<AbstractPatch>()
+        private readonly List<AbstractPatch> _abstractPatches = new()
         {
             new GetResponseOverride(),
             new GetFriendListOverride(),
+            new SendFriendRequestOverride(),
+            new AcceptFriendRequestOverride(),
             new SendMessageOverride(),
             new GetMiniProfilesOverride(),
             new GetFriendsOverride(),
@@ -38,10 +41,18 @@ namespace FikaServer.OnLoad
                 return;
             }
 
-            foreach (var patch in abstractPatches)
+            try
             {
-                logger.Debug($"[Fika Server] Loading patch: {patch.GetType().Name}");
-                patch.Enable();
+                foreach (AbstractPatch patch in _abstractPatches)
+                {
+                    logger.Debug($"[Fika Server] Loading patch: {patch.GetType().Name}");
+                    patch.Enable();
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error($"Error applying patch: {ex.Message}");
+                throw;
             }
 
             _overridesInjected = true;

@@ -72,12 +72,34 @@ namespace FikaServer.Services.Cache
             }
         }
 
+        /// <summary>
+        /// Checks if there is a friend request between to ProfileIDs
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <returns></returns>
         public bool HasFriendRequest(string from, string to)
         {
             lock (_listLock)
             {
                 return _friendRequests
                     .Any(x => x.From == from && x.To == to);
+            }
+        }
+
+        /// <summary>
+        /// Checks if there is a friend request between two ProfileIDs
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <param name="response"></param>
+        /// <returns>The friend request</returns>
+        public bool HasFriendRequest(string from, string to, out FriendRequestListResponse response)
+        {
+            lock (_listLock)
+            {
+                response = _friendRequests.Single(x => x.From == from && x.To == to);
+                return response != null;
             }
         }
 

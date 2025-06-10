@@ -89,7 +89,7 @@ namespace FikaServer.Services.Cache
             }
         }
 
-        private void SaveProfileRelations()
+        public void SaveProfileRelations()
         {
             File.WriteAllText($"{_playerRelationsFullPath}/playerRelations.json", JsonSerializer.Serialize(_playerRelations, ConfigService.serializerOptions));
         }

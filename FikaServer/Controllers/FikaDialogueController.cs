@@ -1,22 +1,28 @@
 ﻿using FikaServer.Helpers;
+using FikaServer.Models.Fika.WebSocket;
 using FikaServer.Services.Cache;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Controllers;
 using SPTarkov.Server.Core.Helpers;
+using SPTarkov.Server.Core.Models.Eft.Common;
 using SPTarkov.Server.Core.Models.Eft.Dialog;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Eft.Ws;
+using SPTarkov.Server.Core.Models.Enums;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Servers.Ws;
 using SPTarkov.Server.Core.Utils;
+using System.Reflection.Metadata.Ecma335;
+using static FikaServer.Helpers.PlayerRelationsHelper;
 
 namespace FikaServer.Controllers
 {
     [Injectable]
     public class FikaDialogueController(ISptLogger<FikaDialogueController> logger, PlayerRelationsService playerRelationsService, DialogueController dialogueController,
         ProfileHelper profileHelper, PlayerRelationsHelper playerRelationsHelper, SaveServer saveServer,
-        HashUtil hashUtil, TimeUtil timeUtil, DialogueHelper dialogueHelper, SptWebSocketConnectionHandler socketConnectionHandler)
+        HashUtil hashUtil, TimeUtil timeUtil, DialogueHelper dialogueHelper, SptWebSocketConnectionHandler socketConnectionHandler,
+        FriendRequestsService friendRequestsService, HttpResponseUtil httpResponseUtil)
     {
         /// <summary>
         /// Gets a list of all friends for the specified profileId
@@ -25,12 +31,12 @@ namespace FikaServer.Controllers
         /// <returns>A new <see cref="GetFriendListDataResponse"/></returns>
         public GetFriendListDataResponse GetFriendsList(string sessionId)
         {
-            var botsAndFriends = dialogueController.GetActiveChatBots();
-            var friends = playerRelationsHelper.GetFriendsList(sessionId);
+            List<UserDialogInfo> botsAndFriends = dialogueController.GetActiveChatBots();
+            List<string> friends = playerRelationsHelper.GetFriendsList(sessionId);
 
-            foreach (var friend in friends)
+            foreach (string friend in friends)
             {
-                var profile = profileHelper.GetPmcProfile(friend);
+                PmcData? profile = profileHelper.GetPmcProfile(friend);
                 if (profile == null)
                 {
                     playerRelationsHelper.RemoveFriend(sessionId, friend);
@@ -60,9 +66,59 @@ namespace FikaServer.Controllers
             };
         }
 
-        public void SendFriendRequest(string from, string to)
+        public FriendRequestSendResponse? AddFriendRequest(string from, string to)
         {
+            if (friendRequestsService.HasFriendRequest(from, to))
+            {
+                logger.Error($"{from} has already sent a request to {to}");
+                return null;
+            }
 
+            if (!saveServer.ProfileExists(to))
+            {
+                logger.Error($"{from} tried to send a friend request to {to} who doesn't exist");
+                return null;
+            }
+
+            friendRequestsService.AddFriendRequest(new()
+            {
+                Id = hashUtil.Generate(),
+                From = from,
+                To = to,
+                Date = timeUtil.GetTimeStamp()
+            });
+
+            SptProfile fromProfile = saveServer.GetProfile(from)
+                ?? throw new NullReferenceException($"{from} did not exist in the database");
+
+            socketConnectionHandler.SendMessage(to, new WsFriendListAdd()
+            {
+                EventIdentifier = "friendListNewRequest",
+                EventType = NotificationEventType.friendListNewRequest,
+                Id = from,
+                Profile = new()
+                {
+                    Id = fromProfile.ProfileInfo.ProfileId,
+                    Aid = fromProfile.ProfileInfo.Aid,
+                    Info = new()
+                    {
+                        Nickname = fromProfile.CharacterData.PmcData.Info.Nickname,
+                        Side = fromProfile.CharacterData.PmcData.Info.Side,
+                        Level = fromProfile.CharacterData.PmcData.Info.Level,
+                        MemberCategory = fromProfile.CharacterData.PmcData.Info.MemberCategory,
+                        SelectedMemberCategory = fromProfile.CharacterData.PmcData.Info.SelectedMemberCategory,
+                        Ignored = false,
+                        Banned = fromProfile.CharacterData.PmcData.Info.BannedState
+                    }
+                }
+            });
+
+            return new FriendRequestSendResponse
+            {
+                Status = BackendErrorCodes.None,
+                RequestId = from,
+                RetryAfter = 0
+            };
         }
 
         /// <summary>
@@ -71,17 +127,10 @@ namespace FikaServer.Controllers
         /// <param name="sessionId">The profile id to send from</param>
         /// <param name="request">The request to handle</param>
         /// <returns>The id of the message sent</returns>
-        public string SendMessage(string sessionId, SendMessageRequest request)
+        public string SendMessage(string sessionId, SendMessageRequest request, Dictionary<string, SptProfile> profiles)
         {
-            var profiles = saveServer.GetProfiles();
-            if (!profiles.TryGetValue(sessionId, out var profile))
-            {
-                // it's not a player, let SPT handle it
-                return dialogueController.SendMessage(sessionId, request);
-            }
-
-            var receiverProfile = profiles[request.DialogId];
-            var senderProfile = profiles[sessionId];
+            SptProfile receiverProfile = profiles[request.DialogId];
+            SptProfile senderProfile = profiles[sessionId];
 
             if (!senderProfile.DialogueRecords.ContainsKey(request.DialogId))
             {
@@ -97,7 +146,7 @@ namespace FikaServer.Controllers
                 });
             }
 
-            var senderDialog = senderProfile.DialogueRecords[request.DialogId];
+            Dialogue senderDialog = senderProfile.DialogueRecords[request.DialogId];
             senderDialog.Users = [
                 new()
                 {
@@ -127,7 +176,7 @@ namespace FikaServer.Controllers
                 }
             ];
 
-            if (!receiverProfile.DialogueRecords.ContainsKey(request.DialogId))
+            if (!receiverProfile.DialogueRecords.ContainsKey(sessionId))
             {
                 receiverProfile.DialogueRecords.Add(sessionId, new()
                 {
@@ -141,7 +190,7 @@ namespace FikaServer.Controllers
                 });
             }
 
-            var receiverDialog = receiverProfile.DialogueRecords[sessionId];
+            Dialogue receiverDialog = receiverProfile.DialogueRecords[sessionId];
             receiverDialog.New++;
             receiverDialog.Users = [
                 new()
@@ -183,7 +232,9 @@ namespace FikaServer.Controllers
                     Side = senderProfile.CharacterData.PmcData.Info.Side,
                     Level = senderProfile.CharacterData.PmcData.Info.Level,
                     MemberCategory = senderProfile.CharacterData.PmcData.Info.MemberCategory,
-                    IsIgnored = playerRelationsHelper.GetInIgnoreList(sessionId).Contains(request.DialogId),
+                    IsIgnored = playerRelationsHelper
+                        .GetInIgnoreList(sessionId)
+                        .Contains(request.DialogId),
                     IsBanned = false
                 },
                 DateTime = timeUtil.GetTimeStamp(),
@@ -193,7 +244,7 @@ namespace FikaServer.Controllers
 
             if (!string.IsNullOrEmpty(request.ReplyTo))
             {
-                var replyMessage = GetMessageToReplyTo(request.DialogId, request.ReplyTo, sessionId);
+                ReplyTo? replyMessage = GetMessageToReplyTo(request.DialogId, request.ReplyTo, sessionId);
                 if (replyMessage != null)
                 {
                     message.ReplyTo = replyMessage;
@@ -222,14 +273,15 @@ namespace FikaServer.Controllers
         /// <returns>A new <see cref="ReplyTo"/> containing data for the message to reply to</returns>
         private ReplyTo? GetMessageToReplyTo(string recipientId, string replyToId, string dialogueId)
         {
-            var currentDialogue = dialogueHelper.GetDialogueFromProfile(recipientId, dialogueId);
+            Dialogue? currentDialogue = dialogueHelper.GetDialogueFromProfile(recipientId, dialogueId);
             if (currentDialogue == null)
             {
                 logger.Warning($"Could not find dialogue {dialogueId} from sender");
                 return null;
             }
 
-            var message = currentDialogue.Messages.Where(x => x.Id == replyToId)
+            Message? message = currentDialogue.Messages
+                .Where(x => x.Id == replyToId)
                 .FirstOrDefault();
 
             if (message != null)
@@ -245,6 +297,23 @@ namespace FikaServer.Controllers
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Accepts a friend request
+        /// </summary>
+        /// <param name="sessionID"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        public ValueTask<string> AcceptFriendRequest(string sessionID, AcceptFriendRequestData request)
+        {
+            if (playerRelationsHelper.RemoveFriendRequest(sessionID, request.ProfileId, ERemoveFriendReason.Accept))
+            {
+                playerRelationsHelper.AddFriend(sessionID, request.ProfileId);
+                
+            }
+
+            return new(httpResponseUtil.GetBody(true));
         }
     }
 }
