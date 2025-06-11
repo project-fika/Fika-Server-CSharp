@@ -14,7 +14,9 @@ using System.Collections.Concurrent;
 namespace FikaServer.Services
 {
     [Injectable(InjectionType.Singleton)]
-    public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleService locationLifecycleService, SaveServer saveServer, ConfigService fikaConfig, HeadlessHelper headlessHelper, HeadlessService headlessService, InsuranceService insuranceService, PresenceService presenceService)
+    public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleService locationLifecycleService,
+        SaveServer saveServer, ConfigService fikaConfig, HeadlessHelper headlessHelper, HeadlessService headlessService,
+        InsuranceService insuranceService, PresenceService presenceService)
     {
         public readonly ConcurrentDictionary<string, FikaMatch> Matches = [];
         protected readonly ConcurrentDictionary<string, System.Timers.Timer> _timeoutIntervals = [];
