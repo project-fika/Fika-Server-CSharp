@@ -383,14 +383,13 @@ namespace FikaServer.Controllers
         public ValueTask<string> IgnoreFriend(string fromProfileId, string toProfileId)
         {
             playerRelationsHelper.AddToIgnoreList(fromProfileId, toProfileId);
-            //Todo: stub, implement method
+
             return new(httpResponseUtil.NullResponse());
         }
 
         public ValueTask<string> UnIgnoreFriend(string fromProfileId, string toProfileId)
         {
             playerRelationsHelper.RemoveFromIgnoreList(fromProfileId, toProfileId);
-            //Todo: stub, implement method
 
             return new(httpResponseUtil.NullResponse());
         }
