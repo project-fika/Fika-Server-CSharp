@@ -243,7 +243,6 @@ namespace FikaServer.Controllers
             senderDialog.Messages?.Add(message);
             receiverDialog.Messages?.Add(message);
 
-            // TODO: is this correct?
             socketConnectionHandler.SendMessage(receiverProfile.ProfileInfo.ProfileId, new WsChatMessageReceived()
             {
                 EventIdentifier = "new_message",
