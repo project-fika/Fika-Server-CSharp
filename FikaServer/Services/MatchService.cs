@@ -46,6 +46,7 @@ namespace FikaServer.Services
                 }
 
             };
+            timer.Start();
         }
 
         /// <summary>
