@@ -12,7 +12,7 @@ namespace FikaServer.Services.Cache
     public class PlayerRelationsService(ProfileHelper profileHelper, ConfigService FikaConfig, ISptLogger<PlayerRelationsService> logger)
     {
         private readonly string _playerRelationsFullPath = Path.Join(FikaConfig.GetModPath(), "database");
-        private readonly ConcurrentDictionary<string, FikaPlayerRelations> _playerRelations = [];
+        private ConcurrentDictionary<string, FikaPlayerRelations> _playerRelations = [];
 
         public List<string> Keys
         {
@@ -37,9 +37,15 @@ namespace FikaServer.Services.Cache
                 Directory.CreateDirectory(_playerRelationsFullPath);
             }
 
-            if (!File.Exists($"{_playerRelationsFullPath}/playerRelations.json"))
+            string file = $"{_playerRelationsFullPath}/playerRelations.json";
+            if (!File.Exists(file))
             {
                 SaveProfileRelations();
+            }
+            else
+            {
+                string data = File.ReadAllText(file);
+                _playerRelations = JsonSerializer.Deserialize<ConcurrentDictionary<string, FikaPlayerRelations>>(data, ConfigService.serializerOptions);
             }
         }
 

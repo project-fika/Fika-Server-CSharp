@@ -34,18 +34,20 @@ namespace FikaServer.Services.Cache
                 Directory.CreateDirectory(_friendRequestsFullPath);
             }
 
-            if (!File.Exists($"{_friendRequestsFullPath}/friendRequests.json"))
+            string file = $"{_friendRequestsFullPath}/friendRequests.json";
+            if (!File.Exists(file))
             {
                 SaveFriendRequests();
+            }
+            else
+            {
+                string data = File.ReadAllText(file);
+                _friendRequests = _friendRequests = JsonSerializer.Deserialize<List<FriendRequestListResponse>>(, ConfigService.serializerOptions);
             }
         }
 
         public void OnPostLoad()
         {
-            string data = File.ReadAllText($"{_friendRequestsFullPath}/friendRequests.json");
-            ArgumentNullException.ThrowIfNull(data);
-
-            _friendRequests = JsonSerializer.Deserialize<List<FriendRequestListResponse>>(data, ConfigService.serializerOptions);
             logger.Debug($"Loaded {_friendRequests.Count} friend requests");
         }
 
