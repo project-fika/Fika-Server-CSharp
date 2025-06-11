@@ -1,5 +1,4 @@
 ﻿using FikaServer.Helpers;
-using FikaServer.Models.Fika.Config;
 using FikaServer.Models.Fika.Dialog;
 using FikaServer.Models.Fika.WebSocket;
 using FikaServer.Services;
@@ -32,7 +31,7 @@ namespace FikaServer.Controllers
         /// <param name="sessionId">The profile id to get the list for</param>
         /// <returns>A new <see cref="GetFriendListDataResponse"/></returns>
         public GetFriendListDataResponse GetFriendsList(string sessionId)
-        {            
+        {
             List<UserDialogInfo> botsAndFriends = configService.Config.Server.SPT.DisableSPTChatBots
                 ? [] : dialogueController.GetActiveChatBots();
 
@@ -245,10 +244,12 @@ namespace FikaServer.Controllers
             receiverDialog.Messages?.Add(message);
 
             // TODO: is this correct?
-            socketConnectionHandler.SendMessage(receiverProfile.ProfileInfo.ProfileId, new()
+            socketConnectionHandler.SendMessage(receiverProfile.ProfileInfo.ProfileId, new WsChatMessageReceived()
             {
                 EventIdentifier = "new_message",
-                EventType = NotificationEventType.new_message
+                EventType = NotificationEventType.new_message,
+                DialogId = sessionId,
+                Message = message
             });
 
             return message.Id;
