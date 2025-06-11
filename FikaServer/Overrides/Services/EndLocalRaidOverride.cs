@@ -1,4 +1,5 @@
-﻿using FikaServer.Services;
+﻿using FikaServer.Models.Fika;
+using FikaServer.Services;
 using SPTarkov.Reflection.Patching;
 using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Models.Eft.Match;
@@ -23,11 +24,16 @@ namespace FikaServer.Overrides.Services
 
             // Get match id from player session id
             string? matchId = matchService.GetMatchIdByPlayer(sessionId);
+            if (matchId == null)
+            {
+                // Could not find matchId, run original
+                return true;
+            }
 
             // Find player that exited the raid
-            Models.Fika.FikaPlayer? player = matchService.GetPlayerInMatch(matchId, sessionId);
+            FikaPlayer? player = matchService.GetPlayerInMatch(matchId, sessionId);
 
-            if (player is not null)
+            if (player != null)
             {
                 insuranceService.OnEndLocalRaidRequest(sessionId, insuranceService.GetMatchId(sessionId), request);
 
