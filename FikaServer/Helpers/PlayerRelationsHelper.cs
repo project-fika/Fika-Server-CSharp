@@ -149,9 +149,9 @@ namespace FikaServer.Helpers
         public void AddFriend(string from, string? to)
         {
             FikaPlayerRelations fromRelations = playerRelationsService.GetStoredValue(from);
-            if (!fromRelations.Friends.Contains(from))
+            if (!fromRelations.Friends.Contains(to))
             {
-                fromRelations.Friends.Add(from);
+                fromRelations.Friends.Add(to);
             }
 
             FikaPlayerRelations toRelations = playerRelationsService.GetStoredValue(to);
