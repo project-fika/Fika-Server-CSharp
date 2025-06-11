@@ -3,6 +3,7 @@ using SPTarkov.Reflection.Patching;
 using SPTarkov.Server.Core.Callbacks;
 using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Models.Eft.Common;
+using SPTarkov.Server.Core.Models.Eft.Common.Request;
 using SPTarkov.Server.Core.Models.Eft.Dialog;
 using System.Reflection;
 
@@ -169,12 +170,12 @@ namespace FikaServer.Overrides.Callbacks
         }
 
         [PatchPrefix]
-        public static bool Prefix(string url, DeleteFriendRequest request, string sessionID, ref ValueTask<string> __result)
+        public static bool Prefix(UIDRequestData request, string sessionID, ref ValueTask<string> __result)
         {
             FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
                 ?? throw new NullReferenceException("Could not get DialogueController");
 
-            __result = dialogueController.DeleteFriend(sessionID, request.FriendId);
+            __result = dialogueController.IgnoreFriend(sessionID, request.Uid);
             return false;
         }
     }
@@ -188,12 +189,12 @@ namespace FikaServer.Overrides.Callbacks
         }
 
         [PatchPrefix]
-        public static bool Prefix(string url, DeleteFriendRequest request, string sessionID, ref ValueTask<string> __result)
+        public static bool Prefix(UIDRequestData request, string sessionID, ref ValueTask<string> __result)
         {
             FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
                 ?? throw new NullReferenceException("Could not get DialogueController");
 
-            __result = dialogueController.DeleteFriend(sessionID, request.FriendId);
+            __result = dialogueController.UnIgnoreFriend(sessionID, request.Uid);
             return false;
         }
     }
