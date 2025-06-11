@@ -42,7 +42,7 @@ namespace FikaServer.Services.Cache
             else
             {
                 string data = File.ReadAllText(file);
-                _friendRequests = _friendRequests = JsonSerializer.Deserialize<List<FriendRequestListResponse>>(, ConfigService.serializerOptions);
+                _friendRequests = _friendRequests = JsonSerializer.Deserialize<List<FriendRequestListResponse>>(data, ConfigService.serializerOptions);
             }
         }
 
