@@ -34,26 +34,26 @@ namespace FikaServer.Helpers
         /// <exception cref="NotImplementedException"></exception>
         public void RemoveFriend(string fromProfileId, string toProfileId)
         {
-            FikaPlayerRelations requesterRelation = playerRelationsService.GetStoredValue(fromProfileId);
-            if (requesterRelation == null)
+            FikaPlayerRelations fromRelations = playerRelationsService.GetStoredValue(fromProfileId);
+            if (fromRelations == null)
             {
                 logger.Debug($"Could not find relations for {fromProfileId}");
                 return;
             }
 
-            FikaPlayerRelations friendRelation = playerRelationsService.GetStoredValue(toProfileId);
-            if (friendRelation == null)
+            FikaPlayerRelations toRelations = playerRelationsService.GetStoredValue(toProfileId);
+            if (toRelations == null)
             {
                 logger.Debug($"Could not find relations for target {toProfileId}");
                 return;
             }
 
-            if (!requesterRelation.Friends.Remove(toProfileId))
+            if (!fromRelations.Friends.Remove(toProfileId))
             {
                 logger.Warning($"{fromProfileId} tried to remove {toProfileId} from their friend list unsuccessfully");
             }
 
-            if (!friendRelation.Friends.Remove(toProfileId))
+            if (!toRelations.Friends.Remove(fromProfileId))
             {
                 logger.Warning($"{toProfileId} tried to remove {fromProfileId} from their friend list unsuccessfully");
             }
