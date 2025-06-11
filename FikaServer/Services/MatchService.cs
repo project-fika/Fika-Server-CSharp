@@ -210,7 +210,7 @@ namespace FikaServer.Services
         /// <param name="reason"></param>
         public void EndMatch(string matchId, EFikaMatchEndSessionMessage reason)
         {
-            logger.Info($"Coop session {matchId} has ended {Enum.GetName(typeof(EFikaMatchEndSessionMessage), reason)}");
+            logger.Info($"Coop session {matchId} has ended {Enum.GetName(reason)}");
 
             if (headlessHelper.IsHeadlessClient(matchId))
             {
@@ -269,11 +269,6 @@ namespace FikaServer.Services
         /// <param name="matchId"></param>
         public void ResetTimeout(string matchId)
         {
-            if (!Matches.ContainsKey(matchId))
-            {
-                return;
-            }
-
             if (Matches.TryGetValue(matchId, out FikaMatch? match))
             {
                 match.Timeout = 0;
