@@ -12,13 +12,13 @@ namespace FikaServer.Servers
     public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer> logger) : INatPunchListener, INetEventListener
     {
         private readonly Dictionary<string, NatPunchServerPeer> _servers = [];
-        private NetManager? NetServer;
+        private NetManager? _netServer;
 
         public void Start()
         {
-            if (NetServer is null)
+            if (_netServer is null)
             {
-                NetServer = new(this)
+                _netServer = new(this)
                 {
                     IPv6Enabled = false,
                     NatPunchEnabled = true
@@ -27,10 +27,10 @@ namespace FikaServer.Servers
 
             try
             {
-                NetServer.Start(fikaConfig.Config.Server.SPT.Http.Ip, "", fikaConfig.Config.NatPunchServer.Port);
-                NetServer.NatPunchModule.Init(this);
+                _netServer.Start(fikaConfig.Config.Server.SPT.Http.Ip, "", fikaConfig.Config.NatPunchServer.Port);
+                _netServer.NatPunchModule.Init(this);
 
-                logger.Success($"[Fika NatPunch] NatPunchServer started on {fikaConfig.Config.Server.SPT.Http.Ip}:{NetServer.LocalPort}");
+                logger.Success($"[Fika NatPunch] NatPunchServer started on {fikaConfig.Config.Server.SPT.Http.Ip}:{_netServer.LocalPort}");
             }
             catch (Exception ex)
             {
@@ -40,13 +40,13 @@ namespace FikaServer.Servers
 
         public void Stop()
         {
-            NetServer?.Stop();
+            _netServer?.Stop();
         }
 
         public void PollEvents()
         {
-            NetServer?.PollEvents();
-            NetServer?.NatPunchModule.PollEvents();
+            _netServer?.PollEvents();
+            _netServer?.NatPunchModule.PollEvents();
         }
 
         public void OnNatIntroductionRequest(IPEndPoint localEndPoint, IPEndPoint remoteEndPoint, string token)
@@ -88,7 +88,7 @@ namespace FikaServer.Servers
 
                         for (int i = 0; i < fikaConfig.Config.NatPunchServer.NatIntroduceAmount; i++)
                         {
-                            NetServer?.NatPunchModule.NatIntroduce(
+                            _netServer?.NatPunchModule.NatIntroduce(
                                 sPeer.InternalAddr,
                                 sPeer.ExternalAddr,
                                 localEndPoint,

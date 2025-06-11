@@ -11,9 +11,9 @@ namespace FikaServer.Services
     public class ClientService(ISptLogger<ClientService> logger, SaveServer saveServer,
         ClientModHashesService fikaClientModHashesService, ConfigService fikaConfig)
     {
-        private List<string> requiredMods = ["com.fika.core", "com.SPT.custom", "com.SPT.singleplayer", "com.SPT.core", "com.SPT.debugging"];
-        private List<string> allowedMods = ["com.bepis.bepinex.configurationmanager", "com.fika.headless"];
-        private bool hasRequiredOrOptionalMods = false;
+        private readonly List<string> _requiredMods = ["com.fika.core", "com.SPT.custom", "com.SPT.singleplayer", "com.SPT.core", "com.SPT.debugging"];
+        private readonly List<string> _allowedMods = ["com.bepis.bepinex.configurationmanager", "com.fika.headless"];
+        private bool _hasRequiredOrOptionalMods = false;
 
         public void OnPreLoad()
         {
@@ -24,24 +24,24 @@ namespace FikaServer.Services
 
             if (sanitizedRequiredMods.Count == 0 && sanitizedOptionalMods.Count == 0)
             {
-                hasRequiredOrOptionalMods = false;
+                _hasRequiredOrOptionalMods = false;
             }
 
             foreach (string mod in sanitizedRequiredMods)
             {
-                requiredMods.Add(mod);
-                allowedMods.Add(mod);
+                _requiredMods.Add(mod);
+                _allowedMods.Add(mod);
             }
 
             foreach (string mod in sanitizedOptionalMods)
             {
-                allowedMods.Add(mod);
+                _allowedMods.Add(mod);
             }
         }
 
         protected List<string> FilterEmptyMods(List<string> list)
         {
-            return list.Where(str => !string.IsNullOrWhiteSpace(str)).ToList();
+            return [.. list.Where(str => !string.IsNullOrWhiteSpace(str))];
         }
 
         public FikaConfigClient GetClientConfig()
@@ -77,13 +77,13 @@ namespace FikaServer.Services
             };
 
             // if no configuration was made, allow all mods
-            if (!hasRequiredOrOptionalMods)
+            if (!_hasRequiredOrOptionalMods)
             {
                 return mismatchedMods;
             }
 
             // check for missing required mods first
-            foreach (string pluginId in requiredMods)
+            foreach (string pluginId in _requiredMods)
             {
                 if (!request.ContainsKey(pluginId))
                 {
@@ -102,7 +102,7 @@ namespace FikaServer.Services
                 int hash = request[pluginId];
 
                 // check if the mod isn't allowed
-                if (!allowedMods.Contains(pluginId))
+                if (!_allowedMods.Contains(pluginId))
                 {
                     mismatchedMods.Forbidden.Add(pluginId);
                     continue;

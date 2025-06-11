@@ -15,7 +15,7 @@ namespace FikaServer.Services.Headless
     public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, SaveServer saveServer, ConfigService configService,
         ConfigServer configServer, HashUtil hashUtil, ProfileController profileController, InventoryHelper inventoryHelper)
     {
-        private readonly CoreConfig sptCoreConfig = configServer.GetConfig<CoreConfig>();
+        private readonly CoreConfig _sptCoreConfig = configServer.GetConfig<CoreConfig>();
         public List<SptProfile> HeadlessProfiles { get; set; } = [];
 
         private const string HEAD_USEC_4 = "5fdb4139e4ed5b5ea251e4ed"; // _parent: 5cc085e214c02e000c6bea67
@@ -37,7 +37,7 @@ namespace FikaServer.Services.Headless
             // Stop headless from adding up to the percentage of achievements unlocked
             foreach (SptProfile headlessProfile in HeadlessProfiles)
             {
-                sptCoreConfig.Features.AchievementProfileIdBlacklist.Add(headlessProfile.ProfileInfo.ProfileId);
+                _sptCoreConfig.Features.AchievementProfileIdBlacklist.Add(headlessProfile.ProfileInfo.ProfileId);
             }
         }
 

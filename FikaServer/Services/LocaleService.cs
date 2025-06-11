@@ -7,10 +7,11 @@ using System.Text.Json;
 namespace FikaServer.Services
 {
     [Injectable(InjectionType.Singleton)]
-    public class LocaleService(ISptLogger<LocaleService> logger, SPTarkov.Server.Core.Services.LocaleService localeService,
-        JsonUtil jsonUtil, FileUtil fileUtil, ConfigService fikaConfig, DatabaseServer databaseServer)
+    public class LocaleService(ISptLogger<LocaleService> logger,
+        SPTarkov.Server.Core.Services.LocaleService localeService, JsonUtil jsonUtil, FileUtil fileUtil,
+        ConfigService fikaConfig, DatabaseServer databaseServer)
     {
-        private readonly string globalLocaleDir = Path.Join(fikaConfig.GetModPath(), "assets", "database", "locales", "global");
+        private readonly string _globalLocaleDir = Path.Join(fikaConfig.GetModPath(), "assets", "database", "locales", "global");
         //private readonly string serverLocaleDir = Path.Join(fikaConfig.GetModPath(), "assets", "database", "locales", "server");
 
         Dictionary<string, Dictionary<string, string>> _globalLocales = [];
@@ -23,15 +24,13 @@ namespace FikaServer.Services
 
         private async Task LoadGlobalLocales()
         {
-            _globalLocales = await RecursiveLoadFiles(globalLocaleDir);
+            _globalLocales = await RecursiveLoadFiles(_globalLocaleDir);
 
-            foreach (KeyValuePair<string, Dictionary<string, string>> language in _globalLocales)
+            foreach ((string language, Dictionary<string, string> locales) in _globalLocales)
             {
-                Dictionary<string, string> languageLocales = language.Value;
-
-                foreach (KeyValuePair<string, string> locale in languageLocales)
+                foreach ((string lang, string locale) in locales)
                 {
-                    localeService.AddCustomClientLocale(language.Key, locale.Key, locale.Value);
+                    localeService.AddCustomClientLocale(language, lang, locale);
                 }
             }
 
@@ -65,12 +64,11 @@ namespace FikaServer.Services
         private async Task<Dictionary<string, Dictionary<string, string>>> RecursiveLoadFiles(string path)
         {
             List<string> files = fileUtil.GetFiles(path);
-
             Dictionary<string, Dictionary<string, string>> locales = [];
 
             foreach (string file in files)
             {
-                await using (FileStream fs = new FileStream(file, FileMode.Open, FileAccess.Read))
+                await using (FileStream fs = new(file, FileMode.Open, FileAccess.Read))
                 {
                     Dictionary<string, string>? localeFile = await JsonSerializer.DeserializeAsync<Dictionary<string, string>>(fs);
 

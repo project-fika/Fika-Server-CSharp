@@ -14,9 +14,9 @@ namespace FikaServer.Services
     public class ConfigService(ISptLogger<ConfigService> logger, ConfigServer configServer,
         ModHelper modHelper, JsonUtil jsonUtil)
     {
-        private readonly string configFolderPath = Path.Join(modHelper.GetAbsolutePathToModFolder(Assembly.GetExecutingAssembly()), "assets/configs");
+        private readonly string _configFolderPath = Path.Join(modHelper.GetAbsolutePathToModFolder(Assembly.GetExecutingAssembly()), "assets/configs");
         public FikaConfig Config { get; private set; } = new();
-        private readonly FikaModMetadata fikaModMetaData = new();
+        private readonly FikaModMetadata _fikaModMetaData = new();
         public static readonly JsonSerializerOptions serializerOptions = new() { WriteIndented = true };
 
         public string GetModPath()
@@ -26,24 +26,24 @@ namespace FikaServer.Services
 
         public string? GetVersion()
         {
-            return fikaModMetaData.Version;
+            return _fikaModMetaData.Version;
         }
 
         public async Task OnPreLoad()
         {
             //This is debug, probably wont exist in the final release.
-            if (!Directory.Exists(configFolderPath))
+            if (!Directory.Exists(_configFolderPath))
             {
-                Directory.CreateDirectory(configFolderPath);
+                Directory.CreateDirectory(_configFolderPath);
             }
 
-            string configPath = Path.Combine(configFolderPath, "fika.jsonc");
+            string configPath = Path.Combine(_configFolderPath, "fika.jsonc");
 
             Config = await jsonUtil.DeserializeFromFileAsync<FikaConfig>(configPath) ?? new();
 
             // No need to do any fancyness around sorting properties and writing them if they weren't set before here
             // We store default values in the config models, and if one is missing this will write it to the file in the correct place
-            await WriteConfig(configFolderPath);
+            await WriteConfig(_configFolderPath);
 
             ApplySPTConfig(Config.Server.SPT);
         }

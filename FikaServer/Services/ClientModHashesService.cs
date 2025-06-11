@@ -6,26 +6,26 @@ namespace FikaServer.Services
     public class ClientModHashesService
     {
         //Todo: ConcurrentDictionary
-        private readonly Dictionary<string, int> hashes = [];
+        private readonly Dictionary<string, int> _hashes = [];
 
         public int GetLength()
         {
-            return hashes.Count;
+            return _hashes.Count;
         }
 
         public bool Exists(string pluginId)
         {
-            return hashes.ContainsKey(pluginId);
+            return _hashes.ContainsKey(pluginId);
         }
 
         public int GetHash(string pluginId)
         {
-            return hashes[pluginId];
+            return _hashes[pluginId];
         }
 
         public void AddHash(string pluginId, int hash)
         {
-            hashes.Add(pluginId, hash);
+            _hashes.Add(pluginId, hash);
         }
     }
 }
