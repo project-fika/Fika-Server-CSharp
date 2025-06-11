@@ -1,6 +1,8 @@
 ﻿using FikaServer.Helpers;
+using FikaServer.Models.Fika.Config;
 using FikaServer.Models.Fika.Dialog;
 using FikaServer.Models.Fika.WebSocket;
+using FikaServer.Services;
 using FikaServer.Services.Cache;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Controllers;
@@ -19,10 +21,10 @@ using static FikaServer.Helpers.PlayerRelationsHelper;
 namespace FikaServer.Controllers
 {
     [Injectable]
-    public class FikaDialogueController(ISptLogger<FikaDialogueController> logger, PlayerRelationsService playerRelationsService, DialogueController dialogueController,
+    public class FikaDialogueController(ISptLogger<FikaDialogueController> logger, DialogueController dialogueController,
         ProfileHelper profileHelper, PlayerRelationsHelper playerRelationsHelper, SaveServer saveServer,
         HashUtil hashUtil, TimeUtil timeUtil, DialogueHelper dialogueHelper, SptWebSocketConnectionHandler socketConnectionHandler,
-        FriendRequestsService friendRequestsService, HttpResponseUtil httpResponseUtil)
+        FriendRequestsService friendRequestsService, HttpResponseUtil httpResponseUtil, ConfigService configService)
     {
         /// <summary>
         /// Gets a list of all friends for the specified profileId
@@ -30,8 +32,10 @@ namespace FikaServer.Controllers
         /// <param name="sessionId">The profile id to get the list for</param>
         /// <returns>A new <see cref="GetFriendListDataResponse"/></returns>
         public GetFriendListDataResponse GetFriendsList(string sessionId)
-        {
-            List<UserDialogInfo> botsAndFriends = dialogueController.GetActiveChatBots();
+        {            
+            List<UserDialogInfo> botsAndFriends = configService.Config.Server.SPT.DisableSPTChatBots
+                ? [] : dialogueController.GetActiveChatBots();
+
             List<string> friends = playerRelationsHelper.GetFriendsList(sessionId);
 
             foreach (string friend in friends)
