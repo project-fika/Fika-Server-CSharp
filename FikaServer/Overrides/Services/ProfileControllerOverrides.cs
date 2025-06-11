@@ -51,7 +51,7 @@ namespace FikaServer.Overrides.Services
             Dictionary<string, SptProfile> profiles = profileHelper.GetProfiles();
             List<SearchFriendResponse> friends = [];
 
-            foreach(SptProfile profile in profiles.Values)
+            foreach (SptProfile profile in profiles.Values)
             {
                 if (profile.ProfileInfo.Password == "fika-headless")
                 {
@@ -60,7 +60,7 @@ namespace FikaServer.Overrides.Services
 
                 if (profile.CharacterData?.PmcData?.Info != null)
                 {
-                    if(profile.CharacterData.PmcData.Info.Nickname.StartsWith(searchNickname, StringComparison.CurrentCultureIgnoreCase))
+                    if (profile.CharacterData.PmcData.Info.Nickname.StartsWith(searchNickname, StringComparison.CurrentCultureIgnoreCase))
                     {
                         friends.Add(new SearchFriendResponse
                         {

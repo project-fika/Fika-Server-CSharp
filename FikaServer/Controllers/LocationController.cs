@@ -43,7 +43,7 @@ namespace FikaServer.Controllers
                     Status = match.Status,
                     Location = match.RaidConfig.Location,
                     Side = match.Side,
-                    Time =  match.Time,
+                    Time = match.Time,
                     Players = players,
                     IsHeadless = match.IsHeadless,
                     HeadlessRequesterNickname = headlessHelper.GetRequesterUsername(hostUsername) ?? "" // Set this to an empty string if there is no requester.

@@ -1,6 +1,5 @@
 ﻿using FikaServer.Controllers;
 using SPTarkov.Reflection.Patching;
-using SPTarkov.Server.Core.Callbacks;
 using SPTarkov.Server.Core.Controllers;
 using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Models.Eft.Dialog;

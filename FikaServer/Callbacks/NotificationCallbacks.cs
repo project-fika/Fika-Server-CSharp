@@ -8,7 +8,7 @@ using SPTarkov.Server.Core.Utils;
 namespace FikaServer.Callbacks
 {
     [Injectable]
-    public class NotificationCallbacks(NotificationWebSocket notificationWebSocket, 
+    public class NotificationCallbacks(NotificationWebSocket notificationWebSocket,
         ISptLogger<NotificationWebSocket> logger, HttpResponseUtil httpResponseUtil)
     {
         /// <summary>

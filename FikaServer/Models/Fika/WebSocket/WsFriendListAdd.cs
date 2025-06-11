@@ -1,5 +1,4 @@
 ﻿using FikaServer.Models.Fika.Dialog;
-using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Eft.Ws;
 using System.Text.Json.Serialization;
 

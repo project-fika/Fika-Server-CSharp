@@ -54,7 +54,7 @@ namespace FikaServer.Overrides.Services
 
             var playerProfile = profileHelper.GetPmcProfile(sessionId);
 
-            StartLocalRaidResponseData result = new StartLocalRaidResponseData
+            StartLocalRaidResponseData result = new()
             {
                 ServerId = $"{request.Location}.{request.PlayerSide}.{timeUtil.GetTimeStamp()}",
                 ServerSettings = databaseService.GetLocationServices(),

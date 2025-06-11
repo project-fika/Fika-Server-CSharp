@@ -189,7 +189,7 @@ namespace FikaServer.Helpers
 
         public void RemoveFromIgnoreList(string from, string to)
         {
-            FikaPlayerRelations fromRelations = playerRelationsService.GetStoredValue(from);            
+            FikaPlayerRelations fromRelations = playerRelationsService.GetStoredValue(from);
             if (!fromRelations.Ignore.Remove(to))
             {
                 logger.Warning($"{from} tried to remove {to} from their ignore list but it was unsuccesful");

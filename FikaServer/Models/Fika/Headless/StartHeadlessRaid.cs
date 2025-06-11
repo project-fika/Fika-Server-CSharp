@@ -12,7 +12,7 @@ namespace FikaServer.Models.Fika.Headless
             StartHeadlessRequest = request;
         }
 
-        public EFikaHeadlessWSMessageType Type {  get; set; } = EFikaHeadlessWSMessageType.HeadlessStartRaid;
+        public EFikaHeadlessWSMessageType Type { get; set; } = EFikaHeadlessWSMessageType.HeadlessStartRaid;
         public required StartHeadlessRequest? StartHeadlessRequest { get; set; }
     }
 }
