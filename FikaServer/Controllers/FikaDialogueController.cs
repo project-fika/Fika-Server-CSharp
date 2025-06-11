@@ -6,7 +6,6 @@ using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Controllers;
 using SPTarkov.Server.Core.Helpers;
 using SPTarkov.Server.Core.Models.Eft.Common;
-using SPTarkov.Server.Core.Models.Eft.Common.Tables;
 using SPTarkov.Server.Core.Models.Eft.Dialog;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Eft.Ws;
@@ -15,7 +14,6 @@ using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Servers.Ws;
 using SPTarkov.Server.Core.Utils;
-using System.Reflection.Metadata.Ecma335;
 using static FikaServer.Helpers.PlayerRelationsHelper;
 
 namespace FikaServer.Controllers
@@ -291,7 +289,7 @@ namespace FikaServer.Controllers
         {
             List<FriendRequestListResponse> receivedFriendRequests = friendRequestsService.GetReceivedFriendRequests(sessionID);
 
-            foreach(var receivedFriendRequest in receivedFriendRequests)
+            foreach (FriendRequestListResponse receivedFriendRequest in receivedFriendRequests)
             {
                 PmcData? profile = profileHelper.GetPmcProfile(receivedFriendRequest.From);
 
@@ -310,7 +308,7 @@ namespace FikaServer.Controllers
         {
             List<FriendRequestListResponse> sentFriendRequests = friendRequestsService.GetSentFriendRequests(sessionID);
 
-            foreach (var sentFriendRequest in sentFriendRequests)
+            foreach (FriendRequestListResponse sentFriendRequest in sentFriendRequests)
             {
                 PmcData? profile = profileHelper.GetPmcProfile(sentFriendRequest.To);
 
@@ -332,11 +330,11 @@ namespace FikaServer.Controllers
 
         public ValueTask<string> AcceptAllFriendRequests(string sessionID)
         {
-            var receivedFriendRequests = friendRequestsService.GetReceivedFriendRequests(sessionID);
+            List<FriendRequestListResponse> receivedFriendRequests = friendRequestsService.GetReceivedFriendRequests(sessionID);
 
-            foreach(var receivedFriendRequest in receivedFriendRequests)
+            foreach (FriendRequestListResponse receivedFriendRequest in receivedFriendRequests)
             {
-                if(playerRelationsHelper.RemoveFriendRequest(receivedFriendRequest.From, receivedFriendRequest.To, ERemoveFriendReason.Accept))
+                if (playerRelationsHelper.RemoveFriendRequest(receivedFriendRequest.From, receivedFriendRequest.To, ERemoveFriendReason.Accept))
                 {
                     playerRelationsHelper.AddFriend(receivedFriendRequest.From, receivedFriendRequest.To);
                 }
@@ -384,12 +382,14 @@ namespace FikaServer.Controllers
 
         public ValueTask<string> IgnoreFriend(string fromProfileId, string toProfileId)
         {
+            playerRelationsHelper.AddToIgnoreList(fromProfileId, toProfileId);
             //Todo: stub, implement method
             return new(httpResponseUtil.NullResponse());
         }
 
         public ValueTask<string> UnIgnoreFriend(string fromProfileId, string toProfileId)
         {
+            playerRelationsHelper.RemoveFromIgnoreList(fromProfileId, toProfileId);
             //Todo: stub, implement method
 
             return new(httpResponseUtil.NullResponse());

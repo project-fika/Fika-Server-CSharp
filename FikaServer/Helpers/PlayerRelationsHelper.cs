@@ -163,6 +163,53 @@ namespace FikaServer.Helpers
             playerRelationsService.SaveProfileRelations();
         }
 
+        public void AddToIgnoreList(string from, string to)
+        {
+            FikaPlayerRelations fromRelations = playerRelationsService.GetStoredValue(from);
+            if (fromRelations.Ignore.Contains(to))
+            {
+                logger.Warning($"{from} already has {to} in their ignore list");
+                return;
+            }
+
+            fromRelations.Ignore.Add(to);
+            playerRelationsService.SaveProfileRelations();
+
+            SptProfile profile = saveServer.GetProfile(from);
+            ArgumentNullException.ThrowIfNull(profile);
+
+            webSocketHandler.SendMessage(to, new WsIgnoreListAdd()
+            {
+                EventIdentifier = "youAreAddToIgnoreList",
+                EventType = NotificationEventType.youAreAddToIgnoreList,
+                Id = from,
+                Profile = profile.ToFriendData()
+            });
+        }
+
+        public void RemoveFromIgnoreList(string from, string to)
+        {
+            FikaPlayerRelations fromRelations = playerRelationsService.GetStoredValue(from);            
+            if (!fromRelations.Ignore.Remove(to))
+            {
+                logger.Warning($"{from} tried to remove {to} from their ignore list but it was unsuccesful");
+                return;
+            }
+
+            playerRelationsService.SaveProfileRelations();
+
+            SptProfile profile = saveServer.GetProfile(from);
+            ArgumentNullException.ThrowIfNull(profile);
+
+            webSocketHandler.SendMessage(to, new WsIgnoreListAdd()
+            {
+                EventIdentifier = "youAreRemoveFromIgnoreList",
+                EventType = NotificationEventType.youAreRemoveFromIgnoreList,
+                Id = from,
+                Profile = profile.ToFriendData()
+            });
+        }
+
         public enum ERemoveFriendReason
         {
             Accept,
