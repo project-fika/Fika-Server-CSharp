@@ -119,7 +119,7 @@ namespace FikaServer.Services.Headless
                 return;
             }
 
-            var headlessProfile = saveServer.GetProfile(headlessClientId)
+            SptProfile headlessProfile = saveServer.GetProfile(headlessClientId)
                 ?? throw new NullReferenceException($"Could not find headlessProfile {headlessClientId}");
 
             int baseHeadlessLevel = 0;

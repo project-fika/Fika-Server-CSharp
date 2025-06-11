@@ -25,11 +25,11 @@ namespace FikaServer.Services
         {
             _globalLocales = await RecursiveLoadFiles(globalLocaleDir);
 
-            foreach (var language in _globalLocales)
+            foreach (KeyValuePair<string, Dictionary<string, string>> language in _globalLocales)
             {
-                var languageLocales = language.Value;
+                Dictionary<string, string> languageLocales = language.Value;
 
-                foreach (var locale in languageLocales)
+                foreach (KeyValuePair<string, string> locale in languageLocales)
                 {
                     localeService.AddCustomClientLocale(language.Key, locale.Key, locale.Value);
                 }
@@ -70,9 +70,9 @@ namespace FikaServer.Services
 
             foreach (string file in files)
             {
-                await using (var fs = new FileStream(file, FileMode.Open, FileAccess.Read))
+                await using (FileStream fs = new FileStream(file, FileMode.Open, FileAccess.Read))
                 {
-                    var localeFile = await JsonSerializer.DeserializeAsync<Dictionary<string, string>>(fs);
+                    Dictionary<string, string>? localeFile = await JsonSerializer.DeserializeAsync<Dictionary<string, string>>(fs);
 
                     locales.Add(Path.GetFileNameWithoutExtension(file), localeFile);
                 }

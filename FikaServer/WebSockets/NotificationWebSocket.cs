@@ -60,7 +60,7 @@ namespace FikaServer.WebSockets
 
         public Task OnClose(WebSocket ws, HttpContext context, string sessionIdContext)
         {
-            var client = clientWebSockets.Where(x => x.Value == ws).FirstOrDefault();
+            KeyValuePair<string, WebSocket> client = clientWebSockets.Where(x => x.Value == ws).FirstOrDefault();
 
             if (client.Key != null)
             {
@@ -92,7 +92,7 @@ namespace FikaServer.WebSockets
 
         public async Task BroadcastAsync<T>(T message) where T : IFikaNotificationBase
         {
-            foreach (var websocket in clientWebSockets)
+            foreach (KeyValuePair<string, WebSocket> websocket in clientWebSockets)
             {
                 await SendAsync(websocket.Key, message);
             }

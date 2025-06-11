@@ -24,7 +24,7 @@ namespace FikaServer.Overrides.Services
             MatchService matchService = ServiceLocator.ServiceProvider.GetService<MatchService>()!;
             LocationLifecycleService locationLifeCycleService = ServiceLocator.ServiceProvider.GetService<LocationLifecycleService>()!;
 
-            var matchId = matchService!.GetMatchIdByProfile(sessionId);
+            string? matchId = matchService!.GetMatchIdByProfile(sessionId);
 
             if (string.IsNullOrEmpty(matchId))
             {
@@ -34,7 +34,7 @@ namespace FikaServer.Overrides.Services
             else
             {
                 // player is in a Fika match, use match location loot and regen if transit
-                var match = matchService.GetMatch(matchId);
+                Models.Fika.FikaMatch? match = matchService.GetMatch(matchId);
 
                 if (matchId == sessionId)
                 {
@@ -52,7 +52,7 @@ namespace FikaServer.Overrides.Services
             ProfileHelper profileHelper = ServiceLocator.ServiceProvider.GetService<ProfileHelper>()!;
             TimeUtil timeUtil = ServiceLocator.ServiceProvider.GetService<TimeUtil>()!;
 
-            var playerProfile = profileHelper.GetPmcProfile(sessionId);
+            PmcData? playerProfile = profileHelper.GetPmcProfile(sessionId);
 
             StartLocalRaidResponseData result = new()
             {

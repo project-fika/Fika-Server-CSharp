@@ -32,7 +32,7 @@ namespace FikaServer.Services
             System.Timers.Timer timer = new(60 * 1000);
             timer.Elapsed += (sender, e) =>
             {
-                var match = GetMatch(matchId);
+                FikaMatch? match = GetMatch(matchId);
 
                 if (match != null)
                 {
@@ -74,7 +74,7 @@ namespace FikaServer.Services
         /// <returns>Returns the match object if a match is found with this match ID, returns null if not.</returns>
         public FikaMatch? GetMatch(string matchId)
         {
-            if (Matches.TryGetValue(matchId, out var match))
+            if (Matches.TryGetValue(matchId, out FikaMatch? match))
             {
                 return match;
             }
@@ -90,7 +90,7 @@ namespace FikaServer.Services
         /// <returns>Returns a FikaPlayer object if the player is found, returns null if not.</returns>
         public FikaPlayer? GetPlayerInMatch(string matchId, string playerId)
         {
-            if (!Matches.TryGetValue(matchId, out var match))
+            if (!Matches.TryGetValue(matchId, out FikaMatch? match))
             {
                 return null;
             }
@@ -110,7 +110,7 @@ namespace FikaServer.Services
         /// <returns>The match ID containing the player, or null if the player isn't in a match.</returns>
         public string? GetMatchIdByPlayer(string playerId)
         {
-            foreach (var kvp in Matches)
+            foreach (KeyValuePair<string, FikaMatch> kvp in Matches)
             {
                 if (kvp.Value.Players.ContainsKey(playerId))
                 {
@@ -147,7 +147,7 @@ namespace FikaServer.Services
                 DeleteMatch(data.ServerId);
             }
 
-            var locationData = locationLifecycleService.GenerateLocationAndLoot(sessionId, data.Settings.Location);
+            SPTarkov.Server.Core.Models.Eft.Common.LocationBase locationData = locationLifecycleService.GenerateLocationAndLoot(sessionId, data.Settings.Location);
 
             Matches.TryAdd(data.ServerId, new FikaMatch
             {
@@ -228,7 +228,7 @@ namespace FikaServer.Services
         /// <param name="status"></param>
         public async Task SetMatchStatus(string matchId, EFikaMatchStatus status)
         {
-            if (Matches.TryGetValue(matchId, out var match))
+            if (Matches.TryGetValue(matchId, out FikaMatch? match))
             {
                 match.Status = status;
             }
@@ -254,7 +254,7 @@ namespace FikaServer.Services
                 return;
             }
 
-            if (Matches.TryGetValue(matchId, out var match))
+            if (Matches.TryGetValue(matchId, out FikaMatch? match))
             {
                 match.Ips = ips;
                 match.Port = port;
@@ -274,7 +274,7 @@ namespace FikaServer.Services
                 return;
             }
 
-            if (Matches.TryGetValue(matchId, out var match))
+            if (Matches.TryGetValue(matchId, out FikaMatch? match))
             {
                 match.Timeout = 0;
             }
@@ -293,7 +293,7 @@ namespace FikaServer.Services
                 return;
             }
 
-            if (Matches.TryGetValue(matchId, out var match))
+            if (Matches.TryGetValue(matchId, out FikaMatch? match))
             {
                 match.Players.Add(playerId, data);
             }
@@ -334,7 +334,7 @@ namespace FikaServer.Services
                 return;
             }
 
-            if (Matches.TryGetValue(matchId, out var match))
+            if (Matches.TryGetValue(matchId, out FikaMatch? match))
             {
                 if (!match.Players.ContainsKey(playerId))
                 {
@@ -358,7 +358,7 @@ namespace FikaServer.Services
                 return;
             }
 
-            if (Matches.TryGetValue(matchId, out var match))
+            if (Matches.TryGetValue(matchId, out FikaMatch? match))
             {
                 if (!match.Players.ContainsKey(playerId))
                 {
@@ -381,7 +381,7 @@ namespace FikaServer.Services
                 return;
             }
 
-            if (Matches.TryGetValue(matchId, out var match))
+            if (Matches.TryGetValue(matchId, out FikaMatch? match))
             {
                 match.Players.Remove(playerId);
 

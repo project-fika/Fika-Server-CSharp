@@ -22,10 +22,10 @@ namespace FikaServer.Overrides.Services
             InsuranceService insuranceService = ServiceLocator.ServiceProvider.GetService<InsuranceService>();
 
             // Get match id from player session id
-            var matchId = matchService.GetMatchIdByPlayer(sessionId);
+            string? matchId = matchService.GetMatchIdByPlayer(sessionId);
 
             // Find player that exited the raid
-            var player = matchService.GetPlayerInMatch(matchId, sessionId);
+            Models.Fika.FikaPlayer? player = matchService.GetPlayerInMatch(matchId, sessionId);
 
             if (player is not null)
             {

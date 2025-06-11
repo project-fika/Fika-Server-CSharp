@@ -94,7 +94,7 @@ namespace FikaServer.Controllers
         /// <returns></returns>
         public FikaRaidGethostResponse? HandleRaidGetHost(FikaRaidServerIdRequestData request)
         {
-            var match = matchService.GetMatch(request.ServerId);
+            FikaMatch? match = matchService.GetMatch(request.ServerId);
 
             if (match == null)
             {
@@ -117,7 +117,7 @@ namespace FikaServer.Controllers
         /// <returns></returns>
         public FikaRaidSettingsResponse? HandleRaidGetSettings(FikaRaidServerIdRequestData request)
         {
-            var match = matchService.GetMatch(request.ServerId);
+            FikaMatch? match = matchService.GetMatch(request.ServerId);
 
             if (match == null)
             {
