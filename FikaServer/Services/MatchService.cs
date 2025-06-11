@@ -266,6 +266,11 @@ namespace FikaServer.Services
             if (Matches.TryGetValue(matchId, out FikaMatch? match))
             {
                 match.Timeout = 0;
+                if (_timeoutIntervals.TryGetValue(matchId, out System.Timers.Timer? timer))
+                {
+                    timer.Stop();
+                    timer.Start();
+                }
             }
         }
 
