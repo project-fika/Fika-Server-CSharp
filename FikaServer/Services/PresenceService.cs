@@ -12,7 +12,7 @@ namespace FikaServer.Services
     [Injectable(InjectionType.Singleton)]
     public class PresenceService(SaveServer saveServer, TimeUtil timeUtil, ISptLogger<PresenceService> logger)
     {
-        private ConcurrentDictionary<string, FikaPlayerPresence> onlinePlayers = [];
+        private readonly ConcurrentDictionary<string, FikaPlayerPresence> _onlinePlayers = [];
 
         public void AddPlayerPresence(string sessionID)
         {
@@ -33,24 +33,24 @@ namespace FikaServer.Services
 
             logger.Debug($"[Fika Presence] Adding player: {data.Nickname}");
 
-            onlinePlayers.TryAdd(sessionID, data);
+            _onlinePlayers.TryAdd(sessionID, data);
         }
 
         public List<FikaPlayerPresence> GetAllPlayersPresence()
         {
-            return onlinePlayers.Values.ToList();
+            return [.. _onlinePlayers.Values];
         }
 
         public void UpdatePlayerPresence(string sessionID, FikaSetPresence NewPresence)
         {
-            if (!onlinePlayers.TryGetValue(sessionID, out FikaPlayerPresence currentPresence))
+            if (!_onlinePlayers.TryGetValue(sessionID, out FikaPlayerPresence currentPresence))
             {
                 return;
             }
 
             SptProfile profile = saveServer.GetProfile(sessionID);
 
-            onlinePlayers.TryUpdate(sessionID, new FikaPlayerPresence
+            _onlinePlayers.TryUpdate(sessionID, new FikaPlayerPresence
             {
                 Nickname = profile.CharacterData.PmcData.Info.Nickname,
                 Level = profile.CharacterData.PmcData.Info.Level ?? 0,
@@ -62,12 +62,7 @@ namespace FikaServer.Services
 
         public void RemovePlayerPresence(string sessionID)
         {
-            if (!onlinePlayers.ContainsKey(sessionID))
-            {
-                return;
-            }
-
-            onlinePlayers.TryRemove(sessionID, out _);
+            _onlinePlayers.TryRemove(sessionID, out _);
         }
     }
 }
