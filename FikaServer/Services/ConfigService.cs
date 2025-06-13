@@ -45,6 +45,11 @@ namespace FikaServer.Services
             // We store default values in the config models, and if one is missing this will write it to the file in the correct place
             await WriteConfig(_configFolderPath);
 
+#if DEBUG
+            Config.Client.AllowFreeCam = true;
+            Config.Server.ShowDevProfile = true;
+#endif
+
             ApplySPTConfig(Config.Server.SPT);
         }
 
