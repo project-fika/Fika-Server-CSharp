@@ -7,9 +7,7 @@ using System.Text.Json;
 namespace FikaServer.Services
 {
     [Injectable(InjectionType.Singleton)]
-    public class LocaleService(ISptLogger<LocaleService> logger,
-        SPTarkov.Server.Core.Services.LocaleService localeService, JsonUtil jsonUtil, FileUtil fileUtil,
-        ConfigService fikaConfig, DatabaseServer databaseServer)
+    public class LocaleService(FileUtil fileUtil, ConfigService fikaConfig, DatabaseServer databaseServer)
     {
         private readonly string _globalLocaleDir = Path.Join(fikaConfig.GetModPath(), "assets", "database", "locales", "global");
         //private readonly string serverLocaleDir = Path.Join(fikaConfig.GetModPath(), "assets", "database", "locales", "server");
@@ -26,34 +24,27 @@ namespace FikaServer.Services
         {
             _globalLocales = await RecursiveLoadFiles(_globalLocaleDir);
 
-            foreach ((string language, Dictionary<string, string> locales) in _globalLocales)
+            foreach ((string locale, var lazyLoadedValue) in databaseServer.GetTables().Locales.Global)
             {
-                foreach ((string lang, string locale) in locales)
+                lazyLoadedValue.AddTransformer(localeData =>
                 {
-                    localeService.AddCustomClientLocale(language, lang, locale);
-                }
-            }
+                    var fikaLocales = _globalLocales[locale];
 
-            /* Todo
-            foreach(var localeKvP in databaseServer.GetTables().Locales.Global)
-            {
-                localeKvP.Value.OnLazyLoad += (object? sender, SPTarkov.Server.Core.Utils.Json.OnLazyLoadEventArgs<Dictionary<string, string>> e) =>
-                {
-                    if(_globalLocales.ContainsKey(localeKvP.Key))
+                    foreach (var fikaLocale in fikaLocales)
                     {
-                        var fikaLocales = _globalLocales[localeKvP.Key];
-
-                        foreach(var fikaLocale in fikaLocales)
+                        if (localeData.ContainsKey(fikaLocale.Key))
                         {
-                            if (!e.Value.ContainsKey(fikaLocale.Key))
-                            {
-                                e.Value.Add(fikaLocale.Key, fikaLocale.Value);
-                            }
+                            localeData[fikaLocale.Key] = fikaLocale.Value;
+                        }
+                        else
+                        {
+                            localeData.Add(fikaLocale.Key, fikaLocale.Value);
                         }
                     }
-                };
+
+                    return localeData;
+                });
             }
-            */
         }
 
         private void LoadServerLocales()
