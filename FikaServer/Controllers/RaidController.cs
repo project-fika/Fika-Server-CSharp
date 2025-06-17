@@ -121,6 +121,7 @@ namespace FikaServer.Controllers
 
             if (match == null)
             {
+                logger.Error($"Could not find match with id {request.ServerId}");
                 return null;
             }
 
