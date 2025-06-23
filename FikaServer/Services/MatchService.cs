@@ -187,18 +187,14 @@ namespace FikaServer.Services
         /// <param name="matchId">The match Id to remove</param>
         public void DeleteMatch(string matchId)
         {
-            if (!Matches.ContainsKey(matchId))
-            {
-                return;
-            }
-
-            if (Matches.TryRemove(matchId, out _))
+            if (Matches.TryRemove(matchId, out FikaMatch? match))
             {
                 RemoveTimeoutInterval(matchId);
+                logger.Info($"Deleted match [{matchId}]");
             }
             else
             {
-                logger.Warning($"Failed to remove match: {matchId}");
+                logger.Warning($"Failed to delete match: {matchId}");
             }
         }
 
