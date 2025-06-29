@@ -3,6 +3,7 @@ using FikaServer.Models.Fika.WebSocket.Notifications;
 using FikaServer.Services;
 using FikaServer.WebSockets;
 using SPTarkov.DI.Annotations;
+using SPTarkov.Server.Core.Extensions;
 using SPTarkov.Server.Core.Helpers;
 using SPTarkov.Server.Core.Models.Eft.Common;
 using SPTarkov.Server.Core.Models.Eft.Common.Tables;
@@ -40,7 +41,7 @@ namespace FikaServer.Controllers
             logger.Info($"{body.ID} is going to sessionID: {body.Target}");
 
             List<Item> senderItems = senderProfile.CharacterData?.PmcData?.Inventory?.Items ?? [];
-            List<Item> itemsToSend = itemHelper.FindAndReturnChildrenAsItems(senderItems, body.ID);
+            List<Item> itemsToSend = senderItems.FindAndReturnChildrenAsItems(body.ID);
 
             if (itemsToSend.Count == 0)
             {
