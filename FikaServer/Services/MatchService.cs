@@ -148,7 +148,7 @@ namespace FikaServer.Services
 
             SPTarkov.Server.Core.Models.Eft.Common.LocationBase locationData = locationLifecycleService.GenerateLocationAndLoot(sessionId, data.Settings.Location);
 
-            Matches.TryAdd(data.ServerId, new FikaMatch
+            FikaMatch match = new()
             {
                 Ips = [],
                 Port = 0,
@@ -167,7 +167,12 @@ namespace FikaServer.Services
                 NatPunch = false,
                 IsHeadless = false,
                 Raids = 0
-            });
+            };
+
+            if (!Matches.TryAdd(data.ServerId, match))
+            {
+                logger.Error($"Failed to create match {data.ServerId}");
+            }
 
             AddTimeoutInterval(data.ServerId);
 
