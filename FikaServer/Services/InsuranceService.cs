@@ -133,7 +133,9 @@ namespace FikaServer.Services
                     }
 
                     // Find overlap between players other than the initial player we're looping over, if it contains the lost item id of the initial player we add it to foundItems
-                    List<MongoId> overlap = nextPlayer.Inventory.Where(player.LostItems.Contains).ToList() ?? [];
+                    List<MongoId> overlap = nextPlayer.Inventory
+                        .Where(player.LostItems.Contains)
+                        .ToList() ?? [];
 
                     // Add said overlap to player's found items
                     player.FoundItems.AddRange(overlap);
