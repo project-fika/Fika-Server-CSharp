@@ -1,6 +1,7 @@
 ﻿using FikaServer.Models.Fika.Insurance;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Helpers;
+using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Common.Tables;
 using SPTarkov.Server.Core.Models.Eft.Match;
 using SPTarkov.Server.Core.Models.Eft.Profile;
@@ -88,8 +89,12 @@ namespace FikaServer.Services
                 }
 
                 // Map both the lost items and the current inventory
-                player.LostItems = endLocalRaidRequest.LostInsuredItems?.Select((i) => i.Id).ToList() ?? [];
-                player.Inventory = endLocalRaidRequest.Results?.Profile?.Inventory?.Items?.Select(i => i.Id).ToList() ?? [];
+                player.LostItems = endLocalRaidRequest.LostInsuredItems?
+                    .Select((i) => i.Id)
+                    .ToList() ?? [];
+                player.Inventory = endLocalRaidRequest.Results?.Profile?.Inventory?.Items?
+                    .Select(i => i.Id)
+                    .ToList() ?? [];
                 player.EndedRaid = true;
             }
         }
@@ -128,7 +133,7 @@ namespace FikaServer.Services
                     }
 
                     // Find overlap between players other than the initial player we're looping over, if it contains the lost item id of the initial player we add it to foundItems
-                    List<string?> overlap = nextPlayer.Inventory.Where(player.LostItems.Contains).ToList() ?? [];
+                    List<MongoId> overlap = nextPlayer.Inventory.Where(player.LostItems.Contains).ToList() ?? [];
 
                     // Add said overlap to player's found items
                     player.FoundItems.AddRange(overlap);
@@ -150,7 +155,7 @@ namespace FikaServer.Services
         /// <param name="sessionID">The profile to remove from</param>
         /// <param name="ids">The item ids to search for and remove</param>
         /// <exception cref="NullReferenceException"></exception>
-        private void RemoveItemsFromInsurance(string sessionID, List<string?> ids)
+        private void RemoveItemsFromInsurance(string sessionID, List<MongoId> ids)
         {
             SptProfile profile = saveServer.GetProfile(sessionID)
                 ?? throw new NullReferenceException("[Fika Insurance] Profile was null");
