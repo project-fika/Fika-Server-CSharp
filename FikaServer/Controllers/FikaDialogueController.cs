@@ -6,6 +6,7 @@ using FikaServer.Services.Cache;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Controllers;
 using SPTarkov.Server.Core.Helpers;
+using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Common;
 using SPTarkov.Server.Core.Models.Eft.Dialog;
 using SPTarkov.Server.Core.Models.Eft.Profile;
@@ -85,7 +86,7 @@ namespace FikaServer.Controllers
 
             friendRequestsService.AddFriendRequest(new()
             {
-                Id = hashUtil.Generate(),
+                Id = new MongoId(),
                 From = from,
                 To = to,
                 Date = timeUtil.GetTimeStamp()
@@ -212,7 +213,7 @@ namespace FikaServer.Controllers
 
             Message message = new()
             {
-                Id = hashUtil.Generate(),
+                Id = new MongoId(),
                 UserId = sessionId,
                 MessageType = request.Type,
                 Member = new()

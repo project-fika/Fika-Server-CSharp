@@ -1,6 +1,7 @@
 ﻿using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Controllers;
 using SPTarkov.Server.Core.Helpers;
+using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Common;
 using SPTarkov.Server.Core.Models.Eft.Common.Tables;
 using SPTarkov.Server.Core.Models.Eft.Profile;
@@ -65,7 +66,7 @@ namespace FikaServer.Services.Headless
         private async Task<SptProfile> CreateHeadlessProfile()
         {
             // Generate a unique username
-            string username = $"headless_{hashUtil.Generate()}";
+            MongoId username = $"headless_{new MongoId()}";
             // Using a password allows us to know which profiles are headless client profiles.
             string password = "fika-headless";
             // Random edition. Doesn't matter
@@ -88,8 +89,8 @@ namespace FikaServer.Services.Headless
 
         private async Task<string> CreateMiniProfile(string username, string password, string edition)
         {
-            string profileId = hashUtil.Generate();
-            string scavId = hashUtil.Generate();
+            MongoId profileId = new();
+            MongoId scavId = new();
 
             SPTarkov.Server.Core.Models.Eft.Profile.Info newProfile = new()
             {

@@ -11,6 +11,7 @@ using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Utils;
 using SPTarkov.Server.Core.Utils.Json.Converters;
+using System.Text.Json;
 
 namespace FikaServer.OnLoad
 {
