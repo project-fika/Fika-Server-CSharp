@@ -36,7 +36,7 @@ namespace FikaServer.Overrides.Services
         }
 
         [PatchPrefix]
-        public static bool Prefix(string sessionId, SendMessageRequest request, ref ValueTask<string> __result)
+        public static bool Prefix(MongoId sessionId, SendMessageRequest request, ref ValueTask<string> __result)
         {
             FikaDialogueController? dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
                 ?? throw new NullReferenceException("Missing FikaDialogueController");
