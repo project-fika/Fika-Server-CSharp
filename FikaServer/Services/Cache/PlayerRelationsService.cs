@@ -1,6 +1,7 @@
 ﻿using FikaServer.Models.Fika;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Helpers;
+using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Utils;
 using System.Collections.Concurrent;
@@ -51,7 +52,7 @@ namespace FikaServer.Services.Cache
 
         public void OnPostLoad()
         {
-            Dictionary<string, SptProfile> profiles = profileHelper.GetProfiles();
+            Dictionary<MongoId, SptProfile> profiles = profileHelper.GetProfiles();
             bool shouldSave = false;
 
             foreach (string profileId in profiles.Keys)

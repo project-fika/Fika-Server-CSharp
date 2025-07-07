@@ -117,7 +117,7 @@ namespace FikaServer.Controllers
         /// <param name="sessionId">The profile id to send from</param>
         /// <param name="request">The request to handle</param>
         /// <returns>The id of the message sent</returns>
-        public string SendMessage(string sessionId, SendMessageRequest request, Dictionary<string, SptProfile> profiles)
+        public string SendMessage(string sessionId, SendMessageRequest request, Dictionary<MongoId, SptProfile> profiles)
         {
             SptProfile receiverProfile = profiles[request.DialogId];
             SptProfile senderProfile = profiles[sessionId];

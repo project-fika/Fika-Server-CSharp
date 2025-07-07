@@ -5,6 +5,7 @@ using FikaServer.WebSockets;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Extensions;
 using SPTarkov.Server.Core.Helpers;
+using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Common;
 using SPTarkov.Server.Core.Models.Eft.Common.Tables;
 using SPTarkov.Server.Core.Models.Eft.ItemEvent;
@@ -83,9 +84,9 @@ namespace FikaServer.Controllers
 
             SptProfile sender = saveServer.GetProfile(sessionID);
 
-            Dictionary<string, SptProfile> profiles = saveServer.GetProfiles();
+            Dictionary<MongoId, SptProfile> profiles = saveServer.GetProfiles();
 
-            foreach (KeyValuePair<string, SptProfile> profileKvP in profiles)
+            foreach (KeyValuePair<MongoId, SptProfile> profileKvP in profiles)
             {
                 SptProfile profile = profileKvP.Value;
 

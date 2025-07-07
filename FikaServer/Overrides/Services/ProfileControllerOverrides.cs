@@ -4,6 +4,7 @@ using SPTarkov.Reflection.Patching;
 using SPTarkov.Server.Core.Controllers;
 using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Helpers;
+using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Launcher;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using System.Reflection;
@@ -48,7 +49,7 @@ namespace FikaServer.Overrides.Services
 
             ProfileHelper profileHelper = ServiceLocator.ServiceProvider.GetService<ProfileHelper>();
 
-            Dictionary<string, SptProfile> profiles = profileHelper.GetProfiles();
+            Dictionary<MongoId, SptProfile> profiles = profileHelper.GetProfiles();
             List<SearchFriendResponse> friends = [];
 
             foreach (SptProfile profile in profiles.Values)
