@@ -32,15 +32,19 @@
   <ItemGroup>
     <Reference Include="SPTarkov.Common">
       <HintPath>tref\SPTarkov.Common.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="SPTarkov.DI">
       <HintPath>tref\SPTarkov.DI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="SPTarkov.Reflection">
       <HintPath>tref\SPTarkov.Reflection.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="SPTarkov.Server.Core">
       <HintPath>tref\SPTarkov.Server.Core.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
 </Project>
