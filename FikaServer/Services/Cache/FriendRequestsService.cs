@@ -41,8 +41,15 @@ namespace FikaServer.Services.Cache
             }
             else
             {
-                string data = File.ReadAllText(file);
-                _friendRequests = _friendRequests = JsonSerializer.Deserialize<List<FriendRequestListResponse>>(data, ConfigService.serializerOptions);
+                try
+                {
+                    string data = File.ReadAllText(file);
+                    _friendRequests = _friendRequests = JsonSerializer.Deserialize<List<FriendRequestListResponse>>(data, ConfigService.serializerOptions);
+                }
+                catch (Exception ex)
+                {
+                    logger.Error($"Failed to load friend requests: {ex.Message}");
+                }
             }
         }
 
