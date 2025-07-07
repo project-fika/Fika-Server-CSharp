@@ -2,6 +2,7 @@
 using SPTarkov.Reflection.Patching;
 using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Helpers;
+using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Common;
 using SPTarkov.Server.Core.Models.Eft.Match;
 using SPTarkov.Server.Core.Services;
@@ -18,7 +19,7 @@ namespace FikaServer.Overrides.Services
         }
 
         [PatchPrefix]
-        public static bool Prefix(string sessionId, StartLocalRaidRequestData request, ref StartLocalRaidResponseData __result)
+        public static bool Prefix(MongoId sessionId, StartLocalRaidRequestData request, ref StartLocalRaidResponseData __result)
         {
             LocationBase locationLoot;
             MatchService matchService = ServiceLocator.ServiceProvider.GetService<MatchService>()!;
@@ -106,7 +107,6 @@ namespace FikaServer.Overrides.Services
                 typeof(LocationLifecycleService).GetMethod("AdjustExtracts")?.Invoke(locationLifeCycleService, [request.PlayerSide, request.Location, result.LocationLoot]);
 
                 // Clear bot cache ready for a fresh raid
-                ServiceLocator.ServiceProvider.GetService<BotGenerationCacheService>()!.ClearStoredBots();
                 ServiceLocator.ServiceProvider.GetService<BotNameService>()!.ClearNameCache();
             }
 

@@ -49,7 +49,7 @@ namespace FikaServer.Controllers
 
                 botsAndFriends.Add(new()
                 {
-                    Id = profile.Id,
+                    Id = profile.Id.Value,
                     Aid = profile.Aid,
                     Info = new()
                     {
@@ -140,7 +140,7 @@ namespace FikaServer.Controllers
             senderDialog.Users = [
                 new()
                 {
-                    Id = receiverProfile.ProfileInfo.ProfileId,
+                    Id = receiverProfile.ProfileInfo.ProfileId.Value,
                     Aid = receiverProfile.ProfileInfo.Aid,
                     Info = new()
                     {
@@ -153,7 +153,7 @@ namespace FikaServer.Controllers
                 },
                 new()
                 {
-                    Id = senderProfile.ProfileInfo.ProfileId,
+                    Id = senderProfile.ProfileInfo.ProfileId.Value,
                     Aid = senderProfile.ProfileInfo.Aid,
                     Info = new()
                     {
@@ -185,7 +185,7 @@ namespace FikaServer.Controllers
             receiverDialog.Users = [
                 new()
                 {
-                    Id = senderProfile.ProfileInfo.ProfileId,
+                    Id = senderProfile.ProfileInfo.ProfileId.Value,
                     Aid = senderProfile.ProfileInfo.Aid,
                     Info = new()
                     {
@@ -198,7 +198,7 @@ namespace FikaServer.Controllers
                 },
                 new()
                 {
-                    Id = receiverProfile.ProfileInfo.ProfileId,
+                    Id = receiverProfile.ProfileInfo.ProfileId.Value,
                     Aid = receiverProfile.ProfileInfo.Aid,
                     Info = new()
                     {

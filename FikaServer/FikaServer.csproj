@@ -14,16 +14,33 @@
       <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
-	<ItemGroup>
+	<!--<ItemGroup>
 		<PackageReference Include="SPTarkov.Common" Version="4.0.0-prerelease20" />
 		<PackageReference Include="SPTarkov.DI" Version="4.0.0-prerelease20" />
 		<PackageReference Include="SPTarkov.Reflection" Version="4.0.0-prerelease20" />
 		<PackageReference Include="SPTarkov.Server.Core" Version="4.0.0-prerelease20" />
-	</ItemGroup>
+	</ItemGroup>-->
+	
 	
   <ItemGroup>
       <Content Include="Assets\**">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
+  </ItemGroup>
+	
+	
+  <ItemGroup>
+    <Reference Include="SPTarkov.Common">
+      <HintPath>tref\SPTarkov.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="SPTarkov.DI">
+      <HintPath>tref\SPTarkov.DI.dll</HintPath>
+    </Reference>
+    <Reference Include="SPTarkov.Reflection">
+      <HintPath>tref\SPTarkov.Reflection.dll</HintPath>
+    </Reference>
+    <Reference Include="SPTarkov.Server.Core">
+      <HintPath>tref\SPTarkov.Server.Core.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>
