@@ -2,6 +2,7 @@
 using FikaServer.Services;
 using SPTarkov.Reflection.Patching;
 using SPTarkov.Server.Core.DI;
+using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Match;
 using SPTarkov.Server.Core.Services;
 using System.Reflection;
@@ -17,7 +18,7 @@ namespace FikaServer.Overrides.Services
         }
 
         [PatchPrefix]
-        public static bool Prefix(string sessionId, EndLocalRaidRequestData request)
+        public static bool Prefix(MongoId sessionId, EndLocalRaidRequestData request)
         {
             MatchService matchService = ServiceLocator.ServiceProvider.GetService<MatchService>();
             InsuranceService insuranceService = ServiceLocator.ServiceProvider.GetService<InsuranceService>();

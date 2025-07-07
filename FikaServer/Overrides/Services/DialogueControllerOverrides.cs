@@ -18,7 +18,7 @@ namespace FikaServer.Overrides.Services
         }
 
         [PatchPrefix]
-        public static bool Prefix(string sessionId, ref GetFriendListDataResponse __result)
+        public static bool Prefix(MongoId sessionId, ref GetFriendListDataResponse __result)
         {
             FikaDialogueController? dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>();
 

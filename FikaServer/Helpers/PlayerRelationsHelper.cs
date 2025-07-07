@@ -3,6 +3,7 @@ using FikaServer.Models.Fika.Dialog;
 using FikaServer.Models.Fika.WebSocket;
 using FikaServer.Services.Cache;
 using SPTarkov.DI.Annotations;
+using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Eft.Ws;
 using SPTarkov.Server.Core.Models.Utils;
@@ -21,7 +22,7 @@ namespace FikaServer.Helpers
         /// </summary>
         /// <param name="profileId"></param>
         /// <returns>Friends list</returns>
-        public List<string> GetFriendsList(string profileId)
+        public List<string> GetFriendsList(MongoId profileId)
         {
             return playerRelationsService.GetStoredValue(profileId).Friends;
         }
@@ -32,7 +33,7 @@ namespace FikaServer.Helpers
         /// <param name="fromProfileId">Requesting profileId</param>
         /// <param name="toProfileId">Target profileId</param>
         /// <exception cref="NotImplementedException"></exception>
-        public void RemoveFriend(string fromProfileId, string toProfileId)
+        public void RemoveFriend(MongoId fromProfileId, string toProfileId)
         {
             FikaPlayerRelations fromRelations = playerRelationsService.GetStoredValue(fromProfileId);
             if (fromRelations == null)
@@ -86,7 +87,7 @@ namespace FikaServer.Helpers
         /// <param name="profileId">The player to check for</param>
         /// <returns>List of players ignoring the player</returns>
         /// <exception cref="NotImplementedException"></exception>
-        public List<string> GetInIgnoreList(string profileId)
+        public List<string> GetInIgnoreList(MongoId profileId)
         {
             return [.. playerRelationsService.Keys
                 .Where(x => playerRelationsService.GetStoredValue(x).Ignore.Contains(profileId))];

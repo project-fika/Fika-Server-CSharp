@@ -13,9 +13,9 @@ namespace FikaServer.Services.Cache
     public class PlayerRelationsService(ProfileHelper profileHelper, ConfigService FikaConfig, ISptLogger<PlayerRelationsService> logger)
     {
         private readonly string _playerRelationsFullPath = Path.Join(FikaConfig.GetModPath(), "database");
-        private ConcurrentDictionary<string, FikaPlayerRelations> _playerRelations = [];
+        private ConcurrentDictionary<MongoId, FikaPlayerRelations> _playerRelations = [];
 
-        public List<string> Keys
+        public List<MongoId> Keys
         {
             get
             {
@@ -46,7 +46,7 @@ namespace FikaServer.Services.Cache
             else
             {
                 string data = File.ReadAllText(file);
-                _playerRelations = JsonSerializer.Deserialize<ConcurrentDictionary<string, FikaPlayerRelations>>(data, ConfigService.serializerOptions);
+                _playerRelations = JsonSerializer.Deserialize<ConcurrentDictionary<MongoId, FikaPlayerRelations>>(data, ConfigService.SerializerOptions);
             }
         }
 
@@ -98,24 +98,24 @@ namespace FikaServer.Services.Cache
 
         public void SaveProfileRelations()
         {
-            File.WriteAllText($"{_playerRelationsFullPath}/playerRelations.json", JsonSerializer.Serialize(_playerRelations, ConfigService.serializerOptions));
+            File.WriteAllText($"{_playerRelationsFullPath}/playerRelations.json", JsonSerializer.Serialize(_playerRelations, ConfigService.SerializerOptions));
         }
 
-        public FikaPlayerRelations GetStoredValue(string key)
+        public FikaPlayerRelations GetStoredValue(MongoId profileId)
         {
-            if (!_playerRelations.ContainsKey(key))
+            if (!_playerRelations.ContainsKey(profileId))
             {
-                StoreValue(key, new FikaPlayerRelations());
+                StoreValue(profileId, new FikaPlayerRelations());
             }
 
-            return _playerRelations[key];
+            return _playerRelations[profileId];
         }
 
-        public void StoreValue(string key, FikaPlayerRelations value)
+        public void StoreValue(MongoId profileId, FikaPlayerRelations value)
         {
-            if (!_playerRelations.TryAdd(key, value))
+            if (!_playerRelations.TryAdd(profileId, value))
             {
-                logger.Error($"Failed to add {key} to relations database");
+                logger.Error($"Failed to add {profileId} to relations database");
                 return;
             }
 

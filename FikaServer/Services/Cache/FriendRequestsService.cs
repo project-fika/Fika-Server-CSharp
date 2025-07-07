@@ -44,7 +44,7 @@ namespace FikaServer.Services.Cache
                 try
                 {
                     string data = File.ReadAllText(file);
-                    _friendRequests = _friendRequests = JsonSerializer.Deserialize<List<FriendRequestListResponse>>(data, ConfigService.serializerOptions);
+                    _friendRequests = _friendRequests = JsonSerializer.Deserialize<List<FriendRequestListResponse>>(data, ConfigService.SerializerOptions);
                 }
                 catch (Exception ex)
                 {
@@ -134,7 +134,7 @@ namespace FikaServer.Services.Cache
         {
             File.WriteAllText($"{_friendRequestsFullPath}/friendRequests.json",
                 JsonSerializer.Serialize(_friendRequests,
-                ConfigService.serializerOptions));
+                ConfigService.SerializerOptions));
         }
     }
 }

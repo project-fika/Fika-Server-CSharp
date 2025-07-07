@@ -2,6 +2,7 @@
 using SPTarkov.Reflection.Patching;
 using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Helpers;
+using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Routers;
 using System.Reflection;
 
@@ -19,7 +20,7 @@ namespace FikaServer.Overrides.Routers
         }
 
         [PatchPostfix]
-        public async static ValueTask<string?> Postfix(ValueTask<string?> __result, HttpRequest req, string sessionID, string? body)
+        public async static ValueTask<string?> Postfix(ValueTask<string?> __result, HttpRequest req)
         {
             string? response = await __result;
 

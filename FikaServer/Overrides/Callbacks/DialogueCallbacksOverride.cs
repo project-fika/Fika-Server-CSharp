@@ -2,6 +2,7 @@
 using SPTarkov.Reflection.Patching;
 using SPTarkov.Server.Core.Callbacks;
 using SPTarkov.Server.Core.DI;
+using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Common;
 using SPTarkov.Server.Core.Models.Eft.Common.Request;
 using SPTarkov.Server.Core.Models.Eft.Dialog;
@@ -18,7 +19,7 @@ namespace FikaServer.Overrides.Callbacks
         }
 
         [PatchPrefix]
-        public static bool Prefix(string url, EmptyRequestData _, string sessionID, ref ValueTask<string> __result)
+        public static bool Prefix(string url, EmptyRequestData _, MongoId sessionID, ref ValueTask<string> __result)
         {
             FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
                 ?? throw new NullReferenceException("Could not get DialogueController");
@@ -37,7 +38,7 @@ namespace FikaServer.Overrides.Callbacks
         }
 
         [PatchPrefix]
-        public static bool Prefix(string url, EmptyRequestData _, string sessionID, ref ValueTask<string> __result)
+        public static bool Prefix(string url, EmptyRequestData _, MongoId sessionID, ref ValueTask<string> __result)
         {
             FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
                 ?? throw new NullReferenceException("Could not get DialogueController");
@@ -56,12 +57,12 @@ namespace FikaServer.Overrides.Callbacks
         }
 
         [PatchPrefix]
-        public static bool Prefix(string url, FriendRequestData request, string sessionID, ref ValueTask<string> __result)
+        public static bool Prefix(string url, FriendRequestData request, MongoId sessionID, ref ValueTask<string> __result)
         {
             FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
                 ?? throw new NullReferenceException("Could not get DialogueController");
 
-            __result = dialogueController.SendFriendRequest(sessionID, request.To);
+            __result = dialogueController.SendFriendRequest(sessionID, request.To.Value);
             return false;
         }
     }
@@ -75,7 +76,7 @@ namespace FikaServer.Overrides.Callbacks
         }
 
         [PatchPrefix]
-        public static bool Prefix(string url, EmptyRequestData _, string sessionID, ref ValueTask<string> __result)
+        public static bool Prefix(string url, EmptyRequestData _, MongoId sessionID, ref ValueTask<string> __result)
         {
             FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
                 ?? throw new NullReferenceException("Could not get DialogueController");
@@ -94,7 +95,7 @@ namespace FikaServer.Overrides.Callbacks
         }
 
         [PatchPrefix]
-        public static bool Prefix(AcceptFriendRequestData request, string sessionID, ref ValueTask<string> __result)
+        public static bool Prefix(AcceptFriendRequestData request, MongoId sessionID, ref ValueTask<string> __result)
         {
             FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
                 ?? throw new NullReferenceException("Could not get DialogueController");
@@ -113,7 +114,7 @@ namespace FikaServer.Overrides.Callbacks
         }
 
         [PatchPrefix]
-        public static bool Prefix(string url, DeclineFriendRequestData request, string sessionID, ref ValueTask<string> __result)
+        public static bool Prefix(string url, DeclineFriendRequestData request, MongoId sessionID, ref ValueTask<string> __result)
         {
             FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
                 ?? throw new NullReferenceException("Could not get DialogueController");
@@ -132,7 +133,7 @@ namespace FikaServer.Overrides.Callbacks
         }
 
         [PatchPrefix]
-        public static bool Prefix(string url, DeclineFriendRequestData request, string sessionID, ref ValueTask<string> __result)
+        public static bool Prefix(string url, DeclineFriendRequestData request, MongoId sessionID, ref ValueTask<string> __result)
         {
             FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
                 ?? throw new NullReferenceException("Could not get DialogueController");
@@ -151,7 +152,7 @@ namespace FikaServer.Overrides.Callbacks
         }
 
         [PatchPrefix]
-        public static bool Prefix(string url, DeleteFriendRequest request, string sessionID, ref ValueTask<string> __result)
+        public static bool Prefix(string url, DeleteFriendRequest request, MongoId sessionID, ref ValueTask<string> __result)
         {
             FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
                 ?? throw new NullReferenceException("Could not get DialogueController");
@@ -170,7 +171,7 @@ namespace FikaServer.Overrides.Callbacks
         }
 
         [PatchPrefix]
-        public static bool Prefix(UIDRequestData request, string sessionID, ref ValueTask<string> __result)
+        public static bool Prefix(UIDRequestData request, MongoId sessionID, ref ValueTask<string> __result)
         {
             FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
                 ?? throw new NullReferenceException("Could not get DialogueController");
@@ -189,7 +190,7 @@ namespace FikaServer.Overrides.Callbacks
         }
 
         [PatchPrefix]
-        public static bool Prefix(UIDRequestData request, string sessionID, ref ValueTask<string> __result)
+        public static bool Prefix(UIDRequestData request, MongoId sessionID, ref ValueTask<string> __result)
         {
             FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
                 ?? throw new NullReferenceException("Could not get DialogueController");

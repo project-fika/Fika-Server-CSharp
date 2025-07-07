@@ -31,7 +31,7 @@ namespace FikaServer.Controllers
         /// </summary>
         /// <param name="sessionId">The profile id to get the list for</param>
         /// <returns>A new <see cref="GetFriendListDataResponse"/></returns>
-        public GetFriendListDataResponse GetFriendsList(string sessionId)
+        public GetFriendListDataResponse GetFriendsList(MongoId sessionId)
         {
             List<UserDialogInfo> botsAndFriends = configService.Config.Server.SPT.DisableSPTChatBots
                 ? [] : dialogueController.GetActiveChatBots();
@@ -328,7 +328,7 @@ namespace FikaServer.Controllers
             return new(httpResponseUtil.GetBody(sentFriendRequests));
         }
 
-        public ValueTask<string> SendFriendRequest(string fromProfileId, string toProfileId)
+        public ValueTask<string> SendFriendRequest(MongoId fromProfileId, MongoId toProfileId)
         {
             return new(httpResponseUtil.GetBody(AddFriendRequest(fromProfileId, toProfileId)));
         }

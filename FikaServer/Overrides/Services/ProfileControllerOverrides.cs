@@ -43,7 +43,7 @@ namespace FikaServer.Overrides.Services
         }
 
         [PatchPrefix]
-        public static bool Prefix(SearchProfilesRequestData request, string sessionID, ref List<SearchFriendResponse> __result)
+        public static bool Prefix(SearchProfilesRequestData request, MongoId sessionID, ref List<SearchFriendResponse> __result)
         {
             string searchNickname = request.Nickname.ToLower();
 
