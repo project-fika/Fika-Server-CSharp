@@ -28,7 +28,7 @@ namespace FikaServer.ChatBot
                     Level = 1,
                     MemberCategory = MemberCategory.Emissary,
                     SelectedMemberCategory = MemberCategory.Emissary,
-                    Nickname = "Mr.Fika",
+                    Nickname = "Mr. Fika",
                     Side = "Usec",
                 },
             };
