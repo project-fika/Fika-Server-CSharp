@@ -10,10 +10,11 @@ using SPTarkov.Server.Core.Services;
 namespace FikaServer.ChatBot
 {
     [Injectable]
-    public class FikaChatBot(ISptLogger<AbstractDialogChatBot> Logger, MailSendService MailSendService,
+    public class FikaChatBot(ISptLogger<AbstractDialogChatBot> logger, MailSendService mailSendService,
         ServerLocalisationService localisationService, IEnumerable<IChatCommand> chatCommands)
-        : AbstractDialogChatBot(Logger, MailSendService, localisationService, chatCommands)
+        : AbstractDialogChatBot(logger, mailSendService, localisationService, chatCommands)
     {
+        private readonly Dictionary<string, IChatCommand> _fikaCommands = chatCommands.ToDictionary(c => c.GetCommandPrefix());
         private static readonly MongoId _id = new("686d2c4165a0857987a7f1b8");
 
         public override UserDialogInfo GetChatBot()

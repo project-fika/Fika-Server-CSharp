@@ -1,12 +1,14 @@
 ﻿using FikaServer.Models.Fika.WebSocket.Notifications;
 using FikaServer.Services;
 using FikaServer.WebSockets;
+using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Dialog;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 
 namespace FikaServer.ChatBot.Commands
 {
+    [Injectable]
     public class OpenAdminSettings(ConfigService configService, NotificationWebSocket notificationWebSocket) : IFikaCommand
     {
         public string Command

@@ -6,9 +6,16 @@ namespace FikaServer.ChatBot
 {
     public class FikaChatBotCommands : IChatCommand
     {
+        protected readonly IDictionary<string, IFikaCommand> _fikaCommands;
+
+        public FikaChatBotCommands(IEnumerable<IFikaCommand> fikaCommands)
+        {
+            _fikaCommands = fikaCommands.ToDictionary(c => c.Command);
+        }
+
         public string GetCommandHelp(string command)
         {
-            throw new NotImplementedException();
+            return _fikaCommands.TryGetValue(command, out IFikaCommand? value) ? value.CommandHelp : string.Empty;
         }
 
         public string GetCommandPrefix()
@@ -18,12 +25,12 @@ namespace FikaServer.ChatBot
 
         public List<string> GetCommands()
         {
-            throw new NotImplementedException();
+            return [.. _fikaCommands.Keys];
         }
 
-        public ValueTask<string> Handle(string command, UserDialogInfo commandHandler, string sessionId, SendMessageRequest request)
+        public async ValueTask<string> Handle(string command, UserDialogInfo commandHandler, string sessionId, SendMessageRequest request)
         {
-            throw new NotImplementedException();
+            return await _fikaCommands[command].PerformAction(commandHandler, sessionId, request);
         }
     }
 }

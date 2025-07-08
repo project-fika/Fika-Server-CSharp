@@ -1,4 +1,5 @@
-﻿using FikaServer.Models.Fika.Config;
+﻿using FikaServer.ChatBot;
+using FikaServer.Models.Fika.Config;
 using FikaServer.Servers;
 using FikaServer.Services;
 using FikaServer.Services.Cache;
