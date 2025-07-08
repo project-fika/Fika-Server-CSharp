@@ -19,8 +19,8 @@ namespace FikaServer.Services.Headless
         private readonly CoreConfig _sptCoreConfig = configServer.GetConfig<CoreConfig>();
         public List<SptProfile> HeadlessProfiles { get; set; } = [];
 
-        private const string HEAD_USEC_4 = "5fdb4139e4ed5b5ea251e4ed"; // _parent: 5cc085e214c02e000c6bea67
-        private const string VOICE_USEC_4 = "6284d6a28e4092597733b7a6"; // _parent: 5fc100cf95572123ae738483
+        private static readonly MongoId HEAD_USEC_4 = new("5fdb4139e4ed5b5ea251e4ed"); // _parent: 5cc085e214c02e000c6bea67
+        private static readonly MongoId VOICE_USEC_4 = new("6284d6a28e4092597733b7a6"); // _parent: 5fc100cf95572123ae738483
 
         public async Task OnPostLoadAsync()
         {
@@ -87,7 +87,7 @@ namespace FikaServer.Services.Headless
             return await CreateFullProfile(newProfileData, profileId);
         }
 
-        private async Task<string> CreateMiniProfile(string username, string password, string edition)
+        private async Task<MongoId> CreateMiniProfile(string username, string password, string edition)
         {
             MongoId profileId = new();
             MongoId scavId = new();
@@ -111,7 +111,7 @@ namespace FikaServer.Services.Headless
             return profileId;
         }
 
-        private async Task<SptProfile> CreateFullProfile(ProfileCreateRequestData profileData, string profileId)
+        private async Task<SptProfile> CreateFullProfile(ProfileCreateRequestData profileData, MongoId profileId)
         {
             await profileController.CreateProfile(profileData, profileId);
 
@@ -123,13 +123,13 @@ namespace FikaServer.Services.Headless
             return profile;
         }
 
-        private void GenerateLaunchScript(string profileId, string backendUrl, string scriptsFolderPath)
+        private void GenerateLaunchScript(MongoId profileId, string backendUrl, string scriptsFolderPath)
         {
             //Todo: Stub for now, implement method.
             // This will become a generator for a json that will be used in the new headless launcher
         }
 
-        private void ClearUnecessaryHeadlessItems(PmcData pmcProfile, string sessionId)
+        private void ClearUnecessaryHeadlessItems(PmcData pmcProfile, MongoId sessionId)
         {
             if (pmcProfile == null)
             {
