@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using SPTarkov.Server.Core.Models.Common;
+using System.Text.Json.Serialization;
 
 namespace FikaServer.Models.Fika.Config
 {
@@ -18,6 +19,8 @@ namespace FikaServer.Models.Fika.Config
         public bool ShowDevProfile { get; set; } = false;
         [JsonPropertyName("showNonStandardProfile")]
         public bool ShowNonStandardProfile { get; set; } = false;
+        [JsonPropertyName("adminIds")]
+        public List<MongoId> AdminIds { get; set; } = [];
     }
 
     public record FikaSPTServerConfig
