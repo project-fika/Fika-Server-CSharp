@@ -1,5 +1,6 @@
 ﻿using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Helpers.Dialog.Commando;
+using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Dialog;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 
@@ -15,17 +16,23 @@ namespace FikaServer.ChatBot
             return _fikaCommands.TryGetValue(command, out IFikaCommand? value) ? value.CommandHelp : string.Empty;
         }
 
-        public string GetCommandPrefix()
+        public string CommandPrefix
         {
-            return "fika";
+            get
+            {
+                return "fika";
+            }
         }
 
-        public List<string> GetCommands()
+        public List<string> Commands
         {
-            return [.. _fikaCommands.Keys];
+            get
+            {
+                return [.. _fikaCommands.Keys];
+            }
         }
 
-        public async ValueTask<string> Handle(string command, UserDialogInfo commandHandler, string sessionId, SendMessageRequest request)
+        public async ValueTask<string> Handle(string command, UserDialogInfo commandHandler, MongoId sessionId, SendMessageRequest request)
         {
             return await _fikaCommands[command].PerformAction(commandHandler, sessionId, request);
         }

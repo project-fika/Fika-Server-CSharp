@@ -14,7 +14,7 @@ namespace FikaServer.ChatBot
         ServerLocalisationService localisationService, IEnumerable<FikaChatBotCommands> chatCommands)
         : AbstractDialogChatBot(logger, mailSendService, localisationService, chatCommands)
     {
-        private readonly Dictionary<string, FikaChatBotCommands> _fikaCommands = chatCommands.ToDictionary(c => c.GetCommandPrefix());
+        private readonly Dictionary<string, FikaChatBotCommands> _fikaCommands = chatCommands.ToDictionary(c => c.CommandPrefix);
         private static readonly MongoId _id = new("686d2c4165a0857987a7f1b8");
 
         public override UserDialogInfo GetChatBot()
