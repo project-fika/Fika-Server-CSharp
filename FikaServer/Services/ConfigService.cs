@@ -45,7 +45,7 @@ namespace FikaServer.Services
 
             // No need to do any fancyness around sorting properties and writing them if they weren't set before here
             // We store default values in the config models, and if one is missing this will write it to the file in the correct place
-            await WriteConfig(_configFolderPath);
+            await SaveConfig();
 
 #if DEBUG
             Config.Client.AllowFreeCam = true;
@@ -55,14 +55,9 @@ namespace FikaServer.Services
             ApplySPTConfig(Config.Server.SPT);
         }
 
-        private async Task WriteConfig(string ConfigFolderPath)
+        public async Task SaveConfig()
         {
-            await File.WriteAllTextAsync($"{ConfigFolderPath}/fika.jsonc", JsonSerializer.Serialize(Config, SerializerOptions));
-        }
-
-        public void SaveConfig()
-        {
-            File.WriteAllText($"{_configFolderPath}/fika.jsonc", JsonSerializer.Serialize(Config, SerializerOptions));
+            await File.WriteAllTextAsync($"{_configFolderPath}/fika.jsonc", JsonSerializer.Serialize(Config, SerializerOptions));
         }
 
         private void ApplySPTConfig(FikaSPTServerConfig config)

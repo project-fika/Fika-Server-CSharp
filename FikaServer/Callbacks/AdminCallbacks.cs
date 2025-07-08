@@ -24,9 +24,9 @@ namespace FikaServer.Callbacks
         /// <param name="adminSetSettingsRequest"></param>
         /// <param name="sessionId"></param>
         /// <returns></returns>
-        public ValueTask<string> HandleSetSettings(AdminSetSettingsRequest adminSetSettingsRequest, MongoId sessionId)
+        public async ValueTask<string> HandleSetSettings(AdminSetSettingsRequest adminSetSettingsRequest, MongoId sessionId)
         {
-            return new(httpResponseUtil.NoBody(adminController.HandleSetSettings(adminSetSettingsRequest, sessionId)));
+            return new(httpResponseUtil.NoBody(await adminController.HandleSetSettings(adminSetSettingsRequest, sessionId)));
         }
     }
 }
