@@ -60,6 +60,11 @@ namespace FikaServer.Services
             await File.WriteAllTextAsync($"{ConfigFolderPath}/fika.jsonc", JsonSerializer.Serialize(Config, SerializerOptions));
         }
 
+        public void SaveConfig()
+        {
+            File.WriteAllText($"{_configFolderPath}/fika.jsonc", JsonSerializer.Serialize(Config, SerializerOptions));
+        }
+
         private void ApplySPTConfig(FikaSPTServerConfig config)
         {
             logger.Info("[Fika Server] Overriding SPT configuration");

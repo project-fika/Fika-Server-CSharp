@@ -9,12 +9,21 @@ namespace FikaServer.Callbacks
     [Injectable]
     public class AdminCallbacks(HttpResponseUtil httpResponseUtil, AdminController adminController)
     {
-
+        /// <summary>
+        /// Handle /fika/admin/get
+        /// </summary>
+        /// <returns></returns>
         public ValueTask<string> HandleGetSettings()
         {
             return new(httpResponseUtil.NoBody(adminController.HandleGetSettings()));
         }
 
+        /// <summary>
+        /// Handle /fika/admin/set
+        /// </summary>
+        /// <param name="adminSetSettingsRequest"></param>
+        /// <param name="sessionId"></param>
+        /// <returns></returns>
         public ValueTask<string> HandleSetSettings(AdminSetSettingsRequest adminSetSettingsRequest, MongoId sessionId)
         {
             return new(httpResponseUtil.NoBody(adminController.HandleSetSettings(adminSetSettingsRequest, sessionId)));

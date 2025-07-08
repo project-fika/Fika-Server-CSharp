@@ -10,11 +10,21 @@ namespace FikaServer.Controllers
     [Injectable]
     public class AdminController(ConfigService configService, ISptLogger<AdminController> logger)
     {
+        /// <summary>
+        /// Handle /fika/admin/get
+        /// </summary>
+        /// <returns></returns>
         public AdminGetSettingsResponse HandleGetSettings()
         {
             return new(configService);
         }
 
+        /// <summary>
+        /// Handle /fika/admin/set
+        /// </summary>
+        /// <param name="adminSetSettingsRequest"></param>
+        /// <param name="sessionId"></param>
+        /// <returns></returns>
         public AdminSetSettingsResponse HandleSetSettings(AdminSetSettingsRequest adminSetSettingsRequest, MongoId sessionId)
         {
             if (!configService.Config.Server.AdminIds.Contains(sessionId))
@@ -32,6 +42,7 @@ namespace FikaServer.Controllers
             configService.Config.Headless.SetLevelToAverageOfLobby = adminSetSettingsRequest.AverageLevel;
 
             logger.Info($"{sessionId} has updated the server settings");
+            configService.SaveConfig();
             return new(true);
         }
     }
