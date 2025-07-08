@@ -9,5 +9,6 @@ namespace FikaServer.Models.Enums
         StartedRaid = 1,
         SentItem = 2,
         PushNotification = 3,
+        OpenAdminSettings = 4
     }
 }
