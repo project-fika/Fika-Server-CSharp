@@ -5,13 +5,13 @@
     <RootNamespace>FikaServer</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-      <OutputType>Library</OutputType>
-      <Version>3.0.0</Version>
-      <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-      <EnableDefaultContentItems>false</EnableDefaultContentItems>
+    <OutputType>Library</OutputType>
+    <Version>3.0.0</Version>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <EnableDefaultContentItems>false</EnableDefaultContentItems>
 	  
-	  <!-- LiteNetLib requires unsafe blocks-->
-      <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	<!-- LiteNetLib requires unsafe blocks-->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
 	<!--<ItemGroup>
@@ -23,9 +23,9 @@
 	
 	
   <ItemGroup>
-      <Content Include="Assets\**">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
+    <Content Include="Assets\**">
+    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 	
 	
