@@ -6,6 +6,7 @@ using FikaServer.Services.Cache;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Controllers;
 using SPTarkov.Server.Core.Helpers;
+using SPTarkov.Server.Core.Helpers.Dialogue;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Common;
 using SPTarkov.Server.Core.Models.Eft.Dialog;
@@ -24,8 +25,11 @@ namespace FikaServer.Controllers
     public class FikaDialogueController(ISptLogger<FikaDialogueController> logger, DialogueController dialogueController,
         ProfileHelper profileHelper, PlayerRelationsHelper playerRelationsHelper, SaveServer saveServer,
         HashUtil hashUtil, TimeUtil timeUtil, DialogueHelper dialogueHelper, SptWebSocketConnectionHandler socketConnectionHandler,
-        FriendRequestsService friendRequestsService, HttpResponseUtil httpResponseUtil, ConfigService configService)
+        FriendRequestsService friendRequestsService, HttpResponseUtil httpResponseUtil, ConfigService configService,
+        IEnumerable<IDialogueChatBot> dialogueChatBots)
     {
+        protected readonly List<IDialogueChatBot> _dialogueChatBots = [.. dialogueChatBots];
+
         /// <summary>
         /// Gets a list of all friends for the specified profileId
         /// </summary>
@@ -60,6 +64,11 @@ namespace FikaServer.Controllers
                         SelectedMemberCategory = profile.Info.MemberCategory
                     }
                 });
+            }
+
+            foreach (IDialogueChatBot item in _dialogueChatBots)
+            {
+                botsAndFriends.Add(item.GetChatBot());
             }
 
             return new()

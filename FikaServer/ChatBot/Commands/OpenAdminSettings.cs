@@ -5,17 +5,18 @@ using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Dialog;
 using SPTarkov.Server.Core.Models.Eft.Profile;
+using SPTarkov.Server.Core.Services;
 
 namespace FikaServer.ChatBot.Commands
 {
     [Injectable]
-    public class OpenAdminSettings(ConfigService configService, NotificationWebSocket notificationWebSocket) : IFikaCommand
+    public class OpenAdminSettings(ConfigService configService, NotificationWebSocket notificationWebSocket, MailSendService mailSendService) : IFikaCommand
     {
         public string Command
         {
             get
             {
-                return "showadminsettings";
+                return "adminsettings";
             }
         }
 
@@ -23,7 +24,7 @@ namespace FikaServer.ChatBot.Commands
         {
             get
             {
-                return "fika showadminsettings\n\nOpens the settings GUI if you are a registered admin.";
+                return $"fika {Command}\n\nOpens the settings GUI if you are a registered admin.";
             }
         }
 
@@ -31,7 +32,10 @@ namespace FikaServer.ChatBot.Commands
         {
             bool isAdmin = configService.Config.Server.AdminIds.Contains(sessionId);
             await notificationWebSocket.SendAsync(sessionId, new OpenAdminMenuNotification(isAdmin));
-            return isAdmin ? "Opening admin menu." : "You are not an admin!";
+
+            mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
+                isAdmin ? "Opening admin menu." : "You are not an admin!");
+            return new(request.DialogId);
         }
     }
 }

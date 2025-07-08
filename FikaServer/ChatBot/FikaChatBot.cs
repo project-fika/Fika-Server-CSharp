@@ -11,10 +11,10 @@ namespace FikaServer.ChatBot
 {
     [Injectable]
     public class FikaChatBot(ISptLogger<AbstractDialogChatBot> logger, MailSendService mailSendService,
-        ServerLocalisationService localisationService, IEnumerable<IChatCommand> chatCommands)
+        ServerLocalisationService localisationService, IEnumerable<FikaChatBotCommands> chatCommands)
         : AbstractDialogChatBot(logger, mailSendService, localisationService, chatCommands)
     {
-        private readonly Dictionary<string, IChatCommand> _fikaCommands = chatCommands.ToDictionary(c => c.GetCommandPrefix());
+        private readonly Dictionary<string, FikaChatBotCommands> _fikaCommands = chatCommands.ToDictionary(c => c.GetCommandPrefix());
         private static readonly MongoId _id = new("686d2c4165a0857987a7f1b8");
 
         public override UserDialogInfo GetChatBot()

@@ -1,17 +1,14 @@
-﻿using SPTarkov.Server.Core.Helpers.Dialog.Commando;
+﻿using SPTarkov.DI.Annotations;
+using SPTarkov.Server.Core.Helpers.Dialog.Commando;
 using SPTarkov.Server.Core.Models.Eft.Dialog;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 
 namespace FikaServer.ChatBot
 {
-    public class FikaChatBotCommands : IChatCommand
+    [Injectable]
+    public class FikaChatBotCommands(IEnumerable<IFikaCommand> fikaCommands) : IChatCommand
     {
-        protected readonly IDictionary<string, IFikaCommand> _fikaCommands;
-
-        public FikaChatBotCommands(IEnumerable<IFikaCommand> fikaCommands)
-        {
-            _fikaCommands = fikaCommands.ToDictionary(c => c.Command);
-        }
+        protected readonly IDictionary<string, IFikaCommand> _fikaCommands = fikaCommands.ToDictionary(c => c.Command);
 
         public string GetCommandHelp(string command)
         {
