@@ -9,6 +9,8 @@ namespace FikaServer.Models.Fika.Config
         public FikaSPTServerConfig SPT { get; set; } = new();
         [JsonPropertyName("allowItemSending")]
         public bool AllowItemSending { get; set; } = true;
+        [JsonPropertyName("itemSendingStorageTime")]
+        public long ItemSendingStorageTime { get; set; } = 604800;
         [JsonPropertyName("sentItemsLoseFIR")]
         public bool SentItemsLoseFIR { get; set; } = true;
         [JsonPropertyName("launcherListAllProfiles")]
