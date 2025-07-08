@@ -1,4 +1,5 @@
-﻿using FikaServer.Services;
+﻿using FikaServer.Models.Fika.Config;
+using FikaServer.Services;
 using System.Text.Json.Serialization;
 
 namespace FikaServer.Models.Fika.Routes.Admin
@@ -7,10 +8,11 @@ namespace FikaServer.Models.Fika.Routes.Admin
     {
         public AdminGetSettingsResponse(ConfigService service)
         {
-            FriendlyFire = service.Config.Client.FriendlyFire;
-            FreeCam = service.Config.Client.AllowFreeCam;
-            SpectateFreeCam = service.Config.Client.AllowSpectateFreeCam;
-            SharedQuestProgression = service.Config.Client.SharedQuestProgression;
+            FikaConfigClient client = service.Config.Client;
+            FriendlyFire = client.FriendlyFire;
+            FreeCam = client.AllowFreeCam;
+            SpectateFreeCam = client.AllowSpectateFreeCam;
+            SharedQuestProgression = client.SharedQuestProgression;
             AverageLevel = service.Config.Headless.SetLevelToAverageOfLobby;
         }
 
