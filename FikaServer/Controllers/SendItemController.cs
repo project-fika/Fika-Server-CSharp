@@ -60,7 +60,7 @@ namespace FikaServer.Controllers
 
             mailSendService.SendSystemMessageToPlayer(body.Target,
                 $"You have received a gift from {senderProfile?.CharacterData?.PmcData?.Info?.Nickname ?? "Unknown"}",
-                itemsToSend, fikaConfigService.Config.Server.ItemSendingStorageTime);
+                itemsToSend, fikaConfigService.Config.Server.ItemSendingStorageTime * 86400); // days * seconds per day
             inventoryHelper.RemoveItem(senderProfile.CharacterData.PmcData, body.ID, sessionId, output);
 
             await notificationWebSocket.SendAsync(body.Target, new ReceivedSentItemNotification

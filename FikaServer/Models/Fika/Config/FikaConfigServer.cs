@@ -10,7 +10,7 @@ namespace FikaServer.Models.Fika.Config
         [JsonPropertyName("allowItemSending")]
         public bool AllowItemSending { get; set; } = true;
         [JsonPropertyName("itemSendingStorageTime")]
-        public long ItemSendingStorageTime { get; set; } = 604800;
+        public int ItemSendingStorageTime { get; set; } = 7;
         [JsonPropertyName("sentItemsLoseFIR")]
         public bool SentItemsLoseFIR { get; set; } = true;
         [JsonPropertyName("launcherListAllProfiles")]
