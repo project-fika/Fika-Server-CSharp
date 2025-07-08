@@ -1,6 +1,7 @@
 ﻿using FikaServer.Models.Fika.WebSocket;
 using FikaServer.Services;
 using SPTarkov.DI.Annotations;
+using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Servers.Ws;
@@ -73,7 +74,7 @@ namespace FikaServer.WebSockets
             return Task.CompletedTask;
         }
 
-        public async Task SendAsync<T>(string sessionID, T message) where T : IFikaNotificationBase
+        public async Task SendAsync<T>(MongoId sessionID, T message) where T : IFikaNotificationBase
         {
             // Client is not online or not currently connected to the websocket.
             if (!clientWebSockets.TryGetValue(sessionID, out WebSocket ws))
