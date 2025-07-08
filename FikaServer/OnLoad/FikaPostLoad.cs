@@ -35,7 +35,7 @@ namespace FikaServer.OnLoad
 
             await localeService.OnPostLoadAsync();
             BlacklistSpecialProfiles();
-            playerRelationsCacheService.OnPostLoad();
+            await playerRelationsCacheService.OnPostLoad();
             friendRequestsService.OnPostLoad();
 
             if (config.Background.Enable)

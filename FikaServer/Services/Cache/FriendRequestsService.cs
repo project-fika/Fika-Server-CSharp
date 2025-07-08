@@ -3,7 +3,7 @@ using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Helpers;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
-using System.Text.Json;
+using SPTarkov.Server.Core.Utils;
 
 namespace FikaServer.Services.Cache
 {
@@ -12,6 +12,7 @@ namespace FikaServer.Services.Cache
         ProfileHelper profileHelper,
         ConfigService FikaConfig,
         SaveServer saveServer,
+        JsonUtil jsonUtil,
         ISptLogger<PlayerRelationsService> logger)
     {
         public List<FriendRequestListResponse> AllFriendRequests
@@ -27,7 +28,7 @@ namespace FikaServer.Services.Cache
 
         private readonly Lock _listLock = new();
 
-        public void OnPreLoad()
+        public async Task OnPreLoad()
         {
             if (!Directory.Exists(_friendRequestsFullPath))
             {
@@ -37,14 +38,14 @@ namespace FikaServer.Services.Cache
             string file = $"{_friendRequestsFullPath}/friendRequests.json";
             if (!File.Exists(file))
             {
-                SaveFriendRequests();
+                await SaveFriendRequests();
             }
             else
             {
                 try
                 {
                     string data = File.ReadAllText(file);
-                    _friendRequests = _friendRequests = JsonSerializer.Deserialize<List<FriendRequestListResponse>>(data, ConfigService.SerializerOptions);
+                    _friendRequests = await jsonUtil.DeserializeFromFileAsync<List<FriendRequestListResponse>>(file);
                 }
                 catch (Exception ex)
                 {
@@ -58,16 +59,17 @@ namespace FikaServer.Services.Cache
             logger.Debug($"Loaded {_friendRequests.Count} friend requests");
         }
 
-        public void AddFriendRequest(FriendRequestListResponse friendRequest)
+        public async Task AddFriendRequest(FriendRequestListResponse friendRequest)
         {
             lock (_listLock)
             {
                 _friendRequests.Add(friendRequest);
-                SaveFriendRequests();
             }
+
+            await SaveFriendRequests();
         }
 
-        public void DeleteFriendRequest(FriendRequestListResponse friendRequest)
+        public async Task DeleteFriendRequest(FriendRequestListResponse friendRequest)
         {
             lock (_listLock)
             {
@@ -76,9 +78,9 @@ namespace FikaServer.Services.Cache
                     logger.Error($"Unable to remove friend request {friendRequest.Id}");
                     return;
                 }
-
-                SaveFriendRequests();
             }
+
+            await SaveFriendRequests();
         }
 
         /// <summary>
@@ -130,11 +132,10 @@ namespace FikaServer.Services.Cache
             }
         }
 
-        private void SaveFriendRequests()
+        private async Task SaveFriendRequests()
         {
-            File.WriteAllText($"{_friendRequestsFullPath}/friendRequests.json",
-                JsonSerializer.Serialize(_friendRequests,
-                ConfigService.SerializerOptions));
+            await File.WriteAllTextAsync($"{_friendRequestsFullPath}/friendRequests.json",
+                jsonUtil.Serialize(_friendRequests, true));
         }
     }
 }

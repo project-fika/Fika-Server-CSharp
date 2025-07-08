@@ -4,13 +4,13 @@ using SPTarkov.Server.Core.Helpers;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Utils;
+using SPTarkov.Server.Core.Utils;
 using System.Collections.Concurrent;
-using System.Text.Json;
 
 namespace FikaServer.Services.Cache
 {
     [Injectable(InjectionType.Singleton)]
-    public class PlayerRelationsService(ProfileHelper profileHelper, ConfigService FikaConfig, ISptLogger<PlayerRelationsService> logger)
+    public class PlayerRelationsService(ProfileHelper profileHelper, ConfigService FikaConfig, JsonUtil jsonUtil, ISptLogger<PlayerRelationsService> logger)
     {
         private readonly string _playerRelationsFullPath = Path.Join(FikaConfig.GetModPath(), "database");
         private ConcurrentDictionary<MongoId, FikaPlayerRelations> _playerRelations = [];
@@ -31,7 +31,7 @@ namespace FikaServer.Services.Cache
             }
         }
 
-        public void OnPreLoad()
+        public async Task OnPreLoad()
         {
             if (!Directory.Exists(_playerRelationsFullPath))
             {
@@ -41,16 +41,15 @@ namespace FikaServer.Services.Cache
             string file = $"{_playerRelationsFullPath}/playerRelations.json";
             if (!File.Exists(file))
             {
-                SaveProfileRelations();
+                await SaveProfileRelationsAsync();
             }
             else
             {
-                string data = File.ReadAllText(file);
-                _playerRelations = JsonSerializer.Deserialize<ConcurrentDictionary<MongoId, FikaPlayerRelations>>(data, ConfigService.SerializerOptions);
+                _playerRelations = await jsonUtil.DeserializeFromFileAsync<ConcurrentDictionary<MongoId, FikaPlayerRelations>>(file);
             }
         }
 
-        public void OnPostLoad()
+        public async Task OnPostLoad()
         {
             Dictionary<MongoId, SptProfile> profiles = profileHelper.GetProfiles();
             bool shouldSave = false;
@@ -92,13 +91,18 @@ namespace FikaServer.Services.Cache
 
             if (shouldSave)
             {
-                SaveProfileRelations();
+                await SaveProfileRelationsAsync();
             }
         }
 
         public void SaveProfileRelations()
         {
-            File.WriteAllText($"{_playerRelationsFullPath}/playerRelations.json", JsonSerializer.Serialize(_playerRelations, ConfigService.SerializerOptions));
+            File.WriteAllText($"{_playerRelationsFullPath}/playerRelations.json", jsonUtil.Serialize(_playerRelations, true));
+        }
+
+        public async Task SaveProfileRelationsAsync()
+        {
+            await File.WriteAllTextAsync($"{_playerRelationsFullPath}/playerRelations.json", jsonUtil.Serialize(_playerRelations, true));
         }
 
         public FikaPlayerRelations GetStoredValue(MongoId profileId)

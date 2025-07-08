@@ -5,9 +5,7 @@ using SPTarkov.Server.Core.Models.Spt.Config;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Utils;
-using SPTarkov.Server.Core.Utils.Json.Converters;
 using System.Reflection;
-using System.Text.Json;
 
 namespace FikaServer.Services
 {
@@ -18,7 +16,6 @@ namespace FikaServer.Services
         private readonly string _configFolderPath = Path.Join(modHelper.GetAbsolutePathToModFolder(Assembly.GetExecutingAssembly()), "assets/configs");
         public FikaConfig Config { get; private set; } = new();
         private readonly FikaModMetadata _fikaModMetaData = new();
-        public static readonly JsonSerializerOptions SerializerOptions = new() { WriteIndented = true };
 
         public string GetModPath()
         {
@@ -32,7 +29,6 @@ namespace FikaServer.Services
 
         public async Task OnPreLoad()
         {
-            SerializerOptions.Converters.Add(new StringToMongoIdConverter());
             //This is debug, probably wont exist in the final release.
             if (!Directory.Exists(_configFolderPath))
             {
@@ -57,7 +53,7 @@ namespace FikaServer.Services
 
         public async Task SaveConfig()
         {
-            await File.WriteAllTextAsync($"{_configFolderPath}/fika.jsonc", JsonSerializer.Serialize(Config, SerializerOptions));
+            await File.WriteAllTextAsync($"{_configFolderPath}/fika.jsonc", jsonUtil.Serialize(Config, true));
         }
 
         private void ApplySPTConfig(FikaSPTServerConfig config)

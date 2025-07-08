@@ -74,8 +74,8 @@ namespace FikaServer.OnLoad
 
             await fikaConfig.OnPreLoad();
             clientService.OnPreLoad();
-            playerRelationsCacheService.OnPreLoad();
-            friendRequestsService.OnPreLoad();
+            await playerRelationsCacheService.OnPreLoad();
+            await friendRequestsService.OnPreLoad();
         }
     }
 }
