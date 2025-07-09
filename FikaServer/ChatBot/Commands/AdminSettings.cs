@@ -10,7 +10,7 @@ using SPTarkov.Server.Core.Services;
 namespace FikaServer.ChatBot.Commands
 {
     [Injectable]
-    public class OpenAdminSettings(ConfigService configService, NotificationWebSocket notificationWebSocket, MailSendService mailSendService) : IFikaCommand
+    public class AdminSettings(ConfigService configService, NotificationWebSocket notificationWebSocket, MailSendService mailSendService) : IFikaCommand
     {
         public string Command
         {
