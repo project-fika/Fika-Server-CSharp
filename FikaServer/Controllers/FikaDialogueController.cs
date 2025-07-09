@@ -79,7 +79,7 @@ namespace FikaServer.Controllers
             };
         }
 
-        public FriendRequestSendResponse? AddFriendRequest(string from, string to)
+        public FriendRequestSendResponse? AddFriendRequest(MongoId from, MongoId to)
         {
             if (friendRequestsService.HasFriendRequest(from, to))
             {
@@ -299,7 +299,7 @@ namespace FikaServer.Controllers
             return null;
         }
 
-        public ValueTask<string> ListInbox(string sessionID)
+        public ValueTask<string> ListInbox(MongoId sessionID)
         {
             List<FriendRequestListResponse> receivedFriendRequests = friendRequestsService.GetReceivedFriendRequests(sessionID);
 
@@ -318,7 +318,7 @@ namespace FikaServer.Controllers
             return new(httpResponseUtil.GetBody(receivedFriendRequests));
         }
 
-        public ValueTask<string> ListOutBox(string sessionID)
+        public ValueTask<string> ListOutBox(MongoId sessionID)
         {
             List<FriendRequestListResponse> sentFriendRequests = friendRequestsService.GetSentFriendRequests(sessionID);
 
@@ -342,7 +342,7 @@ namespace FikaServer.Controllers
             return new(httpResponseUtil.GetBody(AddFriendRequest(fromProfileId, toProfileId)));
         }
 
-        public ValueTask<string> AcceptAllFriendRequests(string sessionID)
+        public ValueTask<string> AcceptAllFriendRequests(MongoId sessionID)
         {
             List<FriendRequestListResponse> receivedFriendRequests = friendRequestsService.GetReceivedFriendRequests(sessionID);
 
@@ -363,7 +363,7 @@ namespace FikaServer.Controllers
         /// <param name="sessionID"></param>
         /// <param name="request"></param>
         /// <returns></returns>
-        public ValueTask<string> AcceptFriendRequest(string sessionID, AcceptFriendRequestData request)
+        public ValueTask<string> AcceptFriendRequest(MongoId sessionID, AcceptFriendRequestData request)
         {
             if (playerRelationsHelper.RemoveFriendRequest(request.ProfileId, sessionID, ERemoveFriendReason.Accept))
             {
@@ -380,28 +380,28 @@ namespace FikaServer.Controllers
             return new(httpResponseUtil.NullResponse());
         }
 
-        public ValueTask<string> DeclineFriendRequest(string fromProfileId, string toProfileId)
+        public ValueTask<string> DeclineFriendRequest(MongoId fromProfileId, string toProfileId)
         {
             playerRelationsHelper.RemoveFriendRequest(fromProfileId, toProfileId, ERemoveFriendReason.Decline);
 
             return new(httpResponseUtil.NullResponse());
         }
 
-        public ValueTask<string> DeleteFriend(string fromProfileId, string toProfileId)
+        public ValueTask<string> DeleteFriend(MongoId fromProfileId, string toProfileId)
         {
             playerRelationsHelper.RemoveFriend(fromProfileId, toProfileId);
 
             return new(httpResponseUtil.NullResponse());
         }
 
-        public ValueTask<string> IgnoreFriend(string fromProfileId, string toProfileId)
+        public ValueTask<string> IgnoreFriend(MongoId fromProfileId, string toProfileId)
         {
             playerRelationsHelper.AddToIgnoreList(fromProfileId, toProfileId);
 
             return new(httpResponseUtil.NullResponse());
         }
 
-        public ValueTask<string> UnIgnoreFriend(string fromProfileId, string toProfileId)
+        public ValueTask<string> UnIgnoreFriend(MongoId fromProfileId, string toProfileId)
         {
             playerRelationsHelper.RemoveFromIgnoreList(fromProfileId, toProfileId);
 
