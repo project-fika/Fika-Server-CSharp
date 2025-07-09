@@ -9,6 +9,7 @@
     <Version>3.0.0</Version>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <EnableDefaultContentItems>false</EnableDefaultContentItems>
+	<NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
 	  
 	<!-- LiteNetLib requires unsafe blocks-->
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
