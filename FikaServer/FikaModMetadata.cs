@@ -16,6 +16,6 @@ namespace FikaServer
         public override string? Url { get; set; } = "https://github.com/project-fika/Fika-Server";
         public override bool? IsBundleMod { get; set; } = false;
         public override string? Licence { get; set; } = "CC-BY-NC-SA-4.0";
-
+        public override string ModId { get; set; } = "Fika";
     }
 }
