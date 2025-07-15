@@ -8,8 +8,10 @@ namespace FikaServer.Models.Fika.WebSocket.Notifications
     {
         [JsonPropertyName("type")]
         public EFikaNotifications Type { get; set; } = EFikaNotifications.PushNotification;
+
         [JsonPropertyName("notificationIcon")]
         public EEFTNotificationIconType NotificationIcon { get; set; } = EEFTNotificationIconType.Default;
+
         [JsonPropertyName("notification")]
         public string Notification { get; set; } = string.Empty;
 

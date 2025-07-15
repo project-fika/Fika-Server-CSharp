@@ -12,6 +12,7 @@ namespace FikaServer.Models.Fika.WebSocket.Notifications
 
         [JsonPropertyName("type")]
         public EFikaNotifications Type { get; set; } = EFikaNotifications.OpenAdminSettings;
+
         [JsonPropertyName("success")]
         public bool Success { get; set; }
     }
