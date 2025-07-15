@@ -65,7 +65,7 @@ namespace FikaServer.Overrides.Services
                     {
                         friends.Add(new SearchFriendResponse
                         {
-                            Id = profile.CharacterData.PmcData.Id,
+                            Id = profile.CharacterData.PmcData.Id.Value,
                             Aid = profile.CharacterData.PmcData.Aid,
                             Info = new UserDialogDetails
                             {
