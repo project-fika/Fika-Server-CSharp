@@ -62,10 +62,21 @@ namespace FikaServer.ChatBot.Commands
 
             if (headlessService.HeadlessClients.TryGetValue(profileId, out HeadlessClientInfo? client))
             {
+                if (client.WebSocket == null || client.WebSocket.State is WebSocketState.Closed)
+                {
+                    mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
+                $"'{profileId}' is not connected to the headless websocket, cannot shutdown.");
+
+                    return value;
+                }
+
                 string? data = jsonUtil.Serialize(new HeadlessShutdownClient())
                     ?? throw new NullReferenceException("ShutdownClient::Data was null after serializing");
                 await client.WebSocket.SendAsync(Encoding.UTF8.GetBytes(data),
                 WebSocketMessageType.Text, true, CancellationToken.None);
+
+                mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
+                $"'{profileId}' is shutting down.");
 
                 return value;
             }
