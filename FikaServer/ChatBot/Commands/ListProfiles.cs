@@ -1,5 +1,6 @@
 ﻿using FikaServer.Models.Fika.WebSocket.Notifications;
 using FikaServer.Services;
+using FikaServer.Services.Cache;
 using FikaServer.WebSockets;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Common;
@@ -12,8 +13,9 @@ using System.Text;
 namespace FikaServer.ChatBot.Commands
 {
     [Injectable]
-    public class ListProfiles(ConfigService configService, NotificationWebSocket notificationWebSocket,
-        MailSendService mailSendService, SaveServer saveServer) : IFikaCommand
+    public class ListProfiles(ConfigService configService,
+        FikaProfileService fikaProfileService,
+        MailSendService mailSendService) : IFikaCommand
     {
         public string Command
         {
@@ -27,7 +29,7 @@ namespace FikaServer.ChatBot.Commands
         {
             get
             {
-                return $"fika {Command}\nLists all profileIds.";
+                return $"fika {Command}\nLists all profileIds and nicknames.\nNicknames are used for most commands";
             }
         }
 
@@ -41,11 +43,11 @@ namespace FikaServer.ChatBot.Commands
                 return request.DialogId;
             }
 
-            Dictionary<MongoId, SptProfile> profiles = saveServer.GetProfiles();
+            Dictionary<string, SptProfile> profiles = fikaProfileService.AllProfiles;
             StringBuilder sb = new(profiles.Count);
-            foreach ((MongoId id, SptProfile profile) in profiles)
+            foreach ((string nickname, SptProfile profile) in profiles)
             {
-                sb.AppendLine($"{id} - {profile?.CharacterData?.PmcData?.Info?.Nickname ?? "Unknown"}");
+                sb.AppendLine($"{nickname} - {profile.ProfileInfo.ProfileId.GetValueOrDefault()}");
             }
             
             mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,

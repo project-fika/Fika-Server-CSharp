@@ -29,45 +29,7 @@ namespace FikaServer.Controllers
         FriendRequestsService friendRequestsService, HttpResponseUtil httpResponseUtil, ConfigService configService,
         IEnumerable<IDialogueChatBot> dialogueChatBots)
     {
-        protected readonly List<IDialogueChatBot> _dialogueChatBots = [.. dialogueChatBots];
-        private readonly Dictionary<string, SptProfile> _profiles = [];
-
-        public SptProfile? GetProfileByName(string nickname)
-        {
-            if (_profiles.Count == 0)
-            {
-                RefreshProfiles();
-            }
-
-            if (_profiles.TryGetValue(nickname, out SptProfile? foundProfile))
-            {
-                return foundProfile;
-            }
-            else
-            {
-                RefreshProfiles();
-                if (_profiles.TryGetValue(nickname, out foundProfile))
-                {
-                    return foundProfile;
-                }
-            }
-
-            return null;
-        }
-
-        private void RefreshProfiles()
-        {
-            _profiles.Clear();
-            Dictionary<MongoId, SptProfile>.ValueCollection profiles = saveServer.GetProfiles().Values;
-            foreach (SptProfile profile in profiles)
-            {
-                string? nick = profile.CharacterData?.PmcData?.Info?.Nickname;
-                if (!string.IsNullOrEmpty(nick))
-                {
-                    _profiles.Add(nick, profile);
-                }
-            }
-        }
+        protected readonly List<IDialogueChatBot> _dialogueChatBots = [.. dialogueChatBots];        
 
         /// <summary>
         /// Gets a list of all friends for the specified profileId

@@ -1,4 +1,5 @@
 ﻿using FikaServer.Services;
+using FikaServer.Services.Cache;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Helpers;
 using SPTarkov.Server.Core.Models.Common;
@@ -13,9 +14,10 @@ namespace FikaServer.ChatBot.Commands
 {
     [Injectable]
     public partial class ForceLogout(ConfigService configService, MailSendService mailSendService,
-        NotificationSendHelper sendHelper, SptWebSocketConnectionHandler websocketHandler) : IFikaCommand
+        NotificationSendHelper sendHelper, SptWebSocketConnectionHandler websocketHandler,
+        FikaProfileService fikaProfileService) : IFikaCommand
     {
-        [GeneratedRegex("^fika\\s+forcelogout\\s+(?:[a-f\\d]{24}|all)$")]
+        [GeneratedRegex("^fika\\s+forcelogout\\s+\\S+$")]
         private static partial Regex ForceLogoutCommandRegex();
 
         public string Command
@@ -30,7 +32,7 @@ namespace FikaServer.ChatBot.Commands
         {
             get
             {
-                return $"fika {Command}\nForces a client to logout if they are in the menu\nExample: fika forcelogout 686e0d60baa8bb63cee3dbc3\nUse all to logout everyone (including you).";
+                return $"fika {Command}\nForces a client to logout if they are in the menu\nExample: fika forcelogout Nickname\nUse all to logout everyone (including you).";
             }
         }
 
@@ -54,9 +56,9 @@ namespace FikaServer.ChatBot.Commands
             }
 
             string[] split = text.Split(' ');
-            string profileId = split[2];
+            string nickname = split[2];
 
-            if (profileId == "all")
+            if (nickname == "all")
             {
                 mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
                 "Everyone has been forced to log out.");
@@ -70,9 +72,11 @@ namespace FikaServer.ChatBot.Commands
             }
 
             mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
-                $"'{profileId}' has been forced to log out.");
+                $"'{nickname}' has been forced to log out.");
 
-            sendHelper.SendMessage(profileId, new WsNotificationEvent()
+            SptProfile? profile = fikaProfileService.GetProfileByName(nickname)
+                ?? throw new NullReferenceException($"Could not find profile {nickname}");
+            sendHelper.SendMessage(profile.ProfileInfo.ProfileId.GetValueOrDefault(), new WsNotificationEvent()
             {
                 EventType = NotificationEventType.ForceLogout,
                 EventIdentifier = new()

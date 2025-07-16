@@ -1,6 +1,7 @@
 ﻿using FikaServer.Models.Fika.Headless;
 using FikaServer.Models.Fika.WebSocket.Notifications;
 using FikaServer.Services;
+using FikaServer.Services.Cache;
 using FikaServer.Services.Headless;
 using FikaServer.WebSockets;
 using SPTarkov.DI.Annotations;
@@ -17,9 +18,10 @@ namespace FikaServer.ChatBot.Commands
 {
     [Injectable]
     public partial class ShutdownClient(ConfigService configService, MailSendService mailSendService,
-        NotificationWebSocket notificationWebSocket, HeadlessService headlessService, JsonUtil jsonUtil) : IFikaCommand
+        NotificationWebSocket notificationWebSocket, HeadlessService headlessService, JsonUtil jsonUtil,
+        FikaProfileService fikaProfileService) : IFikaCommand
     {
-        [GeneratedRegex("^fika\\s+shutdownclient\\s+[a-f\\d]{24}$")]
+        [GeneratedRegex("^fika\\s+shutdownclient\\s+\\S+$")]
         private static partial Regex ShutdownClientCommandRegex();
 
         public string Command
@@ -34,7 +36,7 @@ namespace FikaServer.ChatBot.Commands
         {
             get
             {
-                return $"fika {Command}\nForces a headless client to shutdown\nExample: fika shutdownclient 686e0d60baa8bb63cee3dbc3";
+                return $"fika {Command}\nForces a headless client to shutdown\nExample: fika shutdownclient Nickname";
             }
         }
 
@@ -58,14 +60,15 @@ namespace FikaServer.ChatBot.Commands
             }
 
             string[] split = text.Split(' ');
-            string profileId = split[2];
+            string nickname = split[2];
+            SptProfile? profile = fikaProfileService.GetProfileByName(nickname);
 
-            if (headlessService.HeadlessClients.TryGetValue(profileId, out HeadlessClientInfo? client))
+            if (headlessService.HeadlessClients.TryGetValue(profile.ProfileInfo.ProfileId.GetValueOrDefault(), out HeadlessClientInfo? client))
             {
                 if (client.WebSocket == null || client.WebSocket.State is WebSocketState.Closed)
                 {
                     mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
-                $"'{profileId}' is not connected to the headless websocket, cannot shutdown.");
+                $"'{nickname}' is not connected to the headless websocket, cannot shutdown.");
 
                     return value;
                 }
@@ -76,14 +79,14 @@ namespace FikaServer.ChatBot.Commands
                 WebSocketMessageType.Text, true, CancellationToken.None);
 
                 mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
-                $"'{profileId}' is shutting down.");
+                $"'{nickname}' is shutting down.");
 
                 return value;
             }
 
             mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
-                $"'{profileId}' is shutting down.");
-            await notificationWebSocket.SendAsync(profileId, new ShutdownClientNotification());
+                $"'{nickname}' is shutting down.");
+            await notificationWebSocket.SendAsync(profile.ProfileInfo.ProfileId.GetValueOrDefault(), new ShutdownClientNotification());
 
             return value;
         }

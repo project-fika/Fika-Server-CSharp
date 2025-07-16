@@ -1,5 +1,6 @@
 ﻿using FikaServer.Models.Fika.WebSocket.Notifications;
 using FikaServer.Services;
+using FikaServer.Services.Cache;
 using FikaServer.WebSockets;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Helpers;
@@ -17,10 +18,10 @@ using System.Text.RegularExpressions;
 namespace FikaServer.ChatBot.Commands
 {
     [Injectable]
-    public partial class SpoofMessage(ConfigService configService, NotificationWebSocket notificationWebSocket, MailSendService mailSendService,
-        HashUtil hashUtil) : IFikaCommand
+    public partial class SpoofMessage(ConfigService configService, MailSendService mailSendService,
+        HashUtil hashUtil, FikaProfileService fikaProfileService) : IFikaCommand
     {
-        [GeneratedRegex("^fika\\s+spoofmessage\\s+[a-f\\d]{24}\\s+\"([^\"]+)\"\\s+(.*)$")]
+        [GeneratedRegex("^fika\\s+spoofmessage\\s+\\S+\\s+\"([^\"]+)\"\\s+(.+)$")]
         private static partial Regex SpoofMessageCommandRegex();
 
         public string Command
@@ -35,13 +36,13 @@ namespace FikaServer.ChatBot.Commands
         {
             get
             {
-                return $"fika {Command}\nSpoofs a message to a client, using a fake account\nExample: fika spoofmessage 686e0d60baa8bb63cee3dbc3 \"Test\" hello\nNote: Fake account name has to be surrounded by quotes";
+                return $"fika {Command}\nSpoofs a message to a client, using a fake account\nExample: fika spoofmessage Nickname \"Test\" hello\nNote: Fake account name has to be surrounded by quotes";
             }
         }
 
-        public async ValueTask<string> PerformAction(UserDialogInfo commandHandler, MongoId sessionId, SendMessageRequest request)
+        public ValueTask<string> PerformAction(UserDialogInfo commandHandler, MongoId sessionId, SendMessageRequest request)
         {
-            string value = request.DialogId;
+            ValueTask<string> value = new(request.DialogId);
             bool isAdmin = configService.Config.Server.AdminIds.Contains(sessionId);
             if (!isAdmin)
             {
@@ -60,12 +61,12 @@ namespace FikaServer.ChatBot.Commands
             }
 
             string[] split = text.Split(' ');
-            string profileId = split[2];
+            string nickname = split[2];
             string user = match.Groups[1].Value;
             string message = match.Groups[2].Value;
 
             mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
-                $"'{profileId}' been sent the spoofed message:\n{message}");
+                $"'{nickname}' been sent the spoofed message:\n{message}");
 
             MemberCategory memberCategory = MemberCategory.Default;
             Array values = Enum.GetValues<MemberCategory>();
@@ -74,7 +75,8 @@ namespace FikaServer.ChatBot.Commands
                 memberCategory = (MemberCategory)values?.GetValue(Random.Shared.Next(values.Length));
             }           
 
-            mailSendService.SendUserMessageToPlayer(profileId, new()
+            SptProfile? profile = fikaProfileService.GetProfileByName(nickname);
+            mailSendService.SendUserMessageToPlayer(profile.ProfileInfo.ProfileId.GetValueOrDefault(), new()
             {
                 Aid = hashUtil.GenerateAccountId(),
                 Id = new(),

@@ -1,5 +1,6 @@
 ﻿using FikaServer.Models.Fika.WebSocket.Notifications;
 using FikaServer.Services;
+using FikaServer.Services.Cache;
 using FikaServer.WebSockets;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Helpers;
@@ -16,10 +17,10 @@ using System.Text.RegularExpressions;
 namespace FikaServer.ChatBot.Commands
 {
     [Injectable]
-    public partial class RemoveFleaBan(ConfigService configService, NotificationWebSocket notificationWebSocket, MailSendService mailSendService,
-        SaveServer saveServer, TimeUtil timeUtil, NotificationSendHelper sendHelper) : IFikaCommand
+    public partial class RemoveFleaBan(ConfigService configService, MailSendService mailSendService,
+        SaveServer saveServer, NotificationSendHelper sendHelper, FikaProfileService fikaProfileService) : IFikaCommand
     {
-        [GeneratedRegex("^fika\\s+removefleaban\\s+[a-f\\d]{24}$")]
+        [GeneratedRegex("^fika\\s+removefleaban\\s+\\S+$")]
         private static partial Regex RemoveFleaBanCommandRegex();
 
         public string Command
@@ -34,7 +35,7 @@ namespace FikaServer.ChatBot.Commands
         {
             get
             {
-                return $"fika {Command}\nUnbans a player from the flea\nExample: fika removefleaban 686e0d60baa8bb63cee3dbc3";
+                return $"fika {Command}\nUnbans a player from the flea\nExample: fika removefleaban Nickname";
             }
         }
 
@@ -58,12 +59,12 @@ namespace FikaServer.ChatBot.Commands
             }
 
             string[] split = text.Split(' ');
-            string profileId = split[2];
-            SptProfile profile = saveServer.GetProfile(profileId);
+            string nickname = split[2];
+            SptProfile? profile = fikaProfileService.GetProfileByName(nickname);
             if (profile == null)
             {
                 mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
-                    $"Could not find profile '{profileId}'.");
+                    $"Could not find profile '{nickname}'.");
                 return value;
             }
 
@@ -71,18 +72,18 @@ namespace FikaServer.ChatBot.Commands
             if (bans == null || !bans.Any(b => b.BanType == BanType.RagFair))
             {
                 mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
-                    $"'{profileId}' does not have any flea bans.");
+                    $"'{nickname}' does not have any flea bans.");
                 return value;
             }
 
             bans.RemoveAll(b => b.BanType == BanType.RagFair);
 
-            await saveServer.SaveProfileAsync(profileId);
+            await saveServer.SaveProfileAsync(profile.ProfileInfo.ProfileId.Value);
 
             mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
-                $"'{profileId}' has been unbanned from the flea.");
+                $"'{nickname}' has been unbanned from the flea.");
 
-            sendHelper.SendMessage(profileId, new RemoveBanNotification()
+            sendHelper.SendMessage(profile.ProfileInfo.ProfileId.GetValueOrDefault(), new RemoveBanNotification()
             {
                 EventType = NotificationEventType.InGameUnBan,
                 EventIdentifier = new(),
