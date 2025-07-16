@@ -49,5 +49,15 @@ namespace FikaServer
                 }
             };
         }
+
+        /// <summary>
+        /// Checks if the profile has valid data to get the <see cref="Info.ProfileId"/>
+        /// </summary>
+        /// <param name="profile"></param>
+        /// <returns></returns>
+        public static bool HasProfileData(this SptProfile? profile)
+        {
+            return profile != null && profile.ProfileInfo != null && profile.ProfileInfo.ProfileId != null;
+        }
     }
 }

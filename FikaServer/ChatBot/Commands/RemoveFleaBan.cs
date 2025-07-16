@@ -20,7 +20,7 @@ namespace FikaServer.ChatBot.Commands
     public partial class RemoveFleaBan(ConfigService configService, MailSendService mailSendService,
         SaveServer saveServer, NotificationSendHelper sendHelper, FikaProfileService fikaProfileService) : IFikaCommand
     {
-        [GeneratedRegex("^fika\\s+removefleaban\\s+\\S+$")]
+        [GeneratedRegex("^fika removefleaban (\\w+)$")]
         private static partial Regex RemoveFleaBanCommandRegex();
 
         public string Command
@@ -61,7 +61,7 @@ namespace FikaServer.ChatBot.Commands
             string[] split = text.Split(' ');
             string nickname = split[2];
             SptProfile? profile = fikaProfileService.GetProfileByName(nickname);
-            if (profile == null)
+            if (!profile.HasProfileData())
             {
                 mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
                     $"Could not find profile '{nickname}'.");
@@ -83,7 +83,7 @@ namespace FikaServer.ChatBot.Commands
             mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
                 $"'{nickname}' has been unbanned from the flea.");
 
-            sendHelper.SendMessage(profile.ProfileInfo.ProfileId.GetValueOrDefault(), new RemoveBanNotification()
+            sendHelper.SendMessage(profile.ProfileInfo.ProfileId.Value, new RemoveBanNotification()
             {
                 EventType = NotificationEventType.InGameUnBan,
                 EventIdentifier = new(),

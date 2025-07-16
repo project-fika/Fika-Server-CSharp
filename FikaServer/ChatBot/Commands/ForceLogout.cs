@@ -17,7 +17,7 @@ namespace FikaServer.ChatBot.Commands
         NotificationSendHelper sendHelper, SptWebSocketConnectionHandler websocketHandler,
         FikaProfileService fikaProfileService) : IFikaCommand
     {
-        [GeneratedRegex("^fika\\s+forcelogout\\s+\\S+$")]
+        [GeneratedRegex("^fika forcelogout (\\w+)$")]
         private static partial Regex ForceLogoutCommandRegex();
 
         public string Command

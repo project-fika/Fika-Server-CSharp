@@ -21,7 +21,7 @@ namespace FikaServer.ChatBot.Commands
         SaveServer saveServer, TimeUtil timeUtil, NotificationSendHelper sendHelper,
         FikaProfileService fikaProfileService) : IFikaCommand
     {
-        [GeneratedRegex("^fika\\s+fleaban\\s+\\w+\\s+\\d+$")]
+        [GeneratedRegex("^fika fleaban (\\w+) (\\d+)$")]
         private static partial Regex FleaBanCommandRegex();
 
         public string Command
@@ -66,8 +66,9 @@ namespace FikaServer.ChatBot.Commands
             {
                 days = 9999;
             }
+
             SptProfile? profile = fikaProfileService.GetProfileByName(nickname);
-            if (profile == null)
+            if (!profile.HasProfileData())
             {
                 mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
                     $"Could not find profile '{nickname}'.");
@@ -80,7 +81,7 @@ namespace FikaServer.ChatBot.Commands
                 BanType = BanType.RagFair,
                 DateTime = banTime
             });
-            await saveServer.SaveProfileAsync(nickname);
+            await saveServer.SaveProfileAsync(profile.ProfileInfo.ProfileId.GetValueOrDefault());
 
             mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
                 $"'{nickname}' has been banned from the flea for {days} days.");

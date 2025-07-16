@@ -18,7 +18,7 @@ namespace FikaServer.ChatBot.Commands
         NotificationSendHelper sendHelper, SptWebSocketConnectionHandler websocketHandler,
         FikaProfileService fikaProfileService) : IFikaCommand
     {
-        [GeneratedRegex("^fika\\s+sendmessage\\s+(\\S+)\\s+(.*)$\r\n")]
+        [GeneratedRegex("^fika sendmessage (\\w+) (.+)$")]
         private static partial Regex SendMessageCommandRegex();
 
         public string Command
@@ -58,9 +58,8 @@ namespace FikaServer.ChatBot.Commands
                 return new(value);
             }
 
-            string[] split = text.Split(' ');
-            string nickname = split[2];
-            string message = match.Groups[1].Value;
+            string nickname = match.Groups[1].Value;
+            string message = match.Groups[2].Value;
 
             if (nickname == "all")
             {

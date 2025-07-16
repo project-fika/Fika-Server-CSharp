@@ -21,7 +21,7 @@ namespace FikaServer.ChatBot.Commands
         NotificationWebSocket notificationWebSocket, HeadlessService headlessService, JsonUtil jsonUtil,
         FikaProfileService fikaProfileService) : IFikaCommand
     {
-        [GeneratedRegex("^fika\\s+shutdownclient\\s+\\S+$")]
+        [GeneratedRegex("^fika shutdownclient (\\w+)$")]
         private static partial Regex ShutdownClientCommandRegex();
 
         public string Command
