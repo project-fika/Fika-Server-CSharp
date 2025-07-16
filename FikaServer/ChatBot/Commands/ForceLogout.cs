@@ -33,7 +33,7 @@ namespace FikaServer.ChatBot.Commands
             }
         }
 
-        public async ValueTask<string> PerformAction(UserDialogInfo commandHandler, MongoId sessionId, SendMessageRequest request)
+        public ValueTask<string> PerformAction(UserDialogInfo commandHandler, MongoId sessionId, SendMessageRequest request)
         {
             string value = request.DialogId;
             bool isAdmin = configService.Config.Server.AdminIds.Contains(sessionId);
@@ -41,7 +41,7 @@ namespace FikaServer.ChatBot.Commands
             {
                 mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
                     "You are not an admin!");
-                return value;
+                return new(value);
             }
 
             string text = request.Text;
@@ -49,7 +49,7 @@ namespace FikaServer.ChatBot.Commands
             {
                 mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
                     "Invalid use of the command.");
-                return value;
+                return new(value);
             }
 
             string[] split = text.Split(' ');
@@ -64,7 +64,7 @@ namespace FikaServer.ChatBot.Commands
                 EventIdentifier = new()
             });
 
-            return value;
+            return new(value);
         }
 
 
