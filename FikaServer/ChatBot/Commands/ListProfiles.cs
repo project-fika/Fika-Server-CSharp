@@ -45,7 +45,7 @@ namespace FikaServer.ChatBot.Commands
             StringBuilder sb = new(profiles.Count);
             foreach ((MongoId id, SptProfile profile) in profiles)
             {
-                sb.AppendLine($"{id} - {profile?.CharacterData?.PmcData?.Info?.MainProfileNickname ?? "Unknown"}");
+                sb.AppendLine($"{id} - {profile?.CharacterData?.PmcData?.Info?.Nickname ?? "Unknown"}");
             }
             
             mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
