@@ -1,6 +1,7 @@
 ﻿using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Profile;
+using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
 
 namespace FikaServer.Services.Cache
@@ -10,7 +11,7 @@ namespace FikaServer.Services.Cache
     /// </summary>
     /// <param name="saveServer"></param>
     [Injectable(InjectionType.Singleton)]
-    public class FikaProfileService(SaveServer saveServer)
+    public class FikaProfileService(ISptLogger<FikaProfileService> logger, SaveServer saveServer)
     {
         public Dictionary<string, SptProfile> AllProfiles
         {
@@ -59,7 +60,10 @@ namespace FikaServer.Services.Cache
                 string? nick = profile.CharacterData?.PmcData?.Info?.Nickname;
                 if (!string.IsNullOrEmpty(nick))
                 {
-                    _profiles.Add(nick, profile);
+                    if (!_profiles.TryAdd(nick, profile))
+                    {
+                        logger.Error($"Failed to add {nick} to the profile cache. Someone is possibly using the same nickname");
+                    }
                 }
             }
         }
