@@ -57,6 +57,7 @@ namespace FikaServer.Controllers
 
         private void RefreshProfiles()
         {
+            _profiles.Clear();
             Dictionary<MongoId, SptProfile>.ValueCollection profiles = saveServer.GetProfiles().Values;
             foreach (SptProfile profile in profiles)
             {
