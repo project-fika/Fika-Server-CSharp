@@ -6,6 +6,7 @@ using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Dialog;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Eft.Ws;
+using SPTarkov.Server.Core.Servers.Ws;
 using SPTarkov.Server.Core.Services;
 using System.Text.RegularExpressions;
 
@@ -13,7 +14,7 @@ namespace FikaServer.ChatBot.Commands
 {
     [Injectable]
     public partial class SendMessage(ConfigService configService, MailSendService mailSendService,
-        NotificationSendHelper sendHelper) : IFikaCommand
+        NotificationSendHelper sendHelper, SptWebSocketConnectionHandler websocketHandler) : IFikaCommand
     {
         [GeneratedRegex("^fika\\s+sendmessage\\s+(?:[a-f\\d]{24}|all)\\s+(.*)$")]
         private static partial Regex SendMessageCommandRegex();
@@ -58,6 +59,19 @@ namespace FikaServer.ChatBot.Commands
             string[] split = text.Split(' ');
             string profileId = split[2];
             string message = match.Groups[1].Value;
+
+            if (profileId == "all")
+            {
+                mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
+                $"Everyone has been sent the message:\n{message}");
+                websocketHandler.SendMessageToAll(new SendMessageNotification(message)
+                {
+                    EventType = NotificationEventType.tournamentWarning,
+                    EventIdentifier = new()
+                });
+
+                return new(value);
+            }
 
             mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
                 $"'{profileId}' has been sent the message:\n{message}.");

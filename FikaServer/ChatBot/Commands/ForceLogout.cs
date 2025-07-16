@@ -5,6 +5,7 @@ using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Dialog;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Eft.Ws;
+using SPTarkov.Server.Core.Servers.Ws;
 using SPTarkov.Server.Core.Services;
 using System.Text.RegularExpressions;
 
@@ -12,7 +13,7 @@ namespace FikaServer.ChatBot.Commands
 {
     [Injectable]
     public partial class ForceLogout(ConfigService configService, MailSendService mailSendService,
-        NotificationSendHelper sendHelper) : IFikaCommand
+        NotificationSendHelper sendHelper, SptWebSocketConnectionHandler websocketHandler) : IFikaCommand
     {
         [GeneratedRegex("^fika\\s+forcelogout\\s+(?:[a-f\\d]{24}|all)$")]
         private static partial Regex ForceLogoutCommandRegex();
@@ -54,6 +55,19 @@ namespace FikaServer.ChatBot.Commands
 
             string[] split = text.Split(' ');
             string profileId = split[2];
+
+            if (profileId == "all")
+            {
+                mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
+                "Everyone has been forced to log out.");
+                websocketHandler.SendMessageToAll(new WsNotificationEvent()
+                {
+                    EventType = NotificationEventType.ForceLogout,
+                    EventIdentifier = new()
+                });
+
+                return new(value);
+            }
 
             mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
                 $"'{profileId}' has been forced to log out.");
