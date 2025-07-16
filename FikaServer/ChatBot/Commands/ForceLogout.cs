@@ -74,7 +74,7 @@ namespace FikaServer.ChatBot.Commands
             mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
                 $"'{nickname}' has been forced to log out.");
 
-            SptProfile? profile = fikaProfileService.GetProfileByName(nickname)
+            SptProfile? profile = fikaProfileService.GetProfileByNickname(nickname)
                 ?? throw new NullReferenceException($"Could not find profile {nickname}");
             sendHelper.SendMessage(profile.ProfileInfo.ProfileId.GetValueOrDefault(), new WsNotificationEvent()
             {

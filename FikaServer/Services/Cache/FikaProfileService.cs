@@ -13,38 +13,60 @@ namespace FikaServer.Services.Cache
     [Injectable(InjectionType.Singleton)]
     public class FikaProfileService(ISptLogger<FikaProfileService> logger, SaveServer saveServer)
     {
-        public Dictionary<string, SptProfile> AllProfiles
+        private readonly Dictionary<string, MongoId> _profiles = [];
+
+        public Dictionary<string, MongoId> GetAllProfiles(bool forceRefresh = false)
         {
-            get
-            {
-                if (_profiles.Count == 0)
-                {
-                    RefreshProfiles();
-                }
-
-                return _profiles;
-            }
-        }
-
-        private readonly Dictionary<string, SptProfile> _profiles = [];
-
-        public SptProfile? GetProfileByName(string nickname)
-        {
-            if (_profiles.Count == 0)
+            if (_profiles.Count == 0 || forceRefresh)
             {
                 RefreshProfiles();
             }
 
-            if (_profiles.TryGetValue(nickname, out SptProfile? foundProfile))
+            return _profiles;
+        }
+
+        public MongoId? GetProfileIdByNickname(string nickname)
+        {
+            Dictionary<string, MongoId> profiles = GetAllProfiles();
+
+            if (profiles.TryGetValue(nickname, out MongoId foundId))
             {
-                return foundProfile;
+                return foundId;
             }
             else
             {
                 RefreshProfiles();
-                if (_profiles.TryGetValue(nickname, out foundProfile))
+                if (profiles.TryGetValue(nickname, out foundId))
                 {
-                    return foundProfile;
+                    return foundId;
+                }
+            }
+
+            return null;
+        }
+
+        public SptProfile? GetProfileByNickname(string nickname)
+        {
+            Dictionary<string, MongoId> profiles = GetAllProfiles();
+
+            if (profiles.TryGetValue(nickname, out MongoId foundId))
+            {
+                SptProfile profile = saveServer.GetProfile(foundId);
+                if (profile != null)
+                {
+                    return profile;
+                }
+            }
+            else
+            {
+                RefreshProfiles();
+                if (profiles.TryGetValue(nickname, out foundId))
+                {
+                    SptProfile profile = saveServer.GetProfile(foundId);
+                    if (profile != null)
+                    {
+                        return profile;
+                    }
                 }
             }
 
@@ -54,13 +76,18 @@ namespace FikaServer.Services.Cache
         private void RefreshProfiles()
         {
             _profiles.Clear();
-            Dictionary<MongoId, SptProfile>.ValueCollection profiles = saveServer.GetProfiles().Values;
-            foreach (SptProfile profile in profiles)
+            Dictionary<MongoId, SptProfile> profiles = saveServer.GetProfiles();
+            foreach ((MongoId id, SptProfile profile) in profiles)
             {
-                string? nick = profile.CharacterData?.PmcData?.Info?.Nickname;
+                if (!profile.HasProfileData())
+                {
+                    continue;
+                }
+
+                string nick = profile.CharacterData.PmcData.Info.Nickname;
                 if (!string.IsNullOrEmpty(nick))
                 {
-                    if (!_profiles.TryAdd(nick, profile))
+                    if (!_profiles.TryAdd(nick, id))
                     {
                         logger.Error($"Failed to add {nick} to the profile cache. Someone is possibly using the same nickname");
                     }

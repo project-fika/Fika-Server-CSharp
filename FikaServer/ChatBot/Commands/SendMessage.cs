@@ -77,7 +77,7 @@ namespace FikaServer.ChatBot.Commands
             mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
                 $"'{nickname}' has been sent the message:\n{message}");
 
-            SptProfile? profile = fikaProfileService.GetProfileByName(nickname);
+            SptProfile? profile = fikaProfileService.GetProfileByNickname(nickname);
             sendHelper.SendMessage(profile.ProfileInfo.ProfileId.GetValueOrDefault(), new SendMessageNotification(message)
             {
                 EventType = NotificationEventType.tournamentWarning,

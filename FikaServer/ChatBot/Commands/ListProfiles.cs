@@ -14,7 +14,7 @@ namespace FikaServer.ChatBot.Commands
 {
     [Injectable]
     public class ListProfiles(ConfigService configService,
-        FikaProfileService fikaProfileService,
+        SaveServer saveServer,
         MailSendService mailSendService) : IFikaCommand
     {
         public string Command
@@ -43,11 +43,16 @@ namespace FikaServer.ChatBot.Commands
                 return request.DialogId;
             }
 
-            Dictionary<string, SptProfile> profiles = fikaProfileService.AllProfiles;
+            Dictionary<MongoId, SptProfile>.ValueCollection profiles = saveServer.GetProfiles().Values;
             StringBuilder sb = new(profiles.Count);
-            foreach ((string nickname, SptProfile profile) in profiles)
+            foreach (SptProfile profile in profiles)
             {
-                sb.AppendLine($"{nickname} - {profile.ProfileInfo.ProfileId.GetValueOrDefault()}");
+                if (!profile.HasProfileData())
+                {
+                    continue;
+                }
+
+                sb.AppendLine($"{profile.CharacterData.PmcData.Info.Nickname} - {profile.ProfileInfo.ProfileId.GetValueOrDefault()}");
             }
             
             mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,

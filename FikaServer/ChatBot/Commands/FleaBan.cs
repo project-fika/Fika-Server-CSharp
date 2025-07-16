@@ -67,7 +67,7 @@ namespace FikaServer.ChatBot.Commands
                 days = 9999;
             }
 
-            SptProfile? profile = fikaProfileService.GetProfileByName(nickname);
+            SptProfile? profile = fikaProfileService.GetProfileByNickname(nickname);
             if (!profile.HasProfileData())
             {
                 mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,

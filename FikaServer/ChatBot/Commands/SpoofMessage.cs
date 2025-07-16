@@ -68,7 +68,7 @@ namespace FikaServer.ChatBot.Commands
                 memberCategory = (MemberCategory)values?.GetValue(Random.Shared.Next(values.Length));
             }
 
-            SptProfile? profile = fikaProfileService.GetProfileByName(nickname);
+            SptProfile? profile = fikaProfileService.GetProfileByNickname(nickname);
             mailSendService.SendUserMessageToPlayer(profile.ProfileInfo.ProfileId.GetValueOrDefault(), new()
             {
                 Aid = hashUtil.GenerateAccountId(),

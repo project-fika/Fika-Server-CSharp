@@ -60,7 +60,7 @@ namespace FikaServer.ChatBot.Commands
 
             string[] split = text.Split(' ');
             string nickname = split[2];
-            SptProfile? profile = fikaProfileService.GetProfileByName(nickname);
+            SptProfile? profile = fikaProfileService.GetProfileByNickname(nickname);
             if (!profile.HasProfileData())
             {
                 mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,

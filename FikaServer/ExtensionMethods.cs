@@ -57,7 +57,7 @@ namespace FikaServer
         /// <returns></returns>
         public static bool HasProfileData(this SptProfile? profile)
         {
-            return profile != null && profile.ProfileInfo != null && profile.ProfileInfo.ProfileId != null;
+            return profile != null && profile.ProfileInfo?.ProfileId != null && profile.CharacterData?.PmcData?.Info?.Nickname != null;
         }
     }
 }
