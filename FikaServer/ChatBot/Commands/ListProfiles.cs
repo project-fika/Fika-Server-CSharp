@@ -48,7 +48,6 @@ namespace FikaServer.ChatBot.Commands
                 sb.AppendLine($"{id} - {profile?.CharacterData?.PmcData?.Info?.MainProfileNickname ?? "Unknown"}");
             }
             
-            await notificationWebSocket.SendAsync(sessionId, new OpenAdminMenuNotification(isAdmin));
             mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
                 $"All profiles:\n\n{sb}");
             return new(request.DialogId);
