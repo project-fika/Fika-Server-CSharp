@@ -17,6 +17,7 @@ using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Servers.Ws;
 using SPTarkov.Server.Core.Utils;
+using System.Runtime.CompilerServices;
 using static FikaServer.Helpers.PlayerRelationsHelper;
 
 namespace FikaServer.Controllers
@@ -24,11 +25,48 @@ namespace FikaServer.Controllers
     [Injectable]
     public class FikaDialogueController(ISptLogger<FikaDialogueController> logger, DialogueController dialogueController,
         ProfileHelper profileHelper, PlayerRelationsHelper playerRelationsHelper, SaveServer saveServer,
-        HashUtil hashUtil, TimeUtil timeUtil, DialogueHelper dialogueHelper, SptWebSocketConnectionHandler socketConnectionHandler,
+        TimeUtil timeUtil, DialogueHelper dialogueHelper, SptWebSocketConnectionHandler socketConnectionHandler,
         FriendRequestsService friendRequestsService, HttpResponseUtil httpResponseUtil, ConfigService configService,
         IEnumerable<IDialogueChatBot> dialogueChatBots)
     {
         protected readonly List<IDialogueChatBot> _dialogueChatBots = [.. dialogueChatBots];
+        private readonly Dictionary<string, SptProfile> _profiles = [];
+
+        public SptProfile? GetProfileByName(string nickname)
+        {
+            if (_profiles.Count == 0)
+            {
+                RefreshProfiles();
+            }
+
+            if (_profiles.TryGetValue(nickname, out SptProfile? foundProfile))
+            {
+                return foundProfile;
+            }
+            else
+            {
+                RefreshProfiles();
+                if (_profiles.TryGetValue(nickname, out foundProfile))
+                {
+                    return foundProfile;
+                }
+            }
+
+            return null;
+        }
+
+        private void RefreshProfiles()
+        {
+            Dictionary<MongoId, SptProfile>.ValueCollection profiles = saveServer.GetProfiles().Values;
+            foreach (SptProfile profile in profiles)
+            {
+                string? nick = profile.CharacterData?.PmcData?.Info?.Nickname;
+                if (!string.IsNullOrEmpty(nick))
+                {
+                    _profiles.Add(nick, profile);
+                }
+            }
+        }
 
         /// <summary>
         /// Gets a list of all friends for the specified profileId
