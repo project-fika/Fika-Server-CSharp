@@ -74,7 +74,7 @@ namespace FikaServer.WebSockets
             return Task.CompletedTask;
         }
 
-        public async Task SendAsync<T>(MongoId sessionID, T message) where T : IFikaNotificationBase
+        public async Task SendAsync<T>(MongoId sessionID, T message) where T : IFikaNotification
         {
             // Client is not online or not currently connected to the websocket.
             if (!clientWebSockets.TryGetValue(sessionID, out WebSocket ws))
@@ -91,7 +91,7 @@ namespace FikaServer.WebSockets
             await ws.SendAsync(Encoding.UTF8.GetBytes(jsonUtil.Serialize(message)), WebSocketMessageType.Text, true, CancellationToken.None);
         }
 
-        public async Task BroadcastAsync<T>(T message) where T : IFikaNotificationBase
+        public async Task BroadcastAsync<T>(T message) where T : IFikaNotification
         {
             foreach (KeyValuePair<string, WebSocket> websocket in clientWebSockets)
             {

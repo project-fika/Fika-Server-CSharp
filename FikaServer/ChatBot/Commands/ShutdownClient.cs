@@ -1,18 +1,23 @@
-﻿using FikaServer.Models.Fika.WebSocket.Notifications;
+﻿using FikaServer.Models.Fika.Headless;
+using FikaServer.Models.Fika.WebSocket.Notifications;
 using FikaServer.Services;
+using FikaServer.Services.Headless;
 using FikaServer.WebSockets;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Dialog;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Services;
+using SPTarkov.Server.Core.Utils;
+using System.Net.WebSockets;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace FikaServer.ChatBot.Commands
 {
     [Injectable]
     public partial class ShutdownClient(ConfigService configService, MailSendService mailSendService,
-        NotificationWebSocket notificationWebSocket) : IFikaCommand
+        NotificationWebSocket notificationWebSocket, HeadlessService headlessService, JsonUtil jsonUtil) : IFikaCommand
     {
         [GeneratedRegex("^fika\\s+shutdownclient\\s+[a-f\\d]{24}$")]
         private static partial Regex ShutdownClientCommandRegex();
@@ -55,9 +60,18 @@ namespace FikaServer.ChatBot.Commands
             string[] split = text.Split(' ');
             string profileId = split[2];
 
+            if (headlessService.HeadlessClients.TryGetValue(profileId, out HeadlessClientInfo? client))
+            {
+                string? data = jsonUtil.Serialize(new HeadlessShutdownClient())
+                    ?? throw new NullReferenceException("ShutdownClient::Data was null after serializing");
+                await client.WebSocket.SendAsync(Encoding.UTF8.GetBytes(data),
+                WebSocketMessageType.Text, true, CancellationToken.None);
+
+                return value;
+            }
+
             mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
                 $"'{profileId}' is shutting down.");
-
             await notificationWebSocket.SendAsync(profileId, new ShutdownClientNotification());
 
             return value;

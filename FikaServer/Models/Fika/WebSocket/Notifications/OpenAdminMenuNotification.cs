@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace FikaServer.Models.Fika.WebSocket.Notifications
 {
-    public record OpenAdminMenuNotification : IFikaNotificationBase
+    public record OpenAdminMenuNotification : IFikaNotification
     {
         public OpenAdminMenuNotification(bool success)
         {
@@ -11,7 +11,7 @@ namespace FikaServer.Models.Fika.WebSocket.Notifications
         }
 
         [JsonPropertyName("type")]
-        public EFikaNotifications Type { get; set; } = EFikaNotifications.OpenAdminSettings;
+        public EFikaNotification Type { get; set; } = EFikaNotification.OpenAdminSettings;
 
         [JsonPropertyName("success")]
         public bool Success { get; set; }

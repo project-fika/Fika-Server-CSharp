@@ -3,9 +3,9 @@ using System.Text.Json.Serialization;
 
 namespace FikaServer.Models.Fika.WebSocket
 {
-    public interface IFikaNotificationBase
+    public interface IFikaNotification
     {
         [JsonPropertyName("type")]
-        public abstract EFikaNotifications Type { get; set; }
+        public abstract EFikaNotification Type { get; set; }
     }
 }

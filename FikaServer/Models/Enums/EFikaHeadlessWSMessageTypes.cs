@@ -7,6 +7,7 @@ namespace FikaServer.Models.Enums
     {
         KeepAlive = 0,
         HeadlessStartRaid = 1,
-        RequesterJoinMatch = 2
+        RequesterJoinMatch = 2,
+        ShutdownClient = 4
     }
 }

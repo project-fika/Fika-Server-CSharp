@@ -3,10 +3,10 @@ using System.Text.Json.Serialization;
 
 namespace FikaServer.Models.Fika.WebSocket.Notifications
 {
-    public record ReceivedSentItemNotification : IFikaNotificationBase
+    public record ReceivedSentItemNotification : IFikaNotification
     {
         [JsonPropertyName("type")]
-        public EFikaNotifications Type { get; set; } = EFikaNotifications.SentItem;
+        public EFikaNotification Type { get; set; } = EFikaNotification.SentItem;
 
         [JsonPropertyName("nickname")]
         public string Nickname { get; set; } = string.Empty;

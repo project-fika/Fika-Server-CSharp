@@ -3,12 +3,9 @@ using System.Text.Json.Serialization;
 
 namespace FikaServer.Models.Fika.WebSocket.Notifications
 {
-    /// <summary>
-    /// Used to restart the headless, does not run on clients
-    /// </summary>
-    public record ShutdownClientNotification : IFikaNotificationBase
+    public record ShutdownClientNotification : IFikaNotification
     {
         [JsonPropertyName("type")]
-        public EFikaNotifications Type { get; set; } = EFikaNotifications.ShutdownClient;
+        public EFikaNotification Type { get; set; } = EFikaNotification.ShutdownClient;
     }
 }

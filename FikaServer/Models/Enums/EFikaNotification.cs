@@ -3,7 +3,7 @@
 namespace FikaServer.Models.Enums
 {
     [EftEnumConverter]
-    public enum EFikaNotifications
+    public enum EFikaNotification
     {
         KeepAlive = 0,
         StartedRaid = 1,

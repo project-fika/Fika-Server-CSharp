@@ -4,10 +4,10 @@ using System.Text.Json.Serialization;
 
 namespace FikaServer.Models.Fika.WebSocket.Notifications
 {
-    public record PushNotification : IFikaNotificationBase, IRequestData
+    public record PushNotification : IFikaNotification, IRequestData
     {
         [JsonPropertyName("type")]
-        public EFikaNotifications Type { get; set; } = EFikaNotifications.PushNotification;
+        public EFikaNotification Type { get; set; } = EFikaNotification.PushNotification;
 
         [JsonPropertyName("notificationIcon")]
         public EEFTNotificationIconType NotificationIcon { get; set; } = EEFTNotificationIconType.Default;
