@@ -33,7 +33,7 @@ namespace FikaServer.Helpers
         /// <param name="fromProfileId">Requesting profileId</param>
         /// <param name="toProfileId">Target profileId</param>
         /// <exception cref="NotImplementedException"></exception>
-        public void RemoveFriend(MongoId fromProfileId, string toProfileId)
+        public void RemoveFriend(MongoId fromProfileId, MongoId toProfileId)
         {
             FikaPlayerRelations fromRelations = playerRelationsService.GetStoredValue(fromProfileId);
             if (fromRelations == null)
@@ -64,7 +64,7 @@ namespace FikaServer.Helpers
             {
                 webSocketHandler.SendMessage(toProfileId, new WsFriendListRemove()
                 {
-                    EventIdentifier = "youAreRemovedFromFriendList",
+                    EventIdentifier = new(),
                     EventType = NotificationEventType.youAreRemovedFromFriendList,
                     Profile = profile.ToFriendData()
                 });
@@ -76,7 +76,7 @@ namespace FikaServer.Helpers
         /// </summary>
         /// <param name="profileId"></param>
         /// <returns>Ignore list</returns>
-        public List<string> GetIgnoreList(string profileId)
+        public List<string> GetIgnoreList(MongoId profileId)
         {
             return playerRelationsService.GetStoredValue(profileId).Ignore;
         }
@@ -93,7 +93,7 @@ namespace FikaServer.Helpers
                 .Where(x => playerRelationsService.GetStoredValue(x).Ignore.Contains(profileId))];
         }
 
-        public bool RemoveFriendRequest(string from, string? to, ERemoveFriendReason reason)
+        public bool RemoveFriendRequest(MongoId from, MongoId to, ERemoveFriendReason reason)
         {
             if (!friendRequestsService.HasFriendRequest(from, to, out FriendRequestListResponse? response))
             {
@@ -101,7 +101,9 @@ namespace FikaServer.Helpers
                 return false;
             }
 
-            friendRequestsService.DeleteFriendRequest(response);
+            friendRequestsService.DeleteFriendRequest(response)
+                .GetAwaiter().GetResult();
+
             switch (reason)
             {
                 case ERemoveFriendReason.Accept:
@@ -109,7 +111,7 @@ namespace FikaServer.Helpers
                         SptProfile profile = saveServer.GetProfile(to);
                         webSocketHandler.SendMessage(from, new WsFriendListRemove()
                         {
-                            EventIdentifier = "friendListRequestAccept",
+                            EventIdentifier = new(),
                             EventType = NotificationEventType.friendListRequestAccept,
                             Profile = profile.ToFriendData()
                         });
@@ -120,7 +122,7 @@ namespace FikaServer.Helpers
                         SptProfile profile = saveServer.GetProfile(from);
                         webSocketHandler.SendMessage(to, new WsFriendListRemove()
                         {
-                            EventIdentifier = "friendListRequestCancel",
+                            EventIdentifier = new(),
                             EventType = NotificationEventType.friendListRequestCancel,
                             Profile = profile.ToFriendData()
                         });
@@ -131,7 +133,7 @@ namespace FikaServer.Helpers
                         SptProfile profile = saveServer.GetProfile(to);
                         webSocketHandler.SendMessage(from, new WsFriendListRemove()
                         {
-                            EventIdentifier = "friendListRequestDecline",
+                            EventIdentifier = new(),
                             EventType = NotificationEventType.friendListRequestDecline,
                             Profile = profile.ToFriendData()
                         });
@@ -147,7 +149,7 @@ namespace FikaServer.Helpers
         /// </summary>
         /// <param name="from"></param>
         /// <param name="to"></param>
-        public void AddFriend(string from, string? to)
+        public void AddFriend(MongoId from, MongoId to)
         {
             FikaPlayerRelations fromRelations = playerRelationsService.GetStoredValue(from);
             if (!fromRelations.Friends.Contains(to))
@@ -164,7 +166,7 @@ namespace FikaServer.Helpers
             playerRelationsService.SaveProfileRelations();
         }
 
-        public void AddToIgnoreList(string from, string to)
+        public void AddToIgnoreList(MongoId from, MongoId to)
         {
             FikaPlayerRelations fromRelations = playerRelationsService.GetStoredValue(from);
             if (fromRelations.Ignore.Contains(to))
@@ -181,14 +183,14 @@ namespace FikaServer.Helpers
 
             webSocketHandler.SendMessage(to, new WsIgnoreListAdd()
             {
-                EventIdentifier = "youAreAddToIgnoreList",
+                EventIdentifier = new(),
                 EventType = NotificationEventType.youAreAddToIgnoreList,
                 Id = from,
                 Profile = profile.ToFriendData()
             });
         }
 
-        public void RemoveFromIgnoreList(string from, string to)
+        public void RemoveFromIgnoreList(MongoId from, MongoId to)
         {
             FikaPlayerRelations fromRelations = playerRelationsService.GetStoredValue(from);
             if (!fromRelations.Ignore.Remove(to))
@@ -204,7 +206,7 @@ namespace FikaServer.Helpers
 
             webSocketHandler.SendMessage(to, new WsIgnoreListAdd()
             {
-                EventIdentifier = "youAreRemoveFromIgnoreList",
+                EventIdentifier = new(),
                 EventType = NotificationEventType.youAreRemoveFromIgnoreList,
                 Id = from,
                 Profile = profile.ToFriendData()

@@ -1,6 +1,7 @@
 ﻿using FikaServer.Models.Fika.Dialog;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Helpers;
+using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Utils;
@@ -89,7 +90,7 @@ namespace FikaServer.Services.Cache
         /// <param name="from"></param>
         /// <param name="to"></param>
         /// <returns></returns>
-        public bool HasFriendRequest(string from, string to)
+        public bool HasFriendRequest(MongoId from, MongoId to)
         {
             lock (_listLock)
             {
@@ -105,7 +106,7 @@ namespace FikaServer.Services.Cache
         /// <param name="to"></param>
         /// <param name="response"></param>
         /// <returns>The friend request</returns>
-        public bool HasFriendRequest(string from, string to, out FriendRequestListResponse response)
+        public bool HasFriendRequest(MongoId from, MongoId to, out FriendRequestListResponse response)
         {
             lock (_listLock)
             {
@@ -114,7 +115,7 @@ namespace FikaServer.Services.Cache
             }
         }
 
-        public List<FriendRequestListResponse> GetReceivedFriendRequests(string profileId)
+        public List<FriendRequestListResponse> GetReceivedFriendRequests(MongoId profileId)
         {
             lock (_listLock)
             {
@@ -123,7 +124,7 @@ namespace FikaServer.Services.Cache
             }
         }
 
-        public List<FriendRequestListResponse> GetSentFriendRequests(string profileId)
+        public List<FriendRequestListResponse> GetSentFriendRequests(MongoId profileId)
         {
             lock (_listLock)
             {

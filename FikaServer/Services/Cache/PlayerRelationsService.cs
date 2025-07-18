@@ -54,7 +54,7 @@ namespace FikaServer.Services.Cache
             Dictionary<MongoId, SptProfile> profiles = profileHelper.GetProfiles();
             bool shouldSave = false;
 
-            foreach (string profileId in profiles.Keys)
+            foreach (MongoId profileId in profiles.Keys)
             {
                 if (!_playerRelations.TryGetValue(profileId, out FikaPlayerRelations? value))
                 {
@@ -105,7 +105,7 @@ namespace FikaServer.Services.Cache
             await File.WriteAllTextAsync($"{_playerRelationsFullPath}/playerRelations.json", jsonUtil.Serialize(_playerRelations, true));
         }
 
-        public FikaPlayerRelations GetStoredValue(MongoId profileId)
+        public FikaPlayerRelations GetStoredValue(string profileId)
         {
             if (!_playerRelations.ContainsKey(profileId))
             {

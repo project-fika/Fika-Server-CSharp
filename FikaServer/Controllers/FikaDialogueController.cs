@@ -9,6 +9,7 @@ using SPTarkov.Server.Core.Helpers;
 using SPTarkov.Server.Core.Helpers.Dialogue;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Common;
+using SPTarkov.Server.Core.Models.Eft.Common.Tables;
 using SPTarkov.Server.Core.Models.Eft.Dialog;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Eft.Ws;
@@ -80,34 +81,40 @@ namespace FikaServer.Controllers
             };
         }
 
-        public FriendRequestSendResponse? AddFriendRequest(MongoId from, MongoId to)
+        public FriendRequestSendResponse? AddFriendRequest(MongoId from, MongoId? to)
         {
-            if (friendRequestsService.HasFriendRequest(from, to))
+            if (from == default || to == null)
+            {
+                throw new NullReferenceException($"From or to was null! [From]: {from}, [To]: {to}");
+            }
+
+            if (friendRequestsService.HasFriendRequest(from, to.Value))
             {
                 logger.Error($"{from} has already sent a request to {to}");
                 return null;
             }
 
-            if (!saveServer.ProfileExists(to))
+            if (!saveServer.ProfileExists(to.Value))
             {
                 logger.Error($"{from} tried to send a friend request to {to} who doesn't exist");
                 return null;
             }
 
+            // todo: fix async
             friendRequestsService.AddFriendRequest(new()
             {
                 Id = new MongoId(),
                 From = from,
-                To = to,
+                To = to.Value,
                 Date = timeUtil.GetTimeStamp()
-            });
+            }).GetAwaiter().GetResult();
 
             SptProfile fromProfile = saveServer.GetProfile(from)
                 ?? throw new NullReferenceException($"{from} did not exist in the database");
 
             socketConnectionHandler.SendMessage(to, new WsFriendListAdd()
             {
-                EventIdentifier = "friendListNewRequest",
+                EventIdentifier = new(),
                 EventType = NotificationEventType.friendListNewRequest,
                 Id = from,
                 Profile = fromProfile.ToFriendData()
@@ -256,7 +263,7 @@ namespace FikaServer.Controllers
 
             socketConnectionHandler.SendMessage(receiverProfile.ProfileInfo.ProfileId, new WsChatMessageReceived()
             {
-                EventIdentifier = "new_message",
+                EventIdentifier = new(),
                 EventType = NotificationEventType.new_message,
                 DialogId = sessionId,
                 Message = message
@@ -338,7 +345,7 @@ namespace FikaServer.Controllers
             return new(httpResponseUtil.GetBody(sentFriendRequests));
         }
 
-        public ValueTask<string> SendFriendRequest(MongoId fromProfileId, MongoId toProfileId)
+        public ValueTask<string> SendFriendRequest(MongoId fromProfileId, MongoId? toProfileId)
         {
             return new(httpResponseUtil.GetBody(AddFriendRequest(fromProfileId, toProfileId)));
         }
@@ -374,21 +381,29 @@ namespace FikaServer.Controllers
             return new(httpResponseUtil.NullResponse());
         }
 
-        public ValueTask<string> CancelFriendRequest(string fromProfileId, string toProfileId)
+        public ValueTask<string> CancelFriendRequest(MongoId fromProfileId, string toProfileId)
         {
-            playerRelationsHelper.RemoveFriendRequest(fromProfileId, toProfileId, ERemoveFriendReason.Cancel);
+            if (toProfileId == null)
+            {
+                throw new NullReferenceException("Request.ProfileId was null!");
+            }
+
+            if (!playerRelationsHelper.RemoveFriendRequest(fromProfileId, toProfileId, ERemoveFriendReason.Cancel))
+            {
+                logger.Error($"Failed to delete friend request from {fromProfileId} to {toProfileId}");
+            }
 
             return new(httpResponseUtil.NullResponse());
         }
 
-        public ValueTask<string> DeclineFriendRequest(MongoId fromProfileId, string toProfileId)
+        public ValueTask<string> DeclineFriendRequest(string fromProfileId, MongoId toProfileId)
         {
             playerRelationsHelper.RemoveFriendRequest(fromProfileId, toProfileId, ERemoveFriendReason.Decline);
 
             return new(httpResponseUtil.NullResponse());
         }
 
-        public ValueTask<string> DeleteFriend(MongoId fromProfileId, string toProfileId)
+        public ValueTask<string> DeleteFriend(MongoId fromProfileId, MongoId toProfileId)
         {
             playerRelationsHelper.RemoveFriend(fromProfileId, toProfileId);
 

@@ -28,7 +28,7 @@ namespace FikaServer.OnLoad
             new ListInboxOverride(),
             new ListOutboxOverride(),
             new SendFriendRequestOverride(),
-            new AcceptAllFriendRequeststOverride(),
+            new AcceptAllFriendRequestsOverride(),
             new AcceptFriendRequestOverride(),
             new DeclineFriendRequestOverride(),
             new CancelFriendRequestOverride(),

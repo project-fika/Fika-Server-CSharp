@@ -3,6 +3,7 @@ using FikaServer.Models.Fika;
 using FikaServer.Models.Fika.Routes.Location;
 using FikaServer.Services;
 using SPTarkov.DI.Annotations;
+using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Match;
 
 namespace FikaServer.Controllers
@@ -20,11 +21,11 @@ namespace FikaServer.Controllers
         {
             List<FikaRaidResponse> matches = [];
 
-            foreach ((string serverId, FikaMatch match) in matchService.Matches)
+            foreach ((MongoId serverId, FikaMatch match) in matchService.Matches)
             {
-                Dictionary<string, bool> players = [];
+                Dictionary<MongoId, bool> players = [];
 
-                foreach ((string playerId, FikaPlayer player) in match.Players)
+                foreach ((MongoId playerId, FikaPlayer player) in match.Players)
                 {
                     players[playerId] = player.IsDead;
                 }
@@ -46,7 +47,7 @@ namespace FikaServer.Controllers
                     Time = match.Time,
                     Players = players,
                     IsHeadless = match.IsHeadless,
-                    HeadlessRequesterNickname = headlessHelper.GetRequesterUsername(hostUsername) ?? "" // Set this to an empty string if there is no requester.
+                    HeadlessRequesterNickname = headlessHelper.GetRequesterUsername(serverId) ?? "" // Set this to an empty string if there is no requester.
                 });
 
             }

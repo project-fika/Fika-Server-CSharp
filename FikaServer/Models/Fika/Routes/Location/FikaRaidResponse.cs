@@ -1,4 +1,5 @@
 ﻿using FikaServer.Models.Enums;
+using SPTarkov.Server.Core.Models.Common;
 using System.Text.Json.Serialization;
 
 namespace FikaServer.Models.Fika.Routes.Location
@@ -20,7 +21,7 @@ namespace FikaServer.Models.Fika.Routes.Location
         [JsonPropertyName("time")]
         public EFikaTime Time { get; set; }
         [JsonPropertyName("players")]
-        public Dictionary<string, bool> Players { get; set; } = [];
+        public Dictionary<MongoId, bool> Players { get; set; } = [];
         [JsonPropertyName("isHeadless")]
         public bool IsHeadless { get; set; }
         [JsonPropertyName("headlessRequesterNickname")]

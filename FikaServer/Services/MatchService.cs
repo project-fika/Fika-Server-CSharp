@@ -72,7 +72,7 @@ namespace FikaServer.Services
         /// </summary>
         /// <param name="matchId">The match ID of the match to get</param>
         /// <returns>Returns the match object if a match is found with this match ID, returns null if not.</returns>
-        public FikaMatch? GetMatch(MongoId matchId)
+        public FikaMatch? GetMatch(string matchId)
         {
             if (Matches.TryGetValue(matchId, out FikaMatch? match))
             {
@@ -88,7 +88,7 @@ namespace FikaServer.Services
         /// <param name="matchId">The match ID of what match the player is in</param>
         /// <param name="playerId">The player ID to look for</param>
         /// <returns>Returns a FikaPlayer object if the player is found, returns null if not.</returns>
-        public FikaPlayer? GetPlayerInMatch(MongoId matchId, MongoId playerId)
+        public FikaPlayer? GetPlayerInMatch(string matchId, MongoId playerId)
         {
             if (!Matches.TryGetValue(matchId, out FikaMatch? match))
             {

@@ -67,7 +67,7 @@ namespace FikaServer.Overrides.Callbacks
         }
     }
 
-    public class AcceptAllFriendRequeststOverride : AbstractPatch
+    public class AcceptAllFriendRequestsOverride : AbstractPatch
     {
         protected override MethodBase GetTargetMethod()
         {
@@ -129,12 +129,13 @@ namespace FikaServer.Overrides.Callbacks
         protected override MethodBase GetTargetMethod()
         {
             return typeof(DialogueCallbacks)
-                .GetMethod(nameof(DialogueCallbacks.DeclineFriendRequest));
+                .GetMethod(nameof(DialogueCallbacks.CancelFriendRequest));
         }
 
         [PatchPrefix]
-        public static bool Prefix(string url, DeclineFriendRequestData request, MongoId sessionID, ref ValueTask<string> __result)
+        public static bool Prefix(string url, CancelFriendRequestData request, MongoId sessionID, ref ValueTask<string> __result)
         {
+            Console.WriteLine("ASD");
             FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
                 ?? throw new NullReferenceException("Could not get DialogueController");
 

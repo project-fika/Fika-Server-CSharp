@@ -1,4 +1,5 @@
-﻿using SPTarkov.Server.Core.Models.Enums;
+﻿using SPTarkov.Server.Core.Models.Common;
+using SPTarkov.Server.Core.Models.Enums;
 using System.Text.Json.Serialization;
 
 namespace FikaServer.Models.Fika.Dialog
@@ -6,7 +7,7 @@ namespace FikaServer.Models.Fika.Dialog
     public record FriendData
     {
         [JsonPropertyName("_id")]
-        public required string? Id { get; set; }
+        public required MongoId? Id { get; set; }
 
         [JsonPropertyName("aid")]
         public required int? Aid { get; set; }
