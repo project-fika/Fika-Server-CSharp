@@ -1,6 +1,7 @@
 ﻿using FikaServer.Models.Enums;
 using FikaServer.Models.Fika.Presence;
 using SPTarkov.DI.Annotations;
+using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
@@ -12,9 +13,9 @@ namespace FikaServer.Services
     [Injectable(InjectionType.Singleton)]
     public class PresenceService(SaveServer saveServer, TimeUtil timeUtil, ISptLogger<PresenceService> logger)
     {
-        private readonly ConcurrentDictionary<string, FikaPlayerPresence> _onlinePlayers = [];
+        private readonly ConcurrentDictionary<MongoId, FikaPlayerPresence> _onlinePlayers = [];
 
-        public void AddPlayerPresence(string sessionID)
+        public void AddPlayerPresence(MongoId sessionID)
         {
             SptProfile profile = saveServer.GetProfile(sessionID);
 
@@ -41,7 +42,7 @@ namespace FikaServer.Services
             return [.. _onlinePlayers.Values];
         }
 
-        public void UpdatePlayerPresence(string sessionID, FikaSetPresence NewPresence)
+        public void UpdatePlayerPresence(MongoId sessionID, FikaSetPresence NewPresence)
         {
             if (!_onlinePlayers.TryGetValue(sessionID, out FikaPlayerPresence currentPresence))
             {
@@ -60,7 +61,7 @@ namespace FikaServer.Services
             }, currentPresence);
         }
 
-        public void RemovePlayerPresence(string sessionID)
+        public void RemovePlayerPresence(MongoId sessionID)
         {
             _onlinePlayers.TryRemove(sessionID, out _);
         }

@@ -2,6 +2,7 @@
 using FikaServer.Models.Fika.Routes.Client.Check;
 using FikaServer.Services;
 using SPTarkov.DI.Annotations;
+using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -47,7 +48,7 @@ namespace FikaServer.Controllers
         /// <summary>
         /// Handle /fika/client/check/mods
         /// </summary>
-        public SptProfile? HandleProfileDownload(string sessionId)
+        public SptProfile? HandleProfileDownload(MongoId sessionId)
         {
             return fikaClientService.GetProfileBySessionID(sessionId);
         }

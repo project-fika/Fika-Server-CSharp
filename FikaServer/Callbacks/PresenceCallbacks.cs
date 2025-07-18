@@ -1,6 +1,7 @@
 ﻿using FikaServer.Models.Fika.Presence;
 using FikaServer.Services;
 using SPTarkov.DI.Annotations;
+using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Utils;
 
@@ -12,7 +13,7 @@ namespace FikaServer.Callbacks
         /// <summary>
         /// Handle /fika/presence/get
         /// </summary>
-        public ValueTask<string> HandleGetPresence(string url, IRequestData info, string sessionID)
+        public ValueTask<string> HandleGetPresence(string url, IRequestData info, MongoId sessionID)
         {
             return new ValueTask<string>(httpResponseUtil.NoBody(fikaPresenceService.GetAllPlayersPresence()));
         }
@@ -20,7 +21,7 @@ namespace FikaServer.Callbacks
         /// <summary>
         /// Handle /fika/presence/set
         /// </summary>
-        public ValueTask<string> HandleSetPresence(string url, FikaSetPresence info, string sessionID)
+        public ValueTask<string> HandleSetPresence(string url, FikaSetPresence info, MongoId sessionID)
         {
             fikaPresenceService.UpdatePlayerPresence(sessionID, info);
 
@@ -30,7 +31,7 @@ namespace FikaServer.Callbacks
         /// <summary>
         /// Handle /fika/presence/setget
         /// </summary>
-        public ValueTask<string> HandleSetGetPresence(string url, FikaSetPresence info, string sessionID)
+        public ValueTask<string> HandleSetGetPresence(string url, FikaSetPresence info, MongoId sessionID)
         {
             fikaPresenceService.UpdatePlayerPresence(sessionID, info);
 

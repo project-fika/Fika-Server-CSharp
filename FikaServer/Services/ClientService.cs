@@ -1,6 +1,7 @@
 ﻿using FikaServer.Models.Fika.Config;
 using FikaServer.Models.Fika.Routes.Client.Check;
 using SPTarkov.DI.Annotations;
+using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
@@ -124,7 +125,7 @@ namespace FikaServer.Services
             return mismatchedMods;
         }
 
-        public SptProfile? GetProfileBySessionID(string sessionId)
+        public SptProfile? GetProfileBySessionID(MongoId sessionId)
         {
             SptProfile profile = saveServer.GetProfile(sessionId);
 

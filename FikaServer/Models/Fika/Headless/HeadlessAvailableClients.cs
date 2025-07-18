@@ -1,10 +1,11 @@
-﻿using System.Text.Json.Serialization;
+﻿using SPTarkov.Server.Core.Models.Common;
+using System.Text.Json.Serialization;
 
 namespace FikaServer.Models.Fika.Headless
 {
     public record HeadlessAvailableClients
     {
-        public HeadlessAvailableClients(string sessionId, string alias)
+        public HeadlessAvailableClients(MongoId sessionId, string alias)
         {
             HeadlessSessionID = sessionId;
             Alias = alias;
@@ -14,7 +15,7 @@ namespace FikaServer.Models.Fika.Headless
         /// SessionID of the headless client
         /// </summary>
         [JsonPropertyName("headlessSessionID")]
-        public string HeadlessSessionID { get; set; } = string.Empty;
+        public MongoId HeadlessSessionID { get; set; } = default;
         /// <summary>
         /// The alias of the headless client, if it has any assigned. If it doesn't have any assigned uses the nickname 
         /// </summary>

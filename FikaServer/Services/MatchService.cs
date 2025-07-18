@@ -5,6 +5,7 @@ using FikaServer.Models.Fika.Presence;
 using FikaServer.Models.Fika.Routes.Raid.Create;
 using FikaServer.Services.Headless;
 using SPTarkov.DI.Annotations;
+using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
@@ -18,14 +19,14 @@ namespace FikaServer.Services
         SaveServer saveServer, ConfigService fikaConfig, HeadlessHelper headlessHelper, HeadlessService headlessService,
         InsuranceService insuranceService, PresenceService presenceService)
     {
-        public readonly ConcurrentDictionary<string, FikaMatch> Matches = [];
-        protected readonly ConcurrentDictionary<string, System.Timers.Timer> _timeoutIntervals = [];
+        public readonly ConcurrentDictionary<MongoId, FikaMatch> Matches = [];
+        protected readonly ConcurrentDictionary<MongoId, System.Timers.Timer> _timeoutIntervals = [];
 
         /// <summary>
         /// Adds a timeout interval for the given match
         /// </summary>
         /// <param name="matchId">The match ID to add a timeout for</param>
-        private void AddTimeoutInterval(string matchId)
+        private void AddTimeoutInterval(MongoId matchId)
         {
             if (_timeoutIntervals.ContainsKey(matchId))
             {
@@ -71,7 +72,7 @@ namespace FikaServer.Services
         /// </summary>
         /// <param name="matchId">The match ID of the match to get</param>
         /// <returns>Returns the match object if a match is found with this match ID, returns null if not.</returns>
-        public FikaMatch? GetMatch(string matchId)
+        public FikaMatch? GetMatch(MongoId matchId)
         {
             if (Matches.TryGetValue(matchId, out FikaMatch? match))
             {
@@ -87,7 +88,7 @@ namespace FikaServer.Services
         /// <param name="matchId">The match ID of what match the player is in</param>
         /// <param name="playerId">The player ID to look for</param>
         /// <returns>Returns a FikaPlayer object if the player is found, returns null if not.</returns>
-        public FikaPlayer? GetPlayerInMatch(string matchId, string playerId)
+        public FikaPlayer? GetPlayerInMatch(MongoId matchId, MongoId playerId)
         {
             if (!Matches.TryGetValue(matchId, out FikaMatch? match))
             {
@@ -107,9 +108,9 @@ namespace FikaServer.Services
         /// </summary>
         /// <param name="playerId">The ID of the player whose match ID is to be found.</param>
         /// <returns>The match ID containing the player, or null if the player isn't in a match.</returns>
-        public string? GetMatchIdByPlayer(string playerId)
+        public string? GetMatchIdByPlayer(MongoId playerId)
         {
-            foreach ((string matchId, FikaMatch match) in Matches)
+            foreach ((MongoId matchId, FikaMatch match) in Matches)
             {
                 if (match.Players.ContainsKey(playerId))
                 {
@@ -125,11 +126,12 @@ namespace FikaServer.Services
         /// </summary>
         /// <param name="sessionId"></param>
         /// <returns></returns>
-        public string? GetMatchIdByProfile(string sessionId)
+        public string? GetMatchIdByProfile(MongoId sessionId)
         {
             SptProfile profile = saveServer.GetProfile(sessionId);
 
-            string? matchid = GetMatchIdByPlayer(profile.CharacterData.PmcData.Id) ?? GetMatchIdByPlayer(profile.CharacterData.ScavData.Id);
+            string? matchid = GetMatchIdByPlayer(profile.CharacterData.PmcData.Id.GetValueOrDefault())
+                ?? GetMatchIdByPlayer(profile.CharacterData.ScavData.Id.GetValueOrDefault());
 
             return matchid;
         }
@@ -139,7 +141,7 @@ namespace FikaServer.Services
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public bool CreateMatch(FikaRaidCreateRequestData data, string sessionId)
+        public bool CreateMatch(FikaRaidCreateRequestData data, MongoId sessionId)
         {
             if (Matches.ContainsKey(data.ServerId))
             {
@@ -190,7 +192,7 @@ namespace FikaServer.Services
         /// Deletes a coop match and removes the timeout interval
         /// </summary>
         /// <param name="matchId">The match Id to remove</param>
-        public void DeleteMatch(string matchId)
+        public void DeleteMatch(MongoId matchId)
         {
             if (Matches.TryRemove(matchId, out FikaMatch? match))
             {
@@ -208,7 +210,7 @@ namespace FikaServer.Services
         /// </summary>
         /// <param name="matchId"></param>
         /// <param name="reason"></param>
-        public void EndMatch(string matchId, EFikaMatchEndSessionMessage reason)
+        public void EndMatch(MongoId matchId, EFikaMatchEndSessionMessage reason)
         {
             logger.Info($"Coop session {matchId} has ended {Enum.GetName(reason)}");
 
@@ -226,7 +228,7 @@ namespace FikaServer.Services
         /// </summary>
         /// <param name="matchId"></param>
         /// <param name="status"></param>
-        public async Task SetMatchStatus(string matchId, EFikaMatchStatus status)
+        public async Task SetMatchStatus(MongoId matchId, EFikaMatchStatus status)
         {
             if (Matches.TryGetValue(matchId, out FikaMatch? match))
             {
@@ -247,7 +249,7 @@ namespace FikaServer.Services
         /// <param name="port"></param>
         /// <param name="natPunch"></param>
         /// <param name="isHeadless"></param>
-        public void SetMatchHost(string matchId, string[] ips, int port, bool natPunch, bool isHeadless)
+        public void SetMatchHost(MongoId matchId, string[] ips, int port, bool natPunch, bool isHeadless)
         {
             if (Matches.TryGetValue(matchId, out FikaMatch? match))
             {
@@ -262,7 +264,7 @@ namespace FikaServer.Services
         /// Resets the timeout of the given match
         /// </summary>
         /// <param name="matchId"></param>
-        public void ResetTimeout(string matchId)
+        public void ResetTimeout(MongoId matchId)
         {
             if (Matches.TryGetValue(matchId, out FikaMatch? match))
             {
@@ -281,7 +283,7 @@ namespace FikaServer.Services
         /// <param name="matchId"></param>
         /// <param name="playerId"></param>
         /// <param name="data"></param>
-        public void AddPlayerToMatch(string matchId, string playerId, FikaPlayer data)
+        public void AddPlayerToMatch(MongoId matchId, MongoId playerId, FikaPlayer data)
         {
             if (Matches.TryGetValue(matchId, out FikaMatch? match))
             {
@@ -317,7 +319,7 @@ namespace FikaServer.Services
         /// </summary>
         /// <param name="matchId"></param>
         /// <param name="playerId"></param>
-        public void SetPlayerDead(string matchId, string playerId)
+        public void SetPlayerDead(MongoId matchId, MongoId playerId)
         {
             if (Matches.TryGetValue(matchId, out FikaMatch? match))
             {
@@ -336,7 +338,7 @@ namespace FikaServer.Services
         /// <param name="matchId"></param>
         /// <param name="playerId"></param>
         /// <param name="groupId"></param>
-        public void SetPlayerGroup(string matchId, string playerId, string groupId)
+        public void SetPlayerGroup(MongoId matchId, MongoId playerId, string groupId)
         {
             if (Matches.TryGetValue(matchId, out FikaMatch? match))
             {
@@ -354,7 +356,7 @@ namespace FikaServer.Services
         /// </summary>
         /// <param name="matchId"></param>
         /// <param name="playerId"></param>
-        public void RemovePlayerFromMatch(string matchId, string playerId)
+        public void RemovePlayerFromMatch(MongoId matchId, MongoId playerId)
         {
             if (Matches.TryGetValue(matchId, out FikaMatch? match))
             {

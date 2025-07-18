@@ -2,6 +2,7 @@
 using FikaServer.Models.Fika.WebSocket.Notifications;
 using FikaServer.WebSockets;
 using SPTarkov.DI.Annotations;
+using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Utils;
 
@@ -14,7 +15,7 @@ namespace FikaServer.Callbacks
         /// <summary>
         /// Handle /fika/notification/push
         /// </summary>
-        public async ValueTask<string> HandlePushNotification(string url, PushNotification info, string sessionID)
+        public async ValueTask<string> HandlePushNotification(string url, PushNotification info, MongoId sessionID)
         {
             if (info.Notification == null)
             {

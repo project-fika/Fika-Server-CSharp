@@ -1,5 +1,6 @@
 ﻿using FikaServer.Controllers;
 using SPTarkov.DI.Annotations;
+using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Match;
 using SPTarkov.Server.Core.Utils;
 
@@ -15,7 +16,7 @@ namespace FikaServer.Callbacks
         /// <param name="info"></param>
         /// <param name="sessionID"></param>
         /// <returns></returns>
-        public ValueTask<string> HandleGetRaids(string url, GetRaidConfigurationRequestData info, string sessionID)
+        public ValueTask<string> HandleGetRaids(string url, GetRaidConfigurationRequestData info, MongoId sessionID)
         {
             return new ValueTask<string>(httpResponseUtil.NoBody(locationController.HandleGetRaids(info)));
         }

@@ -3,6 +3,7 @@ using FikaServer.Models.Fika.Headless;
 using FikaServer.Models.Fika.Routes.Headless;
 using FikaServer.WebSockets;
 using SPTarkov.DI.Annotations;
+using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Logging;
 using SPTarkov.Server.Core.Models.Utils;
@@ -17,7 +18,7 @@ namespace FikaServer.Services.Headless
     [Injectable(InjectionType.Singleton)]
     public class HeadlessService(ISptLogger<HeadlessService> logger, HeadlessRequesterWebSocket headlessRequesterWebSocket, JsonUtil jsonUtil, ConfigService fikaConfigService, SaveServer saveServer)
     {
-        public ConcurrentDictionary<string, HeadlessClientInfo> HeadlessClients { get; private set; } = [];
+        public ConcurrentDictionary<MongoId, HeadlessClientInfo> HeadlessClients { get; private set; } = [];
 
         /// <summary>
         /// Begin setting up a raid for a headless client

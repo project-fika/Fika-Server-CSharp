@@ -1,4 +1,5 @@
 ﻿using FikaServer.Models.Enums;
+using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Match;
 using SPTarkov.Server.Core.Models.Utils;
 using System.Text.Json.Serialization;
@@ -10,7 +11,7 @@ namespace FikaServer.Models.Fika.Routes.Raid.Create
         [JsonPropertyName("raidCode")]
         public string RaidCode { get; set; } = string.Empty;
         [JsonPropertyName("serverId")]
-        public string ServerId { get; set; } = string.Empty;
+        public MongoId ServerId { get; set; } = default;
         [JsonPropertyName("hostUsername")]
         public string HostUsername { get; set; } = string.Empty;
         [JsonPropertyName("timestamp")]

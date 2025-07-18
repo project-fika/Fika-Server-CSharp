@@ -13,6 +13,7 @@ using FikaServer.Services.Headless;
 using FikaServer.WebSockets;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Controllers;
+using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.InRaid;
 using SPTarkov.Server.Core.Models.Utils;
 
@@ -29,7 +30,7 @@ namespace FikaServer.Controllers
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>
-        public async Task<FikaRaidCreateResponse> HandleRaidCreate(FikaRaidCreateRequestData request, string sessionId)
+        public async Task<FikaRaidCreateResponse> HandleRaidCreate(FikaRaidCreateRequestData request, MongoId sessionId)
         {
             string hostUsername = request.HostUsername;
 
@@ -140,7 +141,7 @@ namespace FikaServer.Controllers
         /// <param name="sessionID"></param>
         /// <param name="info"></param>
         /// <returns></returns>
-        public async Task<StartHeadlessResponse> HandleRaidStartHeadless(string sessionID, StartHeadlessRequest info)
+        public async Task<StartHeadlessResponse> HandleRaidStartHeadless(MongoId sessionID, StartHeadlessRequest info)
         {
             if (!headlessHelper.IsHeadlessClientAvailable(info.HeadlessSessionID))
             {
@@ -177,7 +178,7 @@ namespace FikaServer.Controllers
         /// </summary>
         /// <param name="SessionID"></param>
         /// <param name="info"></param>
-        public void HandleRaidRegisterPlayer(string SessionID, RegisterPlayerRequestData info)
+        public void HandleRaidRegisterPlayer(MongoId SessionID, RegisterPlayerRequestData info)
         {
             inraidController.AddPlayer(SessionID, info);
         }

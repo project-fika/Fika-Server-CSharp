@@ -5,6 +5,7 @@ using FikaServer.Models.Fika.Routes.Raid.Create;
 using FikaServer.Models.Fika.Routes.Raid.Join;
 using FikaServer.Models.Fika.Routes.Raid.Leave;
 using SPTarkov.DI.Annotations;
+using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.InRaid;
 using SPTarkov.Server.Core.Utils;
 
@@ -20,7 +21,7 @@ namespace FikaServer.Callbacks
         /// <param name="info"></param>
         /// <param name="sessionID"></param>
         /// <returns></returns>
-        public async ValueTask<string> HandleRaidCreate(string url, FikaRaidCreateRequestData info, string sessionID)
+        public async ValueTask<string> HandleRaidCreate(string url, FikaRaidCreateRequestData info, MongoId sessionID)
         {
             return httpResponseUtil.NoBody(await raidController.HandleRaidCreate(info, sessionID));
         }
@@ -32,7 +33,7 @@ namespace FikaServer.Callbacks
         /// <param name="info"></param>
         /// <param name="sessionID"></param>
         /// <returns></returns>
-        public ValueTask<string> HandleRaidJoin(string url, FikaRaidJoinRequestData info, string sessionID)
+        public ValueTask<string> HandleRaidJoin(string url, FikaRaidJoinRequestData info, MongoId sessionID)
         {
             return new ValueTask<string>(httpResponseUtil.NoBody(raidController.HandleRaidJoin(info)));
         }
@@ -44,7 +45,7 @@ namespace FikaServer.Callbacks
         /// <param name="info"></param>
         /// <param name="sessionID"></param>
         /// <returns></returns>
-        public ValueTask<string> HandleRaidLeave(string url, FikaRaidLeaveRequestData info, string sessionID)
+        public ValueTask<string> HandleRaidLeave(string url, FikaRaidLeaveRequestData info, MongoId sessionID)
         {
             raidController.HandleRaidLeave(info);
 
@@ -58,7 +59,7 @@ namespace FikaServer.Callbacks
         /// <param name="info"></param>
         /// <param name="sessionID"></param>
         /// <returns></returns>
-        public ValueTask<string> HandleRaidGetHost(string url, FikaRaidServerIdRequestData info, string sessionID)
+        public ValueTask<string> HandleRaidGetHost(string url, FikaRaidServerIdRequestData info, MongoId sessionID)
         {
             return new ValueTask<string>(httpResponseUtil.NoBody(raidController.HandleRaidGetHost(info)));
         }
@@ -70,7 +71,7 @@ namespace FikaServer.Callbacks
         /// <param name="info"></param>
         /// <param name="sessionID"></param>
         /// <returns></returns>
-        public ValueTask<string> HandleRaidGetSettings(string url, FikaRaidServerIdRequestData info, string sessionID)
+        public ValueTask<string> HandleRaidGetSettings(string url, FikaRaidServerIdRequestData info, MongoId sessionID)
         {
             return new ValueTask<string>(httpResponseUtil.NoBody(raidController.HandleRaidGetSettings(info)));
         }
@@ -94,7 +95,7 @@ namespace FikaServer.Callbacks
         /// <param name="info"></param>
         /// <param name="sessionID"></param>
         /// <returns></returns>
-        public ValueTask<string> HandleRaidRegisterPlayer(string url, RegisterPlayerRequestData info, string sessionID)
+        public ValueTask<string> HandleRaidRegisterPlayer(string url, RegisterPlayerRequestData info, MongoId sessionID)
         {
             raidController.HandleRaidRegisterPlayer(sessionID, info);
 

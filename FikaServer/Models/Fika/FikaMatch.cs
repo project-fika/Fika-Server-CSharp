@@ -1,4 +1,5 @@
 ﻿using FikaServer.Models.Enums;
+using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Common;
 using SPTarkov.Server.Core.Models.Eft.Match;
 using System.Text.Json.Serialization;
@@ -28,7 +29,7 @@ namespace FikaServer.Models.Fika
         [JsonPropertyName("timeout")]
         public int Timeout { get; set; }
         [JsonPropertyName("players")]
-        public Dictionary<string, FikaPlayer> Players { get; set; } = [];
+        public Dictionary<MongoId, FikaPlayer> Players { get; set; } = [];
         [JsonPropertyName("side")]
         public EFikaSide Side { get; set; }
         [JsonPropertyName("time")]
