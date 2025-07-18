@@ -2,6 +2,7 @@
 using FikaServer.Models.Fika.Routes.Raid.Join;
 using FikaServer.Models.Fika.Routes.Update;
 using SPTarkov.DI.Annotations;
+using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Utils;
 
 namespace FikaServer.Callbacks
@@ -16,7 +17,7 @@ namespace FikaServer.Callbacks
         /// <param name="info"></param>
         /// <param name="sessionID"></param>
         /// <returns></returns>
-        public ValueTask<string> HandlePing(string url, FikaUpdatePingRequestData info, string sessionID)
+        public ValueTask<string> HandlePing(string url, FikaUpdatePingRequestData info, MongoId sessionID)
         {
             updateController.HandlePing(info);
 
@@ -30,7 +31,7 @@ namespace FikaServer.Callbacks
         /// <param name="info"></param>
         /// <param name="sessionID"></param>
         /// <returns></returns>
-        public ValueTask<string> HandlePlayerSpawn(string url, FikaUpdatePlayerSpawnRequestData info, string sessionID)
+        public ValueTask<string> HandlePlayerSpawn(string url, FikaUpdatePlayerSpawnRequestData info, MongoId sessionID)
         {
             updateController.HandlePlayerSpawn(info);
 
@@ -44,7 +45,7 @@ namespace FikaServer.Callbacks
         /// <param name="info"></param>
         /// <param name="sessionID"></param>
         /// <returns></returns>
-        public ValueTask<string> HandleSetHost(string url, FikaUpdateSethostRequestData info, string sessionID)
+        public ValueTask<string> HandleSetHost(string url, FikaUpdateSethostRequestData info, MongoId sessionID)
         {
             updateController.HandleSetHost(info);
 
@@ -58,7 +59,7 @@ namespace FikaServer.Callbacks
         /// <param name="info"></param>
         /// <param name="sessionID"></param>
         /// <returns></returns>
-        public async ValueTask<string> HandleSetStatus(string url, FikaUpdateSetStatusRequestData info, string sessionID)
+        public async ValueTask<string> HandleSetStatus(string url, FikaUpdateSetStatusRequestData info, MongoId sessionID)
         {
             await updateController.HandleSetStatus(info);
 
@@ -72,7 +73,7 @@ namespace FikaServer.Callbacks
         /// <param name="info"></param>
         /// <param name="sessionID"></param>
         /// <returns></returns>
-        public ValueTask<string> HandleRaidAddPlayer(string url, FikaUpdateRaidAddPlayerData info, string sessionID)
+        public ValueTask<string> HandleRaidAddPlayer(string url, FikaUpdateRaidAddPlayerData info, MongoId sessionID)
         {
             updateController.HandleRaidAddPlayer(info);
 
@@ -86,7 +87,7 @@ namespace FikaServer.Callbacks
         /// <param name="info"></param>
         /// <param name="sessionID"></param>
         /// <returns></returns>
-        public ValueTask<string> HandlePlayerDied(string url, FikaUpdateRaidAddPlayerData info, string sessionID)
+        public ValueTask<string> HandlePlayerDied(string url, FikaUpdateRaidAddPlayerData info, MongoId sessionID)
         {
             updateController.HandleRaidPlayerDied(info);
 
