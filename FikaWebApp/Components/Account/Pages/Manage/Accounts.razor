@@ -1,0 +1,48 @@
+﻿@page "/Account/Manage/Accounts"
+
+@using FikaWebApp.Data
+@using Microsoft.AspNetCore.Identity
+
+@inject UserManager<ApplicationUser> UserManager
+
+<h3>Accounts</h3>
+
+@if (users == null)
+{
+	<p><em>Loading users...</em></p>
+}
+else if (!users.Any())
+{
+	<p>No users found.</p>
+}
+else
+{
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Username</th>
+				<th>Email</th>
+				<th>Id</th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var user in users)
+			{
+				<tr>
+					<td>@user.UserName</td>
+					<td>@user.Email</td>
+					<td>@user.Id</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+}
+
+@code {
+	private List<ApplicationUser> users;
+
+	protected override async Task OnInitializedAsync()
+	{
+		users = UserManager.Users.ToList();
+	}
+}
