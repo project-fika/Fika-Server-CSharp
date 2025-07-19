@@ -16,7 +16,7 @@ using System.Text.Json;
 namespace FikaServer.OnLoad
 {
     [Injectable(InjectionType.Singleton, TypePriority = OnLoadOrder.PreSptModLoader)]
-    public class FikaPreLoad(ISptLogger<FikaPreLoad> logger, ConfigService fikaConfig, ClientService clientService,
+    public class FikaPreLoad(ISptLogger<FikaPreLoad> logger, ClientService clientService,
         PlayerRelationsService playerRelationsCacheService, FriendRequestsService friendRequestsService,
         JsonUtil jsonUtil) : IOnLoad
     {
@@ -72,7 +72,6 @@ namespace FikaServer.OnLoad
 
             BaseInteractionRequestDataConverter.RegisterModDataHandler(FikaItemEventRouter.SENDTOPLAYER, jsonUtil.Deserialize<SendItemRequestData>);
 
-            await fikaConfig.OnPreLoad();
             clientService.OnPreLoad();
             await playerRelationsCacheService.OnPreLoad();
             await friendRequestsService.OnPreLoad();

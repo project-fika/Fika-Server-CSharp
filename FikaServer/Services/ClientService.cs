@@ -64,7 +64,7 @@ namespace FikaServer.Services
         {
             return new VersionCheckResponse
             {
-                Version = fikaConfig.GetVersion()
+                Version = fikaConfig.Version
             };
         }
 

@@ -13,21 +13,27 @@ namespace FikaServer.Services
     public class ConfigService(ISptLogger<ConfigService> logger, ConfigServer configServer,
         ModHelper modHelper, JsonUtil jsonUtil)
     {
-        private readonly string _configFolderPath = Path.Join(modHelper.GetAbsolutePathToModFolder(Assembly.GetExecutingAssembly()), "assets/configs");
         public FikaConfig Config { get; private set; } = new();
+        private readonly string _configFolderPath = Path.Join(modHelper.GetAbsolutePathToModFolder(Assembly.GetExecutingAssembly()), "assets/configs");
         private readonly FikaModMetadata _fikaModMetaData = new();
 
-        public string GetModPath()
+        public string ModPath
         {
-            return modHelper.GetAbsolutePathToModFolder(Assembly.GetExecutingAssembly());
+            get
+            {
+                return modHelper.GetAbsolutePathToModFolder(Assembly.GetExecutingAssembly());
+            }
         }
 
-        public string? GetVersion()
+        public string? Version
         {
-            return _fikaModMetaData.Version;
+            get
+            {
+                return _fikaModMetaData.Version;
+            }
         }
 
-        public async Task OnPreLoad()
+        public async Task OnWebAppBuildAsync()
         {
             //This is debug, probably wont exist in the final release.
             if (!Directory.Exists(_configFolderPath))

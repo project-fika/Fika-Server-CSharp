@@ -12,7 +12,7 @@ namespace FikaServer.Services.Cache
     [Injectable(InjectionType.Singleton)]
     public class PlayerRelationsService(ProfileHelper profileHelper, ConfigService FikaConfig, JsonUtil jsonUtil, ISptLogger<PlayerRelationsService> logger)
     {
-        private readonly string _playerRelationsFullPath = Path.Join(FikaConfig.GetModPath(), "database");
+        private readonly string _playerRelationsFullPath = Path.Join(FikaConfig.ModPath, "database");
         private ConcurrentDictionary<MongoId, FikaPlayerRelations> _playerRelations = [];
 
         public List<MongoId> Keys

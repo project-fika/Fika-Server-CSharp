@@ -42,7 +42,7 @@ namespace FikaServer.OnLoad
             if (config.Background.Enable)
             {
                 string imagePath = "assets/images/launcher/bg.png";
-                imageRouter.AddRoute("/files/launcher/bg", Path.Join(fikaConfig.GetModPath(), imagePath));
+                imageRouter.AddRoute("/files/launcher/bg", Path.Join(fikaConfig.ModPath, imagePath));
             }
         }
 

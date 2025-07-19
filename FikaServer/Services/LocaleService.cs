@@ -9,7 +9,7 @@ namespace FikaServer.Services
     [Injectable(InjectionType.Singleton)]
     public class LocaleService(FileUtil fileUtil, ConfigService fikaConfig, DatabaseServer databaseServer)
     {
-        private readonly string _globalLocaleDir = Path.Join(fikaConfig.GetModPath(), "assets", "database", "locales", "global");
+        private readonly string _globalLocaleDir = Path.Join(fikaConfig.ModPath, "assets", "database", "locales", "global");
         //private readonly string serverLocaleDir = Path.Join(fikaConfig.GetModPath(), "assets", "database", "locales", "server");
 
         Dictionary<string, Dictionary<string, string>> _globalLocales = [];

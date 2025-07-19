@@ -24,7 +24,7 @@ namespace FikaServer.Services.Cache
             }
         }
 
-        private readonly string _friendRequestsFullPath = Path.Join(FikaConfig.GetModPath(), "database");
+        private readonly string _friendRequestsFullPath = Path.Join(FikaConfig.ModPath, "database");
         private List<FriendRequestListResponse> _friendRequests = [];
 
         private readonly Lock _listLock = new();
