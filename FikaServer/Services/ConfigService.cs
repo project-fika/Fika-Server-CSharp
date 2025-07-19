@@ -5,7 +5,9 @@ using SPTarkov.Server.Core.Models.Spt.Config;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Utils;
+using System.Drawing;
 using System.Reflection;
+using System.Security.Cryptography;
 
 namespace FikaServer.Services
 {
@@ -45,6 +47,11 @@ namespace FikaServer.Services
 
             Config = await jsonUtil.DeserializeFromFileAsync<FikaConfig>(configPath) ?? new();
 
+            if (string.IsNullOrEmpty(Config.Server.ApiKey))
+            {
+                Config.Server.ApiKey = await GenerateAPIKey();
+            }
+
             // No need to do any fancyness around sorting properties and writing them if they weren't set before here
             // We store default values in the config models, and if one is missing this will write it to the file in the correct place
             await SaveConfig();
@@ -54,7 +61,16 @@ namespace FikaServer.Services
             Config.Server.ShowDevProfile = true;
 #endif
 
-            ApplySPTConfig(Config.Server.SPT);
+            ApplySPTConfig(Config.Server.SPT);            
+        }
+
+        private static Task<string> GenerateAPIKey(int size = 32)
+        {
+            byte[] keyBytes = RandomNumberGenerator.GetBytes(size);
+            return Task.FromResult(Convert.ToBase64String(keyBytes)
+                         .Replace("+", "")
+                         .Replace("/", "")
+                         .Replace("=", ""));
         }
 
         public async Task SaveConfig()
