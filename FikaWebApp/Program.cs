@@ -7,8 +7,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using MudBlazor.Services;
-using System.Net;
-using System.Text;
 
 namespace FikaWebApp
 {
@@ -30,25 +28,24 @@ namespace FikaWebApp
             builder.Services.AddScoped<IdentityRedirectManager>();
             builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
 
-            builder.Services.AddAuthentication(options =>
+            /*builder.Services.AddAuthentication(options =>
                 {
                     options.DefaultScheme = IdentityConstants.ApplicationScheme;
                     options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
                 })
-                .AddIdentityCookies();
+                .AddIdentityCookies();*/
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlite("Data Source = fikaWebApp.db"));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-            builder.Services.AddIdentityCore<ApplicationUser>(options =>
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
                 options.SignIn.RequireConfirmedAccount = false;
                 options.User.RequireUniqueEmail = false;
             })
-                .AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddSignInManager()
-                .AddDefaultTokenProviders();
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddDefaultTokenProviders();
 
             builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
@@ -97,6 +94,20 @@ namespace FikaWebApp
 
                 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+                var roleExists = await roleManager.RoleExistsAsync("Admin");
+                if (!roleExists)
+                {
+                    await roleManager.CreateAsync(new IdentityRole("Admin"));
+                }
+
+                roleExists = await roleManager.RoleExistsAsync("Moderator");
+                if (!roleExists)
+                {
+                    await roleManager.CreateAsync(new IdentityRole("Moderator"));
+                }
+
                 var user = await userManager.FindByNameAsync("admin");
                 if (user == null)
                 {
@@ -109,6 +120,14 @@ namespace FikaWebApp
                     if (!result.Succeeded)
                     {
                         throw new Exception($"Failed to create default admin account: \n{string.Join(", ", result.Errors.Select(e => e.Description))}");
+                    }
+                    else
+                    {
+                        user = await userManager.FindByNameAsync("admin");
+                        if (user != null)
+                        {
+                            await userManager.AddToRolesAsync(user, ["Admin", "Moderator"]);
+                        }
                     }
                 }
             }

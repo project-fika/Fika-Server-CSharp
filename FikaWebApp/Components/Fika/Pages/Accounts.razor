@@ -20,6 +20,16 @@
 	<Columns>
 		<PropertyColumn Property="x => x.UserName" Title="Username"/>
 		<PropertyColumn Property="x => x.Id" />
+		<TemplateColumn Title="Roles" CellClass="justify-center">
+			<CellTemplate Context="row">
+				<MudStack>
+					@foreach (var item in GetRoles(row.Item).GetAwaiter().GetResult())
+					{
+						@item<br/>
+					}
+				</MudStack>
+			</CellTemplate>
+		</TemplateColumn>
 		<TemplateColumn Title="Locked" CellClass="justify-center">
 			<CellTemplate Context="row">
 				<MudTooltip Text="@(GetLockText(row.Item))">
@@ -61,6 +71,12 @@
 
 	private MudDataGrid<ApplicationUser> _dataGrid;
 	private IEnumerable<ApplicationUser> _users;
+
+	private async Task<IEnumerable<string>> GetRoles(ApplicationUser user)
+	{
+		var roles = await UserManager.GetRolesAsync(user);
+		return roles;
+	}
 
 	private string? GetLockText(ApplicationUser user)
 	{
@@ -142,22 +158,36 @@
 
 		if (!result.Canceled)
 		{
-			if (result.Data is ApplicationUser newUser)
+			if (result.Data is (string username, string password, List<string> roles))
 			{
-				if (await UserManager.FindByNameAsync(newUser.UserName) == null)
+				if (await UserManager.FindByNameAsync(username) == null)
 				{
-					var createResult = await UserManager.CreateAsync(newUser, newUser.PasswordHash);
+					var newUser = new ApplicationUser()
+						{
+							UserName = username
+						};
+
+					var createResult = await UserManager.CreateAsync(newUser, password);
 					if (!createResult.Succeeded)
 					{
 						Snackbar.Add("Unable to create user!", Severity.Error, config => { config.VisibleStateDuration = 5000; });
 					}
+					else
+					{
+						Snackbar.Add($"User '{newUser.UserName}' was created!", Severity.Success, config => { config.VisibleStateDuration = 5000; });
+					}
 
-					Snackbar.Add($"User '{newUser.UserName}' was created!", Severity.Success, config => { config.VisibleStateDuration = 5000; });
+					newUser = await UserManager.FindByNameAsync(username);
+					if (newUser != null)
+					{
+						await UserManager.AddToRolesAsync(newUser, roles);
+					}
+
 					RefreshUsers();
 				}
 				else
 				{
-					Snackbar.Add($"An account with the username '{newUser.UserName}' already exists!", Severity.Warning, config => { config.VisibleStateDuration = 5000; });
+					Snackbar.Add($"An account with the username '{username}' already exists!", Severity.Warning, config => { config.VisibleStateDuration = 5000; });
 				}
 			}
 		}

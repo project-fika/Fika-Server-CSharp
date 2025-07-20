@@ -1,5 +1,8 @@
 ﻿@using System.Text.RegularExpressions
 @using FikaWebApp.Data
+@using Microsoft.AspNetCore.Identity
+
+@inject RoleManager<IdentityRole> RoleManager
 
 <MudPaper Class="pa-4">
 	<MudDialog>
@@ -13,6 +16,12 @@
 				<MudTextField T="string"
 								Label="Password" HelperText="Repeat the password" InputType="InputType.Password" Required="true"
 								Validation="@(new Func<string, string>(PasswordMatch))" Immediate="true" />
+				<MudSelect MultiSelection="true" Placeholder="Select roles..." HelperText="Role Selection" @bind-Value="_roleValue" @bind-SelectedValues="_selectedRoles">
+					@foreach (var role in _availableRoles)
+					{
+						<MudSelectItem T="string" Value="@role">@role</MudSelectItem>
+					}
+				</MudSelect>
 				<MudPaper Class="pa-4 mt-4">
 					<MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!_success)" Class="ml-auto" OnClick="Submit">Register</MudButton>
 					<MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="ml-auto" OnClick="Cancel">Cancel</MudButton>
@@ -27,6 +36,9 @@
 	private IMudDialogInstance MudDialog { get; set; }
 
 	private ApplicationUser _user = new();
+	private IEnumerable<string> _selectedRoles = new HashSet<string>();
+	private string[] _availableRoles = [];
+	private string _roleValue = "None";
 
 	private bool _success;
 	private string[] _errors = { };
@@ -34,12 +46,22 @@
 	private MudTextField<string> _passwordField;
 	private MudForm _form;
 
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+
+		_availableRoles = RoleManager.Roles
+			.Select(r => r.Name)
+			.ToArray();
+	}
+
 	private void Submit()
 	{
 		_user.UserName = _usernameField.Value;
 		_user.PasswordHash = _passwordField.Value;
 
-		MudDialog.Close(DialogResult.Ok<ApplicationUser>(_user));
+		Tuple<string, string, List<string>> value = new(_usernameField.Value, _passwordField.Value, _selectedRoles.ToList());
+		MudDialog.Close(DialogResult.Ok(value));
 	}
 
 	private void Cancel()
