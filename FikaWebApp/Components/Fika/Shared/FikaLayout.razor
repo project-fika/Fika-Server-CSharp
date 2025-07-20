@@ -1,14 +1,20 @@
 ﻿@inherits LayoutComponentBase
 @layout FikaWebApp.Components.Layout.MainLayout
 
-<MudText Typo="Typo.h3" GutterBottom="true">Fika management</MudText>
-
-<MudGrid>
-    <MudItem md="2">
-        <MudText Typo="Typo.h6" GutterBottom="true">Manage the Fika server</MudText>
-        <FikaNavMenu />
-    </MudItem>
-    <MudItem md="10">
-        @Body
-    </MudItem>
-</MudGrid>
+<AuthorizeView>
+	<Authorized>
+		<MudText Typo="Typo.h3" GutterBottom="true">Fika Management</MudText>
+		<MudGrid>
+			<MudItem md="2">
+				<MudText Typo="Typo.h6" GutterBottom="true">Manage the Fika server</MudText>
+				<FikaNavMenu />
+			</MudItem>
+			<MudItem md="10">
+				@Body
+			</MudItem>
+		</MudGrid>
+	</Authorized>
+	<NotAuthorized>
+		<MudText Typo="Typo.h3" GutterBottom="true" Color="Color.Error">Invalid Permissions</MudText>
+	</NotAuthorized>
+</AuthorizeView>

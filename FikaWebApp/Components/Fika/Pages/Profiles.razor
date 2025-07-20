@@ -11,8 +11,6 @@
 @inject ILogger<Profiles> Logger
 @inject IDialogService DialogService
 
-<h3>Profiles</h3>
-
 <MudDataGrid @ref="_dataGrid" T="ProfileResponse" SortMode="SortMode.Single" ServerData="ServerReload" Filterable="false" RowsPerPage="10">
 	<ToolBarContent>
 		<MudText Typo="Typo.h6">All Profiles</MudText>
