@@ -1,34 +1,156 @@
 ﻿@page "/Fika/Manage/Profiles"
 
 @using FikaShared
+@using FikaWebApp.Components.Fika.Dialogs
 @using FikaWebApp.Data
 @using Microsoft.AspNetCore.Identity
 
 @inject UserManager<ApplicationUser> UserManager
 @inject HttpClient HttpClient
+@inject ILogger<Profiles> Logger
+@inject IDialogService DialogService
 
 <h3>Profiles</h3>
 
-<MudDataGrid Items="@_profiles.Take(4)">
+<MudDataGrid @ref="_dataGrid" T="ProfileResponse" SortMode="SortMode.Single" ServerData="ServerReload" Filterable="false" RowsPerPage="10">
+	<ToolBarContent>
+		<MudText Typo="Typo.h6">All Profiles</MudText>
+		<MudSpacer />
+		<MudTextField T="string" ValueChanged="@(s => OnSearch(s))" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
+			AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+	</ToolBarContent>
 	<Columns>
 		<PropertyColumn Property="x => x.Nickname" />
 		<PropertyColumn Property="x => x.ProfileId" />
-		<PropertyColumn Property="x => x.HasFleaBan" />
+		<PropertyColumn Property="x => x.HasFleaBan" Title="Flea Banned" />
+		<TemplateColumn CellClass="d-flex justify-end">
+			<CellTemplate Context="row">
+				<MudStack Row>
+					<MudButton Size="@Size.Small" Variant="@Variant.Filled" Color="@Color.Primary" OnClick="@(() => OpenModifyDialog(row.Item))">Modify</MudButton>
+				</MudStack>
+			</CellTemplate>
+		</TemplateColumn>
 	</Columns>
+	<RowLoadingContent>
+		<tr class="mud-table-row">
+			<td class="mud-table-cell" colspan="1000">
+				Loading...
+			</td>
+		</tr>
+	</RowLoadingContent>
+	<PagerContent>
+		<MudDataGridPager T="ProfileResponse"/>
+	</PagerContent>
 </MudDataGrid>
 
 @code {
-	private IEnumerable<ProfileResponse> _profiles = new List<ProfileResponse>();
+	MudDataGrid<ProfileResponse> _dataGrid;
+	private string _searchString = null;
 
-	protected override async Task OnInitializedAsync()
+	private async Task OpenModifyDialog(ProfileResponse row)
 	{
+		var parameters = new DialogParameters
+		{
+			{ "Profile", row }
+		};
+
+		var res = await DialogService.ShowAsync<ModifyProfileDialog>("Modify Profile", parameters);
+		var result = await res.Result;
+
+		if (!result.Canceled)
+		{
+			StateHasChanged();
+		}
+	}
+
+	protected override async Task OnAfterRenderAsync(bool firstRender)
+	{
+		await base.OnAfterRenderAsync(firstRender);
+
+		if (firstRender)
+		{
+			await _dataGrid.ReloadServerData();
+		}
+	}
+
+	private async Task<GridData<ProfileResponse>> ServerReload(GridState<ProfileResponse> state)
+	{
+		IEnumerable<ProfileResponse> data;
 		try
 		{
-			_profiles = await HttpClient.GetFromJsonAsync<List<ProfileResponse>>("get/profiles");
+			data = await HttpClient.GetFromJsonAsync<List<ProfileResponse>>("get/profiles");
 		}
-		catch
+		catch (Exception ex)
 		{
-			
+			Logger.LogError($"There was an error retrieving the profiles: {ex.Message}");
+			data = [];
 		}
+
+		data = data.Where(element =>
+		{
+			if (string.IsNullOrWhiteSpace(_searchString))
+				return true;
+			if (element.Nickname.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+				return true;
+			if (element.ProfileId.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+				return true;
+			return false;
+		}).ToArray();
+
+		var totalItems = data.Count();
+
+		var sortDefinition = state.SortDefinitions.FirstOrDefault();
+		if (sortDefinition != null)
+		{
+			switch (sortDefinition.SortBy)
+			{
+				case nameof(ProfileResponse.Nickname):
+					data = data.OrderByDirection(
+						sortDefinition.Descending ? SortDirection.Descending : SortDirection.Ascending,
+						o => o.Nickname
+					);
+					break;
+				case nameof(ProfileResponse.ProfileId):
+					data = data.OrderByDirection(
+						sortDefinition.Descending ? SortDirection.Descending : SortDirection.Ascending,
+						o => o.ProfileId
+					);
+					break;
+				case nameof(ProfileResponse.HasFleaBan):
+					data = data.OrderByDirection(
+						sortDefinition.Descending ? SortDirection.Descending : SortDirection.Ascending,
+						o => o.HasFleaBan
+					);
+					break;
+				default:
+					var sortByColumn = _dataGrid.RenderedColumns.First(c => c.PropertyName == sortDefinition.SortBy);
+					switch (sortByColumn.Title)
+					{
+						case nameof(ProfileResponse.Nickname):
+							data = data.OrderByDirection(
+								sortDefinition.Descending ? SortDirection.Descending : SortDirection.Ascending,
+								o => o.Nickname
+							);
+							break;
+					}
+					break;
+			}
+		}
+
+		var pagedData = data.Skip(state.Page * state.PageSize)
+			.Take(state.PageSize)
+			.ToArray();
+
+		return new()
+		{
+			TotalItems = totalItems,
+			Items = pagedData
+		};
+	}
+
+	private Task OnSearch(string text)
+	{
+		_searchString = text;
+		return _dataGrid.ReloadServerData();
 	}
 }

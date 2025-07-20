@@ -1,0 +1,49 @@
+﻿@using FikaShared
+@using MudBlazor
+
+@inject IDialogService DialogService
+@inject HttpClient HttpClient
+
+<MudDialog>
+	<DialogContent>
+		<MudText Typo="Typo.h6">Editing @Profile.Nickname</MudText>
+		<MudButton OnClick="AddFleaBan" Disabled="Profile.HasFleaBan">Add Flea Ban</MudButton>
+		<MudButton OnClick="RemoveFleaBan" Disabled="!Profile.HasFleaBan">Remove Flea Ban</MudButton>
+	</DialogContent>
+	<DialogActions>
+		<MudButton OnClick="Close">Save</MudButton>
+		<MudButton OnClick="Cancel">Cancel</MudButton>
+	</DialogActions>
+</MudDialog>
+
+@code {
+	[CascadingParameter]
+	public IMudDialogInstance MudDialog { get; set; }
+
+	[Parameter]
+	public ProfileResponse Profile { get; set; }
+
+	private async Task AddFleaBan()
+	{
+		var result = await HttpClient.PutAsJsonAsync("put/addfleaban", new AddFleaBanRequest()
+		{
+			ProfileId = Profile.ProfileId
+		});
+		Profile.HasFleaBan = true;
+	}
+
+	private void RemoveFleaBan()
+	{
+		Profile.HasFleaBan = false;
+	}
+
+	private void Close()
+	{
+		MudDialog.Close(DialogResult.Ok(true));
+	}
+
+	private void Cancel()
+	{
+		MudDialog.Cancel();
+	}
+}
