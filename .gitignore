@@ -365,3 +365,5 @@ FodyWeavers.xsd
 # Fika
 /FikaServer/Properties/launchSettings.json
 /FikaWebApp/fikaWebApp.db
+/FikaWebApp/fikaWebApp.db-shm
+/FikaWebApp/fikaWebApp.db-wal
