@@ -45,9 +45,10 @@ namespace FikaServer.Http.Get
             {
                 profilesResponse.Add(new()
                 {
-                    Nickname = profile.CharacterData.PmcData.Info.Nickname,
-                    ProfileId = profile.ProfileInfo.ProfileId,
-                    HasFleaBan = profile.CharacterData.PmcData.Info.Bans.Any(x => x.BanType is BanType.RagFair)
+                    Nickname = profile.CharacterData?.PmcData?.Info?.Nickname ?? "Unknown",
+                    ProfileId = profile.ProfileInfo?.ProfileId.GetValueOrDefault() ?? "Unknown",
+                    HasFleaBan = profile.CharacterData?.PmcData?.Info?.Bans?.Any(x => x.BanType is BanType.RagFair) ?? false,
+                    Level = profile.CharacterData?.PmcData?.Info?.Level ?? 0,
                 });
             }
 

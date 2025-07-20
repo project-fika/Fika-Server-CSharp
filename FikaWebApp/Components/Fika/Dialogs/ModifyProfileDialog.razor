@@ -1,8 +1,6 @@
 ﻿@using FikaShared
 @using MudBlazor
-@using System.IO.Compression
-@using System.Text
-@using System.Text.Json
+@using System.Net
 
 @inject IDialogService DialogService
 @inject HttpClient HttpClient
@@ -14,8 +12,8 @@
 		<MudButton OnClick="RemoveFleaBan" Disabled="!Profile.HasFleaBan">Remove Flea Ban</MudButton>
 	</DialogContent>
 	<DialogActions>
-		<MudButton OnClick="Close">Save</MudButton>
-		<MudButton OnClick="Cancel">Cancel</MudButton>
+		<MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.CheckCircle" OnClick="Close">Save</MudButton>
+		<MudButton Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Cancel" OnClick="Cancel">Cancel</MudButton>
 	</DialogActions>
 </MudDialog>
 
@@ -28,16 +26,42 @@
 
 	private async Task AddFleaBan()
 	{
-		var result = await HttpClient.PostAsJsonAsync("put/addfleaban", new AddFleaBanRequest()
+		var confirmation = await DialogService.ShowAsync<ConfirmFleaBanDialog>("Confirm Flea Ban");
+		var result = await confirmation.Result;
+
+		if (!result.Canceled)
 		{
-			ProfileId = Profile.ProfileId
-		});
-		Profile.HasFleaBan = true;
+			if (result.Data is int amountOfDays)
+			{
+				amountOfDays = Math.Clamp(amountOfDays, 0, 9999);
+				var response = await HttpClient.PostAsJsonAsync("put/addfleaban", new AddFleaBanRequest()
+				{
+					ProfileId = Profile.ProfileId,
+					AmountOfDays = amountOfDays
+				});
+
+				Profile.HasFleaBan = response.StatusCode is HttpStatusCode.OK;
+			}
+		}
 	}
 
-	private void RemoveFleaBan()
+	private async Task RemoveFleaBan()
 	{
-		Profile.HasFleaBan = false;
+		var confirmation = await DialogService.ShowAsync<YesNoDialog>("Confirmation");
+		var result = await confirmation.Result;
+
+		if (!result.Canceled)
+		{
+			var response = await HttpClient.PostAsJsonAsync("put/removefleaban", new ProfileIdRequest()
+			{
+				ProfileId = Profile.ProfileId
+			});
+
+			if (response.StatusCode is HttpStatusCode.OK)
+			{
+				Profile.HasFleaBan = false;
+			}
+		}
 	}
 
 	private void Close()

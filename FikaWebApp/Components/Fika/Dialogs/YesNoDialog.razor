@@ -1,0 +1,24 @@
+﻿<MudDialog>
+	<DialogContent>
+		Are you sure?
+	</DialogContent>
+	<DialogActions>
+		<MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.CheckCircle" OnClick="Confirm">Yes</MudButton>
+		<MudButton Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Cancel" OnClick="Cancel">No</MudButton>
+	</DialogActions>
+</MudDialog>
+
+@code {
+	[CascadingParameter]
+	private IMudDialogInstance MudDialog { get; set; }
+
+	private void Confirm()
+	{
+		MudDialog.Close();
+	}
+
+	private void Cancel()
+	{
+		MudDialog.Cancel();
+	}
+}

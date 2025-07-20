@@ -2,9 +2,9 @@
 
 namespace FikaShared
 {
-    public record AddFleaBanRequest
+    public record AddFleaBanRequest : ProfileIdRequest
     {
-        [JsonPropertyName("profileId")]
-        public string ProfileId { get; set; }
+        [JsonPropertyName("amountOfDays")]
+        public required int AmountOfDays { get; set; }
     }
 }

@@ -15,8 +15,8 @@ using SPTarkov.Server.Core.Utils;
 namespace FikaServer.Http.Post
 {
     [Injectable(TypePriority = 0)]
-    public class HttpAddFleaBan(SaveServer saveServer, ConfigService configService,
-        TimeUtil timeUtil, JsonUtil jsonUtil, NotificationSendHelper sendHelper) : IHttpListener
+    public class HttpAddRemoveBan(SaveServer saveServer, ConfigService configService,
+        JsonUtil jsonUtil, NotificationSendHelper sendHelper) : IHttpListener
     {
         public bool CanHandle(MongoId sessionId, HttpRequest req)
         {
@@ -25,7 +25,7 @@ namespace FikaServer.Http.Post
                 return false;
             }
 
-            if (!req.Path.Value?.Contains("put/addfleaban", StringComparison.OrdinalIgnoreCase) ?? true)
+            if (!req.Path.Value?.Contains("put/removefleaban", StringComparison.OrdinalIgnoreCase) ?? true)
             {
                 return false;
             }
@@ -45,29 +45,22 @@ namespace FikaServer.Http.Post
             {
                 string rawData = await sr.ReadToEndAsync();
 
-                AddFleaBanRequest request = jsonUtil.Deserialize<AddFleaBanRequest>(rawData);
+                ProfileIdRequest request = jsonUtil.Deserialize<ProfileIdRequest>(rawData);
                 if (request != null)
                 {
                     MongoId profileId = new(request.ProfileId);
                     SptProfile profile = saveServer.GetProfile(profileId);
                     if (profile != null)
                     {
-                        int days = request.AmountOfDays == 0 ? 9999 : request.AmountOfDays;
-                        long banTime = timeUtil.GetTimeStampFromNowDays(days);
-                        profile.CharacterData?.PmcData?.Info?.Bans?.Add(new()
-                        {
-                            BanType = BanType.RagFair,
-                            DateTime = banTime
-                        });
+                        profile.CharacterData?.PmcData?.Info?.Bans?.RemoveAll(b => b.BanType is BanType.RagFair);
 
                         await saveServer.SaveProfileAsync(profileId);
 
-                        sendHelper.SendMessage(profileId, new AddBanNotification()
+                        sendHelper.SendMessage(profileId, new RemoveBanNotification()
                         {
-                            EventType = NotificationEventType.InGameBan,
+                            EventType = NotificationEventType.InGameUnBan,
                             EventIdentifier = new(),
-                            BanType = BanType.RagFair,
-                            DateTime = banTime
+                            BanType = BanType.RagFair
                         });
 
                         resp.StatusCode = 200;

@@ -83,7 +83,7 @@ namespace FikaServer.ChatBot.Commands
             mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
                 $"'{nickname}' has been unbanned from the flea.");
 
-            sendHelper.SendMessage(profile.ProfileInfo.ProfileId.Value, new RemoveBanNotification()
+            sendHelper.SendMessage(profile.ProfileInfo.ProfileId.GetValueOrDefault(), new RemoveBanNotification()
             {
                 EventType = NotificationEventType.InGameUnBan,
                 EventIdentifier = new(),

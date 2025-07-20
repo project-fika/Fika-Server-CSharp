@@ -1,0 +1,27 @@
+﻿<MudDialog>
+	<DialogContent>
+		How many days?<br />0 = unlimited
+		<MudNumericField Value="_days" Placeholder="Select the amount of days" Min="0" Max="9999"></MudNumericField>
+	</DialogContent>
+	<DialogActions>
+		<MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.CheckCircle" OnClick="Confirm">Confirm</MudButton>
+		<MudButton Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Cancel" OnClick="Cancel">Cancel</MudButton>
+	</DialogActions>
+</MudDialog>
+
+@code {
+	[CascadingParameter]
+	private IMudDialogInstance MudDialog { get; set; }
+
+	private int _days = 1;
+
+	private void Confirm()
+	{
+		MudDialog.Close(DialogResult.Ok<int>(_days));
+	}
+
+	private void Cancel()
+	{
+		MudDialog.Cancel();
+	}
+}

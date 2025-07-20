@@ -1,48 +1,187 @@
 ﻿@page "/Fika/Manage/Accounts"
 
+@using FikaWebApp.Components.Account
+@using FikaWebApp.Components.Fika.Dialogs
 @using FikaWebApp.Data
 @using Microsoft.AspNetCore.Identity
 
 @inject UserManager<ApplicationUser> UserManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
 
-<h3>Accounts</h3>
+<MudDataGrid @ref="_dataGrid" Items="_users" SortMode="SortMode.Single" Filterable="false" RowsPerPage="10">
+	<ToolBarContent>
+		<MudText Typo="Typo.h6">All Accounts</MudText>
+		<MudSpacer />
+		@* <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
+					  AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField> *@
+	</ToolBarContent>
+	<Columns>
+		<PropertyColumn Property="x => x.UserName" Title="Username"/>
+		<PropertyColumn Property="x => x.Id" />
+		<TemplateColumn Title="Locked" CellClass="justify-center">
+			<CellTemplate Context="row">
+				<MudTooltip Text="@(GetLockText(row.Item))">
+					<MudCheckBox Value="@row.Item.LockoutEnd.HasValue" ReadOnly="true" />
+				</MudTooltip>
+			</CellTemplate>
+		</TemplateColumn>
+		<TemplateColumn CellClass="justify-center">
+			<CellTemplate Context="row">
+				<MudStack Row>
+					<MudTooltip Text="@($"Delete {row.Item.UserName}")">
+						<MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Primary" Variant="Variant.Filled" OnClick="@(() => DeleteUser(row.Item))" />
+					</MudTooltip>
+					<MudTooltip Text="@($"Toggle lock {row.Item.UserName}")">
+						<MudIconButton Icon="@Icons.Material.Filled.Lock" Color="Color.Primary" Variant="Variant.Filled" OnClick="@(() => ToggleLockUser(row.Item))" />
+					</MudTooltip>
+				</MudStack>
+			</CellTemplate>
+		</TemplateColumn>
+	</Columns>
+	<RowLoadingContent>
+		<tr class="mud-table-row">
+			<td class="mud-table-cell" colspan="1000">
+				Loading...
+			</td>
+		</tr>
+	</RowLoadingContent>
+	<PagerContent>
+		<MudDataGridPager T="ApplicationUser" />
+	</PagerContent>
+</MudDataGrid>
 
-@if (users == null)
-{
-	<p><em>Loading users...</em></p>
-}
-else if (!users.Any())
-{
-	<p>No users found.</p>
-}
-else
-{
-	<table class="table">
-		<thead>
-			<tr>
-				<th>Username</th>
-				<th>Email</th>
-				<th>Id</th>
-			</tr>
-		</thead>
-		<tbody>
-			@foreach (var user in users)
-			{
-				<tr>
-					<td>@user.UserName</td>
-					<td>@user.Email</td>
-					<td>@user.Id</td>
-				</tr>
-			}
-		</tbody>
-	</table>
-}
+<br/>
+
+<MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary" OnClick="AddUser">Add New</MudButton>
 
 @code {
-	private List<ApplicationUser> users;
+	private string _username;
+
+	private MudDataGrid<ApplicationUser> _dataGrid;
+	private IEnumerable<ApplicationUser> _users;
+
+	private string? GetLockText(ApplicationUser user)
+	{
+		if (user.LockoutEnd.HasValue)
+		{
+			return $"Expires at {user.LockoutEnd.Value:G}";
+		}
+
+		return null;
+	}
+
+	private async Task DeleteUser(ApplicationUser user)
+	{
+		if (user.UserName == _username)
+		{
+			Snackbar.Add($"You cannot delete your own account!", Severity.Error, config => { config.VisibleStateDuration = 5000; });
+			return;
+		}
+
+		if (user.UserName == "admin")
+		{
+			Snackbar.Add($"You cannot delete the root account!", Severity.Error, config => { config.VisibleStateDuration = 5000; });
+			return;			
+		}
+
+		var result = await UserManager.DeleteAsync(user);
+		if (result.Succeeded)
+		{
+			Snackbar.Add($"User '{user.UserName}' was removed successfully!", Severity.Success, config => { config.VisibleStateDuration = 5000; });
+		}
+		else
+		{
+			Snackbar.Add($"User '{user.UserName}' could not be removed!", Severity.Error, config => { config.VisibleStateDuration = 5000; });
+		}
+
+		RefreshUsers();
+	}
+
+	private async Task ToggleLockUser(ApplicationUser user)
+	{
+		if (user.UserName == _username)
+		{
+			Snackbar.Add($"You cannot lock your own account!", Severity.Error, config => { config.VisibleStateDuration = 5000; });
+			return;
+		}
+
+		if (user.UserName == "admin")
+		{
+			Snackbar.Add($"You cannot lock the root account!", Severity.Error, config => { config.VisibleStateDuration = 5000; });
+			return;
+		}
+
+		IdentityResult? result;
+		if (!user.LockoutEnd.HasValue)
+		{
+			result = await UserManager.SetLockoutEndDateAsync(user, DateTimeOffset.Now.AddYears(100));
+		}
+		else
+		{
+			result = await UserManager.SetLockoutEndDateAsync(user, null);
+		}
+
+		if (!result.Succeeded)
+		{
+			Snackbar.Add($"Failed to toggle account lock!", Severity.Error, config => { config.VisibleStateDuration = 5000; });
+		}
+		else
+		{
+			Snackbar.Add($"Account lock was toggled successfully!", Severity.Success, config => { config.VisibleStateDuration = 5000; });
+		}
+
+		RefreshUsers();
+	}
+
+	private async Task AddUser()
+	{
+		var dialog = await DialogService.ShowAsync<AddAccountDialog>("Add Account");
+		var result = await dialog.Result;
+
+		if (!result.Canceled)
+		{
+			if (result.Data is ApplicationUser newUser)
+			{
+				if (await UserManager.FindByNameAsync(newUser.UserName) == null)
+				{
+					var createResult = await UserManager.CreateAsync(newUser, newUser.PasswordHash);
+					if (!createResult.Succeeded)
+					{
+						Snackbar.Add("Unable to create user!", Severity.Error, config => { config.VisibleStateDuration = 5000; });
+					}
+
+					Snackbar.Add($"User '{newUser.UserName}' was created!", Severity.Success, config => { config.VisibleStateDuration = 5000; });
+					RefreshUsers();
+				}
+				else
+				{
+					Snackbar.Add($"An account with the username '{newUser.UserName}' already exists!", Severity.Warning, config => { config.VisibleStateDuration = 5000; });
+				}
+			}
+		}
+	}
+
+	private void RefreshUsers()
+	{
+		_users = UserManager.Users.ToList();
+	}
 
 	protected override async Task OnInitializedAsync()
 	{
-		users = UserManager.Users.ToList();
+		var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+		var user = authState.User;
+
+		if (user.Identity != null && user.Identity.IsAuthenticated)
+		{
+			_username = user.Identity.Name!;
+		}
+		else
+		{
+			_username = string.Empty;
+		}
+
+		RefreshUsers();
 	}
 }

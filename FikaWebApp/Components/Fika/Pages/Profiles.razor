@@ -22,7 +22,12 @@
 	<Columns>
 		<PropertyColumn Property="x => x.Nickname" />
 		<PropertyColumn Property="x => x.ProfileId" />
-		<PropertyColumn Property="x => x.HasFleaBan" Title="Flea Banned" />
+		<PropertyColumn Property="x => x.Level" />
+		<TemplateColumn Title="Flea Banned" CellClass="justify-center">
+			<CellTemplate Context="row">
+				<MudCheckBox Value="@row.Item.HasFleaBan" ReadOnly="true"/>
+			</CellTemplate>
+		</TemplateColumn>
 		<TemplateColumn CellClass="d-flex justify-end">
 			<CellTemplate Context="row">
 				<MudStack Row>
@@ -43,6 +48,12 @@
 	</PagerContent>
 </MudDataGrid>
 
+<style>
+	.blur-background {
+		backdrop-filter: blur(10px);
+	}
+</style>
+
 @code {
 	MudDataGrid<ProfileResponse> _dataGrid;
 	private string _searchString = null;
@@ -54,7 +65,12 @@
 			{ "Profile", row }
 		};
 
-		var res = await DialogService.ShowAsync<ModifyProfileDialog>("Modify Profile", parameters);
+		var options = new DialogOptions
+		{
+			BackgroundClass = "blur-background"
+		};
+
+		var res = await DialogService.ShowAsync<ModifyProfileDialog>("Modify Profile", parameters, options);
 		var result = await res.Result;
 
 		if (!result.Canceled)

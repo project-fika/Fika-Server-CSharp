@@ -1,0 +1,102 @@
+﻿@using System.Text.RegularExpressions
+@using FikaWebApp.Data
+
+<MudPaper Class="pa-4">
+	<MudDialog>
+		<DialogContent>
+			<MudForm @ref="_form" @bind-IsValid="@_success" @bind-Errors="@_errors" Spacing="4">
+				<MudTextField T="string" Label="Username" Required="true" RequiredError="User name is required!" @ref="_usernameField"
+								Validation="@(new Func<string, IEnumerable<string>>(UsernameLength))" Immediate="true" />
+				<MudTextField T="string" Label="Password" HelperText="Choose a strong password" @ref="_passwordField"
+								InputType="InputType.Password" Validation="@(new Func<string, IEnumerable<string>>(PasswordStrength))" Required="true"
+								RequiredError="Password is required!" Immediate="true" />
+				<MudTextField T="string"
+								Label="Password" HelperText="Repeat the password" InputType="InputType.Password" Required="true"
+								Validation="@(new Func<string, string>(PasswordMatch))" Immediate="true" />
+				<MudPaper Class="pa-4 mt-4">
+					<MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!_success)" Class="ml-auto" OnClick="Submit">Register</MudButton>
+					<MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="ml-auto" OnClick="Cancel">Cancel</MudButton>
+				</MudPaper>
+			</MudForm>
+		</DialogContent>
+	</MudDialog>
+</MudPaper>
+
+@code {
+	[CascadingParameter]
+	private IMudDialogInstance MudDialog { get; set; }
+
+	private ApplicationUser _user = new();
+
+	private bool _success;
+	private string[] _errors = { };
+	private MudTextField<string> _usernameField;
+	private MudTextField<string> _passwordField;
+	private MudForm _form;
+
+	private void Submit()
+	{
+		_user.UserName = _usernameField.Value;
+		_user.PasswordHash = _passwordField.Value;
+
+		MudDialog.Close(DialogResult.Ok<ApplicationUser>(_user));
+	}
+
+	private void Cancel()
+	{
+		MudDialog.Cancel();
+	}
+
+	private IEnumerable<string> UsernameLength(string username)
+	{
+		if (string.IsNullOrWhiteSpace(username))
+		{
+			yield return "Username is required!";
+			yield break;
+		}
+
+		if (username.Length < 5)
+		{
+			yield return "Username must be at least of length 5";
+		}
+
+		if (username.Length > 10)
+		{
+			yield return "Username can not be longer than 10!";
+		}
+	}
+
+	private IEnumerable<string> PasswordStrength(string pw)
+	{
+		if (string.IsNullOrWhiteSpace(pw))
+		{
+			yield return "Password is required!";
+			yield break;
+		}
+		if (pw.Length < 8)
+		{
+			yield return "Password must be at least of length 8";
+		}
+		if (!Regex.IsMatch(pw, @"[A-Z]"))
+		{
+			yield return "Password must contain at least one capital letter";
+		}
+		if (!Regex.IsMatch(pw, @"[a-z]"))
+		{
+			yield return "Password must contain at least one lowercase letter";
+		}
+		if (!Regex.IsMatch(pw, @"[0-9]"))
+		{
+			yield return "Password must contain at least one digit";
+		}
+	}
+
+	private string PasswordMatch(string arg)
+	{
+		if (_passwordField.Value != arg)
+		{
+			return "Passwords don't match";
+		}
+		return null;
+	}
+}
