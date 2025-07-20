@@ -10,61 +10,67 @@
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 
-<MudDataGrid @ref="_dataGrid" Items="_users" SortMode="SortMode.Single" Filterable="false" RowsPerPage="10">
-	<ToolBarContent>
-		<MudText Typo="Typo.h6">All Accounts</MudText>
-		<MudSpacer />
-		@* <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
+<AuthorizeView Roles="Admin">
+	<Authorized>
+		<MudDataGrid @ref="_dataGrid" Items="_users" SortMode="SortMode.Single" Filterable="false" RowsPerPage="10">
+			<ToolBarContent>
+				<MudText Typo="Typo.h6">All Accounts</MudText>
+				<MudSpacer />
+				@* <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
 					  AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField> *@
-	</ToolBarContent>
-	<Columns>
-		<PropertyColumn Property="x => x.UserName" Title="Username"/>
-		<PropertyColumn Property="x => x.Id" />
-		<TemplateColumn Title="Roles" CellClass="justify-center">
-			<CellTemplate Context="row">
-				<MudStack>
-					@foreach (var item in GetRoles(row.Item).GetAwaiter().GetResult())
-					{
-						@item<br/>
-					}
-				</MudStack>
-			</CellTemplate>
-		</TemplateColumn>
-		<TemplateColumn Title="Locked" CellClass="justify-center">
-			<CellTemplate Context="row">
-				<MudTooltip Text="@(GetLockText(row.Item))">
-					<MudCheckBox Value="@row.Item.LockoutEnd.HasValue" ReadOnly="true" />
-				</MudTooltip>
-			</CellTemplate>
-		</TemplateColumn>
-		<TemplateColumn CellClass="justify-center">
-			<CellTemplate Context="row">
-				<MudStack Row>
-					<MudTooltip Text="@($"Delete {row.Item.UserName}")">
-						<MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Primary" Variant="Variant.Filled" OnClick="@(() => DeleteUser(row.Item))" />
-					</MudTooltip>
-					<MudTooltip Text="@($"Toggle lock {row.Item.UserName}")">
-						<MudIconButton Icon="@Icons.Material.Filled.Lock" Color="Color.Primary" Variant="Variant.Filled" OnClick="@(() => ToggleLockUser(row.Item))" />
-					</MudTooltip>
-				</MudStack>
-			</CellTemplate>
-		</TemplateColumn>
-	</Columns>
-	<RowLoadingContent>
-		<tr class="mud-table-row">
-			<td class="mud-table-cell" colspan="1000">
-				Loading...
-			</td>
-		</tr>
-	</RowLoadingContent>
-	<PagerContent>
-		<MudDataGridPager T="ApplicationUser" />
-	</PagerContent>
-</MudDataGrid>
+			</ToolBarContent>
+			<Columns>
+				<PropertyColumn Property="x => x.UserName" Title="Username" />
+				<PropertyColumn Property="x => x.Id" />
+				<TemplateColumn Title="Roles" CellClass="justify-center">
+					<CellTemplate Context="row">
+						<MudStack>
+							@foreach (var item in GetRoles(row.Item).GetAwaiter().GetResult())
+							{
+								@item
+							
+								<br />
+							}
+						</MudStack>
+					</CellTemplate>
+				</TemplateColumn>
+				<TemplateColumn Title="Locked" CellClass="justify-center">
+					<CellTemplate Context="row">
+						<MudTooltip Text="@(GetLockText(row.Item))">
+							<MudCheckBox Value="@row.Item.LockoutEnd.HasValue" ReadOnly="true" />
+						</MudTooltip>
+					</CellTemplate>
+				</TemplateColumn>
+				<TemplateColumn CellClass="justify-center">
+					<CellTemplate Context="row">
+						<MudStack Row>
+							<MudTooltip Text="@($"Delete {row.Item.UserName}")">
+								<MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Primary" Variant="Variant.Filled" OnClick="@(() => DeleteUser(row.Item))" />
+							</MudTooltip>
+							<MudTooltip Text="@($"Toggle lock {row.Item.UserName}")">
+								<MudIconButton Icon="@Icons.Material.Filled.Lock" Color="Color.Primary" Variant="Variant.Filled" OnClick="@(() => ToggleLockUser(row.Item))" />
+							</MudTooltip>
+						</MudStack>
+					</CellTemplate>
+				</TemplateColumn>
+			</Columns>
+			<RowLoadingContent>
+				<tr class="mud-table-row">
+					<td class="mud-table-cell" colspan="1000">
+						Loading...
+					</td>
+				</tr>
+			</RowLoadingContent>
+			<PagerContent>
+				<MudDataGridPager T="ApplicationUser" />
+			</PagerContent>
+		</MudDataGrid>
 
-<br/>
+		<br />
 
-<MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary" OnClick="AddUser">Add New</MudButton>
+		<MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary" OnClick="AddUser">Add New</MudButton>
+	</Authorized>
+</AuthorizeView>
 
 @code {
 	private string _username;

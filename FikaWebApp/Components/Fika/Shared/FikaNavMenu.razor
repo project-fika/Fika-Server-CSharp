@@ -1,8 +1,17 @@
 ﻿@using FikaWebApp.Data
 
 <MudNavMenu>
-	<MudNavLink Href="Fika/Manage/Accounts" Icon="@Icons.Material.Filled.Person2">Accounts</MudNavLink>
-	<MudNavLink Href="Fika/Manage/Profiles" Icon="@Icons.Material.Filled.Person">Profiles</MudNavLink>
+	<AuthorizeView Roles="Admin">
+		<Authorized>
+			<MudNavLink Href="Fika/Manage/Accounts" Icon="@Icons.Material.Filled.Person2">Accounts</MudNavLink>
+		</Authorized>
+	</AuthorizeView>
+
+	<AuthorizeView Roles="Admin, Moderator">
+		<Authorized>
+			<MudNavLink Href="Fika/Manage/Profiles" Icon="@Icons.Material.Filled.Person">Profiles</MudNavLink>
+		</Authorized>
+	</AuthorizeView>
 </MudNavMenu>
 
 @code {
