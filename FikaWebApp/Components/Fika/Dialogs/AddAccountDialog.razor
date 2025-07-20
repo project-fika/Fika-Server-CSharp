@@ -1,8 +1,10 @@
 ﻿@using System.Text.RegularExpressions
 @using FikaWebApp.Data
 @using Microsoft.AspNetCore.Identity
+@using Microsoft.Extensions.Options
 
 @inject RoleManager<IdentityRole> RoleManager
+@inject IOptions<IdentityOptions> IdentityOptions
 
 <MudPaper Class="pa-4">
 	<MudDialog>
@@ -90,35 +92,52 @@
 
 	private IEnumerable<string> PasswordStrength(string pw)
 	{
+		var pwOptions = IdentityOptions.Value.Password; // or IdentityOptionsAccessor.Value.Password in Blazor
+
 		if (string.IsNullOrWhiteSpace(pw))
 		{
 			yield return "Password is required!";
 			yield break;
 		}
-		if (pw.Length < 8)
+
+		if (pw.Length < pwOptions.RequiredLength)
 		{
-			yield return "Password must be at least of length 8";
+			yield return $"Password must be at least {pwOptions.RequiredLength} characters long";
 		}
-		if (!Regex.IsMatch(pw, @"[A-Z]"))
+
+		if (pwOptions.RequireUppercase && !Regex.IsMatch(pw, @"[A-Z]"))
 		{
-			yield return "Password must contain at least one capital letter";
+			yield return "Password must contain at least one uppercase letter";
 		}
-		if (!Regex.IsMatch(pw, @"[a-z]"))
+
+		if (pwOptions.RequireLowercase && !Regex.IsMatch(pw, @"[a-z]"))
 		{
 			yield return "Password must contain at least one lowercase letter";
 		}
-		if (!Regex.IsMatch(pw, @"[0-9]"))
+
+		if (pwOptions.RequireDigit && !Regex.IsMatch(pw, @"[0-9]"))
 		{
 			yield return "Password must contain at least one digit";
 		}
+
+		if (pwOptions.RequireNonAlphanumeric && !Regex.IsMatch(pw, @"[\W_]"))
+		{
+			yield return "Password must contain at least one special character";
+		}
+
+		if (pwOptions.RequiredUniqueChars > 0 && pw.Distinct().Count() < pwOptions.RequiredUniqueChars)
+		{
+			yield return $"Password must contain at least {pwOptions.RequiredUniqueChars} unique characters";
+		}
 	}
 
-	private string PasswordMatch(string arg)
+	private string? PasswordMatch(string arg)
 	{
 		if (_passwordField.Value != arg)
 		{
 			return "Passwords don't match";
 		}
+
 		return null;
 	}
 }
