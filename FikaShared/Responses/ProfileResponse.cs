@@ -1,4 +1,4 @@
-﻿namespace FikaShared
+﻿namespace FikaShared.Responses
 {
     public record ProfileResponse
     {

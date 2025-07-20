@@ -1,6 +1,8 @@
-﻿@using FikaShared
+﻿@using System.Net
+@using FikaShared
+@using FikaShared.Requests
+@using FikaShared.Responses
 @using MudBlazor
-@using System.Net
 
 @inject IDialogService DialogService
 @inject HttpClient HttpClient
@@ -8,8 +10,13 @@
 <MudDialog>
 	<DialogContent>
 		<MudText Typo="Typo.h6">Editing @Profile.Nickname</MudText>
-		<MudButton OnClick="AddFleaBan" Disabled="Profile.HasFleaBan">Add Flea Ban</MudButton>
-		<MudButton OnClick="RemoveFleaBan" Disabled="!Profile.HasFleaBan">Remove Flea Ban</MudButton>
+		<MudStack Row>
+			<MudButton OnClick="AddFleaBan" Disabled="Profile.HasFleaBan">Add Flea Ban</MudButton>
+			<MudButton OnClick="RemoveFleaBan" Disabled="!Profile.HasFleaBan">Remove Flea Ban</MudButton>
+		</MudStack>
+		<MudStack Row>
+			<MudButton OnClick="SendItem">Send Item</MudButton>
+		</MudStack>
 	</DialogContent>
 	<DialogActions>
 		<MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.CheckCircle" OnClick="Close">Save</MudButton>
@@ -23,6 +30,25 @@
 
 	[Parameter]
 	public ProfileResponse Profile { get; set; }
+
+
+	private async Task SendItem()
+	{
+		var dialog = await DialogService.ShowAsync<SendItemDialog>("Send Item");
+		var result = await dialog.Result;
+
+		if (result.Data is (string itemTpl, int amount))
+		{
+			SendItemRequest sendItemRequest = new()
+			{
+				ProfileId = Profile.ProfileId,
+				ItemTemplate = itemTpl,
+				Amount = amount
+			};
+
+			// TODO: Send item
+		}
+	}
 
 	private async Task AddFleaBan()
 	{

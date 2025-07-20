@@ -1,0 +1,55 @@
+﻿<MudDialog>
+	<DialogContent>
+		<MudStack Spacing="4">
+			<MudText>Input a MongoId and a valid amount to send</MudText>
+			<MudTextField Value="_itemId" Placeholder="The MongoId to send"
+				Validation="@(new Func<string, string>(ValidateMongoId))" Immediate="true" OnlyValidateIfDirty="true" />
+			<MudNumericField Value="_amount" Placeholder="How many items to send" Min="0" Max="9999" />
+		</MudStack>
+	</DialogContent>
+	<DialogActions>
+		<MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.CheckCircle" OnClick="Confirm">Confirm</MudButton>
+		<MudButton Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Cancel" OnClick="Cancel">Cancel</MudButton>
+	</DialogActions>
+</MudDialog>
+
+@code {
+	[CascadingParameter]
+	private IMudDialogInstance MudDialog { get; set; }
+
+	private string _itemId = string.Empty;
+	private int _amount = 1;
+
+	private string? ValidateMongoId(string input)
+	{
+		var span = input.AsSpan();
+
+		if (span.Length != 24)
+		{
+			return "The MongoId is too short! Must be 24 characters.";
+		}
+
+		for (var i = 0; i < 24; i++)
+		{
+			var c = span[i];
+			var isHex = (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
+
+			if (!isHex)
+			{
+				return "Input is not a valid MongoId.";
+			}
+		}
+
+		return null;
+	}
+
+	private void Confirm()
+	{
+		MudDialog.Close(DialogResult.Ok(new Tuple<string, int>(_itemId, _amount)));
+	}
+
+	private void Cancel()
+	{
+		MudDialog.Cancel();
+	}
+}

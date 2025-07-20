@@ -1,6 +1,6 @@
 ﻿using FikaServer.Services;
 using FikaServer.Services.Cache;
-using FikaShared;
+using FikaShared.Responses;
 using Microsoft.Extensions.Primitives;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Extensions;

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace FikaShared
+namespace FikaShared.Requests
 {
     /// <summary>
     /// Request where the ProfileId is used

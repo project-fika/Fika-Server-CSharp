@@ -1,6 +1,6 @@
 ﻿using FikaServer.Models.Fika.WebSocket.Notifications;
 using FikaServer.Services;
-using FikaShared;
+using FikaShared.Requests;
 using Microsoft.Extensions.Primitives;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Helpers;
