@@ -68,7 +68,7 @@
 
 		<br />
 
-		<MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary" OnClick="AddUser">Add New</MudButton>
+		<MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Filled" Color="Color.Primary" OnClick="AddUser">Add New Account</MudButton>
 	</Authorized>
 </AuthorizeView>
 
@@ -159,7 +159,8 @@
 
 	private async Task AddUser()
 	{
-		var dialog = await DialogService.ShowAsync<AddAccountDialog>("Add Account");
+		DialogOptions options = new() { MaxWidth = MaxWidth.Small, FullWidth = true };
+		var dialog = await DialogService.ShowAsync<AddAccountDialog>("Add Account", options);
 		var result = await dialog.Result;
 
 		if (!result.Canceled)

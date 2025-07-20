@@ -6,32 +6,32 @@
 @inject RoleManager<IdentityRole> RoleManager
 @inject IOptions<IdentityOptions> IdentityOptions
 
-<MudPaper Class="pa-4">
-	<MudDialog>
-		<DialogContent>
-			<MudForm @ref="_form" @bind-IsValid="@_success" @bind-Errors="@_errors" Spacing="4">
-				<MudTextField T="string" Label="Username" Required="true" RequiredError="User name is required!" @ref="_usernameField"
-								Validation="@(new Func<string, IEnumerable<string>>(UsernameLength))" Immediate="true" />
-				<MudTextField T="string" Label="Password" HelperText="Choose a strong password" @ref="_passwordField"
-								InputType="InputType.Password" Validation="@(new Func<string, IEnumerable<string>>(PasswordStrength))" Required="true"
-								RequiredError="Password is required!" Immediate="true" />
-				<MudTextField T="string"
-								Label="Password" HelperText="Repeat the password" InputType="InputType.Password" Required="true"
-								Validation="@(new Func<string, string>(PasswordMatch))" Immediate="true" />
-				<MudSelect MultiSelection="true" Placeholder="Select roles..." HelperText="Role Selection" @bind-Value="_roleValue" @bind-SelectedValues="_selectedRoles">
-					@foreach (var role in _availableRoles)
-					{
-						<MudSelectItem T="string" Value="@role">@role</MudSelectItem>
-					}
-				</MudSelect>
+<MudDialog>
+	<DialogContent>
+		<MudForm @ref="_form" @bind-IsValid="@_success" @bind-Errors="@_errors" Spacing="4">
+			<MudTextField T="string" Variant="Variant.Filled" Counter="10" MaxLength="10" Label="Username" Required="true" RequiredError="User name is required!" @ref="_usernameField"
+						  Validation="@(new Func<string, IEnumerable<string>>(UsernameLength))" Immediate="true" />
+			<MudTextField T="string" Variant="Variant.Filled" Counter="0" Label="Password" HelperText="Choose a strong password" @ref="_passwordField"
+						  InputType="InputType.Password" Validation="@(new Func<string, IEnumerable<string>>(PasswordStrength))" Required="true"
+						  RequiredError="Password is required!" Immediate="true" />
+			<MudTextField T="string" Variant="Variant.Filled" Counter="0"
+						  Label="Password" HelperText="Repeat the password" InputType="InputType.Password" Required="true"
+						  Validation="@(new Func<string, string>(PasswordMatch))" Immediate="true" />
+			<MudSelect MultiSelection="true" Placeholder="Select roles..." HelperText="Role Selection" @bind-Value="_roleValue" @bind-SelectedValues="_selectedRoles">
+				@foreach (var role in _availableRoles)
+				{
+					<MudSelectItem T="string" Value="@role">@role</MudSelectItem>
+				}
+			</MudSelect>
+			<MudStack Row Justify="Justify.Center" Spacing="2">
 				<MudPaper Class="pa-4 mt-4">
-					<MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!_success)" Class="ml-auto" OnClick="Submit">Register</MudButton>
+					<MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!_success)" Class="ml-auto" OnClick="Submit">Add</MudButton>
 					<MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="ml-auto" OnClick="Cancel">Cancel</MudButton>
 				</MudPaper>
-			</MudForm>
-		</DialogContent>
-	</MudDialog>
-</MudPaper>
+			</MudStack>
+		</MudForm>
+	</DialogContent>
+</MudDialog>
 
 @code {
 	[CascadingParameter]
