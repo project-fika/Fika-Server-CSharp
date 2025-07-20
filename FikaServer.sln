@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FikaServer", "FikaServer\Fi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FikaWebApp", "FikaWebApp\FikaWebApp.csproj", "{467B17EC-038F-4BD9-9F91-8588CFE8DE46}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FikaShared", "FikaShared\FikaShared.csproj", "{D9FCAE4F-C421-42B6-8086-B56600128C75}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{467B17EC-038F-4BD9-9F91-8588CFE8DE46}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{467B17EC-038F-4BD9-9F91-8588CFE8DE46}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{467B17EC-038F-4BD9-9F91-8588CFE8DE46}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9FCAE4F-C421-42B6-8086-B56600128C75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9FCAE4F-C421-42B6-8086-B56600128C75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9FCAE4F-C421-42B6-8086-B56600128C75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9FCAE4F-C421-42B6-8086-B56600128C75}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

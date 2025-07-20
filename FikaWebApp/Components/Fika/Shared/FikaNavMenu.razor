@@ -1,0 +1,18 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using FikaWebApp.Data
+
+@inject SignInManager<ApplicationUser> SignInManager
+
+<MudNavMenu>
+	<MudNavLink Href="Fika/Manage/Accounts" Icon="@Icons.Material.Filled.Person2">Accounts</MudNavLink>
+	<MudNavLink Href="Fika/Manage/Profiles" Icon="@Icons.Material.Filled.Person">Profiles</MudNavLink>
+</MudNavMenu>
+
+@code {
+    private bool hasExternalLogins;
+
+    protected override async Task OnInitializedAsync()
+    {
+        hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
+    }
+}

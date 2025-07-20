@@ -18,4 +18,9 @@
     <PackageReference Include="Extensions.MudBlazor.StaticInput" Version="3.*" />
   </ItemGroup>
 
+
+  <ItemGroup>
+    <ProjectReference Include="..\FikaShared\FikaShared.csproj" />
+  </ItemGroup>
+
 </Project>

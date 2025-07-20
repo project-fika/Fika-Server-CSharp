@@ -3,5 +3,6 @@
     public class FikaConfig
     {
         public string APIKey { get; set; }
+        public Uri BaseUrl { get; set; }
     }
 }

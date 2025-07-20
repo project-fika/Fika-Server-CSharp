@@ -1,4 +1,4 @@
-using FikaWebApp.Components;
+﻿using FikaWebApp.Components;
 using FikaWebApp.Components.Account;
 using FikaWebApp.Data;
 using FikaWebApp.Services;
@@ -6,14 +6,14 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Microsoft.Identity.Client;
 using MudBlazor.Services;
+using System.Text;
 
 namespace FikaWebApp
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -55,6 +55,12 @@ namespace FikaWebApp
             builder.Services.AddSingleton(resolver =>
                 resolver.GetRequiredService<IOptions<FikaConfig>>().Value);
 
+            builder.Services.AddHttpClient(Options.DefaultName, SetupHttpClient)
+                .ConfigurePrimaryHttpMessageHandler(() =>
+                    new HttpClientHandler
+                    {
+                        ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                    });
 
             var app = builder.Build();
 
@@ -83,11 +89,38 @@ namespace FikaWebApp
 
             using (var scope = app.Services.CreateScope())
             {
-                var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                db.Database.Migrate();
+                var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+                await dbContext.Database.MigrateAsync(); // ensure DB and tables exist
+                await dbContext.Database.EnsureCreatedAsync();
+
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+                var user = await userManager.FindByNameAsync("admin");
+                if (user == null)
+                {
+                    user = new()
+                    {
+                        UserName = "admin"
+                    };
+
+                    var result = await userManager.CreateAsync(user, "Admin123!");
+                    if (!result.Succeeded)
+                    {
+                        throw new Exception($"Failed to create default admin account: \n{string.Join(", ", result.Errors.Select(e => e.Description))}");
+                    }
+                }
             }
 
             app.Run();
+        }
+
+        private static void SetupHttpClient(IServiceProvider provider, HttpClient client)
+        {
+            FikaConfig config = provider.GetRequiredService<FikaConfig>();
+
+            client.BaseAddress = config.BaseUrl;
+            client.DefaultRequestHeaders.Add("Auth", config.APIKey);
         }
     }
 }

@@ -31,6 +31,11 @@
 	
 	
   <ItemGroup>
+    <ProjectReference Include="..\FikaShared\FikaShared.csproj" />
+  </ItemGroup>
+	
+	
+  <ItemGroup>
     <Reference Include="SPTarkov.Common">
       <HintPath>tref\SPTarkov.Common.dll</HintPath>
       <Private>False</Private>

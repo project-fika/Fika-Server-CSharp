@@ -1,0 +1,34 @@
+﻿@page "/Fika/Manage/Profiles"
+
+@using FikaShared
+@using FikaWebApp.Data
+@using Microsoft.AspNetCore.Identity
+
+@inject UserManager<ApplicationUser> UserManager
+@inject HttpClient HttpClient
+
+<h3>Profiles</h3>
+
+<MudDataGrid Items="@_profiles.Take(4)">
+	<Columns>
+		<PropertyColumn Property="x => x.Nickname" />
+		<PropertyColumn Property="x => x.ProfileId" />
+		<PropertyColumn Property="x => x.HasFleaBan" />
+	</Columns>
+</MudDataGrid>
+
+@code {
+	private IEnumerable<ProfileResponse> _profiles = new List<ProfileResponse>();
+
+	protected override async Task OnInitializedAsync()
+	{
+		try
+		{
+			_profiles = await HttpClient.GetFromJsonAsync<List<ProfileResponse>>("get/profiles");
+		}
+		catch
+		{
+			
+		}
+	}
+}
