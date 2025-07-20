@@ -1,5 +1,8 @@
 ﻿@using FikaShared
 @using MudBlazor
+@using System.IO.Compression
+@using System.Text
+@using System.Text.Json
 
 @inject IDialogService DialogService
 @inject HttpClient HttpClient
@@ -25,7 +28,7 @@
 
 	private async Task AddFleaBan()
 	{
-		var result = await HttpClient.PutAsJsonAsync("put/addfleaban", new AddFleaBanRequest()
+		var result = await HttpClient.PostAsJsonAsync("put/addfleaban", new AddFleaBanRequest()
 		{
 			ProfileId = Profile.ProfileId
 		});

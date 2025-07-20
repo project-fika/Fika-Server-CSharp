@@ -63,16 +63,6 @@
 		}
 	}
 
-	protected override async Task OnAfterRenderAsync(bool firstRender)
-	{
-		await base.OnAfterRenderAsync(firstRender);
-
-		if (firstRender)
-		{
-			await _dataGrid.ReloadServerData();
-		}
-	}
-
 	private async Task<GridData<ProfileResponse>> ServerReload(GridState<ProfileResponse> state)
 	{
 		IEnumerable<ProfileResponse> data;

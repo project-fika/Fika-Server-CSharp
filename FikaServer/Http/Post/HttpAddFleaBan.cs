@@ -16,11 +16,11 @@ using System.Text.Json;
 namespace FikaServer.Http.Get
 {
     [Injectable(TypePriority = 0)]
-    public class HttpAddFleaBan(SaveServer saveServer, HttpResponseUtil httpResponseUtil, ConfigService configService, TimeUtil timeUtil) : IHttpListener
+    public class HttpAddFleaBan(SaveServer saveServer, HttpResponseUtil httpResponseUtil, ConfigService configService, TimeUtil timeUtil, JsonUtil jsonUtil) : IHttpListener
     {
         public bool CanHandle(MongoId sessionId, HttpRequest req)
         {
-            if (req.Method != HttpMethods.Put)
+            if (req.Method != HttpMethods.Post)
             {
                 return false;
             }
@@ -40,14 +40,14 @@ namespace FikaServer.Http.Get
 
         public async Task Handle(MongoId sessionId, HttpRequest req, HttpResponse resp)
         {
-            using (var sr = new StreamReader(req.Body))
+            using (StreamReader sr = new(req.Body))
             {
-                var rawData = await sr.ReadToEndAsync();
+                string rawData = await sr.ReadToEndAsync();
 
-                AddFleaBanRequest request = JsonSerializer.Deserialize<AddFleaBanRequest>(rawData);
+                AddFleaBanRequest request = jsonUtil.Deserialize<AddFleaBanRequest>(rawData);
                 if (request != null)
                 {
-                    var profile = saveServer.GetProfile(sessionId);
+                    SptProfile profile = saveServer.GetProfile(request.ProfileId);
                     if (profile != null)
                     {
                         long banTime = timeUtil.GetTimeStampFromNowDays(1);
@@ -56,11 +56,13 @@ namespace FikaServer.Http.Get
                             BanType = BanType.RagFair,
                             DateTime = banTime
                         });
+
+                        await saveServer.SaveProfileAsync(request.ProfileId);
                     }
                 }
             }
 
-            await resp.Body.WriteAsync(Encoding.UTF8.GetBytes(httpResponseUtil.NoBody("OK")));
+            resp.StatusCode = 200;
             await resp.StartAsync();
             await resp.CompleteAsync();
         }

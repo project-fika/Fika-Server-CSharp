@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using MudBlazor.Services;
+using System.Net;
 using System.Text;
 
 namespace FikaWebApp
@@ -121,6 +122,7 @@ namespace FikaWebApp
 
             client.BaseAddress = config.BaseUrl;
             client.DefaultRequestHeaders.Add("Auth", config.APIKey);
+            client.DefaultRequestHeaders.Add("requestcompressed", "0");
         }
     }
 }

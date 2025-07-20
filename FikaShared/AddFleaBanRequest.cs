@@ -1,7 +1,10 @@
-﻿namespace FikaShared
+﻿using System.Text.Json.Serialization;
+
+namespace FikaShared
 {
     public record AddFleaBanRequest
     {
-        public required string ProfileId { get; set; }
+        [JsonPropertyName("profileId")]
+        public string ProfileId { get; set; }
     }
 }
