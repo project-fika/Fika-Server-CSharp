@@ -60,7 +60,7 @@
 			if (result.Data is int amountOfDays)
 			{
 				amountOfDays = Math.Clamp(amountOfDays, 0, 9999);
-				var response = await HttpClient.PostAsJsonAsync("put/addfleaban", new AddFleaBanRequest()
+				var response = await HttpClient.PostAsJsonAsync("post/addfleaban", new AddFleaBanRequest()
 				{
 					ProfileId = Profile.ProfileId,
 					AmountOfDays = amountOfDays
@@ -78,7 +78,7 @@
 
 		if (!result.Canceled)
 		{
-			var response = await HttpClient.PostAsJsonAsync("put/removefleaban", new ProfileIdRequest()
+			var response = await HttpClient.PostAsJsonAsync("post/removefleaban", new ProfileIdRequest()
 			{
 				ProfileId = Profile.ProfileId
 			});

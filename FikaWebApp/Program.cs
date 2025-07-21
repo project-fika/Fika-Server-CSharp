@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using MudBlazor.Services;
+using MudExtensions.Services;
 
 namespace FikaWebApp
 {
@@ -18,6 +19,7 @@ namespace FikaWebApp
 
             // Add MudBlazor services
             builder.Services.AddMudServices();
+            builder.Services.AddMudExtensions();
 
             // Add services to the container.
             builder.Services.AddRazorComponents()

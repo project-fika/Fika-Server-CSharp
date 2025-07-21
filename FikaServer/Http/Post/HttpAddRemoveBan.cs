@@ -1,7 +1,6 @@
 ﻿using FikaServer.Models.Fika.WebSocket.Notifications;
 using FikaServer.Services;
 using FikaShared.Requests;
-using Microsoft.Extensions.Primitives;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Helpers;
 using SPTarkov.Server.Core.Models.Common;
@@ -9,38 +8,26 @@ using SPTarkov.Server.Core.Models.Eft.Common.Tables;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Eft.Ws;
 using SPTarkov.Server.Core.Servers;
-using SPTarkov.Server.Core.Servers.Http;
 using SPTarkov.Server.Core.Utils;
 
 namespace FikaServer.Http.Post
 {
     [Injectable(TypePriority = 0)]
     public class HttpAddRemoveBan(SaveServer saveServer, ConfigService configService,
-        JsonUtil jsonUtil, NotificationSendHelper sendHelper) : IHttpListener
+        JsonUtil jsonUtil, NotificationSendHelper sendHelper) : BaseHttpRequest(configService)
     {
-        public bool CanHandle(MongoId sessionId, HttpRequest req)
+        public override string Path { get; set; } = "post/removefleaban";
+
+        public override string Method
         {
-            if (req.Method != HttpMethods.Post)
+            get
             {
-                return false;
+                return HttpMethods.Post;
             }
-
-            if (!req.Path.Value?.Contains("put/removefleaban", StringComparison.OrdinalIgnoreCase) ?? true)
-            {
-                return false;
-            }
-
-            if (!req.Headers.TryGetValue("Auth", out StringValues authHeader))
-            {
-                return false;
-            }
-
-            return authHeader.Contains(configService.Config.Server.ApiKey);
         }
 
-        public async Task Handle(MongoId sessionId, HttpRequest req, HttpResponse resp)
+        public override async Task HandleRequest(HttpRequest req, HttpResponse resp)
         {
-            resp.StatusCode = 403;
             using (StreamReader sr = new(req.Body))
             {
                 string rawData = await sr.ReadToEndAsync();
@@ -62,12 +49,11 @@ namespace FikaServer.Http.Post
                             EventIdentifier = new(),
                             BanType = BanType.RagFair
                         });
-
-                        resp.StatusCode = 200;
                     }
                 }
             }
 
+            resp.StatusCode = 200;
             await resp.StartAsync();
             await resp.CompleteAsync();
         }

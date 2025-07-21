@@ -3,13 +3,19 @@
 <MudNavMenu>
 	<AuthorizeView Roles="Admin">
 		<Authorized>
-			<MudNavLink Href="Fika/Manage/Accounts" Icon="@Icons.Material.Filled.Person2">Accounts</MudNavLink>
+			<MudNavLink Href="Fika/Manage/Accounts" Icon="@Icons.Material.Filled.AdminPanelSettings">Accounts</MudNavLink>
 		</Authorized>
 	</AuthorizeView>
 
 	<AuthorizeView Roles="Admin, Moderator">
 		<Authorized>
 			<MudNavLink Href="Fika/Manage/Profiles" Icon="@Icons.Material.Filled.Person">Profiles</MudNavLink>
+		</Authorized>
+	</AuthorizeView>
+
+	<AuthorizeView>
+		<Authorized>
+			<MudNavLink Href="Fika/Manage/Players" Icon="@Icons.Material.Filled.People">Players</MudNavLink>
 		</Authorized>
 	</AuthorizeView>
 </MudNavMenu>

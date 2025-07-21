@@ -1,0 +1,173 @@
+﻿@page "/Fika/Manage/Players"
+@using FikaShared.Requests
+@using FikaShared.Responses
+@using FikaWebApp.Components.Fika.Dialogs
+@using static FikaShared.Enums
+
+@inject HttpClient HttpClient
+@inject ISnackbar Snackbar
+@inject IDialogService DialogService
+
+<MudPaper Class="mud-width-full pa-4" Style="position: relative;">
+	<MudLoading Loading="_loading" Darken="true" Overlap="true" Text="Waiting for server...">
+		<MudStack Row>
+			<MudGrid>
+				@foreach (var player in _players)
+				{
+					<MudItem xs="3">
+						<MudCard Outlined="true">
+							<MudCardMedia Image="@(player.Location.ToMapURL())" Height="200" Title="@player.Location.ToString()" />
+							<MudCardHeader>
+								<MudStack>
+									<MudText Typo="Typo.h6">@player.Nickname</MudText>
+								</MudStack>
+							</MudCardHeader>
+							<MudCardContent>
+								<MudText>Level: @player.Level</MudText>
+								<MudText>Location: @player.Location</MudText>
+							</MudCardContent>
+							<AuthorizeView Roles="Admin, Moderator">
+								<MudCardActions>
+									<MudButtonGroup Color="Color.Primary" Variant="Variant.Filled" FullWidth="true">
+										<MudButton StartIcon="@Icons.Material.Filled.Logout"
+												   OnClick="@(() => LogoutPlayer(player))" Disabled="@IsRestricted(player.Location)">Logout</MudButton>
+										<MudButton StartIcon="@Icons.Material.Filled.Send"
+												   OnClick="@(() => SendMessage(player))" Disabled="@IsRestricted(player.Location)">Send Message</MudButton>
+									</MudButtonGroup>
+								</MudCardActions>
+							</AuthorizeView>
+						</MudCard>
+					</MudItem>
+				}
+			</MudGrid>
+		</MudStack>
+	</MudLoading>
+</MudPaper>
+
+@code {
+	private List<OnlinePlayer> _players = [];
+	private bool _loading;
+
+	private bool IsRestricted(EFikaLocation location)
+	{
+		return location != EFikaLocation.None && location != EFikaLocation.Hideout;
+	}
+
+	private async Task SendMessage(OnlinePlayer? player)
+	{
+		_loading = true;
+		if (player == null)
+		{
+			_loading = false;
+			return;
+		}
+
+		var options = new DialogOptions()
+		{
+			FullWidth = true
+		};
+		var dialog = await DialogService.ShowAsync<SendMessageDialog>("Send Message", options);
+		var result = await dialog.Result;
+
+		if (!result.Canceled)
+		{
+			if (result.Data is string message)
+			{
+				SendMessageRequest request = new()
+				{
+					ProfileId = player.ProfileId,
+					Message = message
+				};				
+
+				try
+				{
+					var postResult = await HttpClient.PostAsJsonAsync("post/sendmessage", request);
+					Snackbar.Add($"Message sent to {player.Nickname}", Severity.Success);
+				}
+				catch (Exception ex)
+				{
+					Snackbar.Add($"Failed to send message: {ex.Message}", Severity.Error);
+				}
+			}
+		}
+
+		_loading = false;
+	}
+
+	private async Task LogoutPlayer(OnlinePlayer? player)
+	{
+		_loading = true;
+		if (player == null)
+		{
+			_loading = false;
+			return;
+		}
+
+		if (player.Location is not EFikaLocation.None and not EFikaLocation.Hideout)
+		{
+			Snackbar.Add($"{player.Nickname} is in a raid and cannot be logged out", Severity.Warning);
+			_loading = false;
+			return;
+		}
+
+		ProfileIdRequest request = new()
+		{
+			ProfileId = player.ProfileId
+		};
+
+		try
+		{
+			var result = await HttpClient.PostAsJsonAsync("post/logout", request);
+			Snackbar.Add($"Sent logout message to {player.Nickname}", Severity.Success);
+		}
+		catch (Exception ex)
+		{
+			Snackbar.Add($"Failed to send logout request: {ex.Message}", Severity.Error);
+		}
+
+		_loading = false;
+	}
+
+#if DEBUG
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+
+		_players.Add(new()
+		{
+			Level = Random.Shared.Next(1, 69),
+			Location = FikaShared.Enums.EFikaLocation.Labyrinth,
+			Nickname = "Test",
+			ProfileId = "test"
+		});
+		_players.Add(new()
+		{
+			Level = Random.Shared.Next(1, 69),
+			Location = FikaShared.Enums.EFikaLocation.Customs,
+			Nickname = "Test",
+			ProfileId = "test"
+		});
+		_players.Add(new()
+		{
+			Level = Random.Shared.Next(1, 69),
+			Location = FikaShared.Enums.EFikaLocation.Streets,
+			Nickname = "Test",
+			ProfileId = "test"
+		});
+		_players.Add(new()
+		{
+			Level = Random.Shared.Next(1, 69),
+			Location = FikaShared.Enums.EFikaLocation.Hideout,
+			Nickname = "Test",
+			ProfileId = "test"
+		});
+		_players.Add(new()
+		{
+			Level = Random.Shared.Next(1, 69),
+			Location = FikaShared.Enums.EFikaLocation.None,
+			Nickname = "Test",
+			ProfileId = "test"
+		});
+	}
+#endif
+}

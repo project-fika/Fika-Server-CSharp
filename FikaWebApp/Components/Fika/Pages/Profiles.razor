@@ -10,13 +10,14 @@
 @inject HttpClient HttpClient
 @inject ILogger<Profiles> Logger
 @inject IDialogService DialogService
+@inject ISnackbar Snackbar
 
 <MudDataGrid @ref="_dataGrid" T="ProfileResponse" SortMode="SortMode.Single" ServerData="ServerReload" Filterable="false" RowsPerPage="10">
 	<ToolBarContent>
 		<MudText Typo="Typo.h6">All Profiles</MudText>
 		<MudSpacer />
 		<MudTextField T="string" ValueChanged="@(s => OnSearch(s))" Placeholder="Search" Adornment="Adornment.Start" Immediate="true"
-			AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+					  AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
 	</ToolBarContent>
 	<Columns>
 		<PropertyColumn Property="x => x.Nickname" />
@@ -24,7 +25,7 @@
 		<PropertyColumn Property="x => x.Level" />
 		<TemplateColumn Title="Flea Banned" CellClass="justify-center">
 			<CellTemplate Context="row">
-				<MudCheckBox Value="@row.Item.HasFleaBan" ReadOnly="true"/>
+				<MudCheckBox Value="@row.Item.HasFleaBan" ReadOnly="true" />
 			</CellTemplate>
 		</TemplateColumn>
 		<TemplateColumn CellClass="d-flex justify-end">
@@ -43,7 +44,7 @@
 		</tr>
 	</RowLoadingContent>
 	<PagerContent>
-		<MudDataGridPager T="ProfileResponse"/>
+		<MudDataGridPager T="ProfileResponse" />
 	</PagerContent>
 </MudDataGrid>
 
@@ -88,6 +89,7 @@
 		catch (Exception ex)
 		{
 			Logger.LogError($"There was an error retrieving the profiles: {ex.Message}");
+			Snackbar.Add($"An error occured when querying: {ex.Message}", Severity.Error);
 			data = [];
 		}
 

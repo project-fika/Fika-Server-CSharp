@@ -11,11 +11,16 @@
         <MudText Typo="Typo.h5" Class="ml-3">Fika Web Management</MudText>		
 		<MudImage Src="images/fika_logo.png" Elevation="25" Height="32" Width="32" Class="ml-2"/>
 		<MudSpacer />
+		<MudText Typo="Typo.caption" Align="Align.Center" Class="ml-2 text-secondary">
+			© @DateTime.Now.Year Project Fika. All rights reserved.
+		</MudText>
 		<AuthorizeView>
 			<Authorized>
-				<MudAvatar Color="Color.Info" Variant="Variant.Outlined">@char.ToUpper(@context.User.Identity?.Name?[0] ?? ' ')</MudAvatar>
+				<MudAvatar Color="Color.Info" Variant="Variant.Outlined" Class="ml-4">
+					@char.ToUpper(@context.User.Identity?.Name?[0] ?? ' ')
+				</MudAvatar>
 			</Authorized>
-		</AuthorizeView>
+		</AuthorizeView>		
 		<MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" Href="https://github.com/project-fika/fika-server-csharp" Target="_blank" />
         @* <MudSpacer />
         <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" /> *@

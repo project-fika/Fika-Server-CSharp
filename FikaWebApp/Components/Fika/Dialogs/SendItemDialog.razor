@@ -45,7 +45,7 @@
 
 	private void Confirm()
 	{
-		MudDialog.Close(DialogResult.Ok(new Tuple<string, int>(_itemId, _amount)));
+		MudDialog.Close(new Tuple<string, int>(_itemId, _amount));
 	}
 
 	private void Cancel()
