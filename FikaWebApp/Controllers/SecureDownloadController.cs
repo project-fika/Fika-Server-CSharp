@@ -7,20 +7,37 @@ namespace FikaWebApp.Controllers
     [ApiController]
     public class SecureDownloadController : ControllerBase
     {
-        [HttpGet("{filename}")]
+        [HttpGet("{*filename}")]
         [Authorize]
         public IActionResult GetFile(string filename)
         {
-            var filePath = Path.Combine("ProtectedFiles", filename);
+            if (string.IsNullOrWhiteSpace(filename))
+            {
+                return BadRequest("Filename is required.");
+            }
 
-            if (!System.IO.File.Exists(filePath))
+            // Root directory where secure files are stored
+            var rootPath = Path.GetFullPath("ProtectedFiles");
+
+            // Combine root path with requested filename
+            var fullPath = Path.GetFullPath(Path.Combine(rootPath, filename));
+
+            // Prevent access outside of ProtectedFiles
+            if (!fullPath.StartsWith(rootPath, StringComparison.OrdinalIgnoreCase))
+            {
+                return BadRequest("Invalid path");
+            }
+
+            if (!System.IO.File.Exists(fullPath))
             {
                 return NotFound();
             }
 
-            var fileBytes = System.IO.File.ReadAllBytes(filePath);
+            var fileBytes = System.IO.File.ReadAllBytes(fullPath);
             var contentType = "application/octet-stream";
-            return File(fileBytes, contentType, filename);
+
+            // Only return the actual filename, not the full relative path
+            return File(fileBytes, contentType, Path.GetFileName(fullPath));
         }
     }
 }
