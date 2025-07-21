@@ -50,6 +50,9 @@
 							<MudTooltip Text="@($"Toggle lock {row.Item.UserName}")">
 								<MudIconButton Icon="@Icons.Material.Filled.Lock" Color="Color.Primary" Variant="Variant.Filled" OnClick="@(() => ToggleLockUser(row.Item))" />
 							</MudTooltip>
+							<MudTooltip Text="@($"Edit {row.Item.UserName}")">
+								<MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Primary" Variant="Variant.Filled" OnClick="@(() => EditUser(row.Item))" />
+							</MudTooltip>
 						</MudStack>
 					</CellTemplate>
 				</TemplateColumn>
@@ -92,6 +95,11 @@
 		}
 
 		return null;
+	}
+
+	private async Task EditUser(ApplicationUser user)
+	{
+		
 	}
 
 	private async Task DeleteUser(ApplicationUser user)

@@ -8,7 +8,7 @@
 
 <MudDialog>
 	<DialogContent>
-		<MudForm @ref="_form" @bind-IsValid="@_success" @bind-Errors="@_errors" Spacing="4">
+		<MudForm @bind-IsValid="@_success" @bind-Errors="@_errors" Spacing="4">
 			<MudTextField T="string" Variant="Variant.Filled" Counter="10" MaxLength="10" Label="Username" Required="true" RequiredError="User name is required!" @ref="_usernameField"
 						  Validation="@(new Func<string, IEnumerable<string>>(UsernameLength))" Immediate="true" />
 			<MudTextField T="string" Variant="Variant.Filled" Counter="0" Label="Password" HelperText="Choose a strong password" @ref="_passwordField"
@@ -37,7 +37,9 @@
 	[CascadingParameter]
 	private IMudDialogInstance MudDialog { get; set; }
 
-	private ApplicationUser _user = new();
+	[Parameter] 
+	public ApplicationUser User { get; set; }
+
 	private IEnumerable<string> _selectedRoles = new HashSet<string>();
 	private string[] _availableRoles = [];
 	private string _roleValue = "None";
@@ -46,7 +48,6 @@
 	private string[] _errors = { };
 	private MudTextField<string> _usernameField;
 	private MudTextField<string> _passwordField;
-	private MudForm _form;
 
 	protected override void OnInitialized()
 	{
@@ -59,9 +60,6 @@
 
 	private void Submit()
 	{
-		_user.UserName = _usernameField.Value;
-		_user.PasswordHash = _passwordField.Value;
-
 		Tuple<string, string, List<string>> value = new(_usernameField.Value, _passwordField.Value, _selectedRoles.ToList());
 		MudDialog.Close(value);
 	}

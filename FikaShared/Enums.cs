@@ -1,4 +1,6 @@
-﻿namespace FikaShared
+﻿using System.ComponentModel;
+
+namespace FikaShared
 {
     public class Enums
     {
@@ -12,8 +14,10 @@
             Shoreline,
             Interchange,
             Reserve,
+            [Description("Streets of Tarkov")]
             Streets,
             Lighthouse,
+            [Description("Ground Zero")]
             GroundZero,
             Laboratory,
             Labyrinth
