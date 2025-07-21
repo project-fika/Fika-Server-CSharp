@@ -1,7 +1,7 @@
 ﻿<MudDialog>
 	<DialogContent>
-		<MudTextField Value="_message" Label="Message" Counter="255"
-			MaxLength="255" Immediate="true" Variant="Variant.Filled" AutoGrow="true" MaxLines="10" HelperText="Does not support newlines"></MudTextField>
+		<MudTextField @ref="_messageField" Value="_message" Label="Message" Counter="255"
+			MaxLength="255" Immediate="true" Variant="Variant.Filled" AutoGrow="true" MaxLines="10" HelperText="Supports newlines"></MudTextField>
 	</DialogContent>
 	<DialogActions>
 		<MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.CheckCircle" OnClick="Confirm">Send</MudButton>
@@ -14,9 +14,11 @@
 	private IMudDialogInstance MudDialog { get; set; }
 
 	private string _message = string.Empty;
+	private MudTextField<string> _messageField;
 
 	private void Confirm()
 	{
+		_message = _messageField.Value;
 		MudDialog.Close(_message);
 	}
 

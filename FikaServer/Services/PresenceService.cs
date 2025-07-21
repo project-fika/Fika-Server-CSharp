@@ -13,7 +13,25 @@ namespace FikaServer.Services
     [Injectable(InjectionType.Singleton)]
     public class PresenceService(SaveServer saveServer, TimeUtil timeUtil, ISptLogger<PresenceService> logger)
     {
+        public List<FikaPlayerPresence> AllPlayersPresence
+        {
+            get
+            {
+                return [.. _onlinePlayers.Values];
+            }
+        }
+
         private readonly ConcurrentDictionary<MongoId, FikaPlayerPresence> _onlinePlayers = [];
+
+        public FikaPlayerPresence? GetPlayerPresence(MongoId profileId)
+        {
+            if (_onlinePlayers.TryGetValue(profileId, out FikaPlayerPresence? playerPresence))
+            {
+                return playerPresence;
+            }
+
+            return null;
+        }
 
         public void AddPlayerPresence(MongoId sessionID)
         {
@@ -35,11 +53,6 @@ namespace FikaServer.Services
             logger.Debug($"[Fika Presence] Adding player: {data.Nickname}");
 
             _onlinePlayers.TryAdd(sessionID, data);
-        }
-
-        public List<FikaPlayerPresence> GetAllPlayersPresence()
-        {
-            return [.. _onlinePlayers.Values];
         }
 
         public void UpdatePlayerPresence(MongoId sessionID, FikaSetPresence NewPresence)

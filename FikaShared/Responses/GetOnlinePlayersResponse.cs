@@ -1,7 +1,10 @@
-﻿namespace FikaShared.Responses
+﻿using System.Text.Json.Serialization;
+
+namespace FikaShared.Responses
 {
     public record GetOnlinePlayersResponse
     {
-        public OnlinePlayer Players { get; set; }
+        [JsonPropertyName("players")]
+        public List<OnlinePlayer> Players { get; set; }
     }
 }

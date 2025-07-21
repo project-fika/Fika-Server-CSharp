@@ -48,6 +48,29 @@
 	private List<OnlinePlayer> _players = [];
 	private bool _loading;
 
+#if RELEASE
+	protected override async Task OnInitializedAsync()
+	{
+		_loading = true;
+		await base.OnInitializedAsync();
+
+		try
+		{
+			var result = await HttpClient.GetFromJsonAsync<GetOnlinePlayersResponse>("get/players");
+			if (result != null)
+			{
+				_players = result.Players;
+			}
+		}
+		catch (Exception ex)
+		{
+			Snackbar.Add($"There was an error retrieving the players: {ex.Message}", Severity.Error);
+		}
+
+		_loading = false;
+	}
+#endif
+
 	private bool IsRestricted(EFikaLocation location)
 	{
 		return location != EFikaLocation.None && location != EFikaLocation.Hideout;

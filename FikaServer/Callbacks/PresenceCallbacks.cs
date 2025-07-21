@@ -15,7 +15,7 @@ namespace FikaServer.Callbacks
         /// </summary>
         public ValueTask<string> HandleGetPresence(string url, IRequestData info, MongoId sessionID)
         {
-            return new ValueTask<string>(httpResponseUtil.NoBody(fikaPresenceService.GetAllPlayersPresence()));
+            return new ValueTask<string>(httpResponseUtil.NoBody(fikaPresenceService.AllPlayersPresence));
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace FikaServer.Callbacks
         {
             fikaPresenceService.UpdatePlayerPresence(sessionID, info);
 
-            return new ValueTask<string>(httpResponseUtil.NoBody(fikaPresenceService.GetAllPlayersPresence()));
+            return new ValueTask<string>(httpResponseUtil.NoBody(fikaPresenceService.AllPlayersPresence));
         }
     }
 }

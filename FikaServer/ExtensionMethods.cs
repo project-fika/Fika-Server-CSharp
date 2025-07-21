@@ -1,6 +1,9 @@
-﻿using FikaServer.Models.Fika.Dialog;
+﻿using FikaServer.Models.Enums;
+using FikaServer.Models.Fika.Dialog;
+using FikaServer.Models.Fika.Presence;
 using SPTarkov.Server.Core.Models.Eft.Common;
 using SPTarkov.Server.Core.Models.Eft.Profile;
+using static FikaShared.Enums;
 
 namespace FikaServer
 {
@@ -58,6 +61,54 @@ namespace FikaServer
         public static bool HasProfileData(this SptProfile? profile)
         {
             return profile != null && profile.ProfileInfo?.ProfileId != null && profile.CharacterData?.PmcData?.Info?.Nickname != null;
+        }
+
+        public static EFikaLocation ToFikaLocation(this string location)
+        {
+            return location switch
+            {
+                "bigmap" => EFikaLocation.Customs,
+                "factory4_day" or "factory4_night" => EFikaLocation.Factory,
+                "interchange" => EFikaLocation.Interchange,
+                "laboratory" => EFikaLocation.Laboratory,
+                "labyrinth" => EFikaLocation.Labyrinth,
+                "lighthouse" => EFikaLocation.Lighthouse,
+                "rezervbase" => EFikaLocation.Reserve,
+                "sandbox" or "sandbox_high" => EFikaLocation.GroundZero,
+                "shoreline" => EFikaLocation.Shoreline,
+                "tarkovstreets" => EFikaLocation.Streets,
+                "woods" => EFikaLocation.Streets,
+                _ => EFikaLocation.None,
+            };
+        }
+
+        public static EFikaLocation ToFikaLocation(this FikaPlayerPresence presence)
+        {
+            if (presence.Activity is EFikaPlayerPresences.IN_HIDEOUT)
+            {
+                return EFikaLocation.Hideout;
+            }
+
+            if (presence.Activity is not EFikaPlayerPresences.IN_RAID)
+            {
+                return EFikaLocation.None;
+            }
+
+            return presence.RaidInformation?.Location switch
+            {
+                "bigmap" => EFikaLocation.Customs,
+                "factory4_day" or "factory4_night" => EFikaLocation.Factory,
+                "interchange" => EFikaLocation.Interchange,
+                "laboratory" => EFikaLocation.Laboratory,
+                "labyrinth" => EFikaLocation.Labyrinth,
+                "lighthouse" => EFikaLocation.Lighthouse,
+                "rezervbase" => EFikaLocation.Reserve,
+                "sandbox" or "sandbox_high" => EFikaLocation.GroundZero,
+                "shoreline" => EFikaLocation.Shoreline,
+                "tarkovstreets" => EFikaLocation.Streets,
+                "woods" => EFikaLocation.Streets,
+                _ => EFikaLocation.None,
+            };
         }
     }
 }

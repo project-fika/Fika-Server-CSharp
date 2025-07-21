@@ -19,7 +19,7 @@ namespace FikaWebApp
                 EFikaLocation.Streets => "images/maps/streets.png",
                 EFikaLocation.Lighthouse => "images/maps/lighthouse.png",
                 EFikaLocation.GroundZero => "images/maps/groundzero.png",
-                EFikaLocation.Labs => "images/maps/labs.png",
+                EFikaLocation.Laboratory => "images/maps/labs.png",
                 EFikaLocation.Labyrinth => "images/maps/labyrinth.png",
                 _ => string.Empty,
             };

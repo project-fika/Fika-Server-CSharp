@@ -15,7 +15,7 @@
             Streets,
             Lighthouse,
             GroundZero,
-            Labs,
+            Laboratory,
             Labyrinth
         }
     }
