@@ -1,0 +1,20 @@
+﻿@page "/Fika/Manage/FileManager"
+
+<MudPaper Width="100%" Elevation="0">
+	<MudTreeView Items="@TreeItems" SelectionMode="SelectionMode.SingleSelection" @bind-SelectedValues="SelectedValues" @bind-SelectedValue="SelectedValue" CheckBoxColor="Color.Info">
+		<ItemTemplate>
+			@{
+				// Casting context from TreeItemData<string> to our own derived class TreeItemPresenter
+				// for convenient usage in the template
+				var presenter = context as TreeItemPresenter;
+			}
+			<MudTreeViewItem @bind-Expanded="@context.Expanded" Items="@context.Children" Value="@context.Value"
+							 Icon="@context.Icon" Text="@context.Text" EndText="@presenter?.EndText" EndTextTypo="@Typo.caption" />
+		</ItemTemplate>
+	</MudTreeView>
+</MudPaper>
+
+<MudStack Row Justify="Justify.Center" Style="width: 100%">
+	<MudText Typo="@Typo.subtitle1">Selected Files: <MudChip T="string">@SelectedValues.Count</MudChip></MudText>
+	<MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Download" Disabled="@(SelectedValue == null)">Download</MudButton>
+</MudStack>

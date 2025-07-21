@@ -25,6 +25,9 @@ namespace FikaWebApp
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
 
+            // Add Controllers
+            builder.Services.AddControllers();
+
             builder.Services.AddCascadingAuthenticationState();
             builder.Services.AddScoped<IdentityUserAccessor>();
             builder.Services.AddScoped<IdentityRedirectManager>();
@@ -79,6 +82,7 @@ namespace FikaWebApp
             app.UseHttpsRedirection();
 
             app.UseAntiforgery();
+            app.MapControllers();
 
             app.MapStaticAssets();
             app.MapRazorComponents<App>()
@@ -89,52 +93,70 @@ namespace FikaWebApp
 
             using (var scope = app.Services.CreateScope())
             {
-                var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                await InitializeDatabase(scope);
+            }
 
-                await dbContext.Database.MigrateAsync(); // ensure DB and tables exist
-                await dbContext.Database.EnsureCreatedAsync();
+            await CreateSecureFileFolder(app);
 
-                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            app.Run();
+        }
 
-                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+        private static Task CreateSecureFileFolder(WebApplication app)
+        {
+            var protectedFilesPath = Path.Combine(app.Environment.ContentRootPath, "ProtectedFiles");
+            if (!Directory.Exists(protectedFilesPath))
+            {
+                Directory.CreateDirectory(protectedFilesPath);
+            }
 
-                var roleExists = await roleManager.RoleExistsAsync("Admin");
-                if (!roleExists)
+            return Task.CompletedTask;
+        }
+
+        private static async Task InitializeDatabase(IServiceScope scope)
+        {
+            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+            await dbContext.Database.MigrateAsync(); // ensure DB and tables exist
+            await dbContext.Database.EnsureCreatedAsync();
+
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+            var roleExists = await roleManager.RoleExistsAsync("Admin");
+            if (!roleExists)
+            {
+                await roleManager.CreateAsync(new IdentityRole("Admin"));
+            }
+
+            roleExists = await roleManager.RoleExistsAsync("Moderator");
+            if (!roleExists)
+            {
+                await roleManager.CreateAsync(new IdentityRole("Moderator"));
+            }
+
+            var user = await userManager.FindByNameAsync("admin");
+            if (user == null)
+            {
+                user = new()
                 {
-                    await roleManager.CreateAsync(new IdentityRole("Admin"));
+                    UserName = "admin"
+                };
+
+                var result = await userManager.CreateAsync(user, "Admin123!");
+                if (!result.Succeeded)
+                {
+                    throw new Exception($"Failed to create default admin account: \n{string.Join(", ", result.Errors.Select(e => e.Description))}");
                 }
-
-                roleExists = await roleManager.RoleExistsAsync("Moderator");
-                if (!roleExists)
+                else
                 {
-                    await roleManager.CreateAsync(new IdentityRole("Moderator"));
-                }
-
-                var user = await userManager.FindByNameAsync("admin");
-                if (user == null)
-                {
-                    user = new()
+                    user = await userManager.FindByNameAsync("admin");
+                    if (user != null)
                     {
-                        UserName = "admin"
-                    };
-
-                    var result = await userManager.CreateAsync(user, "Admin123!");
-                    if (!result.Succeeded)
-                    {
-                        throw new Exception($"Failed to create default admin account: \n{string.Join(", ", result.Errors.Select(e => e.Description))}");
-                    }
-                    else
-                    {
-                        user = await userManager.FindByNameAsync("admin");
-                        if (user != null)
-                        {
-                            await userManager.AddToRolesAsync(user, ["Admin", "Moderator"]);
-                        }
+                        await userManager.AddToRolesAsync(user, ["Admin", "Moderator"]);
                     }
                 }
             }
-
-            app.Run();
         }
 
         private static void SetupHttpClient(IServiceProvider provider, HttpClient client)

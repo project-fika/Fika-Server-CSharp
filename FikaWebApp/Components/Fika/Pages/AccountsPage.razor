@@ -104,6 +104,12 @@
 			return;
 		}
 
+		if (user.UserName == _username)
+		{
+			Snackbar.Add($"You cannot modify your own account!", Severity.Warning);
+			return;
+		}
+
 		if (user.UserName == "admin")
 		{
 			Snackbar.Add("You cannot modify the root user", Severity.Warning);
@@ -147,13 +153,13 @@
 	{
 		if (user.UserName == _username)
 		{
-			Snackbar.Add($"You cannot delete your own account!", Severity.Error, config => { config.VisibleStateDuration = 5000; });
+			Snackbar.Add($"You cannot delete your own account!", Severity.Warning);
 			return;
 		}
 
 		if (user.UserName == "admin")
 		{
-			Snackbar.Add($"You cannot delete the root account!", Severity.Error, config => { config.VisibleStateDuration = 5000; });
+			Snackbar.Add($"You cannot delete the root account!", Severity.Warning);
 			return;			
 		}
 
@@ -167,11 +173,11 @@
 		var result = await UserManager.DeleteAsync(user);
 		if (result.Succeeded)
 		{
-			Snackbar.Add($"User '{user.UserName}' was removed successfully!", Severity.Success, config => { config.VisibleStateDuration = 5000; });
+			Snackbar.Add($"User '{user.UserName}' was removed successfully!", Severity.Success);
 		}
 		else
 		{
-			Snackbar.Add($"User '{user.UserName}' could not be removed!", Severity.Error, config => { config.VisibleStateDuration = 5000; });
+			Snackbar.Add($"User '{user.UserName}' could not be removed!", Severity.Error);
 		}
 
 		RefreshUsers();
@@ -181,13 +187,13 @@
 	{
 		if (user.UserName == _username)
 		{
-			Snackbar.Add($"You cannot lock your own account!", Severity.Error, config => { config.VisibleStateDuration = 5000; });
+			Snackbar.Add($"You cannot lock your own account!", Severity.Warning);
 			return;
 		}
 
 		if (user.UserName == "admin")
 		{
-			Snackbar.Add($"You cannot lock the root account!", Severity.Error, config => { config.VisibleStateDuration = 5000; });
+			Snackbar.Add($"You cannot lock the root account!", Severity.Warning);
 			return;
 		}
 
@@ -203,11 +209,11 @@
 
 		if (!result.Succeeded)
 		{
-			Snackbar.Add($"Failed to toggle account lock!", Severity.Error, config => { config.VisibleStateDuration = 5000; });
+			Snackbar.Add($"Failed to toggle account lock!", Severity.Error);
 		}
 		else
 		{
-			Snackbar.Add($"Account lock was toggled successfully!", Severity.Success, config => { config.VisibleStateDuration = 5000; });
+			Snackbar.Add($"Account lock was toggled successfully!", Severity.Success);
 		}
 
 		RefreshUsers();
@@ -233,11 +239,11 @@
 					var createResult = await UserManager.CreateAsync(newUser, password);
 					if (!createResult.Succeeded)
 					{
-						Snackbar.Add("Unable to create user!", Severity.Error, config => { config.VisibleStateDuration = 5000; });
+						Snackbar.Add("Unable to create user!", Severity.Error);
 					}
 					else
 					{
-						Snackbar.Add($"User '{newUser.UserName}' was created!", Severity.Success, config => { config.VisibleStateDuration = 5000; });
+						Snackbar.Add($"User '{newUser.UserName}' was created!", Severity.Success);
 					}
 
 					newUser = await UserManager.FindByNameAsync(username);
@@ -250,7 +256,7 @@
 				}
 				else
 				{
-					Snackbar.Add($"An account with the username '{username}' already exists!", Severity.Warning, config => { config.VisibleStateDuration = 5000; });
+					Snackbar.Add($"An account with the username '{username}' already exists!", Severity.Warning);
 				}
 			}
 		}
