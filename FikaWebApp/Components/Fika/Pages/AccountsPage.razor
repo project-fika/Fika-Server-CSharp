@@ -99,7 +99,48 @@
 
 	private async Task EditUser(ApplicationUser user)
 	{
-		
+		if (user == null)
+		{
+			return;
+		}
+
+		if (user.UserName == "admin")
+		{
+			Snackbar.Add("You cannot modify the root user", Severity.Warning);
+			return;
+		}
+
+		var parameters = new DialogParameters()
+		{
+			{ "User", user }
+		};
+
+		var dialog = await DialogService.ShowAsync<ModifyAccountDialog>("Modify Account", parameters);
+		var result = await dialog.Result;
+
+		if (!result.Canceled)
+		{
+			if (result.Data is List<string> roles)
+			{
+				var currentRoles = await UserManager.GetRolesAsync(user);
+				var removeResult = await UserManager.RemoveFromRolesAsync(user, currentRoles);
+				if (!removeResult.Succeeded)
+				{
+					Snackbar.Add($"An unknown error has occurred", Severity.Error);
+					return;
+				}
+
+				var changeResult = await UserManager.AddToRolesAsync(user, roles);
+				if (changeResult.Succeeded)
+				{
+					Snackbar.Add($"Modified roles on {user.UserName}", Severity.Success);
+				}
+				else
+				{
+					Snackbar.Add($"There was an error modifying the roles: {string.Join(", ", changeResult.Errors)}");
+				}
+			}
+		}
 	}
 
 	private async Task DeleteUser(ApplicationUser user)
@@ -114,6 +155,13 @@
 		{
 			Snackbar.Add($"You cannot delete the root account!", Severity.Error, config => { config.VisibleStateDuration = 5000; });
 			return;			
+		}
+
+		var confirmationDialog = await DialogService.ShowAsync<YesNoDialog>("Confirmation");
+		var confirmationResult = await confirmationDialog.Result;
+		if (confirmationResult.Canceled)
+		{
+			return;
 		}
 
 		var result = await UserManager.DeleteAsync(user);

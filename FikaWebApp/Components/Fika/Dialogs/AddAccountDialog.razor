@@ -25,8 +25,8 @@
 			</MudSelect>
 			<MudStack Row Justify="Justify.Center" Spacing="2">
 				<MudPaper Class="pa-4 mt-4">
-					<MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!_success)" Class="ml-auto" OnClick="Submit">Add</MudButton>
-					<MudButton Variant="Variant.Filled" Color="Color.Secondary" Class="ml-auto" OnClick="Cancel">Cancel</MudButton>
+					<MudButton StartIcon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!_success)" Class="ml-auto" OnClick="Submit">Add</MudButton>
+					<MudButton StartIcon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Secondary" Class="ml-auto" OnClick="Cancel">Cancel</MudButton>
 				</MudPaper>
 			</MudStack>
 		</MudForm>
@@ -35,10 +35,7 @@
 
 @code {
 	[CascadingParameter]
-	private IMudDialogInstance MudDialog { get; set; }
-
-	[Parameter] 
-	public ApplicationUser User { get; set; }
+	private IMudDialogInstance MudDialog { get; set; }	
 
 	private IEnumerable<string> _selectedRoles = new HashSet<string>();
 	private string[] _availableRoles = [];

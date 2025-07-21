@@ -1,6 +1,7 @@
 ﻿
 using FikaServer.Services;
 using FikaServer.Services.Cache;
+using FikaShared;
 using FikaShared.Responses;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Eft.Profile;
