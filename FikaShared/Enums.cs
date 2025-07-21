@@ -22,5 +22,11 @@ namespace FikaShared
             Laboratory,
             Labyrinth
         }
+
+        public enum EHeadlessState
+        {
+            Ready,
+            InRaid
+        }
     }
 }

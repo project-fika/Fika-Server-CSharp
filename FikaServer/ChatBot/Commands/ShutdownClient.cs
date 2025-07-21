@@ -90,7 +90,5 @@ namespace FikaServer.ChatBot.Commands
 
             return value;
         }
-
-
     }
 }

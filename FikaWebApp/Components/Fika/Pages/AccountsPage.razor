@@ -27,8 +27,7 @@
 						<MudStack>
 							@foreach (var item in GetRoles(row.Item).GetAwaiter().GetResult())
 							{
-								@item
-							
+								@item							
 								<br />
 							}
 						</MudStack>

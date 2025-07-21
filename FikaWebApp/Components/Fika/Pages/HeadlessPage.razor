@@ -1,0 +1,18 @@
+﻿@page "/Fika/Manage/Headless"
+
+@using FikaShared
+
+<MudPaper Class="pa-2">
+	<MudDataGrid Items="_headlessClients">
+		<Columns>
+			<PropertyColumn Property="p => p.ProfileId" />
+			<PropertyColumn Property="p => p.State" />
+			<PropertyColumn Property="p => p.Players" />
+			<TemplateColumn>
+				<CellTemplate Context="row">
+					<MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(row.Item.State is Enums.EHeadlessState.InRaid)" OnClick="@(() => RestartHeadless(row.Item))">Restart</MudButton>
+				</CellTemplate>
+			</TemplateColumn>
+		</Columns>
+	</MudDataGrid>
+</MudPaper>
