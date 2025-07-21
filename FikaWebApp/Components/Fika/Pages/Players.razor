@@ -55,10 +55,9 @@
 
 	private async Task SendMessage(OnlinePlayer? player)
 	{
-		_loading = true;
+
 		if (player == null)
 		{
-			_loading = false;
 			return;
 		}
 
@@ -71,6 +70,8 @@
 
 		if (!result.Canceled)
 		{
+			_loading = true;
+			StateHasChanged();
 			if (result.Data is string message)
 			{
 				SendMessageRequest request = new()
