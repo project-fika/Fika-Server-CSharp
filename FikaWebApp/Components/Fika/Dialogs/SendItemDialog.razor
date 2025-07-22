@@ -8,8 +8,8 @@
 			<MudNumericField @bind-Value="@_model.Amount" Placeholder="How many items to send" Min="0" Max="9999" />
 			<FikaMultiLineTextField @bind-Value="@_model.Message" />
 			<MudCheckBox Label="Specific Date" @bind-Value="_model.UseDate" Color="Color.Info" />
-			<MudDatePicker Label="Send Date" Editable="true" @bind-Date="_model.Date" Placeholder="Select Date" Disabled="!_model.UseDate" />
-			<MudTimePicker Label="Send Time" Editable="true" @bind-Time="_time" Placeholder="Select Time" Disabled="!_model.UseDate" MinuteSelectionStep="5" />
+			<MudDatePicker Label="Send Date" Editable="true" @bind-Date="_model.Date" Placeholder="Select Date" Disabled="!_model.UseDate" ImmediateText />
+			<MudTimePicker Label="Send Time" Editable="true" @bind-Time="_time" Placeholder="Select Time" Disabled="!_model.UseDate" MinuteSelectionStep="5" ImmediateText />
 		</MudStack>
 	</DialogContent>
 	<DialogActions>
