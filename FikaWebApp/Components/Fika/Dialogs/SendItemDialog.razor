@@ -6,7 +6,7 @@
 			<MudTextField @bind-Value="@_itemId" Placeholder="The MongoId to send"
 				Validation="@(new Func<string, string>(Statics.ValidateMongoId))" Immediate="true" OnlyValidateIfDirty="true" />
 			<MudNumericField @bind-Value="@_amount" Placeholder="How many items to send" Min="0" Max="9999" />
-			<FikaMultiLineTextField StringValue="@_message" />						  
+			<FikaMultiLineTextField @bind-Value="@_message" />
 		</MudStack>
 	</DialogContent>
 	<DialogActions>

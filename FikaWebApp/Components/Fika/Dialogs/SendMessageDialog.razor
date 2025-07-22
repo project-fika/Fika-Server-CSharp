@@ -1,6 +1,6 @@
 ﻿<MudDialog>
 	<DialogContent>
-		<FikaMultiLineTextField StringValue="@_message" />
+		<FikaMultiLineTextField @bind-Value="@_message" />
 	</DialogContent>
 	<DialogActions>
 		<FikaPrimaryButton Text="Send" StartIcon="@Icons.Material.Filled.CheckCircle" OnClick="Confirm" />

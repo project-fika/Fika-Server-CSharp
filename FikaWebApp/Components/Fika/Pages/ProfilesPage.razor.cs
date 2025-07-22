@@ -2,6 +2,7 @@ using FikaShared.Responses;
 using FikaWebApp.Components.Fika.Dialogs;
 using FikaWebApp.Data;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using MudBlazor;
@@ -28,6 +29,7 @@ namespace FikaWebApp.Components.Fika.Pages
         MudDataGrid<ProfileResponse> _dataGrid;
         private string _searchString = null;
         private List<ProfileResponse> _profiles = [];
+        private IList<IBrowserFile> _files = [];
 
         protected override async Task OnInitializedAsync()
         {
@@ -99,5 +101,29 @@ namespace FikaWebApp.Components.Fika.Pages
                 StateHasChanged();
             }
         }
+		private async Task UploadProfile(IReadOnlyList<IBrowserFile> files)
+		{
+			if (_files.Count > 1)
+            {
+                Snackbar.Add("Too many files!", Severity.Warning);
+                return;
+            }
+
+            try
+            {
+                var file = files[0];
+                using (var stream = file.OpenReadStream(10 * 1024 * 1024))
+                {
+                    using (var fs = new StreamReader(stream))
+                    {
+                        var data = await fs.ReadToEndAsync();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add($"There was an error reading the profile: {ex.Message}", Severity.Error);
+            }
+		}
     }
 }
