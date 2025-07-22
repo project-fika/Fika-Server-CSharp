@@ -117,6 +117,17 @@ namespace FikaWebApp.Components.Fika.Pages
                     using (var fs = new StreamReader(stream))
                     {
                         var data = await fs.ReadToEndAsync();
+                        var result = await HttpClient.PostAsync("post/uploadprofile", new StringContent(data));
+
+                        if (result.IsSuccessStatusCode)
+                        {
+                            Snackbar.Add("The profile was successfully uploaded", Severity.Success);
+                        }
+                        else
+                        {
+                            var errorMessage = await result.Content.ReadAsStringAsync();
+                            Snackbar.Add($"There was an error uploading the profile: {errorMessage}", Severity.Error);
+                        }
                     }
                 }
             }
