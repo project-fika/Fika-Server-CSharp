@@ -86,10 +86,12 @@ namespace FikaWebApp.Components.Fika.Pages
 
             var options = new DialogOptions
             {
-                BackgroundClass = "blur-background"
+                BackgroundClass = "blur-background",
+                MaxWidth = MaxWidth.Small,
+                FullWidth = true
             };
 
-            var res = await DialogService.ShowAsync<ModifyProfileDialog>("Modify Profile", parameters, options);
+            var res = await DialogService.ShowAsync<ModifyProfileDialog>($"Modify {row.Nickname}", parameters, options);
             var result = await res.Result;
 
             if (!result.Canceled)
