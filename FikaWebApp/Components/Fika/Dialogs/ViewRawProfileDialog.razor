@@ -1,0 +1,21 @@
+﻿<MudDialog>
+	<DialogContent>
+		<MudTextField T="string" Text="@RawJson" Lines="25" Underline="false" Variant="Variant.Outlined" FullWidth="true" Margin="Margin.Normal" ReadOnly></MudTextField>
+	</DialogContent>
+	<DialogActions>
+		<MudButton Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Cancel" OnClick="Cancel">Close</MudButton>
+	</DialogActions>
+</MudDialog>
+
+@code {
+	[CascadingParameter]
+	private IMudDialogInstance MudDialog { get; set; }
+
+	[Parameter]
+	public string? RawJson { get; set; }
+
+	private void Cancel()
+	{
+		MudDialog.Cancel();
+	}
+}

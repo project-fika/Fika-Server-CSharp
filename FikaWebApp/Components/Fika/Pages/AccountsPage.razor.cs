@@ -49,9 +49,9 @@ namespace FikaWebApp.Components.Fika.Pages
             }
 
             var parameters = new DialogParameters()
-        {
-            { "User", user }
-        };
+            {
+                { "User", user }
+            };
 
             var dialog = await DialogService.ShowAsync<ModifyAccountDialog>("Modify Account", parameters);
             var result = await dialog.Result;
