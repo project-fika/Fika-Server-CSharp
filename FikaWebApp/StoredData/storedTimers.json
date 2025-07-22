@@ -1,0 +1,17 @@
+{
+  "singleRequests": {},
+  "toAllRequests": {
+    "638888904000000000": {
+      "profileIds": [
+        "687aabf851a60732021250bd",
+        "68726b7388561166a0f9b1e2",
+        "684d7671000121466e2fef8f",
+        "684973c90002c5b900cd42d4",
+        "686c1cac91f0811c0fe5cc3d"
+      ],
+      "itemTpl": "63f4da90f31d4a33b87bd054",
+      "amount": 1,
+      "message": "Hi all!"
+    }
+  }
+}

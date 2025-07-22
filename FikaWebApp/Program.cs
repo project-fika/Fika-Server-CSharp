@@ -69,6 +69,8 @@ namespace FikaWebApp
 
             var app = builder.Build();
 
+            _ = InstantiateSingletons(app);
+
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
@@ -99,8 +101,28 @@ namespace FikaWebApp
             }
 
             await CreateSecureFileFolder(app);
+            await CheckForDataFolder(app);
 
             app.Run();
+        }
+        
+        private static async Task InstantiateSingletons(WebApplication app)
+        {
+            // this is ugly but it works for now...
+
+            await Task.Delay(TimeSpan.FromSeconds(5)); // artifical delay
+            var sendTimerService = app.Services.GetRequiredService<SendTimersService>();
+        }
+
+        private static Task CheckForDataFolder(WebApplication app)
+        {
+            var dataPath = Path.Combine(app.Environment.ContentRootPath, "StoredData");
+            if (!Directory.Exists(dataPath))
+            {
+                Directory.CreateDirectory(dataPath);
+            }
+
+            return Task.CompletedTask;
         }
 
         private static Task CreateSecureFileFolder(WebApplication app)

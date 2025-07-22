@@ -17,5 +17,8 @@ namespace FikaShared.Requests
         [JsonPropertyName("message")]
         [MaxLength(255)]
         public required string Message { get; set; }
+
+        [JsonIgnore]
+        public DateTime? SendDate { get; set; }
     }
 }
