@@ -7,6 +7,22 @@ namespace FikaWebApp.Services
 {
     public class SendTimersService
     {
+        public Dictionary<Timer, SendItemRequest> Timers
+        {
+            get
+            {
+                return _timers;
+            }
+        }
+
+        public Dictionary<Timer, SendItemToAllRequest> ToAllTimers
+        {
+            get
+            {
+                return _toAllTimers;
+            }
+        }
+
         private readonly HttpClient _httpClient;
         private readonly ILogger<SendTimersService> _logger;
 
@@ -30,7 +46,7 @@ namespace FikaWebApp.Services
             Load();
         }
 
-        private record TimerSaveData
+        public record TimerSaveData
         {
             [JsonPropertyName("singleRequests")]
             public required Dictionary<long, SendItemRequest> SingleRequests { get; set; }
@@ -123,6 +139,8 @@ namespace FikaWebApp.Services
                 _timers.Clear();
                 _toAllTimers.Clear();
             }
+
+            Save();
         }
 
         public void AddTimer(SendItemRequest request, DateTime targetTime, bool save = true)
