@@ -8,7 +8,7 @@
 			<MudNumericField @bind-Value="@_model.Amount" Placeholder="How many items to send" Min="0" Max="9999" />
 			<FikaMultiLineTextField @bind-Value="@_model.Message" />
 			<MudCheckBox Label="Specific Date" @bind-Value="_model.UseDate" Color="Color.Info" />
-			<MudDatePicker Label="Send Date" Editable="true" @bind-Date="_model.Date" Placeholder="Select Date" Disabled="!_model.UseDate" ImmediateText />
+			<MudDatePicker Label="Send Date" Editable="true" @bind-Date="_model.Date" Placeholder="Select Date" Disabled="!_model.UseDate" IsDateDisabledFunc="CheckDate" ImmediateText />
 			<MudTimePicker Label="Send Time" Editable="true" @bind-Time="_time" Placeholder="Select Time" Disabled="!_model.UseDate" MinuteSelectionStep="5" ImmediateText />
 		</MudStack>
 	</DialogContent>
@@ -49,5 +49,10 @@
 
 		public bool UseDate { get; set; }
 		public DateTime? Date { get; set; }
+	}
+
+	private bool CheckDate(DateTime dt)
+	{
+		return dt < DateTime.Now.AddDays(-1);
 	}
 }
