@@ -2,9 +2,9 @@
 	<DialogContent>
 		<MudStack Spacing="4">
 			<MudText>Input a profile Id and an alias</MudText>
-			<MudTextField @ref="_profileIdField" Value="_profileId" Placeholder="ProfileId"
+			<MudTextField @bind-Value="_profileId" Placeholder="ProfileId"
 						  Validation="@(new Func<string, string>(Statics.ValidateMongoId))" MaxLength="24" Immediate OnlyValidateIfDirty />
-			<MudTextField @ref="_aliasField" Value="_alias" Placeholder="Alias" Immediate />
+			<MudTextField @bind-Value="_alias" Placeholder="Alias" Immediate />
 		</MudStack>
 	</DialogContent>
 	<DialogActions>
@@ -20,17 +20,11 @@
 	[Inject]
 	private ISnackbar Snackbar { get; set; }
 
-	private MudTextField<string> _profileIdField;
-	private MudTextField<string> _aliasField;
-
 	private string? _profileId = string.Empty;
 	private string? _alias = string.Empty;
 
 	private void Confirm()
 	{
-		_profileId = _profileIdField.Value;
-		_alias = _aliasField.Value;
-
 		if (!Statics.IsValidMongoId(_profileId))
 		{
 			Snackbar.Add($"{_profileId} is not a valid MongoId", Severity.Error);

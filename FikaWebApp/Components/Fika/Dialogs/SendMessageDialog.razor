@@ -1,6 +1,6 @@
 ﻿<MudDialog>
 	<DialogContent>
-		<MudTextField @ref="_messageField" Value="_message" Label="Message" Counter="255"
+		<MudTextField @bind-Value="_message" Label="Message" Counter="255"
 			MaxLength="255" Immediate="true" Variant="Variant.Filled" AutoGrow="true" MaxLines="10" HelperText="Supports newlines"></MudTextField>
 	</DialogContent>
 	<DialogActions>
@@ -14,11 +14,9 @@
 	private IMudDialogInstance MudDialog { get; set; }
 
 	private string _message = string.Empty;
-	private MudTextField<string> _messageField;
 
 	private void Confirm()
 	{
-		_message = _messageField.Value;
 		MudDialog.Close(_message);
 	}
 

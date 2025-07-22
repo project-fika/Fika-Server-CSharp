@@ -9,11 +9,11 @@ namespace FikaWebApp.Components.Fika.Dialogs
     public partial class ModifyProfileDialog
     {
         [Inject]
-        IDialogService DialogService { get; set; }
+        private IDialogService DialogService { get; set; }
         [Inject]
-        ISnackbar Snackbar { get; set; }
+        private ISnackbar Snackbar { get; set; }
         [Inject]
-        HttpClient HttpClient { get; set; }
+        private HttpClient HttpClient { get; set; }
 
         [CascadingParameter]
         public IMudDialogInstance MudDialog { get; set; }
