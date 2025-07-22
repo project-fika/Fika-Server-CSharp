@@ -140,11 +140,11 @@ namespace FikaWebApp.Services
                     var result = await _httpClient.PostAsJsonAsync("post/senditem", request);
                     if (!result.IsSuccessStatusCode)
                     {
-                        _logger.LogError($"Failed to send item to {request.ProfileId}");
+                        _logger.LogError("Failed to send item to {ProfileId}", request.ProfileId);
                     }
                     else
                     {
-                        _logger.LogInformation($"Sent item to {request.ProfileId}");
+                        _logger.LogInformation("Sent item to {ProfileId}", request.ProfileId);
                     }
                 }
                 catch (Exception ex)
@@ -171,7 +171,7 @@ namespace FikaWebApp.Services
                 }
             }
 
-            _logger.LogInformation($"Added a timer which will send items in {(int)delay.TotalHours}h {delay.Minutes}m {delay.Seconds}s");
+            _logger.LogInformation("Added a timer which will send items in {Hours}h {Minutes}m {Seconds}s", (int)delay.TotalHours, delay.Minutes, delay.Seconds);
         }
 
         public void AddTimer(SendItemToAllRequest request, DateTime targetTime, bool save = true)
@@ -198,7 +198,7 @@ namespace FikaWebApp.Services
                     {
                         message += $" {failed} failed to send.";
                     }
-                    _logger.LogInformation(message);
+                    _logger.LogInformation("{Message}", message);
                 }
                 catch (Exception ex)
                 {
@@ -224,7 +224,7 @@ namespace FikaWebApp.Services
                 }
             }
 
-            _logger.LogInformation($"Added a timer which will send items in {(int)delay.TotalHours}h {delay.Minutes}m {delay.Seconds}s");
+            _logger.LogInformation("Added a timer which will send items in {Hours}h {Minutes}m {Seconds}s", (int)delay.TotalHours, delay.Minutes, delay.Seconds);
         }
     }
 }

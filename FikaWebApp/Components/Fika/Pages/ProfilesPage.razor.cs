@@ -17,12 +17,16 @@ namespace FikaWebApp.Components.Fika.Pages
     {
         [Inject] 
         UserManager<ApplicationUser> UserManager { get; set; }
+
         [Inject]
         HttpClient HttpClient { get; set; }
+
         [Inject]
         ILogger<ProfilesPage> Logger { get; set; }
+
         [Inject]
         IDialogService DialogService { get; set; }
+
         [Inject]
         ISnackbar Snackbar { get; set; }
 
@@ -42,7 +46,7 @@ namespace FikaWebApp.Components.Fika.Pages
             }
             catch (Exception ex)
             {
-                Logger.LogError($"There was an error retrieving the profiles: {ex.Message}");
+                Logger.LogError("There was an error retrieving the profiles: {ExceptionMessage}", ex.Message);
                 Snackbar.Add($"An error occured when querying: {ex.Message}", Severity.Error);
             }
         }

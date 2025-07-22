@@ -226,7 +226,7 @@ namespace FikaWebApp.Components.Fika.Pages
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, ex.Message);
+                Logger.LogError(ex, "{ExceptionMessage}", ex.Message);
             }
 
             _uploading = false;
