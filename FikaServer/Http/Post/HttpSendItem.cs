@@ -1,12 +1,10 @@
-﻿using FikaServer.Models.Fika.WebSocket.Notifications;
-using FikaServer.Services;
+﻿using FikaServer.Services;
 using FikaShared.Requests;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Extensions;
 using SPTarkov.Server.Core.Helpers;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Common.Tables;
-using SPTarkov.Server.Core.Models.Eft.Ws;
 using SPTarkov.Server.Core.Models.Enums;
 using SPTarkov.Server.Core.Services;
 using SPTarkov.Server.Core.Utils;
@@ -18,8 +16,8 @@ namespace FikaServer.Http.Post
 {
     [Injectable(TypePriority = 0)]
     public class HttpSendItem(ConfigService configService, JsonUtil jsonUtil,
-        MailSendService mailSendService, ItemFilterService itemFilterService,
-        ItemHelper itemHelper, PresetHelper presetHelper, ICloner cloner) : BaseHttpRequest(configService)
+        MailSendService mailSendService, ItemHelper itemHelper,
+        PresetHelper presetHelper, ICloner cloner) : BaseHttpRequest(configService)
     {
         protected static readonly FrozenSet<MongoId> _excludedPresetItems =
         [
@@ -40,14 +38,11 @@ namespace FikaServer.Http.Post
 
         public override async Task HandleRequest(HttpRequest req, HttpResponse resp)
         {
-
-            
-
             using (StreamReader sr = new(req.Body))
             {
                 string rawData = await sr.ReadToEndAsync();
-
                 SendItemRequest request = jsonUtil.Deserialize<SendItemRequest>(rawData);
+
                 if (request != null)
                 {
                     MongoId profileId = new(request.ProfileId);
@@ -98,8 +93,7 @@ namespace FikaServer.Http.Post
                         {
                             for (var i = 0; i < quantity; i++)
                             {
-                                itemsToSend.Add(
-                                    new Item
+                                itemsToSend.Add(new Item
                                     {
                                         Id = new MongoId(),
                                         Template = checkedItem.Value.Id,
@@ -135,12 +129,7 @@ namespace FikaServer.Http.Post
 
                     // Flag the items as FiR
                     itemHelper.SetFoundInRaid(itemsToSend);
-
-                    mailSendService.SendSystemMessageToPlayer(
-                        profileId,
-                        message,
-                        itemsToSend
-                    );
+                    mailSendService.SendSystemMessageToPlayer(profileId, message, itemsToSend);
                 }
                 else
                 {
