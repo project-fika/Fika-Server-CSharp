@@ -1,4 +1,4 @@
-﻿@page "/Account/Register"
+﻿@* @page "/Account/Register"
 
 @using System.ComponentModel.DataAnnotations
 @using System.Text
@@ -48,10 +48,6 @@
                 </MudItem>
             </MudGrid>
         </EditForm>
-    </MudItem>
-    <MudItem md="6">
-        <MudText Typo="Typo.body1" GutterBottom="true">Use another service to register.</MudText>
-        <ExternalLoginPicker />
     </MudItem>
 </MudGrid>
 
@@ -149,3 +145,4 @@
         public string ConfirmPassword { get; set; } = "";
     }
 }
+ *@

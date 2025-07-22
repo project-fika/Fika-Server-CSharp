@@ -1,9 +1,16 @@
 ﻿@using FikaWebApp.Data
 
 <MudNavMenu>
+	<AuthorizeView>
+		<Authorized>
+			<MudNavLink Href="Fika/Manage" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
+		</Authorized>
+	</AuthorizeView>
+
 	<AuthorizeView Roles="Admin">
 		<Authorized>
 			<MudNavLink Href="Fika/Manage/Accounts" Icon="@Icons.Material.Filled.AdminPanelSettings">Accounts</MudNavLink>
+			<MudNavLink Href="Fika/Manage/Configuration" Icon="@Icons.Material.Filled.Settings">Configuration</MudNavLink>
 		</Authorized>
 	</AuthorizeView>
 

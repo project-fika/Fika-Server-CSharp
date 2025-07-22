@@ -8,8 +8,8 @@
     @* <MudNavLink Href="auth" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Lock">Auth Required</MudNavLink> *@
     <AuthorizeView>
         <Authorized>
+			<MudNavLink Href="Fika/Manage" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Storage">Fika</MudNavLink>
             <MudNavLink Href="Account/Manage" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Person">@context.User.Identity?.Name</MudNavLink>
-			<MudNavLink Href="Fika/Manage" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Person">Fika</MudNavLink>
             <form action="Account/Logout" method="post">
                 <AntiforgeryToken />
                 <input type="hidden" name="ReturnUrl" value="@currentUrl" />

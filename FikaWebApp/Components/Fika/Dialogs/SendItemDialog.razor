@@ -3,7 +3,7 @@
 		<MudStack Spacing="4">
 			<MudText>Input a MongoId and a valid amount to send</MudText>
 			<MudTextField Value="_itemId" Placeholder="The MongoId to send"
-				Validation="@(new Func<string, string>(ValidateMongoId))" Immediate="true" OnlyValidateIfDirty="true" />
+				Validation="@(new Func<string, string>(Statics.ValidateMongoId))" Immediate="true" OnlyValidateIfDirty="true" />
 			<MudNumericField Value="_amount" Placeholder="How many items to send" Min="0" Max="9999" />
 		</MudStack>
 	</DialogContent>
@@ -19,29 +19,6 @@
 
 	private string _itemId = string.Empty;
 	private int _amount = 1;
-
-	private string? ValidateMongoId(string input)
-	{
-		var span = input.AsSpan();
-
-		if (span.Length != 24)
-		{
-			return "The MongoId is too short! Must be 24 characters.";
-		}
-
-		for (var i = 0; i < 24; i++)
-		{
-			var c = span[i];
-			var isHex = (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
-
-			if (!isHex)
-			{
-				return "Input is not a valid MongoId.";
-			}
-		}
-
-		return null;
-	}
 
 	private void Confirm()
 	{

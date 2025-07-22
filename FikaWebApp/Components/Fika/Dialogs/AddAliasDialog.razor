@@ -1,0 +1,53 @@
+﻿<MudDialog>
+	<DialogContent>
+		<MudStack Spacing="4">
+			<MudText>Input a profile Id and an alias</MudText>
+			<MudTextField @ref="_profileIdField" Value="_profileId" Placeholder="ProfileId"
+						  Validation="@(new Func<string, string>(Statics.ValidateMongoId))" MaxLength="24" Immediate OnlyValidateIfDirty />
+			<MudTextField @ref="_aliasField" Value="_alias" Placeholder="Alias" Immediate />
+		</MudStack>
+	</DialogContent>
+	<DialogActions>
+		<MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.CheckCircle" OnClick="Confirm">Confirm</MudButton>
+		<MudButton Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Cancel" OnClick="Cancel">Cancel</MudButton>
+	</DialogActions>
+</MudDialog>
+
+@code {
+	[CascadingParameter]
+	private IMudDialogInstance MudDialog { get; set; }
+
+	[Inject]
+	private ISnackbar Snackbar { get; set; }
+
+	private MudTextField<string> _profileIdField;
+	private MudTextField<string> _aliasField;
+
+	private string? _profileId = string.Empty;
+	private string? _alias = string.Empty;
+
+	private void Confirm()
+	{
+		_profileId = _profileIdField.Value;
+		_alias = _aliasField.Value;
+
+		if (!Statics.IsValidMongoId(_profileId))
+		{
+			Snackbar.Add($"{_profileId} is not a valid MongoId", Severity.Error);
+			return;
+		}
+
+		if (string.IsNullOrEmpty(_alias))
+		{
+			Snackbar.Add("Alias cannot be empty", Severity.Error);
+			return;
+		}		
+
+		MudDialog.Close(new Tuple<string, string>(_profileId, _alias));
+	}
+
+	private void Cancel()
+	{
+		MudDialog.Cancel();
+	}
+}

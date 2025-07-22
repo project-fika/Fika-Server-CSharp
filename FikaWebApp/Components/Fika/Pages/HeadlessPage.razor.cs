@@ -13,7 +13,8 @@ namespace FikaWebApp.Components.Fika.Pages
         [Inject]
         public ISnackbar Snackbar { get; set; }
 
-        List<OnlineHeadless> _headlessClients = [];
+        private List<OnlineHeadless> _headlessClients = [];
+        private bool _loading;
 
         protected override async Task OnInitializedAsync()
         {
@@ -59,6 +60,7 @@ namespace FikaWebApp.Components.Fika.Pages
 
         public async Task RestartHeadless(OnlineHeadless headless)
         {
+            _loading = true;
             try
             {
                 var request = new ProfileIdRequest()
@@ -76,6 +78,7 @@ namespace FikaWebApp.Components.Fika.Pages
             {
                 Snackbar.Add($"There was an error when sending the request: {ex.Message}", Severity.Error);
             }
+            _loading = false;
         }
     }
 }

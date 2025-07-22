@@ -6,6 +6,18 @@
 
 <PageTitle>Fika Management</PageTitle>
 
-@code {
-
-}
+<MudPaper Class="pa-4">
+	<MudCard>
+		<MudCardHeader>
+			<MudText Typo="Typo.h4">Server Status</MudText>
+		</MudCardHeader>
+		<MudCardContent>
+			<MudStack>
+				<MudStack Row Spacing="2">
+					<MudAvatar Size="Size.Small" Class="me-2" Color="@_statusColor" />
+					<MudText>@_statusText</MudText>
+				</MudStack>
+			</MudStack>
+		</MudCardContent>
+	</MudCard>
+</MudPaper>

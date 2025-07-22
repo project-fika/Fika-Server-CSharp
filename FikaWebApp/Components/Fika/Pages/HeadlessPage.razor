@@ -2,17 +2,21 @@
 
 @using FikaShared
 
-<MudPaper Class="pa-2">
-	<MudDataGrid Items="_headlessClients">
-		<Columns>
-			<PropertyColumn Property="p => p.ProfileId" />
-			<PropertyColumn Property="p => p.State" />
-			<PropertyColumn Property="p => p.Players" />
-			<TemplateColumn>
-				<CellTemplate Context="row">
-					<MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(row.Item.State is Enums.EHeadlessState.InRaid)" OnClick="@(() => RestartHeadless(row.Item))">Restart</MudButton>
-				</CellTemplate>
-			</TemplateColumn>
-		</Columns>
-	</MudDataGrid>
+
+
+<MudPaper Class="mud-width-full pa-2" Style="position: relative;">
+	<MudLoading Loading="_loading" Darken="true" Overlap="true" Text="Waiting for server...">
+		<MudDataGrid Items="_headlessClients">
+			<Columns>
+				<PropertyColumn Property="p => p.ProfileId" />
+				<PropertyColumn Property="p => p.State" />
+				<PropertyColumn Property="p => p.Players" />
+				<TemplateColumn>
+					<CellTemplate Context="row">
+						<MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(row.Item.State is Enums.EHeadlessState.InRaid)" OnClick="@(() => RestartHeadless(row.Item))">Restart</MudButton>
+					</CellTemplate>
+				</TemplateColumn>
+			</Columns>
+		</MudDataGrid>
+	</MudLoading>
 </MudPaper>
