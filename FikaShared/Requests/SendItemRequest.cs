@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace FikaShared.Requests
 {
@@ -9,5 +10,9 @@ namespace FikaShared.Requests
 
         [JsonPropertyName("amount")]
         public required int Amount { get; set; }
+
+        [JsonPropertyName("message")]
+        [MaxLength(255)]
+        public required string Message { get; set; }
     }
 }
