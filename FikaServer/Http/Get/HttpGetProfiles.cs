@@ -12,7 +12,7 @@ namespace FikaServer.Http.Get
     [Injectable(TypePriority = 0)]
     public class HttpGetProfiles(SaveServer saveServer, HttpResponseUtil httpResponseUtil, ConfigService configService) : BaseHttpRequest(configService)
     {
-        public override string Path { get; set; } = "get/profiles";
+        public override string Path { get; set; } = "/get/profiles";
 
         public override string Method
         {

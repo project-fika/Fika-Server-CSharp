@@ -16,7 +16,7 @@ namespace FikaServer.Http.Get
     public class HttpGetPlayers(ConfigService configService, FikaProfileService profileService,
         SaveServer saveServer, PresenceService presenceService, HttpResponseUtil httpResponseUtil) : BaseHttpRequest(configService)
     {
-        public override string Path { get; set; } = "get/players";
+        public override string Path { get; set; } = "/get/players";
 
         public override string Method
         {

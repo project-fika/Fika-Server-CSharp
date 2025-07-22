@@ -12,7 +12,7 @@ namespace FikaServer.Http.Post
     [Injectable(TypePriority = 0)]
     public class HttpSendMessage(ConfigService configService, JsonUtil jsonUtil, NotificationSendHelper sendHelper) : BaseHttpRequest(configService)
     {
-        public override string Path { get; set; } = "post/sendmessage";
+        public override string Path { get; set; } = "/post/sendmessage";
 
         public override string Method
         {

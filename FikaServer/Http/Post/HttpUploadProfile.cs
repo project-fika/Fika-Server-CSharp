@@ -11,7 +11,7 @@ namespace FikaServer.Http.Post
     public class HttpUploadProfile(ConfigService configService, JsonUtil jsonUtil,
         SaveServer saveServer) : BaseHttpRequest(configService)
     {
-        public override string Path { get; set; } = "post/uploadprofile";
+        public override string Path { get; set; } = "/post/uploadprofile";
 
         public override string Method
         {

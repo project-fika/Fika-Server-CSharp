@@ -14,7 +14,7 @@ namespace FikaServer.Http.Get
     [Injectable(TypePriority = 0)]
     public class HttpGetHeadless(ConfigService configService, HeadlessService headlessService, HttpResponseUtil httpResponseUtil) : BaseHttpRequest(configService)
     {
-        public override string Path { get; set; } = "get/headless";
+        public override string Path { get; set; } = "/get/headless";
 
         public override string Method
         {

@@ -11,7 +11,7 @@ namespace FikaServer.Http.Get
     [Injectable(TypePriority = 0)]
     public class HttpGetRaids(ConfigService configService, MatchService matchService, HttpResponseUtil httpResponseUtil) : BaseHttpRequest(configService)
     {
-        public override string Path { get; set; } = "get/raids";
+        public override string Path { get; set; } = "/get/raids";
 
         public override string Method
         {

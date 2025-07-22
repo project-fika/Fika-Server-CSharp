@@ -16,7 +16,7 @@ namespace FikaServer.Http.Post
     public class HttpAddFleaBan(SaveServer saveServer, ConfigService configService,
         TimeUtil timeUtil, JsonUtil jsonUtil, NotificationSendHelper sendHelper) : BaseHttpRequest(configService)
     {
-        public override string Path { get; set; } = "post/addfleaban";
+        public override string Path { get; set; } = "/post/addfleaban";
 
         public override string Method
         {

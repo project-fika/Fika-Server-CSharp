@@ -16,7 +16,7 @@ namespace FikaServer.Http.Post
     public class HttpAddRemoveBan(SaveServer saveServer, ConfigService configService,
         JsonUtil jsonUtil, NotificationSendHelper sendHelper) : BaseHttpRequest(configService)
     {
-        public override string Path { get; set; } = "post/removefleaban";
+        public override string Path { get; set; } = "/post/removefleaban";
 
         public override string Method
         {

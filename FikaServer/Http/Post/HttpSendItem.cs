@@ -26,7 +26,7 @@ namespace FikaServer.Http.Post
             ItemTpl.FLARE_RSP30_REACTIVE_SIGNAL_CARTRIDGE_YELLOW,
         ];
 
-        public override string Path { get; set; } = "post/senditem";
+        public override string Path { get; set; } = "/post/senditem";
 
         public override string Method
         {

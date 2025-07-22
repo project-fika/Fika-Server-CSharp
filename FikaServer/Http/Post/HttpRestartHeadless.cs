@@ -15,7 +15,7 @@ namespace FikaServer.Http.Post
     public class HttpRestartHeadless(ConfigService configService, JsonUtil jsonUtil, NotificationSendHelper sendHelper,
         HeadlessService headlessService) : BaseHttpRequest(configService)
     {
-        public override string Path { get; set; } = "post/restartheadless";
+        public override string Path { get; set; } = "/post/restartheadless";
 
         public override string Method
         {

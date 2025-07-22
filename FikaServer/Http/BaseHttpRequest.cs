@@ -8,7 +8,7 @@ namespace FikaServer.Http
     public abstract class BaseHttpRequest(ConfigService configService) : IHttpListener
     {
         /// <summary>
-        /// The path, e.g. <c>"get/profiles"</c>
+        /// The path, e.g. <c>"/get/profiles"</c>
         /// </summary>
         public abstract string Path { get; set; }
         /// <summary>
@@ -23,7 +23,7 @@ namespace FikaServer.Http
                 return false;
             }
 
-            if (!req.Path.Value?.Contains(Path, StringComparison.OrdinalIgnoreCase) ?? false)
+            if (!string.Equals(req.Path.Value, Path, StringComparison.OrdinalIgnoreCase))
             {
                 return false;
             }

@@ -1,8 +1,10 @@
 using FikaShared.Requests;
 using FikaShared.Responses;
+using FikaWebApp.Services;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using System.Net;
+using static FikaWebApp.Components.Fika.Dialogs.SendItemDialog;
 
 namespace FikaWebApp.Components.Fika.Dialogs
 {
@@ -10,10 +12,15 @@ namespace FikaWebApp.Components.Fika.Dialogs
     {
         [Inject]
         private IDialogService DialogService { get; set; }
+
         [Inject]
         private ISnackbar Snackbar { get; set; }
+
         [Inject]
         private HttpClient HttpClient { get; set; }
+
+        [Inject]
+        private SendTimersService SendTimersService { get; set; }
 
         [CascadingParameter]
         public IMudDialogInstance MudDialog { get; set; }
@@ -29,32 +36,39 @@ namespace FikaWebApp.Components.Fika.Dialogs
 
             if (!result.Canceled)
             {
-                if (result.Data is (string itemTpl, int amount, string message))
+                if (result.Data is SendItemModel model)
                 {
                     SendItemRequest sendItemRequest = new()
                     {
                         ProfileId = Profile.ProfileId,
-                        ItemTemplate = itemTpl,
-                        Amount = amount,
-                        Message = message
+                        ItemTemplate = model.TemplateId,
+                        Amount = model.Amount,
+                        Message = model.Message
                     };
 
-                    try
+                    if (model.UseDate)
                     {
-                        var postResult = await HttpClient.PostAsJsonAsync("post/senditem", sendItemRequest);
-                        if (postResult.IsSuccessStatusCode)
-                        {
-                            Snackbar.Add($"Item was successfully sent to {Profile.Nickname}", Severity.Success);
-                        }
-                        else
-                        {
-                            var errorMessage = await postResult.Content.ReadAsStringAsync();
-                            Snackbar.Add($"There was an error sending the item: [{postResult.StatusCode}] {errorMessage}", Severity.Error);
-                        }
+                        SendTimersService.AddTimer(sendItemRequest, model.Date.Value);
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        Snackbar.Add($"There was an error sending the item: {ex.Message}", Severity.Error);
+                        try
+                        {
+                            var postResult = await HttpClient.PostAsJsonAsync("post/senditem", sendItemRequest);
+                            if (postResult.IsSuccessStatusCode)
+                            {
+                                Snackbar.Add($"Item was successfully sent to {Profile.Nickname}", Severity.Success);
+                            }
+                            else
+                            {
+                                var errorMessage = await postResult.Content.ReadAsStringAsync();
+                                Snackbar.Add($"There was an error sending the item: [{postResult.StatusCode}] {errorMessage}", Severity.Error);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Snackbar.Add($"There was an error sending the item: {ex.Message}", Severity.Error);
+                        }
                     }
                 } 
             }

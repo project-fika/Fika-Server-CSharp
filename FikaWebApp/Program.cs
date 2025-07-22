@@ -54,7 +54,7 @@ namespace FikaWebApp
 
             builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
-            builder.Services.Configure<FikaConfig>(builder.Configuration.GetSection("FikaConfig"));
+            builder.Services.Configure<FikaConfig>(builder.Configuration.GetSection("FikaConfig"));            
             builder.Services.AddSingleton(resolver =>
                 resolver.GetRequiredService<IOptions<FikaConfig>>().Value);
 
@@ -64,6 +64,8 @@ namespace FikaWebApp
                     {
                         ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
                     });
+
+            builder.Services.AddSingleton<SendTimersService>();
 
             var app = builder.Build();
 

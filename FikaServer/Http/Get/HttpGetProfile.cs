@@ -14,7 +14,7 @@ namespace FikaServer.Http.Get
     public class HttpGetProfile(SaveServer saveServer, HttpResponseUtil httpResponseUtil,
         ConfigService configService, JsonUtil jsonUtil) : BaseHttpRequest(configService)
     {
-        public override string Path { get; set; } = "get/rawprofile";
+        public override string Path { get; set; } = "/get/rawprofile";
 
         public override string Method
         {
