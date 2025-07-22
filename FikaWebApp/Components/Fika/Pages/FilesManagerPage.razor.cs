@@ -1,7 +1,7 @@
-using Humanizer.Localisation.TimeToClockNotation;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
+using System.IO;
 
 namespace FikaWebApp.Components.Fika.Pages
 {
@@ -13,12 +13,22 @@ namespace FikaWebApp.Components.Fika.Pages
         [Inject]
         public ISnackbar Snackbar { get; set; }
 
+        [Inject]
+        private IDialogService DialogService { get; set; }
+
+        [Inject]
+        private ILogger<FilesManagerPage> Logger { get; set; }
+
         //public IReadOnlyCollection<string> SelectedValues { get; set; } = [];
         public string? SelectedValue { get; set; }
         public List<TreeItemData<string>> TreeItems { get; set; } = [];
 
         private bool _expanded;
         private IList<IBrowserFile> _files = [];
+
+        private bool _uploading;
+        private string? _uploadingText;
+        private readonly long _maxSize = 28 * 1024 * 1024;
 
         protected override void OnInitialized()
         {
@@ -53,6 +63,8 @@ namespace FikaWebApp.Components.Fika.Pages
                     EndText = FormatBytes(file.Length)
                 });
             }
+
+            SelectedValue = null;
         }
 
         private static string ExtensionToIcon(string extension)
@@ -156,14 +168,15 @@ namespace FikaWebApp.Components.Fika.Pages
                 Number = number;
             }
         }
-		private void ToggleExpand()
-		{
+        private void ToggleExpand()
+        {
             _expanded = !_expanded;
-		}
+        }
 
-		private async Task UploadFiles(IReadOnlyList<IBrowserFile> files)
-		{
+        private async Task UploadFiles(IReadOnlyList<IBrowserFile> files)
+        {
             _files.Clear();
+            _uploading = true;
 
             foreach (var file in files)
             {
@@ -171,25 +184,91 @@ namespace FikaWebApp.Components.Fika.Pages
             }
 
             var uploadPath = Path.GetFullPath("ProtectedFiles");
+            int filesUploaded = 0;
 
-            foreach (var file in _files)
+            try
             {
-                var safeFileName = Path.GetFileName(file.Name); // prevent directory traversal
-                var filePath = Path.Combine(uploadPath, safeFileName);
-
-                if (File.Exists(filePath))
+                foreach (var file in _files)
                 {
-                    File.Delete(filePath);
+                    if (file.Size > _maxSize)
+                    {
+                        Snackbar.Add($"{file.Name} is too big to upload! Size: {FormatBytes(file.Size)}, Max: {FormatBytes(_maxSize)}", Severity.Error);
+                        continue;
+                    }
+
+                    var safeFileName = Path.GetFileName(file.Name); // prevent directory traversal
+                    var filePath = Path.Combine(uploadPath, safeFileName);
+
+                    if (File.Exists(filePath))
+                    {
+                        File.Delete(filePath);
+                    }
+
+                    await using FileStream writeStream = new(filePath, FileMode.Create);
+                    using var readStream = file.OpenReadStream(_maxSize);
+                    var bytesRead = 0;
+                    var totalRead = 0;
+                    var buffer = new byte[1024 * 10];
+
+                    var uploadPercentage = 0m;
+
+                    while ((bytesRead = await readStream.ReadAsync(buffer)) != 0)
+                    {
+                        totalRead += bytesRead;
+                        await writeStream.WriteAsync(buffer.AsMemory(0, bytesRead));
+                        uploadPercentage = decimal.Divide(totalRead, file.Size) * 100;
+                        _uploadingText = $"Uploading {file.Name} ({uploadPercentage:0.0}%)";
+                        StateHasChanged();
+                    }
+
+                    filesUploaded++;
                 }
-
-                using var fileStream = file.OpenReadStream(maxAllowedSize: 28 * 1024 * 1024); // 10 MB limit
-                using var targetStream = File.Create(filePath);
-
-                await fileStream.CopyToAsync(targetStream);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, ex.Message);
             }
 
-            Snackbar.Add($"Uploaded {_files.Count} file(s)", Severity.Success);
+            _uploading = false;
+            _uploadingText = null;
+            if (filesUploaded > 0)
+            {
+                Snackbar.Add($"Uploaded {filesUploaded} file(s)", Severity.Success); 
+            }
+
+            StateHasChanged();
             RefreshFiles();
-		}
+        }
+        private async Task DeleteFile()
+        {
+            if (string.IsNullOrEmpty(SelectedValue))
+            {
+                return;
+            }
+
+            var result = await DialogService.ShowMessageBox("Confirmation", $"Are you sure you want to remove '{SelectedValue}? This is permanent!", "Yes", cancelText: "No");
+            if (!result.HasValue)
+            {
+                return;
+            }
+
+            // Root directory where secure files are stored
+            var rootPath = Path.GetFullPath("ProtectedFiles");
+
+            // Combine root path with requested filename
+            var fullPath = Path.GetFullPath(Path.Combine(rootPath, SelectedValue));
+
+            if (File.Exists(fullPath))
+            {
+                File.Delete(fullPath);
+            }
+
+            if (Directory.Exists(fullPath))
+            {
+                Directory.Delete(fullPath, true);
+            }
+
+            RefreshFiles();
+        }
     }
 }

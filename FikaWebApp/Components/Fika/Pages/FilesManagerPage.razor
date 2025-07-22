@@ -1,40 +1,43 @@
 ﻿@page "/Fika/Manage/FileManager"
 
 <MudStack Spacing="4">
-	<MudPaper Width="100%" Elevation="0" Class="pa-2">
-		<MudStack Spacing="2">
-			<MudButton OnClick="ToggleExpand">@(_expanded ? "Hide Info" : "Show Info")</MudButton>
-			<MudCollapse Expanded="_expanded">
-				<MudText>
-					You can download files that have been uploaded by the server admin here. <br />
-					NOTE: Files over 250mb are not recommended.
-				</MudText>
-			</MudCollapse>
-		</MudStack>
-		<MudTreeView Items="@TreeItems" SelectionMode="SelectionMode.SingleSelection" @bind-SelectedValue="SelectedValue" CheckBoxColor="Color.Info">
-			<ItemTemplate>
-				@{
-					// Casting context from TreeItemData<string> to our own derived class TreeItemPresenter
-					// for convenient usage in the template
-					var presenter = context as TreeItemPresenter;
-				}
-				<MudTreeViewItem @bind-Expanded="@context.Expanded" Items="@context.Children" Value="@context.Value"
-								 Icon="@context.Icon" Text="@context.Text" EndText="@presenter?.EndText" EndTextTypo="@Typo.caption" />
-			</ItemTemplate>
-		</MudTreeView>
-	</MudPaper>
+	<MudLoading Loading="@_uploading" Text="@_uploadingText" Overlap Darken>
+		<MudPaper Width="100%" Elevation="0" Class="pa-2">
+			<MudStack Spacing="2">
+				<MudButton OnClick="ToggleExpand">@(_expanded ? "Hide Info" : "Show Info")</MudButton>
+				<MudCollapse Expanded="_expanded">
+					<MudText>
+						You can download files that have been uploaded by the server admin here. <br />
+						NOTE: Files over 250mb are not recommended.
+					</MudText>
+				</MudCollapse>
+			</MudStack>
+			<MudTreeView Items="@TreeItems" SelectionMode="SelectionMode.SingleSelection" @bind-SelectedValue="SelectedValue" CheckBoxColor="Color.Info">
+				<ItemTemplate>
+					@{
+						// Casting context from TreeItemData<string> to our own derived class TreeItemPresenter
+						// for convenient usage in the template
+						var presenter = context as TreeItemPresenter;
+					}
+					<MudTreeViewItem @bind-Expanded="@context.Expanded" Items="@context.Children" Value="@context.Value"
+									 Icon="@context.Icon" Text="@context.Text" EndText="@presenter?.EndText" EndTextTypo="@Typo.caption" />
+				</ItemTemplate>
+			</MudTreeView>
+		</MudPaper>
 
-	<MudStack Row Justify="Justify.Center" Style="width: 100%">
-		@* <MudText Typo="@Typo.subtitle1">Selected Files: <MudChip T="string">@SelectedValues.Count</MudChip></MudText> *@
-		<MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FileDownload" Disabled="@(SelectedValue == null)" OnClick="DownloadFile">Download</MudButton>
-		<AuthorizeView Roles="Admin">
-			<Authorized>
-				<MudFileUpload T="IReadOnlyList<IBrowserFile>" FilesChanged="UploadFiles">
-					<ActivatorContent>
-						<MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.UploadFile">Upload</MudButton>
-					</ActivatorContent>
-				</MudFileUpload>
-			</Authorized>
-		</AuthorizeView>
-	</MudStack>
+		<MudStack Row Justify="Justify.Center" Style="width: 100%">
+			@* <MudText Typo="@Typo.subtitle1">Selected Files: <MudChip T="string">@SelectedValues.Count</MudChip></MudText> *@
+			<MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FileDownload" Disabled="@(SelectedValue == null)" OnClick="DownloadFile">Download</MudButton>
+			<AuthorizeView Roles="Admin">
+				<Authorized>
+					<MudFileUpload T="IReadOnlyList<IBrowserFile>" FilesChanged="UploadFiles">
+						<ActivatorContent>
+							<MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.UploadFile">Upload</MudButton>
+						</ActivatorContent>
+					</MudFileUpload>
+					<MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.DeleteForever" OnClick="DeleteFile" Disabled="SelectedValue == null">Delete</MudButton>
+				</Authorized>
+			</AuthorizeView>
+		</MudStack>
+	</MudLoading>
 </MudStack>
