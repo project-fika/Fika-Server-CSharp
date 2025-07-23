@@ -50,7 +50,8 @@ namespace FikaWebApp.Components.Fika.Dialogs
                         ProfileId = Profile.ProfileId,
                         ItemTemplate = model.TemplateId,
                         Amount = model.Amount,
-                        Message = model.Message
+                        Message = model.Message,
+                        FoundInRaid = model.FoundInRaid
                     };
 
                     if (model.UseDate)

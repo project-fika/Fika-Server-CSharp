@@ -10,7 +10,10 @@
 				MaxItems="100" Dense Clearable Modal ResetValueOnEmptyText ShowProgressIndicator="_searching"/>
 			<MudNumericField @bind-Value="@_model.Amount" Placeholder="How many items to send" Min="0" Max="9999" Adornment="Adornment.End" AdornmentText="item(s)" />
 			<FikaMultiLineTextField @bind-Value="@_model.Message" />
-			<MudCheckBox Label="Specific Date" @bind-Value="_model.UseDate" Color="Color.Info" />
+			<MudStack Row>
+				<MudCheckBox Label="Found In Raid" @bind-Value="_model.FoundInRaid" Color="Color.Primary" />
+				<MudCheckBox Label="Specific Date" @bind-Value="_model.UseDate" Color="Color.Info" />
+			</MudStack>
 			<MudDatePicker Label="Send Date" Editable="true" @bind-Date="_model.Date" Placeholder="Select Date" Disabled="!_model.UseDate" IsDateDisabledFunc="CheckDate" ImmediateText />
 			<MudTimePicker Label="Send Time" Editable="true" @bind-Time="_time" Placeholder="Select Time" Disabled="!_model.UseDate" MinuteSelectionStep="5" ImmediateText />
 		</MudStack>
@@ -66,6 +69,7 @@
 		public string TemplateId { get; set; } = string.Empty;
 		public int Amount { get; set; } = 1;
 		public string Message { get; set; } = string.Empty;
+		public bool FoundInRaid { get; set; } = true;
 
 		public bool UseDate { get; set; }
 		public DateTime? Date { get; set; }

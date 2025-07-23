@@ -61,7 +61,8 @@ namespace FikaWebApp.Components.Fika.Pages
                         ProfileIds = [.. profiles.Select(p => p.ProfileId)],
                         ItemTemplate = model.TemplateId,
                         Amount = model.Amount,
-                        Message = model.Message
+                        Message = model.Message,
+                        FoundInRaid = model.FoundInRaid
                     };
 
                     if (model.UseDate)

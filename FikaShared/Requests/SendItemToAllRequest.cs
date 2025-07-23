@@ -18,6 +18,9 @@ namespace FikaShared.Requests
         [MaxLength(255)]
         public required string Message { get; set; }
 
+        [JsonPropertyName("fir")]
+        public required bool FoundInRaid { get; set; }
+
         [JsonIgnore]
         public DateTime? SendDate { get; set; }
     }

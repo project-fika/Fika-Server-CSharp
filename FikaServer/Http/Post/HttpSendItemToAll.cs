@@ -129,8 +129,11 @@ namespace FikaServer.Http.Post
                             }
                         }
 
-                        // Flag the items as FiR
-                        itemHelper.SetFoundInRaid(itemsToSend);
+                        if (request.FoundInRaid)
+                        {
+                            // Flag the items as FiR
+                            itemHelper.SetFoundInRaid(itemsToSend);
+                        }
                         mailSendService.SendSystemMessageToPlayer(profileId, message, itemsToSend);
                     }
                 }
