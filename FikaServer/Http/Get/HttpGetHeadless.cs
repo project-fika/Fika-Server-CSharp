@@ -35,7 +35,7 @@ namespace FikaServer.Http.Get
                 {
                     ProfileId = profileId,
                     State = state,
-                    Players = headlessClient.Players.Count
+                    Players = headlessClient.Players != null ? headlessClient.Players.Count : 0
                 });
             }
 
