@@ -7,18 +7,20 @@ namespace FikaWebApp.Services
         public ItemCacheService(ILogger<ItemCacheService> logger, HttpClient client)
         {
             _logger = logger;
+            _client = client;
 
-            _ = PopulateDictionary(client);
+            _ = PopulateDictionary();
         }
 
-        private async Task PopulateDictionary(HttpClient client)
+        private async Task PopulateDictionary()
         {
             try
             {
-                var result = await client.GetFromJsonAsync<ItemsResponse>("get/items");
+                var result = await _client.GetFromJsonAsync<ItemsResponse>("get/items");
                 if (result != null)
                 {
-                    _itemDict = new(result.Items.Count);
+                    var amount = result.Items.Count;
+                    _itemDict = new(amount);
 
                     var filtered = result.Items
                         .Where(kvp => !string.IsNullOrEmpty(kvp.Value)
@@ -44,6 +46,8 @@ namespace FikaWebApp.Services
 
                         _itemDict.Add(key, newValue);
                     }
+
+                    _logger.LogInformation("Loaded {Amount} item(s) to the database, {Filtered} were filtered out", _itemDict.Count, amount - _itemDict.Count);
                 }
                 else
                 {
@@ -66,6 +70,7 @@ namespace FikaWebApp.Services
         }
 
         private readonly ILogger<ItemCacheService> _logger;
+        private readonly HttpClient _client;
         private OrderedDictionary<string, string> _itemDict;
 
         public string IdToName(string tpl)
