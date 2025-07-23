@@ -67,7 +67,7 @@ namespace FikaWebApp.Components.Fika.Pages
                 var parameters = new DialogParameters()
                 {
                     { "RawJson", result },
-                    { "ProfileId", row.ProfileId }
+                    { "FileName", row.ProfileId }
                 };
                 var options = new DialogOptions()
                 {
@@ -76,7 +76,7 @@ namespace FikaWebApp.Components.Fika.Pages
                     Position = DialogPosition.Center
                 };
 
-                await DialogService.ShowAsync<ViewRawProfileDialog>($"Viewing {row.Nickname}", parameters, options);
+                await DialogService.ShowAsync<ViewJsonDialog>($"Viewing {row.Nickname}", parameters, options);
             }
             catch (Exception ex)
             {

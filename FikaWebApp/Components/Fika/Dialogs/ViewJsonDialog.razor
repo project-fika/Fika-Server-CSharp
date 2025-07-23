@@ -4,10 +4,20 @@
 <MudDialog>
 	<DialogContent>
 		<MudPaper Elevation="2">
-			<MudTextField T="string" Text="@RawJson" Lines="25" Underline="false" Variant="Variant.Outlined" FullWidth="true" Margin="Margin.Normal" ReadOnly />
+			@if (!_fancyView)
+			{
+				<MudTextField T="string" Text="@RawJson" Lines="25" Underline="false" Variant="Variant.Outlined" FullWidth="true" Margin="Margin.Normal" ReadOnly />
+			}
+			else
+			{
+				<CodeBlock Code="@RawJson" Language="CodeLanguage.Json" EnableLineNumbers="false" />
+			}
 		</MudPaper>
 	</DialogContent>
 	<DialogActions>
+		<MudTooltip Text="WARNING: Can be really slow on big files!" Color="Color.Error">
+			<MudSwitch @bind-Value="@_fancyView" Color="Color.Success" Label="Code View" Class="mr-4" />
+		</MudTooltip>
 		<FikaPrimaryButton StartIcon="@Icons.Custom.FileFormats.FileCode" Text="Download" OnClick="DownloadJson" />
 		<MudButton Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Cancel" OnClick="Cancel">Close</MudButton>
 	</DialogActions>
@@ -21,11 +31,13 @@
 	public string? RawJson { get; set; }
 
 	[Parameter]
-	public string? ProfileId { get; set; }
+	public string? FileName { get; set; }
+
+	private bool _fancyView;
 
 	private async Task DownloadJson()
 	{
-		await JS.InvokeVoidAsync("downloadFile", $"{ProfileId}.json", RawJson);
+		await JS.InvokeVoidAsync("downloadFile", $"{FileName}.json", RawJson);
 	}
 
 	private void Cancel()
