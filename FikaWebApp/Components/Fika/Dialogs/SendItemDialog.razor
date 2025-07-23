@@ -9,8 +9,8 @@
 		<MudStack Spacing="4">
 			<MudText>Select an item and an amount to send</MudText>
 			<MudStack Row>
-				<MudAutocomplete T="string" Value="_model.ItemName" ValueChanged="GetImage" Variant="Variant.Filled" Label="Item" Placeholder="Select an item..." SearchFunc="Search"
-								 MaxItems="100" Dense Clearable Modal ResetValueOnEmptyText ShowProgressIndicator="_searching" SelectValueOnTab Required />
+				<MudAutocomplete T="string" Value="_model.ItemName" ValueChanged="GetImage" Variant="Variant.Filled" Label="Item" Placeholder="Select an item..."
+					SearchFunc="Search" MaxItems="100" Dense Clearable Modal ResetValueOnEmptyText ShowProgressIndicator="_searching" SelectValueOnTab Required />
 				<MudImage Src="@_img" Alt="@_model.ItemName" Elevation="20" Width="64" Height="64" />
 			</MudStack>
 			<MudNumericField @bind-Value="@_model.Amount" Placeholder="How many items to send" Min="1" Max="9999" Adornment="Adornment.End" AdornmentText="item(s)" />
@@ -31,7 +31,7 @@
 
 @code {
 	[CascadingParameter]
-	private IMudDialogInstance MudDialog { get; set; }
+	private IMudDialogInstance MudDialog { get; set; } = default!;
 
 	private SendItemModel _model = new();
 	private TimeSpan? _time;
