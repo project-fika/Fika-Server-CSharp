@@ -1,8 +1,12 @@
-﻿<MudDialog>
+﻿@using System.Text.Json
+@inject IJSRuntime JS
+
+<MudDialog>
 	<DialogContent>
 		<MudTextField T="string" Text="@RawJson" Lines="25" Underline="false" Variant="Variant.Outlined" FullWidth="true" Margin="Margin.Normal" ReadOnly></MudTextField>
 	</DialogContent>
 	<DialogActions>
+		<FikaPrimaryButton StartIcon="@Icons.Custom.FileFormats.FileCode" Text="Download" OnClick="DownloadJson" />
 		<MudButton Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Cancel" OnClick="Cancel">Close</MudButton>
 	</DialogActions>
 </MudDialog>
@@ -13,6 +17,14 @@
 
 	[Parameter]
 	public string? RawJson { get; set; }
+
+	[Parameter]
+	public string? ProfileId { get; set; }
+
+	private async Task DownloadJson()
+	{
+		await JS.InvokeVoidAsync("downloadFile", $"{ProfileId}.json", RawJson);
+	}
 
 	private void Cancel()
 	{

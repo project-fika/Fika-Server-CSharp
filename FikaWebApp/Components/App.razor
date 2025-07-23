@@ -19,6 +19,7 @@
     <script src=@Assets["_content/MudBlazor/MudBlazor.min.js"]></script>
     <script src=@Assets["_content/Extensions.MudBlazor.StaticInput/NavigationObserver.js"]></script>
 	<script src="_content/CodeBeam.MudBlazor.Extensions/MudExtensions.min.js"></script>
+	<script src="downloadHelper.js"></script>
 </body>
 
 </html>
@@ -27,6 +28,11 @@
     [CascadingParameter]
     private HttpContext HttpContext { get; set; } = default!;
 
-    private IComponentRenderMode? PageRenderMode =>
-        HttpContext.AcceptsInteractiveRouting() ? InteractiveServer : null;
+    private IComponentRenderMode? PageRenderMode
+    {
+        get
+        {
+            return HttpContext.AcceptsInteractiveRouting() ? InteractiveServer : null;
+        }
+    }
 }

@@ -66,7 +66,8 @@ namespace FikaWebApp.Components.Fika.Pages
 
                 var parameters = new DialogParameters()
                 {
-                    { "RawJson", result }
+                    { "RawJson", result },
+                    { "ProfileId", row.ProfileId }
                 };
                 var options = new DialogOptions()
                 {
