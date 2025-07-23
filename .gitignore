@@ -368,3 +368,5 @@ FodyWeavers.xsd
 /FikaWebApp/fikaWebApp.db-shm
 /FikaWebApp/fikaWebApp.db-wal
 /FikaWebApp/ProtectedFiles/*
+/FikaWebApp/StoredData
+/FikaWebApp/StoredData/*
