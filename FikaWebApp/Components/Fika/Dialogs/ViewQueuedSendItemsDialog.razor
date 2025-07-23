@@ -9,8 +9,14 @@
 				<MudDataGrid Items="SendTimersService.Timers" ExpandSingleRow EditMode="DataGridEditMode.Cell">
 					<Columns>
 						<PropertyColumn Property="x => x.Value.ProfileId" />
-						<PropertyColumn Property="x => x.Value.ItemTemplate" />
+						<PropertyColumn Property="x => ItemCacheService.IdToName(x.Value.ItemTemplate)" Title="Item" />
 						<PropertyColumn Property="x => x.Value.Amount" />
+						<PropertyColumn Property="x => x.Value.Message" />
+						<TemplateColumn title="Found In Raid" Context="row">
+							<CellTemplate>
+								<MudCheckBox Value="row.Item.Value.FoundInRaid" ReadOnly />
+							</CellTemplate>
+						</TemplateColumn>
 						<PropertyColumn Property="x => x.Value.SendDate.Value.ToString(CultureInfo.CurrentCulture)" Title="Send Date" />
 						<TemplateColumn Context="row">
 							<CellTemplate>
@@ -26,8 +32,14 @@
 				<MudDataGrid Items="SendTimersService.ToAllTimers">
 					<Columns>
 						<HierarchyColumn />
-						<PropertyColumn Property="x => x.Value.ItemTemplate" />
+						<PropertyColumn Property="x => ItemCacheService.IdToName(x.Value.ItemTemplate)" Title="Item" />
 						<PropertyColumn Property="x => x.Value.Amount" />
+						<PropertyColumn Property="x => x.Value.Message" />
+						<TemplateColumn title="Found In Raid" Context="row">
+							<CellTemplate>
+								<MudCheckBox Value="row.Item.Value.FoundInRaid" ReadOnly />
+							</CellTemplate>
+						</TemplateColumn>
 						<PropertyColumn Property="x => x.Value.SendDate.Value.ToString(CultureInfo.CurrentCulture)" Title="Send Date" />
 						<TemplateColumn Context="row">
 							<CellTemplate>
@@ -49,5 +61,3 @@
 		</MudPaper>
 	</DialogContent>
 </MudDialog>
-
-

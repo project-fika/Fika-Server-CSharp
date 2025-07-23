@@ -13,6 +13,9 @@ namespace FikaWebApp.Components.Fika.Dialogs
         [Inject]
         private IDialogService DialogService { get; set; }
 
+        [Inject]
+        private ItemCacheService ItemCacheService { get; set; }
+
         public async Task DeleteTimer(KeyValuePair<Timer, SendItemRequest> row)
         {
             var dialog = await DialogService.ShowAsync<YesNoDialog>("Confirmation");

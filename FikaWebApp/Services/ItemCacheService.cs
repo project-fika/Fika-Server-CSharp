@@ -68,6 +68,11 @@ namespace FikaWebApp.Services
         private readonly ILogger<ItemCacheService> _logger;
         private OrderedDictionary<string, string> _itemDict;
 
+        public string IdToName(string tpl)
+        {
+            return _itemDict[tpl];
+        }
+
         public string NameToId(string itemName)
         {
             return _itemDict
