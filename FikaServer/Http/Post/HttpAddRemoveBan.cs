@@ -39,7 +39,12 @@ namespace FikaServer.Http.Post
                     SptProfile profile = saveServer.GetProfile(profileId);
                     if (profile != null)
                     {
-                        profile.CharacterData?.PmcData?.Info?.Bans?.RemoveAll(b => b.BanType is BanType.RagFair);
+                        var bans = profile.CharacterData?.PmcData?.Info?.Bans;
+                        if (bans != null)
+                        {
+                            profile.CharacterData.PmcData.Info.Bans = bans
+                                .Where(b => b.BanType is not BanType.RagFair);
+                        }
 
                         await saveServer.SaveProfileAsync(profileId);
 

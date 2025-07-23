@@ -1,5 +1,8 @@
 using FikaShared;
 using FikaShared.Requests;
+#if RELEASE
+using FikaShared.Responses; 
+#endif
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 

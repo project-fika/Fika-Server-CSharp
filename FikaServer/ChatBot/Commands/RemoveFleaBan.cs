@@ -68,7 +68,7 @@ namespace FikaServer.ChatBot.Commands
                 return value;
             }
 
-            List<Ban>? bans = profile.CharacterData.PmcData.Info.Bans;
+            IEnumerable<Ban>? bans = profile.CharacterData.PmcData.Info.Bans;
             if (bans == null || !bans.Any(b => b.BanType == BanType.RagFair))
             {
                 mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
@@ -76,7 +76,8 @@ namespace FikaServer.ChatBot.Commands
                 return value;
             }
 
-            bans.RemoveAll(b => b.BanType == BanType.RagFair);
+            // create a new filtered collection without flea bans
+            profile.CharacterData.PmcData.Info.Bans = bans.Where(b => b.BanType != BanType.RagFair);
 
             await saveServer.SaveProfileAsync(profile.ProfileInfo.ProfileId.Value);
 

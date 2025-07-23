@@ -76,11 +76,12 @@ namespace FikaServer.ChatBot.Commands
             }
 
             long banTime = timeUtil.GetTimeStampFromNowDays(days);
-            profile.CharacterData?.PmcData?.Info?.Bans?.Add(new()
-            {
-                BanType = BanType.RagFair,
-                DateTime = banTime
-            });
+            profile.CharacterData.PmcData.Info.Bans = (profile.CharacterData.PmcData.Info.Bans ?? [])
+                .Append(new Ban()
+                {
+                    BanType = BanType.RagFair,
+                    DateTime = banTime
+                });
             await saveServer.SaveProfileAsync(profile.ProfileInfo.ProfileId.GetValueOrDefault());
 
             mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,

@@ -42,7 +42,7 @@ namespace FikaServer.Controllers
             logger.Info($"{body.ID} is going to sessionID: {body.Target}");
 
             List<Item> senderItems = senderProfile.CharacterData?.PmcData?.Inventory?.Items ?? [];
-            List<Item> itemsToSend = senderItems.FindAndReturnChildrenAsItems(body.ID);
+            List<Item> itemsToSend = senderItems.GetItemWithChildren(body.ID);
 
             if (itemsToSend.Count == 0)
             {
