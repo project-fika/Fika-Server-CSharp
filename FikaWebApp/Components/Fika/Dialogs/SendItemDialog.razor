@@ -13,7 +13,7 @@
 								 MaxItems="100" Dense Clearable Modal ResetValueOnEmptyText ShowProgressIndicator="_searching" SelectValueOnTab Required />
 				<MudImage Src="@_img" Alt="@_model.ItemName" Elevation="20" Width="64" Height="64" />
 			</MudStack>
-			<MudNumericField @bind-Value="@_model.Amount" Placeholder="How many items to send" Min="0" Max="9999" Adornment="Adornment.End" AdornmentText="item(s)" />
+			<MudNumericField @bind-Value="@_model.Amount" Placeholder="How many items to send" Min="1" Max="9999" Adornment="Adornment.End" AdornmentText="item(s)" />
 			<FikaMultiLineTextField @bind-Value="@_model.Message" />
 			<MudStack Row>
 				<MudCheckBox Label="Found In Raid" @bind-Value="_model.FoundInRaid" Color="Color.Primary" />
