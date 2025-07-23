@@ -3,7 +3,9 @@
 
 <MudDialog>
 	<DialogContent>
-		<MudTextField T="string" Text="@RawJson" Lines="25" Underline="false" Variant="Variant.Outlined" FullWidth="true" Margin="Margin.Normal" ReadOnly></MudTextField>
+		<MudPaper Elevation="2">
+			<MudTextField T="string" Text="@RawJson" Lines="25" Underline="false" Variant="Variant.Outlined" FullWidth="true" Margin="Margin.Normal" ReadOnly />
+		</MudPaper>
 	</DialogContent>
 	<DialogActions>
 		<FikaPrimaryButton StartIcon="@Icons.Custom.FileFormats.FileCode" Text="Download" OnClick="DownloadJson" />
@@ -13,7 +15,7 @@
 
 @code {
 	[CascadingParameter]
-	private IMudDialogInstance MudDialog { get; set; }
+	private IMudDialogInstance MudDialog { get; set; } = default!;
 
 	[Parameter]
 	public string? RawJson { get; set; }

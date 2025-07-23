@@ -1,4 +1,5 @@
-﻿using FikaWebApp.Components;
+﻿using Brism;
+using FikaWebApp.Components;
 using FikaWebApp.Components.Account;
 using FikaWebApp.Data;
 using FikaWebApp.Services;
@@ -29,6 +30,9 @@ namespace FikaWebApp
             // Add MudBlazor services
             builder.Services.AddMudServices();
             builder.Services.AddMudExtensions();
+
+            // Add Brism
+            builder.Services.AddBrism();
 
             // Add services to the container.
             builder.Services.AddRazorComponents()

@@ -9,6 +9,7 @@
 
 
   <ItemGroup>
+    <PackageReference Include="Brism" Version="1.0.1" />
     <PackageReference Include="CodeBeam.MudBlazor.Extensions" Version="8.2.4" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.*" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.*" />
