@@ -4,45 +4,45 @@ using FikaWebApp.Data;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Logging;
 using MudBlazor;
-using MudExtensions;
-using System;
-using System.Text.Json;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace FikaWebApp.Components.Fika.Pages
 {
     public partial class ProfilesPage
     {
-        [Inject] 
-        UserManager<ApplicationUser> UserManager { get; set; }
+        [Inject]
+        UserManager<ApplicationUser> UserManager { get; set; } = default!;
 
         [Inject]
-        HttpClient HttpClient { get; set; }
+        HttpClient HttpClient { get; set; } = default!;
 
         [Inject]
-        ILogger<ProfilesPage> Logger { get; set; }
+        ILogger<ProfilesPage> Logger { get; set; } = default!;
 
         [Inject]
-        IDialogService DialogService { get; set; }
+        IDialogService DialogService { get; set; } = default!;
 
         [Inject]
-        ISnackbar Snackbar { get; set; }
+        ISnackbar Snackbar { get; set; } = default!;
 
-        MudDataGrid<ProfileResponse> _dataGrid;
-        private string _searchString = null;
-        private List<ProfileResponse> _profiles = [];
-        private IList<IBrowserFile> _files = [];
+        MudDataGrid<ProfileResponse> _dataGrid = default!;
+        private readonly string _searchString = null!;
+        private readonly List<ProfileResponse> _profiles = [];
+        private readonly IList<IBrowserFile> _files = [];
 
         protected override async Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
+            await RefreshProfiles();
+        }
 
+        public async Task RefreshProfiles()
+        {
+            _profiles.Clear();
             try
             {
                 var result = await HttpClient.GetFromJsonAsync<List<ProfileResponse>>("get/profiles");
-                _profiles.AddRange(result);
+                _profiles.AddRange(result!);
             }
             catch (Exception ex)
             {
@@ -52,7 +52,7 @@ namespace FikaWebApp.Components.Fika.Pages
         }
 
         private async Task ViewProfile(ProfileResponse row)
-        {            
+        {
             try
             {
                 var result = await HttpClient.GetStringAsync($"get/rawprofile?profileId={Uri.EscapeDataString(row.ProfileId)}")
@@ -101,16 +101,29 @@ namespace FikaWebApp.Components.Fika.Pages
             var res = await DialogService.ShowAsync<ModifyProfileDialog>($"Modify {row.Nickname}", parameters, options);
             var result = await res.Result;
 
-            if (!result.Canceled)
+            if (!result!.Canceled)
             {
                 StateHasChanged();
             }
         }
-		private async Task UploadProfile(IReadOnlyList<IBrowserFile> files)
-		{
-			if (_files.Count > 1)
+        private async Task UploadProfile(IReadOnlyList<IBrowserFile> files)
+        {
+            if (_files.Count > 1)
             {
-                Snackbar.Add("Too many files!", Severity.Warning);
+                Snackbar.Add("Too many files! You can only upload one profile", Severity.Warning);
+                return;
+            }
+
+            var options = new MessageBoxOptions()
+            {
+                Title = "WARNING",
+                MarkupMessage = new("This is an experimental feature.<br/>Are you sure? Damage might be irreversible!"),
+                YesText = "YES",
+                CancelText = "NO"
+            };
+            var confirmation = await DialogService.ShowMessageBox(options);
+            if (!confirmation.HasValue)
+            {
                 return;
             }
 
@@ -126,7 +139,8 @@ namespace FikaWebApp.Components.Fika.Pages
 
                         if (result.IsSuccessStatusCode)
                         {
-                            Snackbar.Add("The profile was successfully uploaded", Severity.Success);
+                            var message = await result.Content.ReadAsStringAsync();
+                            Snackbar.Add(message, Severity.Success);
                         }
                         else
                         {
@@ -135,11 +149,13 @@ namespace FikaWebApp.Components.Fika.Pages
                         }
                     }
                 }
+
+                await RefreshProfiles();
             }
             catch (Exception ex)
             {
                 Snackbar.Add($"There was an error reading the profile: {ex.Message}", Severity.Error);
             }
-		}
+        }
     }
 }
