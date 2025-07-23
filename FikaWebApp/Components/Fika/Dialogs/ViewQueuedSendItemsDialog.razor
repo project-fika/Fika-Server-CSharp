@@ -1,0 +1,53 @@
+﻿@using System.Globalization
+@using FikaShared.Requests
+
+<MudDialog>
+	<DialogContent>
+		<MudPaper Class="pa-2">			
+			<MudStack Spacing="4">
+				<MudText Typo="Typo.h6">To User</MudText>
+				<MudDataGrid Items="SendTimersService.Timers" ExpandSingleRow EditMode="DataGridEditMode.Cell">
+					<Columns>
+						<PropertyColumn Property="x => x.Value.ProfileId" />
+						<PropertyColumn Property="x => x.Value.ItemTemplate" />
+						<PropertyColumn Property="x => x.Value.Amount" />
+						<PropertyColumn Property="x => x.Value.SendDate.Value.ToString(CultureInfo.CurrentCulture)" Title="Send Date" />
+						<TemplateColumn Context="row">
+							<CellTemplate>
+								<MudTooltip Text="Delete queued item(s)">
+									<MudIconButton Variant="Variant.Filled" Color="Color.Error" Icon="@Icons.Material.Filled.Delete" OnClick="@(() => DeleteTimer(row.Item))" />
+								</MudTooltip>
+							</CellTemplate>
+						</TemplateColumn>
+					</Columns>
+				</MudDataGrid>
+
+				<MudText Typo="Typo.h6">To Everyone</MudText>
+				<MudDataGrid Items="SendTimersService.ToAllTimers">
+					<Columns>
+						<HierarchyColumn />
+						<PropertyColumn Property="x => x.Value.ItemTemplate" />
+						<PropertyColumn Property="x => x.Value.Amount" />
+						<PropertyColumn Property="x => x.Value.SendDate.Value.ToString(CultureInfo.CurrentCulture)" Title="Send Date" />
+						<TemplateColumn Context="row">
+							<CellTemplate>
+								<MudTooltip Text="Delete queued item(s)">
+									<MudIconButton Variant="Variant.Filled" Color="Color.Error" Icon="@Icons.Material.Filled.Delete" OnClick="@(() => DeleteTimer(row.Item))" />
+								</MudTooltip>
+							</CellTemplate>
+						</TemplateColumn>
+					</Columns>
+					<ChildRowContent>
+						<MudCard>
+							<MudCardContent>
+								<span>@string.Join(", ", context.Item.Value.ProfileIds)</span>
+							</MudCardContent>
+						</MudCard>
+					</ChildRowContent>
+				</MudDataGrid>
+			</MudStack>
+		</MudPaper>
+	</DialogContent>
+</MudDialog>
+
+

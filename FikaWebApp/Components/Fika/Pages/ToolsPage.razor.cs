@@ -4,6 +4,7 @@ using FikaWebApp.Components.Fika.Dialogs;
 using FikaWebApp.Services;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using System.Globalization;
 using static FikaWebApp.Components.Fika.Dialogs.SendItemDialog;
 
 namespace FikaWebApp.Components.Fika.Pages
@@ -24,7 +25,13 @@ namespace FikaWebApp.Components.Fika.Pages
 
         private async Task SendItemToEveryone()
         {
-            var dialog = await DialogService.ShowAsync<SendItemDialog>("Send Item To All");
+            var options = new DialogOptions()
+            {
+                MaxWidth = MaxWidth.Small,
+                FullWidth = true,
+                NoHeader = true
+            };
+            var dialog = await DialogService.ShowAsync<SendItemDialog>(string.Empty, options);
             var result = await dialog.Result;
 
             if (!result.Canceled)
@@ -60,12 +67,14 @@ namespace FikaWebApp.Components.Fika.Pages
                     if (model.UseDate)
                     {
                         SendTimersService.AddTimer(request, model.Date.Value);
+                        Snackbar.Add($"The item was queued to be sent to everyone at {model.Date.Value.ToString(CultureInfo.CurrentCulture)}.", Severity.Success);
                     }
                     else
                     {
                         try
                         {
                             await HttpClient.PostAsJsonAsync("post/senditemtoall", request);
+                            Snackbar.Add($"The item was sent to everyone.", Severity.Success);
                         }
                         catch (Exception ex)
                         {
@@ -75,5 +84,14 @@ namespace FikaWebApp.Components.Fika.Pages
                 }
             }
         }
+		private async Task OpenQueuedItems()
+		{
+            var options = new DialogOptions()
+            {
+                MaxWidth = MaxWidth.Large,
+                FullWidth = true
+            };
+            var dialog = DialogService.ShowAsync<ViewQueuedSendItemsDialog>("Queued Items", options);
+		}
     }
 }

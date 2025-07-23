@@ -31,7 +31,13 @@ namespace FikaWebApp.Components.Fika.Dialogs
 
         private async Task SendItem()
         {
-            var dialog = await DialogService.ShowAsync<SendItemDialog>("Send Item");
+            var options = new DialogOptions()
+            {
+                MaxWidth = MaxWidth.Small,
+                FullWidth = true,
+                NoHeader = true
+            };
+            var dialog = await DialogService.ShowAsync<SendItemDialog>(string.Empty, options);
             var result = await dialog.Result;
 
             if (!result.Canceled)
@@ -40,6 +46,7 @@ namespace FikaWebApp.Components.Fika.Dialogs
                 {
                     SendItemRequest sendItemRequest = new()
                     {
+
                         ProfileId = Profile.ProfileId,
                         ItemTemplate = model.TemplateId,
                         Amount = model.Amount,
@@ -57,7 +64,7 @@ namespace FikaWebApp.Components.Fika.Dialogs
                             var postResult = await HttpClient.PostAsJsonAsync("post/senditem", sendItemRequest);
                             if (postResult.IsSuccessStatusCode)
                             {
-                                Snackbar.Add($"Item was successfully sent to {Profile.Nickname}", Severity.Success);
+                                Snackbar.Add($"[{model.ItemName}] was successfully sent to {Profile.Nickname}", Severity.Success);
                             }
                             else
                             {

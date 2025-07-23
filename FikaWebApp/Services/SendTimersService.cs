@@ -80,6 +80,7 @@ namespace FikaWebApp.Services
                         dt = DateTime.Now.AddMinutes(1);
                         _logger.LogWarning("Found expired timer, forcing to send in 1 minute...");
                     }
+                    sendRequest.SendDate = dt;
                     AddTimer(sendRequest, dt, false);
                 }
 
@@ -91,6 +92,7 @@ namespace FikaWebApp.Services
                         dt = DateTime.Now.AddMinutes(1);
                         _logger.LogWarning("Found expired timer, forcing to send in 1 minute...");
                     }
+                    sendRequest.SendDate = dt;
                     AddTimer(sendRequest, dt, false);
                 }
             }
@@ -243,6 +245,31 @@ namespace FikaWebApp.Services
             }
 
             _logger.LogInformation("Added a timer which will send items in {Hours}h {Minutes}m {Seconds}s", (int)delay.TotalHours, delay.Minutes, delay.Seconds);
+        }
+
+        public void RemoveTimer(Timer timer)
+        {
+            lock (_lock)
+            {
+                if (_timers.TryGetValue(timer, out var request))
+                {
+                    timer.Dispose();
+                    _timers.Remove(timer);
+                    _logger.LogInformation("Cancelled timer for ProfileId {ProfileId}", request.ProfileId);
+                    Save();
+                }
+                else if (_toAllTimers.TryGetValue(timer, out var _))
+                {
+                    timer.Dispose();
+                    _toAllTimers.Remove(timer);
+                    _logger.LogInformation("Cancelled timer that was queued for everyone");
+                    Save();
+                }
+                else
+                {
+                    _logger.LogWarning("No timer found");
+                }
+            }
         }
     }
 }

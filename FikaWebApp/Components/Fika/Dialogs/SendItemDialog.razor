@@ -1,11 +1,14 @@
 ﻿@using FikaShared.Requests
-<MudDialog>
+
+@inject ItemCacheService ItemCacheService
+
+<MudDialog ContentStyle="overflow:hidden">
 	<DialogContent>
 		<MudStack Spacing="4">
-			<MudText>Input a MongoId and a valid amount to send</MudText>
-			<MudTextField @bind-Value="@_model.TemplateId" Placeholder="The MongoId to send"
-				Validation="@(new Func<string, string>(Statics.ValidateMongoId))" Immediate="true" OnlyValidateIfDirty="true" />
-			<MudNumericField @bind-Value="@_model.Amount" Placeholder="How many items to send" Min="0" Max="9999" />
+			<MudText>Select an item and an amount to send</MudText>
+			<MudAutocomplete @bind-Value="_model.ItemName" Variant="Variant.Filled" Label="Item" Placeholder="Select an item..." SearchFunc="Search"
+				MaxItems="100" Dense Clearable Modal ResetValueOnEmptyText ShowProgressIndicator="_searching"/>
+			<MudNumericField @bind-Value="@_model.Amount" Placeholder="How many items to send" Min="0" Max="9999" Adornment="Adornment.End" AdornmentText="item(s)" />
 			<FikaMultiLineTextField @bind-Value="@_model.Message" />
 			<MudCheckBox Label="Specific Date" @bind-Value="_model.UseDate" Color="Color.Info" />
 			<MudDatePicker Label="Send Date" Editable="true" @bind-Date="_model.Date" Placeholder="Select Date" Disabled="!_model.UseDate" IsDateDisabledFunc="CheckDate" ImmediateText />
@@ -13,7 +16,7 @@
 		</MudStack>
 	</DialogContent>
 	<DialogActions>
-		<MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.CheckCircle" Disabled="@(CanConfirm())" OnClick="Confirm">Confirm</MudButton>
+		<MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.CheckCircle" Disabled="CanConfirm" OnClick="Confirm">Confirm</MudButton>
 		<MudButton Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Cancel" OnClick="Cancel">Cancel</MudButton>
 	</DialogActions>
 </MudDialog>
@@ -24,15 +27,31 @@
 
 	private SendItemModel _model = new();
 	private TimeSpan? _time;
+	private bool _searching;
 
-	private bool CanConfirm()
+	private bool CanConfirm
 	{
-		return _model.UseDate && (_model.Date == null || _time == null);
+		get
+		{
+			if (string.IsNullOrEmpty(_model.ItemName))
+			{
+				return true;
+			}
+
+			return _model.UseDate && (_model.Date == null || _time == null);
+		}
 	}
 
 	private void Confirm()
 	{
+		string templateId = ItemCacheService.NameToId(_model.ItemName);
+		if (string.IsNullOrEmpty(templateId))
+		{
+			return;
+		}
+
 		_model.Date = _model.Date + _time;
+		_model.TemplateId = templateId;
 		MudDialog.Close(_model);
 	}
 
@@ -43,6 +62,7 @@
 
 	public class SendItemModel
 	{
+		public string ItemName { get; set; } = string.Empty;
 		public string TemplateId { get; set; } = string.Empty;
 		public int Amount { get; set; } = 1;
 		public string Message { get; set; } = string.Empty;
@@ -54,5 +74,21 @@
 	private bool CheckDate(DateTime dt)
 	{
 		return dt < DateTime.Now.AddDays(-1);
+	}
+
+	private async Task<IEnumerable<string>> Search(string value, CancellationToken token)
+	{
+		_searching = true;
+
+		if (string.IsNullOrEmpty(value))
+		{
+			_searching = false;
+			return ItemCacheService.Items.Values;
+		}
+
+		var result = await Task.Run(() => ItemCacheService.NameToIdSearch(value), token);
+
+		_searching = false;
+		return result;
 	}
 }
