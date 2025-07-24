@@ -80,6 +80,7 @@ namespace FikaWebApp
 
             builder.Services.AddSingleton<SendTimersService>();
             builder.Services.AddSingleton<ItemCacheService>();
+            builder.Services.AddSingleton<HeartbeatService>();
 
             var app = builder.Build();
 
@@ -127,6 +128,7 @@ namespace FikaWebApp
             await Task.Delay(TimeSpan.FromSeconds(1)); // artifical delay
             var sendTimerService = app.Services.GetRequiredService<SendTimersService>();
             var itemCacheService = app.Services.GetRequiredService<ItemCacheService>();
+            var heartbeatService = app.Services.GetRequiredService<HeartbeatService>();
         }
 
         private static Task CheckForDataFolder(WebApplication app)

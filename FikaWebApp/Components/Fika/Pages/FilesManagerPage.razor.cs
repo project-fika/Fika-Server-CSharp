@@ -8,27 +8,26 @@ namespace FikaWebApp.Components.Fika.Pages
     public partial class FilesManagerPage
     {
         [Inject]
-        public NavigationManager NavigationManager { get; set; }
+        public NavigationManager NavigationManager { get; set; } = default!;
 
         [Inject]
-        public ISnackbar Snackbar { get; set; }
+        public ISnackbar Snackbar { get; set; } = default!;
 
         [Inject]
-        private IDialogService DialogService { get; set; }
+        private IDialogService DialogService { get; set; } = default!;
 
         [Inject]
-        private ILogger<FilesManagerPage> Logger { get; set; }
+        private ILogger<FilesManagerPage> Logger { get; set; } = default!;
 
-        //public IReadOnlyCollection<string> SelectedValues { get; set; } = [];
         public string? SelectedValue { get; set; }
         public List<TreeItemData<string>> TreeItems { get; set; } = [];
 
         private bool _expanded;
-        private IList<IBrowserFile> _files = [];
+        private readonly IList<IBrowserFile> _files = [];
 
         private bool _uploading;
         private string? _uploadingText;
-        private readonly long _maxSize = 28 * 1024 * 1024;
+        private readonly long _maxSize = 28 * 1024 * 1024; // ~28mb
 
         protected override void OnInitialized()
         {
@@ -246,7 +245,14 @@ namespace FikaWebApp.Components.Fika.Pages
                 return;
             }
 
-            var result = await DialogService.ShowMessageBox("Confirmation", $"Are you sure you want to remove '{SelectedValue}? This is permanent!", "Yes", cancelText: "No");
+            var options = new MessageBoxOptions()
+            {
+                Title = "Confirmation",
+                MarkupMessage = new($"Are you sure you want to remove '{SelectedValue}'?<br/>This is permanent!"),
+                YesText = "Yes",
+                CancelText = "No"
+            };
+            var result = await DialogService.ShowMessageBox(options);
             if (!result.HasValue)
             {
                 return;
