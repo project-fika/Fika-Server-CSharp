@@ -11,7 +11,20 @@
 			<MudStack Row>
 				<MudAutocomplete T="string" Value="_model.ItemName" ValueChanged="GetImage" Variant="Variant.Filled" Label="Item" Placeholder="Select an item..."
 					SearchFunc="Search" MaxItems="100" Dense Clearable Modal ResetValueOnEmptyText ShowProgressIndicator="_searching" SelectValueOnTab Required />
-				<MudImage Src="@_img" Alt="@_model.ItemName" Elevation="20" Width="64" Height="64" />
+				<MudTooltip Text="@_itemDescription" Color="Color.Info" Delay="100" Placement="Placement.Top" Arrow>
+					<ChildContent>
+						<div style="position: relative; width: 64px; height: 64px; overflow: visible;">
+							<MudImage Src="@_img" Elevation="20" Width="64" Height="64" FallbackSrc="@_defaultImg" Style="display: block;" />
+							<MudIcon Icon="@Icons.Material.Filled.Info" Style="position: absolute; bottom: 0px; right: 0px; transform: translate(25%, 25%);" />
+						</div>
+					</ChildContent>
+					<TooltipContent>
+						<MudStack Row AlignItems="AlignItems.Center">
+							<MudIcon Icon="@Icons.Material.Filled.Info" />
+							<MudText Typo="Typo.caption" Style="word-wrap: break-word; max-width: 600px;">@_itemDescription</MudText>
+						</MudStack>
+					</TooltipContent>
+				</MudTooltip>
 			</MudStack>
 			<MudNumericField @bind-Value="@_model.Amount" Placeholder="How many items to send" Min="1" Max="9999" Adornment="Adornment.End" AdornmentText="item(s)" />
 			<FikaMultiLineTextField @bind-Value="@_model.Message" />
@@ -25,10 +38,6 @@
 					<MudTimePicker Label="Send Time" Editable="true" @bind-Time="_time" Placeholder="Select Time" Disabled="!_model.UseDate" MinuteSelectionStep="5" ImmediateText />
 				</MudStack>
 			</MudCollapse>
-			@* @if (_model.UseDate)
-			{
-				
-			} *@
 		</MudStack>
 	</DialogContent>
 	<DialogActions>
@@ -45,6 +54,7 @@
 	private TimeSpan? _time;
 	private bool _searching;
 	private string _img = _defaultImg;
+	private string _itemDescription = "Select an item";
 
 	private static readonly string _defaultImg = "images/fika_logo.png";
 
@@ -119,6 +129,7 @@
 		{
 			_img = $"https://assets.tarkov.dev/{tpl}-icon.webp";
 			_model.TemplateId = tpl;
+			_itemDescription = ItemCacheService.GetDescription(tpl);
 			StateHasChanged();
 		}
 	}

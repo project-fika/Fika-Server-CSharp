@@ -6,5 +6,8 @@ namespace FikaShared.Responses
     {
         [JsonPropertyName("items")]
         public required Dictionary<string, string> Items { get; set; } = [];
+
+        [JsonPropertyName("descriptions")]
+        public required Dictionary<string, string> Descriptions { get; set; } = [];
     }
 }

@@ -23,21 +23,28 @@ namespace FikaServer.Http.Get
 
         public override async Task HandleRequest(HttpRequest req, HttpResponse resp)
         {
-            var items = databaseService.GetItems();
+            var allItems = databaseService.GetItems();
             var locale = localeService.GetLocaleDb("en");
 
-            var dictionary = new Dictionary<string, string>();
-            foreach (var itemId in items.Keys)
+            var items = new Dictionary<string, string>();
+            var descriptions = new Dictionary<string, string>();
+            foreach (var itemId in allItems.Keys)
             {
                 if (locale.TryGetValue($"{itemId} Name", out var fullName))
                 {
-                    dictionary.Add(itemId, fullName);
+                    items.Add(itemId, fullName);
+                }
+
+                if (locale.TryGetValue($"{itemId} Description", out var description))
+                {
+                    descriptions.Add(itemId, description);
                 }
             }
 
             ItemsResponse response = new()
             {
-                Items = dictionary
+                Items = items,
+                Descriptions = descriptions
             };
 
             resp.StatusCode = 200;

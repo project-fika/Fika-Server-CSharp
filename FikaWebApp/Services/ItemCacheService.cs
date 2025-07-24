@@ -47,6 +47,15 @@ namespace FikaWebApp.Services
                         _itemDict.Add(key, newValue);
                     }
 
+                    _itemDescriptions = [];
+                    foreach (var item in _itemDict.Keys)
+                    {
+                        if (result.Descriptions.TryGetValue(item, out string? description))
+                        {
+                            _itemDescriptions.Add(item, description);
+                        }
+                    }
+
                     _logger.LogInformation("Loaded {Amount} item(s) to the database, {Filtered} were filtered out", _itemDict.Count, amount - _itemDict.Count);
                 }
                 else
@@ -72,6 +81,7 @@ namespace FikaWebApp.Services
         private readonly ILogger<ItemCacheService> _logger;
         private readonly HttpClient _client;
         private OrderedDictionary<string, string> _itemDict;
+        private Dictionary<string, string> _itemDescriptions;
 
         public string IdToName(string tpl)
         {
@@ -98,6 +108,16 @@ namespace FikaWebApp.Services
             return _itemDict
                 .Where(x => x.Value.Contains(itemName, StringComparison.InvariantCultureIgnoreCase))
                 .Select(x => x.Value);
+        }
+
+        public string GetDescription(string tpl)
+        {
+            if (_itemDescriptions.TryGetValue(tpl, out string? desc))
+            {
+                return desc;
+            }
+
+            return string.Empty;
         }
     }
 }
