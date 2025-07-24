@@ -134,7 +134,7 @@ namespace FikaServer.Http.Post
                             // Flag the items as FiR
                             itemHelper.SetFoundInRaid(itemsToSend);
                         }
-                        mailSendService.SendSystemMessageToPlayer(profileId, message, itemsToSend);
+                        mailSendService.SendSystemMessageToPlayer(profileId, message, itemsToSend, request.ExpirationDays * 86400); // days * seconds per day
                     }
                 }
                 else

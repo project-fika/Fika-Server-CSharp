@@ -63,7 +63,8 @@ namespace FikaWebApp.Components.Fika.Pages
                         ItemTemplate = model.TemplateId,
                         Amount = model.Amount,
                         Message = model.Message,
-                        FoundInRaid = model.FoundInRaid
+                        FoundInRaid = model.FoundInRaid,
+                        ExpirationDays = model.ExpirationDays
                     };
 
                     if (model.UseDate)
