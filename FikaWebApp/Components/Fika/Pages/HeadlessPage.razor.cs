@@ -21,9 +21,13 @@ namespace FikaWebApp.Components.Fika.Pages
 
         protected override async Task OnInitializedAsync()
         {
+            _loading = true;
+
             await base.OnInitializedAsync();
 
 #if DEBUG
+            await Task.Delay(TimeSpan.FromSeconds(1));
+
             _headlessClients.Add(new()
             {
                 ProfileId = "TEST",
@@ -59,6 +63,7 @@ namespace FikaWebApp.Components.Fika.Pages
                 Snackbar.Add($"There was an error retrieving the data: {ex.Message}", Severity.Error);
             }
 #endif
+            _loading = false;
         }
 
         public async Task RestartHeadless(OnlineHeadless headless)

@@ -29,6 +29,7 @@ namespace FikaWebApp.Components.Fika.Pages
         private readonly string _searchString = null!;
         private readonly List<ProfileResponse> _profiles = [];
         private readonly IList<IBrowserFile> _files = [];
+        private bool _loading;
 
         protected override async Task OnInitializedAsync()
         {
@@ -38,6 +39,7 @@ namespace FikaWebApp.Components.Fika.Pages
 
         public async Task RefreshProfiles()
         {
+            _loading = true;
             _profiles.Clear();
             try
             {
@@ -49,6 +51,7 @@ namespace FikaWebApp.Components.Fika.Pages
                 Logger.LogError("There was an error retrieving the profiles: {ExceptionMessage}", ex.Message);
                 Snackbar.Add($"An error occured when querying: {ex.Message}", Severity.Error);
             }
+            _loading = false;
         }
 
         private async Task ViewProfile(ProfileResponse row)

@@ -119,9 +119,12 @@ namespace FikaWebApp.Components.Fika.Pages
         }
 
 #if DEBUG
-        protected override void OnInitialized()
+        protected override async Task OnInitializedAsync()
         {
-            base.OnInitialized();
+            _loading = true;
+            await base.OnInitializedAsync();
+
+            await Task.Delay(TimeSpan.FromSeconds(1));
 
             _players.Add(new()
             {
@@ -172,6 +175,8 @@ namespace FikaWebApp.Components.Fika.Pages
                 Nickname = "guidot",
                 ProfileId = "test"
             });
+
+            _loading = false;
         }
 #endif
     }
