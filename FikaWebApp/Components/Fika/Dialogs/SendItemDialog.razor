@@ -4,7 +4,7 @@
 
 @* @bind-Value="_model.ItemName" *@
 
-<MudDialog ContentStyle="overflow:hidden">
+<MudDialog ContentStyle="overflow: hidden;">
 	<DialogContent>
 		<MudStack Spacing="4">
 			<MudText>Select an item and an amount to send</MudText>
@@ -19,8 +19,16 @@
 				<MudCheckBox Label="Found In Raid" @bind-Value="_model.FoundInRaid" Color="Color.Primary" />
 				<MudCheckBox Label="Specific Date" @bind-Value="_model.UseDate" Color="Color.Info" />
 			</MudStack>
-			<MudDatePicker Label="Send Date" Editable="true" @bind-Date="_model.Date" Placeholder="Select Date" Disabled="!_model.UseDate" IsDateDisabledFunc="CheckDate" ImmediateText />
-			<MudTimePicker Label="Send Time" Editable="true" @bind-Time="_time" Placeholder="Select Time" Disabled="!_model.UseDate" MinuteSelectionStep="5" ImmediateText />
+			<MudCollapse Expanded="_model.UseDate" Style="overflow: hidden;">
+				<MudStack Class="pa-2" Style="overflow: hidden;">
+					<MudDatePicker Label="Send Date" Editable="true" @bind-Date="_model.Date" Placeholder="Select Date" Disabled="!_model.UseDate" IsDateDisabledFunc="CheckDate" ImmediateText />
+					<MudTimePicker Label="Send Time" Editable="true" @bind-Time="_time" Placeholder="Select Time" Disabled="!_model.UseDate" MinuteSelectionStep="5" ImmediateText />
+				</MudStack>
+			</MudCollapse>
+			@* @if (_model.UseDate)
+			{
+				
+			} *@
 		</MudStack>
 	</DialogContent>
 	<DialogActions>
