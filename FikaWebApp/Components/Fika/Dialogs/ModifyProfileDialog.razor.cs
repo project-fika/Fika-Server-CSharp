@@ -1,5 +1,6 @@
 using FikaShared.Requests;
 using FikaShared.Responses;
+using FikaWebApp.Models;
 using FikaWebApp.Services;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;

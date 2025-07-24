@@ -1,7 +1,5 @@
 ﻿@using FikaShared.Requests
 
-@inject ItemCacheService ItemCacheService
-
 @* @bind-Value="_model.ItemName" *@
 
 <MudDialog ContentStyle="overflow: hidden;">
@@ -9,14 +7,16 @@
 		<MudStack Spacing="4">
 			<MudText>Select an item and an amount to send</MudText>
 			<MudStack Row>
-				<MudAutocomplete T="string" Value="_model.ItemName" ValueChanged="GetImage" Variant="Variant.Filled" Label="Item" Placeholder="Select an item..."
+				<MudAutocomplete T="string" VAndUrlalue="_model.ItemName" ValueChanged="GetImageAndUrl" Variant="Variant.Filled" Label="Item" Placeholder="Select an item..."
 					SearchFunc="Search" MaxItems="100" Dense Clearable Modal ResetValueOnEmptyText ShowProgressIndicator="_searching" SelectValueOnTab Required />
 				<MudTooltip Text="@_itemDescription" Color="Color.Info" Delay="100" Placement="Placement.Top" Arrow>
 					<ChildContent>
-						<div style="position: relative; width: 64px; height: 64px; overflow: visible;">
-							<MudImage Src="@_img" Elevation="20" Width="64" Height="64" FallbackSrc="@_defaultImg" Style="display: block; border: 2px solid #2d2d2f;" />
-							<MudIcon Icon="@Icons.Material.Filled.Info" Style="position: absolute; bottom: 0px; right: 0px; transform: translate(25%, 25%);" />
-						</div>
+						<MudLink Href="@_url" Target="_blank" Disabled="_url == null">
+							<div style="position: relative; width: 64px; height: 64px; overflow: visible;">
+								<MudImage Src="@_img" Elevation="20" Width="64" Height="64" FallbackSrc="@_defaultImg" Style="display: block; border: 2px solid #2d2d2f;" />
+								<MudIcon Icon="@Icons.Material.Filled.Info" Style="position: absolute; bottom: 0px; right: 0px; transform: translate(25%, 25%); color: white" />
+							</div>
+						</MudLink>
 					</ChildContent>
 					<TooltipContent>
 						<MudStack Row AlignItems="AlignItems.Center">
@@ -45,92 +45,3 @@
 		<MudButton Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Cancel" OnClick="Cancel">Cancel</MudButton>
 	</DialogActions>
 </MudDialog>
-
-@code {
-	[CascadingParameter]
-	private IMudDialogInstance MudDialog { get; set; } = default!;
-
-	private SendItemModel _model = new();
-	private TimeSpan? _time;
-	private bool _searching;
-	private string _img = _defaultImg;
-	private string _itemDescription = "Select an item";
-
-	private static readonly string _defaultImg = "images/fika_logo.png";
-
-	private bool CanConfirm
-	{
-		get
-		{
-			if (string.IsNullOrEmpty(_model.ItemName))
-			{
-				return true;
-			}
-
-			return _model.UseDate && (_model.Date == null || _time == null);
-		}
-	}
-
-	private void Confirm()
-	{
-		_model.Date = _model.Date + _time;
-		MudDialog.Close(_model);
-	}
-
-	private void Cancel()
-	{
-		MudDialog.Cancel();
-	}
-
-	public class SendItemModel
-	{
-		public string ItemName { get; set; } = string.Empty;
-		public string TemplateId { get; set; } = string.Empty;
-		public int Amount { get; set; } = 1;
-		public string Message { get; set; } = string.Empty;
-		public bool FoundInRaid { get; set; } = true;
-
-		public bool UseDate { get; set; }
-		public DateTime? Date { get; set; }
-	}
-
-	private bool CheckDate(DateTime dt)
-	{
-		return dt < DateTime.Now.AddDays(-1);
-	}
-
-	private async Task<IEnumerable<string>> Search(string value, CancellationToken token)
-	{
-		_searching = true;
-
-		if (string.IsNullOrEmpty(value))
-		{
-			_searching = false;
-			return ItemCacheService.Items.Values;
-		}
-
-		var result = await Task.Run(() => ItemCacheService.NameToIdSearch(value), token);
-
-		_searching = false;
-		return result;
-	}
-
-	private void GetImage(string args)
-	{
-		_model.ItemName = args;
-		if (string.IsNullOrEmpty(args))
-		{
-			_img = _defaultImg;
-			return;
-		}
-
-		var tpl = ItemCacheService.NameToId(args);
-		if (Statics.IsValidMongoId(tpl))
-		{
-			_img = $"https://assets.tarkov.dev/{tpl}-icon.webp";
-			_model.TemplateId = tpl;
-			_itemDescription = ItemCacheService.GetDescription(tpl);
-			StateHasChanged();
-		}
-	}
-}
