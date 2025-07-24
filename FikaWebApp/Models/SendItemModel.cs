@@ -2,7 +2,7 @@ namespace FikaWebApp.Models;
 
 public record SendItemModel
 {
-    public string ItemName { get; set; } = string.Empty;
+    public string? ItemName { get; set; }
     public string TemplateId { get; set; } = string.Empty;
     public int Amount { get; set; } = 1;
     public string Message { get; set; } = string.Empty;

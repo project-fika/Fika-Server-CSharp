@@ -1,7 +1,5 @@
 ﻿@using FikaShared.Requests
 
-@* @bind-Value="_model.ItemName" *@
-
 <MudDialog ContentStyle="overflow: hidden;">
 	<DialogContent>
 		<MudStack Spacing="4">
@@ -14,7 +12,10 @@
 						<MudLink Href="@_url" Target="_blank" Disabled="_url == null">
 							<div style="position: relative; width: 64px; height: 64px; overflow: visible;">
 								<MudImage Src="@_img" Elevation="20" Width="64" Height="64" FallbackSrc="@_defaultImg" Style="display: block; border: 2px solid #2d2d2f;" />
-								<MudIcon Icon="@Icons.Material.Filled.Info" Style="position: absolute; bottom: 0px; right: 0px; transform: translate(25%, 25%); color: white" />
+								@if (!string.IsNullOrEmpty(_model.ItemName))
+								{
+									<MudIcon Icon="@Icons.Material.Filled.Info" Style="position: absolute; bottom: 0px; right: 0px; transform: translate(25%, 25%); color: white" />
+								}
 							</div>
 						</MudLink>
 					</ChildContent>
@@ -41,7 +42,7 @@
 		</MudStack>
 	</DialogContent>
 	<DialogActions>
-		<MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.CheckCircle" Disabled="CanConfirm" OnClick="Confirm">Confirm</MudButton>
+		<MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.CheckCircle" Disabled="CantConfirm" OnClick="Confirm">Confirm</MudButton>
 		<MudButton Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Cancel" OnClick="Cancel">Cancel</MudButton>
 	</DialogActions>
 </MudDialog>

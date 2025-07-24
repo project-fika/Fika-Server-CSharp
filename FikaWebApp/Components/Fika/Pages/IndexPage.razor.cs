@@ -24,5 +24,19 @@ namespace FikaWebApp.Components.Fika.Pages
                 return HeartbeatService.IsRunning ? "Running" : "Not running";
             }
         }
+
+        private string LastRefreshMinutes
+        {
+            get
+            {
+                var timeSpan = DateTime.Now - HeartbeatService.LastRefresh;
+                if (timeSpan.TotalMinutes < 1)
+                {
+                    return "Last update was less than a minute ago";
+                }
+
+                return $"Last update was {(int)timeSpan.TotalMinutes} minute(s) ago";
+            }
+        }
     }
 }

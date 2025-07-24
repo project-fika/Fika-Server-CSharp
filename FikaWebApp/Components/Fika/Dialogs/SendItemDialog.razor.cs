@@ -22,7 +22,7 @@ namespace FikaWebApp.Components.Fika.Dialogs
 
         private static readonly string _defaultImg = "images/missing_item.png";
 
-        private bool CanConfirm
+        private bool CantConfirm
         {
             get
             {
@@ -74,6 +74,7 @@ namespace FikaWebApp.Components.Fika.Dialogs
             {
                 _img = _defaultImg;
                 _url = null;
+                _model.ItemName = null;
                 return;
             }
 

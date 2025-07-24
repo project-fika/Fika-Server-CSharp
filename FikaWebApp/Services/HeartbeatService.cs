@@ -11,6 +11,7 @@
         }
 
         public bool IsRunning { get; private set; }
+        public DateTime LastRefresh { get; private set; } = DateTime.Now;
 
         public void Stop()
         {
@@ -56,6 +57,8 @@
                     _logger.LogError("Something went wrong when querying for heartbeat: {Exception}", ex.Message);
                     IsRunning = false;
                 }
+
+                LastRefresh = DateTime.Now;
             }, null, TimeSpan.Zero, TimeSpan.FromMinutes(_interval));
         }
 
