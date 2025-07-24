@@ -370,3 +370,5 @@ FodyWeavers.xsd
 /FikaWebApp/ProtectedFiles/*
 /FikaWebApp/StoredData
 /FikaWebApp/StoredData/*
+/FikaWebApp/Properties/launchSettings.json
+/FikaWebApp/Properties/serviceDependencies.json
