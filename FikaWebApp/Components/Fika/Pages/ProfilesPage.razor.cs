@@ -26,10 +26,27 @@ namespace FikaWebApp.Components.Fika.Pages
         ISnackbar Snackbar { get; set; } = default!;
 
         MudDataGrid<ProfileResponse> _dataGrid = default!;
-        private readonly string _searchString = null!;
+        private string _searchString = null!;
         private readonly List<ProfileResponse> _profiles = [];
         private readonly IList<IBrowserFile> _files = [];
         private bool _loading;
+
+        private Func<ProfileResponse, bool> _quickFilter
+        {
+            get
+            {
+                return x =>
+                {
+                    if (string.IsNullOrWhiteSpace(_searchString))
+                    {
+                        return true;
+                    }
+
+                    return x.Nickname.Contains(_searchString, StringComparison.OrdinalIgnoreCase)
+                        || x.ProfileId.Contains(_searchString, StringComparison.OrdinalIgnoreCase);
+                };
+            }
+        }
 
         protected override async Task OnInitializedAsync()
         {
