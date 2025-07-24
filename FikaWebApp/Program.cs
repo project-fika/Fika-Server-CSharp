@@ -21,7 +21,7 @@ namespace FikaWebApp
 
             Log.Logger = new LoggerConfiguration()
                 .WriteTo.Console()
-                .WriteTo.File("Logs/log-.log", rollingInterval: RollingInterval.Day)
+                .WriteTo.File("Logs/log-.log", rollingInterval: RollingInterval.Day, retainedFileCountLimit: 7)
                 .Enrich.FromLogContext()
                 .CreateLogger();
 
