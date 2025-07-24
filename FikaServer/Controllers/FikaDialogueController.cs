@@ -9,7 +9,6 @@ using SPTarkov.Server.Core.Helpers;
 using SPTarkov.Server.Core.Helpers.Dialogue;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Common;
-using SPTarkov.Server.Core.Models.Eft.Common.Tables;
 using SPTarkov.Server.Core.Models.Eft.Dialog;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Eft.Ws;
@@ -18,7 +17,6 @@ using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Servers.Ws;
 using SPTarkov.Server.Core.Utils;
-using System.Runtime.CompilerServices;
 using static FikaServer.Helpers.PlayerRelationsHelper;
 
 namespace FikaServer.Controllers
@@ -30,7 +28,7 @@ namespace FikaServer.Controllers
         FriendRequestsService friendRequestsService, HttpResponseUtil httpResponseUtil, ConfigService configService,
         IEnumerable<IDialogueChatBot> dialogueChatBots)
     {
-        protected readonly List<IDialogueChatBot> _dialogueChatBots = [.. dialogueChatBots];        
+        protected readonly List<IDialogueChatBot> _dialogueChatBots = [.. dialogueChatBots];
 
         /// <summary>
         /// Gets a list of all friends for the specified profileId

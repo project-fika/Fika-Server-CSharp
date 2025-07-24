@@ -1,7 +1,4 @@
-﻿using FikaServer.Models.Fika.WebSocket.Notifications;
-using FikaServer.Services;
-using FikaServer.Services.Cache;
-using FikaServer.WebSockets;
+﻿using FikaServer.Services;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Dialog;
@@ -54,7 +51,7 @@ namespace FikaServer.ChatBot.Commands
 
                 sb.AppendLine($"{profile.CharacterData.PmcData.Info.Nickname} - {profile.ProfileInfo.ProfileId.GetValueOrDefault()}");
             }
-            
+
             mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
                 $"All profiles:\n\n{sb}");
             return new(request.DialogId);

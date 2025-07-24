@@ -94,11 +94,11 @@ namespace FikaServer.Http.Post
                             for (var i = 0; i < quantity; i++)
                             {
                                 itemsToSend.Add(new Item
-                                    {
-                                        Id = new MongoId(),
-                                        Template = checkedItem.Value.Id,
-                                        Upd = itemHelper.GenerateUpdForItem(checkedItem.Value),
-                                    }
+                                {
+                                    Id = new MongoId(),
+                                    Template = checkedItem.Value.Id,
+                                    Upd = itemHelper.GenerateUpdForItem(checkedItem.Value),
+                                }
                                 );
                             }
                         }
@@ -126,11 +126,11 @@ namespace FikaServer.Http.Post
                             }
                         }
                     }
-                    
+
                     if (request.FoundInRaid)
                     {
                         // Flag the items as FiR
-                        itemHelper.SetFoundInRaid(itemsToSend); 
+                        itemHelper.SetFoundInRaid(itemsToSend);
                     }
                     mailSendService.SendSystemMessageToPlayer(profileId, message, itemsToSend);
                 }

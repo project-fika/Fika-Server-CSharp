@@ -1,5 +1,4 @@
 ﻿using FikaServer.Services;
-using FikaShared.Requests;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Extensions;
 using SPTarkov.Server.Core.Models.Common;

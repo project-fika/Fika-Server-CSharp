@@ -1,7 +1,6 @@
 ﻿using FikaServer.Models.Fika.WebSocket.Notifications;
 using FikaServer.Services;
 using FikaServer.Services.Cache;
-using FikaServer.WebSockets;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Helpers;
 using SPTarkov.Server.Core.Models.Common;
@@ -11,7 +10,6 @@ using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Eft.Ws;
 using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Services;
-using SPTarkov.Server.Core.Utils;
 using System.Text.RegularExpressions;
 
 namespace FikaServer.ChatBot.Commands
@@ -45,7 +43,7 @@ namespace FikaServer.ChatBot.Commands
             bool isAdmin = configService.Config.Server.AdminIds.Contains(sessionId);
             if (!isAdmin)
             {
-                mailSendService.SendUserMessageToPlayer(sessionId, commandHandler, 
+                mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
                     "You are not an admin!");
                 return value;
             }
@@ -94,6 +92,6 @@ namespace FikaServer.ChatBot.Commands
             return value;
         }
 
-        
+
     }
 }

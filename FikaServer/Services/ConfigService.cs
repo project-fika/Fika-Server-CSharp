@@ -5,7 +5,6 @@ using SPTarkov.Server.Core.Models.Spt.Config;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Utils;
-using System.Drawing;
 using System.Reflection;
 using System.Security.Cryptography;
 
@@ -61,7 +60,7 @@ namespace FikaServer.Services
             Config.Server.ShowDevProfile = true;
 #endif
 
-            ApplySPTConfig(Config.Server.SPT);            
+            ApplySPTConfig(Config.Server.SPT);
         }
 
         private static Task<string> GenerateAPIKey(int size = 32)
