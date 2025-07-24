@@ -89,12 +89,12 @@
 			Logger.LogInformation("User logged in.");
 			RedirectManager.RedirectTo(ReturnUrl);
 		}
-		else if (result.RequiresTwoFactor)
-		{
-			RedirectManager.RedirectTo(
-				"Account/LoginWith2fa",
-				new() { ["returnUrl"] = ReturnUrl, ["rememberMe"] = Input.RememberMe });
-		}
+		// else if (result.RequiresTwoFactor)
+		// {
+		// 	RedirectManager.RedirectTo(
+		// 		"Account/LoginWith2fa",
+		// 		new() { ["returnUrl"] = ReturnUrl, ["rememberMe"] = Input.RememberMe });
+		// }
 		else if (result.IsLockedOut)
 		{
 			Logger.LogWarning("User account locked out.");
