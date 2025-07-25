@@ -5,7 +5,6 @@ using FikaWebApp.Services;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using System.Net;
-using static FikaWebApp.Components.Fika.Dialogs.SendItemDialog;
 
 namespace FikaWebApp.Components.Fika.Dialogs
 {
@@ -80,7 +79,7 @@ namespace FikaWebApp.Components.Fika.Dialogs
                             Snackbar.Add($"There was an error sending the item: {ex.Message}", Severity.Error);
                         }
                     }
-                } 
+                }
             }
         }
 

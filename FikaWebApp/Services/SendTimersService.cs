@@ -1,5 +1,4 @@
 ﻿using FikaShared.Requests;
-using System.Runtime.InteropServices.Marshalling;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -176,7 +175,7 @@ namespace FikaWebApp.Services
                     lock (_lock)
                     {
                         _timers.Remove(timer!);
-                        timer!.Dispose();                        
+                        timer!.Dispose();
                     }
                     await Save();
                 }
@@ -187,7 +186,7 @@ namespace FikaWebApp.Services
                 _timers.Add(timer, request);
                 if (save)
                 {
-                    Save(); 
+                    Save();
                 }
             }
 

@@ -6,7 +6,6 @@ using FikaWebApp.Services;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using System.Globalization;
-using static FikaWebApp.Components.Fika.Dialogs.SendItemDialog;
 
 namespace FikaWebApp.Components.Fika.Pages
 {
@@ -87,14 +86,14 @@ namespace FikaWebApp.Components.Fika.Pages
                 }
             }
         }
-		private async Task OpenQueuedItems()
-		{
+        private async Task OpenQueuedItems()
+        {
             var options = new DialogOptions()
             {
                 MaxWidth = MaxWidth.Large,
                 FullWidth = true
             };
             var dialog = DialogService.ShowAsync<ViewQueuedSendItemsDialog>("Queued Items", options);
-		}
+        }
     }
 }

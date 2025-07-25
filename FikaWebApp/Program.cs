@@ -67,7 +67,7 @@ namespace FikaWebApp
 
             builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
-            builder.Services.Configure<FikaConfig>(builder.Configuration.GetSection("FikaConfig"));            
+            builder.Services.Configure<FikaConfig>(builder.Configuration.GetSection("FikaConfig"));
             builder.Services.AddSingleton(resolver =>
                 resolver.GetRequiredService<IOptions<FikaConfig>>().Value);
 
@@ -120,7 +120,7 @@ namespace FikaWebApp
 
             app.Run();
         }
-        
+
         private static async Task InstantiateSingletons(WebApplication app)
         {
             // this is ugly but it works for now...

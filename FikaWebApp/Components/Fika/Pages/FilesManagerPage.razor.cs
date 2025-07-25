@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
-using System.IO;
 
 namespace FikaWebApp.Components.Fika.Pages
 {
@@ -232,7 +231,7 @@ namespace FikaWebApp.Components.Fika.Pages
             _uploadingText = null;
             if (filesUploaded > 0)
             {
-                Snackbar.Add($"Uploaded {filesUploaded} file(s)", Severity.Success); 
+                Snackbar.Add($"Uploaded {filesUploaded} file(s)", Severity.Success);
             }
 
             StateHasChanged();

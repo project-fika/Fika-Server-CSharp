@@ -66,6 +66,6 @@
         private readonly HttpClient _client;
         private readonly int _interval;
         private Timer? _timer;
-        
+
     }
 }
