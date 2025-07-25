@@ -3,6 +3,7 @@ using FikaServer.Models.Fika.Dialog;
 using FikaServer.Models.Fika.Presence;
 using SPTarkov.Server.Core.Models.Eft.Common;
 using SPTarkov.Server.Core.Models.Eft.Profile;
+using System.Diagnostics.CodeAnalysis;
 using static FikaShared.Enums;
 
 namespace FikaServer

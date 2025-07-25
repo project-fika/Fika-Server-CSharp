@@ -63,5 +63,11 @@ namespace FikaServer.Http
 
             return authHeader.Contains(configService.Config.Server.ApiKey);
         }
+
+        public static class ContentTypes
+        {
+            public const string Json = "application/json";
+            public const string PlainText = "text/plain";
+        }
     }
 }

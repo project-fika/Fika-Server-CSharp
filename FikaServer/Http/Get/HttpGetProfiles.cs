@@ -38,6 +38,7 @@ namespace FikaServer.Http.Get
             }
 
             resp.StatusCode = 200;
+            resp.ContentType = ContentTypes.Json;
             await resp.Body.WriteAsync(Encoding.UTF8.GetBytes(httpResponseUtil.NoBody(profilesResponse)));
             await resp.StartAsync();
             await resp.CompleteAsync();

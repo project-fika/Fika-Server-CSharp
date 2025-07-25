@@ -26,6 +26,7 @@ namespace FikaServer.Http.Get
             ConcurrentDictionary<MongoId, FikaMatch> matches = matchService.Matches;
 
             resp.StatusCode = 200;
+            resp.ContentType = ContentTypes.Json;
             await resp.Body.WriteAsync(Encoding.UTF8.GetBytes(httpResponseUtil.NoBody(matches)));
             await resp.StartAsync();
             await resp.CompleteAsync();

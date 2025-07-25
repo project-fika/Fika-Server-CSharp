@@ -54,6 +54,7 @@ namespace FikaServer.Http.Get
             }
 
             resp.StatusCode = 404;
+            resp.ContentType = ContentTypes.Json;
             await resp.StartAsync();
             await resp.CompleteAsync();
         }

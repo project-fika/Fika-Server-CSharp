@@ -9,6 +9,9 @@ namespace FikaWebApp.Services
             _logger = logger;
             _client = client;
 
+            _itemDict = [];
+            _names = [];
+
             _ = PopulateDictionary();
         }
 
