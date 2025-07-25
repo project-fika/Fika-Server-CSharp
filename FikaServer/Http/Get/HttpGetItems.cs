@@ -1,6 +1,7 @@
 ﻿using FikaServer.Services;
 using FikaShared.Responses;
 using SPTarkov.DI.Annotations;
+using SPTarkov.Server.Core.Extensions;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Services;
 using SPTarkov.Server.Core.Utils;
@@ -44,6 +45,11 @@ namespace FikaServer.Http.Get
             foreach ((var itemId, var item) in allItems)
             {
                 if (_ignoredItems.Contains(itemId))
+                {
+                    continue;
+                }
+
+                if (item.IsQuestItem())
                 {
                     continue;
                 }
