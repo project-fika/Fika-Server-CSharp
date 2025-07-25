@@ -5,6 +5,6 @@ namespace FikaShared.Responses
     public record GetOnlinePlayersResponse
     {
         [JsonPropertyName("players")]
-        public List<OnlinePlayer> Players { get; set; }
+        public required List<OnlinePlayer> Players { get; init; }
     }
 }

@@ -8,6 +8,6 @@ namespace FikaShared.Requests
     public record ProfileIdRequest
     {
         [JsonPropertyName("profileId")]
-        public required string ProfileId { get; set; }
+        public required string ProfileId { get; init; }
     }
 }

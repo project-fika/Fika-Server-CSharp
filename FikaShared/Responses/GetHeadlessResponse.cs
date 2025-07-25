@@ -5,6 +5,6 @@ namespace FikaShared.Responses
     public record GetHeadlessResponse
     {
         [JsonPropertyName("headlessClients")]
-        public List<OnlineHeadless> HeadlessClients { get; set; }
+        public required List<OnlineHeadless> HeadlessClients { get; init; }
     }
 }

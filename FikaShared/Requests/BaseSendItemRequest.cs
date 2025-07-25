@@ -6,20 +6,20 @@ namespace FikaShared.Requests
     public abstract record BaseSendItemRequest
     {
         [JsonPropertyName("itemTpl")]
-        public required string ItemTemplate { get; set; }
+        public required string ItemTemplate { get; init; }
 
         [JsonPropertyName("amount")]
-        public required int Amount { get; set; }
+        public required int Amount { get; init; }
 
         [JsonPropertyName("message")]
         [MaxLength(255)]
-        public required string Message { get; set; }
+        public required string Message { get; init; }
 
         [JsonPropertyName("fir")]
-        public required bool FoundInRaid { get; set; }
+        public required bool FoundInRaid { get; init; }
 
         [JsonPropertyName("expirationDays")]
-        public required int ExpirationDays { get; set; }
+        public required int ExpirationDays { get; init; }
 
         [JsonIgnore]
         public DateTime? SendDate { get; set; }

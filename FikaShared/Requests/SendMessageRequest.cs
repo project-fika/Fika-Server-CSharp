@@ -5,6 +5,6 @@ namespace FikaShared.Requests
     public record SendMessageRequest : ProfileIdRequest
     {
         [JsonPropertyName("message")]
-        public required string Message { get; set; }
+        public required string Message { get; init; }
     }
 }

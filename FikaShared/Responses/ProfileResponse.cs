@@ -5,15 +5,15 @@ namespace FikaShared.Responses
     public record ProfileResponse
     {
         [JsonPropertyName("nickname")]
-        public string Nickname { get; set; } = string.Empty;
+        public string Nickname { get; init; } = string.Empty;
 
         [JsonPropertyName("profileId")]
-        public string ProfileId { get; set; } = string.Empty;
+        public string ProfileId { get; init; } = string.Empty;
 
         [JsonPropertyName("hasFleaBan")]
         public bool HasFleaBan { get; set; }
 
         [JsonPropertyName("level")]
-        public int Level { get; set; }
+        public int Level { get; init; }
     }
 }
