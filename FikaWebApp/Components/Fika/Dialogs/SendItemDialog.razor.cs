@@ -19,6 +19,7 @@ namespace FikaWebApp.Components.Fika.Dialogs
         private string _img = _defaultImg;
         private string? _url;
         private string _itemDescription = "Select an item";
+        private int _maxItems = 10;
 
         private static readonly string _defaultImg = "images/missing_item.png";
 
@@ -46,7 +47,7 @@ namespace FikaWebApp.Components.Fika.Dialogs
             MudDialog.Cancel();
         }
 
-        private bool CheckDate(DateTime dt)
+        private static bool CheckDate(DateTime dt)
         {
             return dt < DateTime.Now.AddDays(-1);
         }
@@ -58,7 +59,7 @@ namespace FikaWebApp.Components.Fika.Dialogs
             if (string.IsNullOrEmpty(value))
             {
                 _searching = false;
-                return ItemCacheService.Items.Values;
+                return ItemCacheService.ItemNames;
             }
 
             var result = await Task.Run(() => ItemCacheService.NameToIdSearch(value), token);
@@ -75,16 +76,18 @@ namespace FikaWebApp.Components.Fika.Dialogs
                 _img = _defaultImg;
                 _url = null;
                 _model.ItemName = null;
+                _maxItems = 10;
                 return;
             }
 
-            var tpl = ItemCacheService.NameToId(args);
+            (var tpl, var data) = ItemCacheService.NameToKvp(args);
             if (Statics.IsValidMongoId(tpl))
             {
                 _img = $"https://assets.tarkov.dev/{tpl}-icon.webp";
                 _url = $"https://tarkov.dev/item/{tpl}";
                 _model.TemplateId = tpl;
-                _itemDescription = ItemCacheService.GetDescription(tpl);
+                _itemDescription = data.Description;
+                _maxItems = Math.Clamp(data.StackAmount, 1, 5_000_000);
                 StateHasChanged();
             }
         }

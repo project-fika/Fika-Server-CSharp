@@ -16,45 +16,40 @@ namespace FikaWebApp.Services
         {
             try
             {
-                var result = await _client.GetFromJsonAsync<ItemsResponse>("get/items");
+                var result = await _client.GetFromJsonAsync<GetItemsResponse>("get/items");
                 if (result != null)
                 {
                     var amount = result.Items.Count;
                     _itemDict = new(amount);
 
                     var filtered = result.Items
-                        .Where(kvp => !string.IsNullOrEmpty(kvp.Value)
-                            && !kvp.Value.StartsWith("!!!DO_NOT_USE!!!", StringComparison.Ordinal)
-                            && !kvp.Value.StartsWith("!!!DO NOT USE!!!", StringComparison.Ordinal));
+                        .Where(kvp => !string.IsNullOrEmpty(kvp.Value.Name)
+                            && !kvp.Value.Name.StartsWith("!!!DO_NOT_USE!!!", StringComparison.Ordinal)
+                            && !kvp.Value.Name.StartsWith("!!!DO NOT USE!!!", StringComparison.Ordinal));
 
                     var valueCounts = new Dictionary<string, int>();
 
-                    foreach (var (key, value) in filtered.OrderBy(x => x.Value))
+                    foreach (var (key, value) in filtered.OrderBy(x => x.Value.Name))
                     {
-                        if (!valueCounts.TryGetValue(value, out int count))
+                        if (!valueCounts.TryGetValue(value.Name, out int count))
                         {
                             count = 1;
-                            valueCounts[value] = count;
+                            valueCounts[value.Name] = count;
                         }
                         else
                         {
                             count++;
-                            valueCounts[value] = count;
+                            valueCounts[value.Name] = count;
                         }
 
-                        var newValue = (count > 1) ? $"{value} ({count})" : value;
+                        var newValue = (count > 1) ? $"{value.Name} ({count})" : value.Name;
+                        value.Name = newValue;
 
-                        _itemDict.Add(key, newValue);
+                        _itemDict.Add(key, value);
                     }
 
-                    _itemDescriptions = [];
-                    foreach (var item in _itemDict.Keys)
-                    {
-                        if (result.Descriptions.TryGetValue(item, out string? description))
-                        {
-                            _itemDescriptions.Add(item, description);
-                        }
-                    }
+                    _names = [.. _itemDict.Values
+                        .Select(x => x.Name)];
 
                     _logger.LogInformation("Loaded {Amount} item(s) to the database, {Filtered} were filtered out", _itemDict.Count, amount - _itemDict.Count);
                 }
@@ -70,7 +65,7 @@ namespace FikaWebApp.Services
             }
         }
 
-        public OrderedDictionary<string, string> Items
+        public OrderedDictionary<string, ItemData> Items
         {
             get
             {
@@ -78,12 +73,20 @@ namespace FikaWebApp.Services
             }
         }
 
+        public string[] ItemNames
+        {
+            get
+            {
+                return _names;
+            }
+        }
+
         private readonly ILogger<ItemCacheService> _logger;
         private readonly HttpClient _client;
-        private OrderedDictionary<string, string> _itemDict;
-        private Dictionary<string, string> _itemDescriptions;
+        private OrderedDictionary<string, ItemData> _itemDict;
+        private string[] _names;
 
-        public string IdToName(string tpl)
+        public ItemData IdToName(string tpl)
         {
             return _itemDict[tpl];
         }
@@ -91,33 +94,31 @@ namespace FikaWebApp.Services
         public string NameToId(string itemName)
         {
             return _itemDict
-                .Where(x => x.Value.Contains(itemName, StringComparison.InvariantCultureIgnoreCase))
+                .Where(x => x.Value.Name.Contains(itemName, StringComparison.InvariantCultureIgnoreCase))
                 .Select(x => x.Key)
                 .FirstOrDefault()!;
         }
 
-        public KeyValuePair<string, string> NameToKvp(string itemName)
+        public ItemData NameToData(string itemName)
+        {
+            return _itemDict.
+                Where(x => x.Value.Name.Contains(itemName, StringComparison.InvariantCultureIgnoreCase))
+                .Select(x => x.Value)
+                .FirstOrDefault()!;
+        }
+
+        public KeyValuePair<string, ItemData> NameToKvp(string itemName)
         {
             return _itemDict
-                .Where(x => x.Value.Contains(itemName, StringComparison.InvariantCultureIgnoreCase))
+                .Where(x => x.Value.Name.Contains(itemName, StringComparison.InvariantCultureIgnoreCase))
                 .FirstOrDefault();
         }
 
         public IEnumerable<string> NameToIdSearch(string itemName)
         {
             return _itemDict
-                .Where(x => x.Value.Contains(itemName, StringComparison.InvariantCultureIgnoreCase))
-                .Select(x => x.Value);
-        }
-
-        public string GetDescription(string tpl)
-        {
-            if (_itemDescriptions.TryGetValue(tpl, out string? desc))
-            {
-                return desc;
-            }
-
-            return string.Empty;
+                .Where(x => x.Value.Name.Contains(itemName, StringComparison.InvariantCultureIgnoreCase))
+                .Select(x => x.Value.Name);
         }
     }
 }

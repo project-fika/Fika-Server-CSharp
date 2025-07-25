@@ -1,4 +1,5 @@
 ﻿@using FikaShared.Requests
+@using System.Globalization
 
 <MudDialog ContentStyle="overflow: hidden;">
 	<DialogContent>
@@ -27,8 +28,8 @@
 					</TooltipContent>
 				</MudTooltip>
 			</MudStack>
-			<MudNumericField Label="Amount of items" HelperText="How many items to send" @bind-Value="@_model.Amount" Placeholder="How many items to send"
-				Min="1" Max="50000" Adornment="Adornment.End" AdornmentText="item(s)" Required HelperTextOnFocus />
+			<MudNumericField Label="Amount of items" HelperText="@($"How many items to send (max {_maxItems.ToString("N0", CultureInfo.CurrentCulture)})")" @bind-Value="@_model.Amount" Placeholder="How many items to send"
+				Min="1" Max="@_maxItems" Adornment="Adornment.End" AdornmentText="item(s)" Required HelperTextOnFocus />
 			<FikaMultiLineTextField @bind-Value="@_model.Message" />
 			<MudNumericField Label="Days until expiration" HelperText="How many days until the message expires" @bind-Value="@_model.ExpirationDays" Placeholder="Days until message expires"
 							 Min="1" Max="31" Adornment="Adornment.End" AdornmentText="day(s)" Required HelperTextOnFocus />

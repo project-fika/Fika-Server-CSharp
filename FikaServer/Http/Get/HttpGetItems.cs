@@ -26,25 +26,31 @@ namespace FikaServer.Http.Get
             var allItems = databaseService.GetItems();
             var locale = localeService.GetLocaleDb("en");
 
-            var items = new Dictionary<string, string>();
-            var descriptions = new Dictionary<string, string>();
-            foreach (var itemId in allItems.Keys)
+            var items = new Dictionary<string, ItemData>();
+            foreach ((var itemId, var item) in allItems)
             {
-                if (locale.TryGetValue($"{itemId} Name", out var fullName))
+                if (!locale.TryGetValue($"{itemId} Name", out var fullName))
                 {
-                    items.Add(itemId, fullName);
+                    continue;
                 }
 
-                if (locale.TryGetValue($"{itemId} Description", out var description))
+                var description = locale.TryGetValue($"{itemId} Description", out var desc) ? desc : "Missing description";
+                var stackAmount = item.Properties?.StackMaxSize ?? 1;
+                var maxSendAmount = stackAmount * 10;
+
+                var itemData = new ItemData
                 {
-                    descriptions.Add(itemId, description);
-                }
+                    Name = fullName,
+                    Description = description,
+                    StackAmount = maxSendAmount
+                };
+
+                items[itemId] = itemData;
             }
 
-            ItemsResponse response = new()
+            GetItemsResponse response = new()
             {
-                Items = items,
-                Descriptions = descriptions
+                Items = items
             };
 
             resp.StatusCode = 200;
