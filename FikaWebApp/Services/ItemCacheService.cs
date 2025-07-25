@@ -25,14 +25,9 @@ namespace FikaWebApp.Services
                     var amount = result.Items.Count;
                     _itemDict = new(amount);
 
-                    var filtered = result.Items
-                        .Where(kvp => !string.IsNullOrEmpty(kvp.Value.Name)
-                            && !kvp.Value.Name.StartsWith("!!!DO_NOT_USE!!!", StringComparison.Ordinal)
-                            && !kvp.Value.Name.StartsWith("!!!DO NOT USE!!!", StringComparison.Ordinal));
-
                     var valueCounts = new Dictionary<string, int>();
 
-                    foreach (var (key, value) in filtered.OrderBy(x => x.Value.Name))
+                    foreach (var (key, value) in result.Items.OrderBy(x => x.Value.Name))
                     {
                         if (!valueCounts.TryGetValue(value.Name, out int count))
                         {
@@ -54,7 +49,7 @@ namespace FikaWebApp.Services
                     _names = [.. _itemDict.Values
                         .Select(x => x.Name)];
 
-                    _logger.LogInformation("Loaded {Amount} item(s) to the database, {Filtered} were filtered out", _itemDict.Count, amount - _itemDict.Count);
+                    _logger.LogInformation("Loaded {Amount} item(s) to the database", _itemDict.Count);
                 }
                 else
                 {
