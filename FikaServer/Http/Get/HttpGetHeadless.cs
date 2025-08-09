@@ -6,6 +6,7 @@ using FikaShared;
 using FikaShared.Responses;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Utils;
+using System.Net.WebSockets;
 using System.Text;
 using static FikaShared.Enums;
 
@@ -30,7 +31,7 @@ namespace FikaServer.Http.Get
             var clients = new List<OnlineHeadless>(headlessClients.Count);
             foreach ((var profileId, var headlessClient) in headlessClients)
             {
-                EHeadlessState state = headlessClient.State is EHeadlessStatus.READY ? EHeadlessState.Ready : EHeadlessState.InRaid;
+                EHeadlessState state = headlessClient.WebSocket.State is WebSocketState.Open ? EHeadlessState.Ready : EHeadlessState.NotReady;
                 clients.Add(new()
                 {
                     ProfileId = profileId,

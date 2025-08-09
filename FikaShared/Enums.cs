@@ -26,7 +26,7 @@ namespace FikaShared
         public enum EHeadlessState
         {
             Ready,
-            InRaid
+            NotReady
         }
     }
 }

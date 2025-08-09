@@ -12,7 +12,7 @@ using System.Text;
 namespace FikaServer.Http.Post
 {
     [Injectable(TypePriority = 0)]
-    public class HttpRestartHeadless(ConfigService configService, JsonUtil jsonUtil, NotificationSendHelper sendHelper,
+    public class HttpRestartHeadless(ConfigService configService, JsonUtil jsonUtil,
         HeadlessService headlessService) : BaseHttpRequest(configService)
     {
         public override string Path { get; set; } = "/post/restartheadless";

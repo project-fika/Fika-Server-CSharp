@@ -13,7 +13,7 @@
 				<PropertyColumn Property="p => p.Players" />
 				<TemplateColumn>
 					<CellTemplate Context="row">
-						<MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(row.Item.State is Enums.EHeadlessState.InRaid)" OnClick="@(() => RestartHeadless(row.Item))">Restart</MudButton>
+						<MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(row.Item.State is Enums.EHeadlessState.NotReady)" OnClick="@(() => RestartHeadless(row.Item))">Restart</MudButton>
 					</CellTemplate>
 				</TemplateColumn>
 			</Columns>

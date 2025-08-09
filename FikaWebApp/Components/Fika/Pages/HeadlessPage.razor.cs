@@ -37,13 +37,13 @@ namespace FikaWebApp.Components.Fika.Pages
             _headlessClients.Add(new()
             {
                 ProfileId = "TEST2",
-                State = Enums.EHeadlessState.InRaid,
+                State = Enums.EHeadlessState.NotReady,
                 Players = Random.Shared.Next(0, 5)
             });
             _headlessClients.Add(new()
             {
                 ProfileId = "TEST3",
-                State = Enums.EHeadlessState.InRaid,
+                State = Enums.EHeadlessState.NotReady,
                 Players = Random.Shared.Next(0, 5)
             });
             _headlessClients.Add(new()
