@@ -2,17 +2,16 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
-namespace FikaServer.Models.Fika.WebSocket.Notifications
-{
-    public record SendMessageNotification : WsNotificationEvent
-    {
-        [SetsRequiredMembers]
-        public SendMessageNotification(string message)
-        {
-            Message = message;
-        }
+namespace FikaServer.Models.Fika.WebSocket.Notifications;
 
-        [JsonPropertyName("message")]
-        public required string Message { get; set; }
+public record SendMessageNotification : WsNotificationEvent
+{
+    [SetsRequiredMembers]
+    public SendMessageNotification(string message)
+    {
+        Message = message;
     }
+
+    [JsonPropertyName("message")]
+    public required string Message { get; set; }
 }

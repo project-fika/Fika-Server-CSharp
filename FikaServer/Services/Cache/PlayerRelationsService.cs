@@ -7,123 +7,122 @@ using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Utils;
 using System.Collections.Concurrent;
 
-namespace FikaServer.Services.Cache
+namespace FikaServer.Services.Cache;
+
+[Injectable(InjectionType.Singleton)]
+public class PlayerRelationsService(ProfileHelper profileHelper, ConfigService FikaConfig, JsonUtil jsonUtil, ISptLogger<PlayerRelationsService> logger)
 {
-    [Injectable(InjectionType.Singleton)]
-    public class PlayerRelationsService(ProfileHelper profileHelper, ConfigService FikaConfig, JsonUtil jsonUtil, ISptLogger<PlayerRelationsService> logger)
+    private readonly string _playerRelationsFullPath = Path.Join(FikaConfig.ModPath, "database");
+    private ConcurrentDictionary<MongoId, FikaPlayerRelations> _playerRelations = [];
+
+    public List<MongoId> Keys
     {
-        private readonly string _playerRelationsFullPath = Path.Join(FikaConfig.ModPath, "database");
-        private ConcurrentDictionary<MongoId, FikaPlayerRelations> _playerRelations = [];
-
-        public List<MongoId> Keys
+        get
         {
-            get
-            {
-                return [.. _playerRelations.Keys];
-            }
+            return [.. _playerRelations.Keys];
+        }
+    }
+
+    public List<FikaPlayerRelations> Values
+    {
+        get
+        {
+            return [.. _playerRelations.Values];
+        }
+    }
+
+    public async Task OnPreLoad()
+    {
+        if (!Directory.Exists(_playerRelationsFullPath))
+        {
+            Directory.CreateDirectory(_playerRelationsFullPath);
         }
 
-        public List<FikaPlayerRelations> Values
+        string file = $"{_playerRelationsFullPath}/playerRelations.json";
+        if (!File.Exists(file))
         {
-            get
-            {
-                return [.. _playerRelations.Values];
-            }
+            await SaveProfileRelationsAsync();
         }
-
-        public async Task OnPreLoad()
+        else
         {
-            if (!Directory.Exists(_playerRelationsFullPath))
-            {
-                Directory.CreateDirectory(_playerRelationsFullPath);
-            }
-
-            string file = $"{_playerRelationsFullPath}/playerRelations.json";
-            if (!File.Exists(file))
-            {
-                await SaveProfileRelationsAsync();
-            }
-            else
-            {
-                _playerRelations = await jsonUtil.DeserializeFromFileAsync<ConcurrentDictionary<MongoId, FikaPlayerRelations>>(file);
-            }
+            _playerRelations = await jsonUtil.DeserializeFromFileAsync<ConcurrentDictionary<MongoId, FikaPlayerRelations>>(file);
         }
+    }
 
-        public async Task OnPostLoad()
+    public async Task OnPostLoad()
+    {
+        Dictionary<MongoId, SptProfile> profiles = profileHelper.GetProfiles();
+        bool shouldSave = false;
+
+        foreach (MongoId profileId in profiles.Keys)
         {
-            Dictionary<MongoId, SptProfile> profiles = profileHelper.GetProfiles();
-            bool shouldSave = false;
-
-            foreach (MongoId profileId in profiles.Keys)
+            if (!_playerRelations.TryGetValue(profileId, out FikaPlayerRelations? value))
             {
-                if (!_playerRelations.TryGetValue(profileId, out FikaPlayerRelations? value))
+                value = new FikaPlayerRelations();
+                if (!_playerRelations.TryAdd(profileId, value))
                 {
-                    value = new FikaPlayerRelations();
-                    if (!_playerRelations.TryAdd(profileId, value))
-                    {
-                        logger.Error($"Failed to add {profileId} to relations database");
-                        continue;
-                    }
-                    shouldSave = true;
-
+                    logger.Error($"Failed to add {profileId} to relations database");
                     continue;
                 }
+                shouldSave = true;
 
-                List<string> Friends = value.Friends;
+                continue;
+            }
 
-                foreach (string friend in Friends.ToList())
+            List<string> Friends = value.Friends;
+
+            foreach (string friend in Friends.ToList())
+            {
+                if (!profiles.ContainsKey(friend))
                 {
-                    if (!profiles.ContainsKey(friend))
-                    {
-                        Friends.Remove(friend);
-                        shouldSave = true;
-                    }
-                }
-
-                List<string> Ignored = value.Ignore;
-
-                foreach (string ignore in Ignored.ToList())
-                {
-                    Ignored.Remove(ignore);
+                    Friends.Remove(friend);
                     shouldSave = true;
                 }
             }
 
-            if (shouldSave)
+            List<string> Ignored = value.Ignore;
+
+            foreach (string ignore in Ignored.ToList())
             {
-                await SaveProfileRelationsAsync();
+                Ignored.Remove(ignore);
+                shouldSave = true;
             }
         }
 
-        public void SaveProfileRelations()
+        if (shouldSave)
         {
-            File.WriteAllText($"{_playerRelationsFullPath}/playerRelations.json", jsonUtil.Serialize(_playerRelations, true));
+            await SaveProfileRelationsAsync();
+        }
+    }
+
+    public void SaveProfileRelations()
+    {
+        File.WriteAllText($"{_playerRelationsFullPath}/playerRelations.json", jsonUtil.Serialize(_playerRelations, true));
+    }
+
+    public async Task SaveProfileRelationsAsync()
+    {
+        await File.WriteAllTextAsync($"{_playerRelationsFullPath}/playerRelations.json", jsonUtil.Serialize(_playerRelations, true));
+    }
+
+    public FikaPlayerRelations GetStoredValue(string profileId)
+    {
+        if (!_playerRelations.ContainsKey(profileId))
+        {
+            StoreValue(profileId, new FikaPlayerRelations());
         }
 
-        public async Task SaveProfileRelationsAsync()
+        return _playerRelations[profileId];
+    }
+
+    public void StoreValue(MongoId profileId, FikaPlayerRelations value)
+    {
+        if (!_playerRelations.TryAdd(profileId, value))
         {
-            await File.WriteAllTextAsync($"{_playerRelationsFullPath}/playerRelations.json", jsonUtil.Serialize(_playerRelations, true));
+            logger.Error($"Failed to add {profileId} to relations database");
+            return;
         }
 
-        public FikaPlayerRelations GetStoredValue(string profileId)
-        {
-            if (!_playerRelations.ContainsKey(profileId))
-            {
-                StoreValue(profileId, new FikaPlayerRelations());
-            }
-
-            return _playerRelations[profileId];
-        }
-
-        public void StoreValue(MongoId profileId, FikaPlayerRelations value)
-        {
-            if (!_playerRelations.TryAdd(profileId, value))
-            {
-                logger.Error($"Failed to add {profileId} to relations database");
-                return;
-            }
-
-            SaveProfileRelations();
-        }
+        SaveProfileRelations();
     }
 }

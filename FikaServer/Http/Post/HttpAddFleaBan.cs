@@ -10,60 +10,59 @@ using SPTarkov.Server.Core.Models.Eft.Ws;
 using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Utils;
 
-namespace FikaServer.Http.Post
+namespace FikaServer.Http.Post;
+
+[Injectable(TypePriority = 0)]
+public class HttpAddFleaBan(SaveServer saveServer, ConfigService configService,
+    TimeUtil timeUtil, JsonUtil jsonUtil, NotificationSendHelper sendHelper) : BaseHttpRequest(configService)
 {
-    [Injectable(TypePriority = 0)]
-    public class HttpAddFleaBan(SaveServer saveServer, ConfigService configService,
-        TimeUtil timeUtil, JsonUtil jsonUtil, NotificationSendHelper sendHelper) : BaseHttpRequest(configService)
+    public override string Path { get; set; } = "/post/addfleaban";
+
+    public override string Method
     {
-        public override string Path { get; set; } = "/post/addfleaban";
-
-        public override string Method
+        get
         {
-            get
-            {
-                return HttpMethods.Post;
-            }
+            return HttpMethods.Post;
         }
+    }
 
-        public override async Task HandleRequest(HttpRequest req, HttpResponse resp)
+    public override async Task HandleRequest(HttpRequest req, HttpResponse resp)
+    {
+        using (StreamReader sr = new(req.Body))
         {
-            using (StreamReader sr = new(req.Body))
+            string rawData = await sr.ReadToEndAsync();
+
+            AddFleaBanRequest request = jsonUtil.Deserialize<AddFleaBanRequest>(rawData);
+            if (request != null)
             {
-                string rawData = await sr.ReadToEndAsync();
-
-                AddFleaBanRequest request = jsonUtil.Deserialize<AddFleaBanRequest>(rawData);
-                if (request != null)
+                MongoId profileId = new(request.ProfileId);
+                SptProfile profile = saveServer.GetProfile(profileId);
+                if (profile != null)
                 {
-                    MongoId profileId = new(request.ProfileId);
-                    SptProfile profile = saveServer.GetProfile(profileId);
-                    if (profile != null)
-                    {
-                        int days = request.AmountOfDays == 0 ? 9999 : request.AmountOfDays;
-                        long banTime = timeUtil.GetTimeStampFromNowDays(days);
-                        profile.CharacterData.PmcData.Info.Bans = (profile.CharacterData.PmcData.Info.Bans ?? [])
-                            .Append(new Ban()
-                            {
-                                BanType = BanType.RagFair,
-                                DateTime = banTime
-                            });
-
-                        await saveServer.SaveProfileAsync(profileId);
-
-                        sendHelper.SendMessage(profileId, new AddBanNotification()
+                    int days = request.AmountOfDays == 0 ? 9999 : request.AmountOfDays;
+                    long banTime = timeUtil.GetTimeStampFromNowDays(days);
+                    profile.CharacterData.PmcData.Info.Bans = (profile.CharacterData.PmcData.Info.Bans ?? [])
+                        .Append(new Ban()
                         {
-                            EventType = NotificationEventType.InGameBan,
-                            EventIdentifier = new(),
                             BanType = BanType.RagFair,
                             DateTime = banTime
                         });
-                    }
+
+                    await saveServer.SaveProfileAsync(profileId);
+
+                    sendHelper.SendMessage(profileId, new AddBanNotification()
+                    {
+                        EventType = NotificationEventType.InGameBan,
+                        EventIdentifier = new(),
+                        BanType = BanType.RagFair,
+                        DateTime = banTime
+                    });
                 }
             }
-
-            resp.StatusCode = 200;
-            await resp.StartAsync();
-            await resp.CompleteAsync();
         }
+
+        resp.StatusCode = 200;
+        await resp.StartAsync();
+        await resp.CompleteAsync();
     }
 }

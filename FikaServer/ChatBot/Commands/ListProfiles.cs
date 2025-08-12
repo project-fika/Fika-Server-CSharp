@@ -7,54 +7,53 @@ using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Services;
 using System.Text;
 
-namespace FikaServer.ChatBot.Commands
+namespace FikaServer.ChatBot.Commands;
+
+[Injectable]
+public class ListProfiles(ConfigService configService,
+    SaveServer saveServer,
+    MailSendService mailSendService) : IFikaCommand
 {
-    [Injectable]
-    public class ListProfiles(ConfigService configService,
-        SaveServer saveServer,
-        MailSendService mailSendService) : IFikaCommand
+    public string Command
     {
-        public string Command
+        get
         {
-            get
-            {
-                return "listprofiles";
-            }
+            return "listprofiles";
         }
+    }
 
-        public string CommandHelp
+    public string CommandHelp
+    {
+        get
         {
-            get
-            {
-                return $"fika {Command}\nLists all profileIds and nicknames.\nNicknames are used for most commands";
-            }
+            return $"fika {Command}\nLists all profileIds and nicknames.\nNicknames are used for most commands";
         }
+    }
 
-        public async ValueTask<string> PerformAction(UserDialogInfo commandHandler, MongoId sessionId, SendMessageRequest request)
+    public async ValueTask<string> PerformAction(UserDialogInfo commandHandler, MongoId sessionId, SendMessageRequest request)
+    {
+        bool isAdmin = configService.Config.Server.AdminIds.Contains(sessionId);
+        if (!isAdmin)
         {
-            bool isAdmin = configService.Config.Server.AdminIds.Contains(sessionId);
-            if (!isAdmin)
-            {
-                mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
-                    "You are not an admin!");
-                return request.DialogId;
-            }
-
-            Dictionary<MongoId, SptProfile>.ValueCollection profiles = saveServer.GetProfiles().Values;
-            StringBuilder sb = new(profiles.Count);
-            foreach (SptProfile profile in profiles)
-            {
-                if (!profile.HasProfileData())
-                {
-                    continue;
-                }
-
-                sb.AppendLine($"{profile.CharacterData.PmcData.Info.Nickname} - {profile.ProfileInfo.ProfileId.GetValueOrDefault()}");
-            }
-
             mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
-                $"All profiles:\n\n{sb}");
-            return new(request.DialogId);
+                "You are not an admin!");
+            return request.DialogId;
         }
+
+        Dictionary<MongoId, SptProfile>.ValueCollection profiles = saveServer.GetProfiles().Values;
+        StringBuilder sb = new(profiles.Count);
+        foreach (SptProfile profile in profiles)
+        {
+            if (!profile.HasProfileData())
+            {
+                continue;
+            }
+
+            sb.AppendLine($"{profile.CharacterData.PmcData.Info.Nickname} - {profile.ProfileInfo.ProfileId.GetValueOrDefault()}");
+        }
+
+        mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
+            $"All profiles:\n\n{sb}");
+        return new(request.DialogId);
     }
 }

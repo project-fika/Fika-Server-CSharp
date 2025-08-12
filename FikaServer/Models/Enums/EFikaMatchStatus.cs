@@ -1,9 +1,8 @@
-﻿namespace FikaServer.Models.Enums
+﻿namespace FikaServer.Models.Enums;
+
+public enum EFikaMatchStatus
 {
-    public enum EFikaMatchStatus
-    {
-        LOADING = 0,
-        IN_GAME = 1,
-        COMPLETE = 2,
-    }
+    LOADING = 0,
+    IN_GAME = 1,
+    COMPLETE = 2,
 }

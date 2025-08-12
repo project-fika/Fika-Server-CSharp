@@ -6,30 +6,29 @@ using SPTarkov.Server.Core.Utils;
 using System.Collections.Concurrent;
 using System.Text;
 
-namespace FikaServer.Http.Get
+namespace FikaServer.Http.Get;
+
+[Injectable(TypePriority = 0)]
+public class HttpGetRaids(ConfigService configService, MatchService matchService, HttpResponseUtil httpResponseUtil) : BaseHttpRequest(configService)
 {
-    [Injectable(TypePriority = 0)]
-    public class HttpGetRaids(ConfigService configService, MatchService matchService, HttpResponseUtil httpResponseUtil) : BaseHttpRequest(configService)
+    public override string Path { get; set; } = "/get/raids";
+
+    public override string Method
     {
-        public override string Path { get; set; } = "/get/raids";
-
-        public override string Method
+        get
         {
-            get
-            {
-                return HttpMethods.Get;
-            }
+            return HttpMethods.Get;
         }
+    }
 
-        public override async Task HandleRequest(HttpRequest req, HttpResponse resp)
-        {
-            ConcurrentDictionary<MongoId, FikaMatch> matches = matchService.Matches;
+    public override async Task HandleRequest(HttpRequest req, HttpResponse resp)
+    {
+        ConcurrentDictionary<MongoId, FikaMatch> matches = matchService.Matches;
 
-            resp.StatusCode = 200;
-            resp.ContentType = ContentTypes.Json;
-            await resp.Body.WriteAsync(Encoding.UTF8.GetBytes(httpResponseUtil.NoBody(matches)));
-            await resp.StartAsync();
-            await resp.CompleteAsync();
-        }
+        resp.StatusCode = 200;
+        resp.ContentType = ContentTypes.Json;
+        await resp.Body.WriteAsync(Encoding.UTF8.GetBytes(httpResponseUtil.NoBody(matches)));
+        await resp.StartAsync();
+        await resp.CompleteAsync();
     }
 }

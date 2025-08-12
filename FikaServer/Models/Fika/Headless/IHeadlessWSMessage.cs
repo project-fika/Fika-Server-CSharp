@@ -1,9 +1,8 @@
 ﻿using FikaServer.Models.Enums;
 
-namespace FikaServer.Models.Fika.Headless
+namespace FikaServer.Models.Fika.Headless;
+
+public interface IHeadlessWSMessage
 {
-    public interface IHeadlessWSMessage
-    {
-        public abstract EFikaHeadlessWSMessageType Type { get; set; }
-    }
+    public abstract EFikaHeadlessWSMessageType Type { get; set; }
 }

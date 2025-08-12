@@ -2,12 +2,11 @@
 using SPTarkov.Server.Core.Models.Eft.Dialog;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 
-namespace FikaServer.ChatBot
+namespace FikaServer.ChatBot;
+
+public interface IFikaCommand
 {
-    public interface IFikaCommand
-    {
-        public string Command { get; }
-        public string CommandHelp { get; }
-        public ValueTask<string> PerformAction(UserDialogInfo commandHandler, MongoId sessionId, SendMessageRequest request);
-    }
+    public string Command { get; }
+    public string CommandHelp { get; }
+    public ValueTask<string> PerformAction(UserDialogInfo commandHandler, MongoId sessionId, SendMessageRequest request);
 }

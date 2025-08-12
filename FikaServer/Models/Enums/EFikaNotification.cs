@@ -1,12 +1,11 @@
-﻿namespace FikaServer.Models.Enums
+﻿namespace FikaServer.Models.Enums;
+
+public enum EFikaNotification
 {
-    public enum EFikaNotification
-    {
-        KeepAlive = 0,
-        StartedRaid = 1,
-        SentItem = 2,
-        PushNotification = 3,
-        OpenAdminSettings = 4,
-        ShutdownClient = 5
-    }
+    KeepAlive = 0,
+    StartedRaid = 1,
+    SentItem = 2,
+    PushNotification = 3,
+    OpenAdminSettings = 4,
+    ShutdownClient = 5
 }

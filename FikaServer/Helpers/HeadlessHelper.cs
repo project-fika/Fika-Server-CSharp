@@ -9,116 +9,115 @@ using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
 using System.Collections.Concurrent;
 
-namespace FikaServer.Helpers
+namespace FikaServer.Helpers;
+
+[Injectable]
+public class HeadlessHelper(ConfigService fikaConfig, SaveServer saveServer, ConfigServer configServer,
+    HeadlessService headlessService, HeadlessProfileService headlessProfileService, ISptLogger<HeadlessHelper> logger)
 {
-    [Injectable]
-    public class HeadlessHelper(ConfigService fikaConfig, SaveServer saveServer, ConfigServer configServer,
-        HeadlessService headlessService, HeadlessProfileService headlessProfileService, ISptLogger<HeadlessHelper> logger)
+    /// <summary>
+    /// Gets all currently logged in headlesses
+    /// </summary>
+    /// <returns>A <see cref="ConcurrentDictionary{TKey, TValue}"/> where the key is the sessionID and the value is an IHeadlessClientInfo object</returns>
+    public ConcurrentDictionary<MongoId, HeadlessClientInfo> HeadlessClients
     {
-        /// <summary>
-        /// Gets all currently logged in headlesses
-        /// </summary>
-        /// <returns>A <see cref="ConcurrentDictionary{TKey, TValue}"/> where the key is the sessionID and the value is an IHeadlessClientInfo object</returns>
-        public ConcurrentDictionary<MongoId, HeadlessClientInfo> HeadlessClients
+        get
         {
-            get
-            {
-                return headlessService.HeadlessClients;
-            }
+            return headlessService.HeadlessClients;
+        }
+    }
+
+    /// <summary>
+    /// Allows for checking if a SessionID is a headless client
+    /// </summary>
+    /// <param name="sessionId">The sessionID to check</param>
+    /// <returns>Returns true if the passed sessionID is a headless, returns false if not.</returns>
+    public bool IsHeadlessClient(MongoId sessionId)
+    {
+        return headlessProfileService.HeadlessProfiles
+            .Where(x => x.ProfileInfo?.ProfileId == sessionId)
+            .Any();
+    }
+
+    /// <summary>
+    /// Allows for checking if the given headless client is available
+    /// </summary>
+    /// <param name="headlessSessionID"></param>
+    /// <returns>Returns true if it's available, returns false if it isn't available.</returns>
+    public bool IsHeadlessClientAvailable(MongoId headlessSessionID)
+    {
+        if (headlessService.HeadlessClients.TryGetValue(headlessSessionID, out HeadlessClientInfo? headlessClientInfo))
+        {
+            return headlessClientInfo.State is EHeadlessStatus.READY;
         }
 
-        /// <summary>
-        /// Allows for checking if a SessionID is a headless client
-        /// </summary>
-        /// <param name="sessionId">The sessionID to check</param>
-        /// <returns>Returns true if the passed sessionID is a headless, returns false if not.</returns>
-        public bool IsHeadlessClient(MongoId sessionId)
-        {
-            return headlessProfileService.HeadlessProfiles
-                .Where(x => x.ProfileInfo?.ProfileId == sessionId)
-                .Any();
-        }
+        return false;
+    }
 
-        /// <summary>
-        /// Allows for checking if the given headless client is available
-        /// </summary>
-        /// <param name="headlessSessionID"></param>
-        /// <returns>Returns true if it's available, returns false if it isn't available.</returns>
-        public bool IsHeadlessClientAvailable(MongoId headlessSessionID)
+    /// <summary>
+    /// Gets the requester's username for a headless client if there is any.
+    /// </summary>
+    /// <param name="headlessSessionID"></param>
+    /// <returns>The nickname if the headless has been requested by a user, returns null if not.</returns>
+    public string? GetRequesterUsername(MongoId headlessSessionID)
+    {
+        if (headlessService.HeadlessClients.TryGetValue(headlessSessionID, out HeadlessClientInfo? headlessClientInfo))
         {
-            if (headlessService.HeadlessClients.TryGetValue(headlessSessionID, out HeadlessClientInfo? headlessClientInfo))
+            if (string.IsNullOrEmpty(headlessClientInfo.RequesterSessionID))
             {
-                return headlessClientInfo.State is EHeadlessStatus.READY;
+                return null;
             }
 
-            return false;
-        }
-
-        /// <summary>
-        /// Gets the requester's username for a headless client if there is any.
-        /// </summary>
-        /// <param name="headlessSessionID"></param>
-        /// <returns>The nickname if the headless has been requested by a user, returns null if not.</returns>
-        public string? GetRequesterUsername(MongoId headlessSessionID)
-        {
-            if (headlessService.HeadlessClients.TryGetValue(headlessSessionID, out HeadlessClientInfo? headlessClientInfo))
-            {
-                if (string.IsNullOrEmpty(headlessClientInfo.RequesterSessionID))
-                {
-                    return null;
-                }
-
-                string? nickname = saveServer.GetProfile(headlessClientInfo.RequesterSessionID).CharacterData?.PmcData?.Info?.Nickname;
-                if (string.IsNullOrEmpty(nickname))
-                {
-                    return null;
-                }
-
-                return nickname;
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Gets the alias (If it has been given one) or nickname of the headless client
-        /// </summary>
-        /// <param name="headlessSessionID"></param>
-        /// <returns>the alias, or nickname or the headless client.</returns>
-        public string GetHeadlessNickname(MongoId headlessSessionID)
-        {
-            FikaConfig config = fikaConfig.Config;
-            if (config.Headless.Profiles.Aliases.TryGetValue(headlessSessionID, out string? alias))
-            {
-                return alias;
-            }
-
-            string? nickname = saveServer.GetProfile(headlessSessionID).CharacterData?.PmcData?.Info?.Nickname;
+            string? nickname = saveServer.GetProfile(headlessClientInfo.RequesterSessionID).CharacterData?.PmcData?.Info?.Nickname;
             if (string.IsNullOrEmpty(nickname))
             {
-                return "ERROR";
+                return null;
             }
 
             return nickname;
         }
 
-        /// <summary>
-        /// Gets all available headless clients
-        /// </summary>
-        /// <returns>Returns an array of available headless clients</returns>
-        public HeadlessAvailableClients[] GetAvailableHeadlessClients()
+        return null;
+    }
+
+    /// <summary>
+    /// Gets the alias (If it has been given one) or nickname of the headless client
+    /// </summary>
+    /// <param name="headlessSessionID"></param>
+    /// <returns>the alias, or nickname or the headless client.</returns>
+    public string GetHeadlessNickname(MongoId headlessSessionID)
+    {
+        FikaConfig config = fikaConfig.Config;
+        if (config.Headless.Profiles.Aliases.TryGetValue(headlessSessionID, out string? alias))
         {
-            List<string> availableClients = [.. HeadlessClients
-                .Where(x => x.Value.State == EHeadlessStatus.READY)
-                .Select(x => x.Key)];
-
-            List<HeadlessAvailableClients> result = [];
-            foreach (string sessionId in availableClients)
-            {
-                result.Add(new(sessionId, GetHeadlessNickname(sessionId)));
-            }
-
-            return [.. result];
+            return alias;
         }
+
+        string? nickname = saveServer.GetProfile(headlessSessionID).CharacterData?.PmcData?.Info?.Nickname;
+        if (string.IsNullOrEmpty(nickname))
+        {
+            return "ERROR";
+        }
+
+        return nickname;
+    }
+
+    /// <summary>
+    /// Gets all available headless clients
+    /// </summary>
+    /// <returns>Returns an array of available headless clients</returns>
+    public HeadlessAvailableClients[] GetAvailableHeadlessClients()
+    {
+        List<string> availableClients = [.. HeadlessClients
+            .Where(x => x.Value.State == EHeadlessStatus.READY)
+            .Select(x => x.Key)];
+
+        List<HeadlessAvailableClients> result = [];
+        foreach (string sessionId in availableClients)
+        {
+            result.Add(new(sessionId, GetHeadlessNickname(sessionId)));
+        }
+
+        return [.. result];
     }
 }

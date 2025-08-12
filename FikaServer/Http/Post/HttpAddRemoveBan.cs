@@ -10,57 +10,56 @@ using SPTarkov.Server.Core.Models.Eft.Ws;
 using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Utils;
 
-namespace FikaServer.Http.Post
+namespace FikaServer.Http.Post;
+
+[Injectable(TypePriority = 0)]
+public class HttpAddRemoveBan(SaveServer saveServer, ConfigService configService,
+    JsonUtil jsonUtil, NotificationSendHelper sendHelper) : BaseHttpRequest(configService)
 {
-    [Injectable(TypePriority = 0)]
-    public class HttpAddRemoveBan(SaveServer saveServer, ConfigService configService,
-        JsonUtil jsonUtil, NotificationSendHelper sendHelper) : BaseHttpRequest(configService)
+    public override string Path { get; set; } = "/post/removefleaban";
+
+    public override string Method
     {
-        public override string Path { get; set; } = "/post/removefleaban";
-
-        public override string Method
+        get
         {
-            get
-            {
-                return HttpMethods.Post;
-            }
+            return HttpMethods.Post;
         }
+    }
 
-        public override async Task HandleRequest(HttpRequest req, HttpResponse resp)
+    public override async Task HandleRequest(HttpRequest req, HttpResponse resp)
+    {
+        using (StreamReader sr = new(req.Body))
         {
-            using (StreamReader sr = new(req.Body))
+            string rawData = await sr.ReadToEndAsync();
+
+            ProfileIdRequest request = jsonUtil.Deserialize<ProfileIdRequest>(rawData);
+            if (request != null)
             {
-                string rawData = await sr.ReadToEndAsync();
-
-                ProfileIdRequest request = jsonUtil.Deserialize<ProfileIdRequest>(rawData);
-                if (request != null)
+                MongoId profileId = new(request.ProfileId);
+                SptProfile profile = saveServer.GetProfile(profileId);
+                if (profile != null)
                 {
-                    MongoId profileId = new(request.ProfileId);
-                    SptProfile profile = saveServer.GetProfile(profileId);
-                    if (profile != null)
+                    var bans = profile.CharacterData?.PmcData?.Info?.Bans;
+                    if (bans != null)
                     {
-                        var bans = profile.CharacterData?.PmcData?.Info?.Bans;
-                        if (bans != null)
-                        {
-                            profile.CharacterData.PmcData.Info.Bans = bans
-                                .Where(b => b.BanType is not BanType.RagFair);
-                        }
-
-                        await saveServer.SaveProfileAsync(profileId);
-
-                        sendHelper.SendMessage(profileId, new RemoveBanNotification()
-                        {
-                            EventType = NotificationEventType.InGameUnBan,
-                            EventIdentifier = new(),
-                            BanType = BanType.RagFair
-                        });
+                        profile.CharacterData.PmcData.Info.Bans = bans
+                            .Where(b => b.BanType is not BanType.RagFair);
                     }
+
+                    await saveServer.SaveProfileAsync(profileId);
+
+                    sendHelper.SendMessage(profileId, new RemoveBanNotification()
+                    {
+                        EventType = NotificationEventType.InGameUnBan,
+                        EventIdentifier = new(),
+                        BanType = BanType.RagFair
+                    });
                 }
             }
-
-            resp.StatusCode = 200;
-            await resp.StartAsync();
-            await resp.CompleteAsync();
         }
+
+        resp.StatusCode = 200;
+        await resp.StartAsync();
+        await resp.CompleteAsync();
     }
 }

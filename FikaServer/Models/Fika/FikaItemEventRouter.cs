@@ -1,7 +1,6 @@
-﻿namespace FikaServer.Models.Fika
+﻿namespace FikaServer.Models.Fika;
+
+public record FikaItemEventRouter
 {
-    public record FikaItemEventRouter
-    {
-        public const string SENDTOPLAYER = "SendToPlayer";
-    }
+    public const string SENDTOPLAYER = "SendToPlayer";
 }

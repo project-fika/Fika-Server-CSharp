@@ -1,9 +1,8 @@
-﻿namespace FikaServer.Models.Enums
+﻿namespace FikaServer.Models.Enums;
+
+public enum EFikaMatchEndSessionMessage
 {
-    public enum EFikaMatchEndSessionMessage
-    {
-        HostShutdown = 0,
-        PingTimeout = 1,
-        NoPlayers = 2,
-    }
+    HostShutdown = 0,
+    PingTimeout = 1,
+    NoPlayers = 2,
 }

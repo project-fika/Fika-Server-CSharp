@@ -8,198 +8,195 @@ using SPTarkov.Server.Core.Models.Eft.Common.Request;
 using SPTarkov.Server.Core.Models.Eft.Dialog;
 using System.Reflection;
 
-namespace FikaServer.Overrides.Callbacks
+namespace FikaServer.Overrides.Callbacks;
+
+public class ListInboxOverride : AbstractPatch
 {
-    public class ListInboxOverride : AbstractPatch
+    protected override MethodBase GetTargetMethod()
     {
-        protected override MethodBase GetTargetMethod()
-        {
-            return typeof(DialogueCallbacks)
-                .GetMethod(nameof(DialogueCallbacks.ListInbox));
-        }
-
-        [PatchPrefix]
-        public static bool Prefix(string url, EmptyRequestData _, MongoId sessionID, ref ValueTask<string> __result)
-        {
-            FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
-                ?? throw new NullReferenceException("Could not get DialogueController");
-
-            __result = dialogueController.ListInbox(sessionID);
-            return false;
-        }
+        return typeof(DialogueCallbacks)
+            .GetMethod(nameof(DialogueCallbacks.ListInbox));
     }
 
-    public class ListOutboxOverride : AbstractPatch
+    [PatchPrefix]
+    public static bool Prefix(string url, EmptyRequestData _, MongoId sessionID, ref ValueTask<string> __result)
     {
-        protected override MethodBase GetTargetMethod()
-        {
-            return typeof(DialogueCallbacks)
-                .GetMethod(nameof(DialogueCallbacks.ListOutbox));
-        }
+        FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
+            ?? throw new NullReferenceException("Could not get DialogueController");
 
-        [PatchPrefix]
-        public static bool Prefix(string url, EmptyRequestData _, MongoId sessionID, ref ValueTask<string> __result)
-        {
-            FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
-                ?? throw new NullReferenceException("Could not get DialogueController");
+        __result = dialogueController.ListInbox(sessionID);
+        return false;
+    }
+}
 
-            __result = dialogueController.ListOutBox(sessionID);
-            return false;
-        }
+public class ListOutboxOverride : AbstractPatch
+{
+    protected override MethodBase GetTargetMethod()
+    {
+        return typeof(DialogueCallbacks)
+            .GetMethod(nameof(DialogueCallbacks.ListOutbox));
     }
 
-    public class SendFriendRequestOverride : AbstractPatch
+    [PatchPrefix]
+    public static bool Prefix(string url, EmptyRequestData _, MongoId sessionID, ref ValueTask<string> __result)
     {
-        protected override MethodBase GetTargetMethod()
-        {
-            return typeof(DialogueCallbacks)
-                .GetMethod(nameof(DialogueCallbacks.SendFriendRequest));
-        }
+        FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
+            ?? throw new NullReferenceException("Could not get DialogueController");
 
-        [PatchPrefix]
-        public static bool Prefix(string url, FriendRequestData request, MongoId sessionID, ref ValueTask<string> __result)
-        {
-            FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
-                ?? throw new NullReferenceException("Could not get DialogueController");
+        __result = dialogueController.ListOutBox(sessionID);
+        return false;
+    }
+}
 
-            __result = dialogueController.SendFriendRequest(sessionID, request.To.Value);
-            return false;
-        }
+public class SendFriendRequestOverride : AbstractPatch
+{
+    protected override MethodBase GetTargetMethod()
+    {
+        return typeof(DialogueCallbacks)
+            .GetMethod(nameof(DialogueCallbacks.SendFriendRequest));
     }
 
-    public class AcceptAllFriendRequestsOverride : AbstractPatch
+    [PatchPrefix]
+    public static bool Prefix(string url, FriendRequestData request, MongoId sessionID, ref ValueTask<string> __result)
     {
-        protected override MethodBase GetTargetMethod()
-        {
-            return typeof(DialogueCallbacks)
-                .GetMethod(nameof(DialogueCallbacks.AcceptAllFriendRequests));
-        }
+        FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
+            ?? throw new NullReferenceException("Could not get DialogueController");
 
-        [PatchPrefix]
-        public static bool Prefix(string url, EmptyRequestData _, MongoId sessionID, ref ValueTask<string> __result)
-        {
-            FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
-                ?? throw new NullReferenceException("Could not get DialogueController");
+        __result = dialogueController.SendFriendRequest(sessionID, request.To.Value);
+        return false;
+    }
+}
 
-            __result = dialogueController.AcceptAllFriendRequests(sessionID);
-            return false;
-        }
+public class AcceptAllFriendRequestsOverride : AbstractPatch
+{
+    protected override MethodBase GetTargetMethod()
+    {
+        return typeof(DialogueCallbacks)
+            .GetMethod(nameof(DialogueCallbacks.AcceptAllFriendRequests));
     }
 
-    public class AcceptFriendRequestOverride : AbstractPatch
+    [PatchPrefix]
+    public static bool Prefix(string url, EmptyRequestData _, MongoId sessionID, ref ValueTask<string> __result)
     {
-        protected override MethodBase GetTargetMethod()
-        {
-            return typeof(DialogueCallbacks)
-                .GetMethod(nameof(DialogueCallbacks.AcceptFriendRequest));
-        }
+        FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
+            ?? throw new NullReferenceException("Could not get DialogueController");
 
-        [PatchPrefix]
-        public static bool Prefix(AcceptFriendRequestData request, MongoId sessionID, ref ValueTask<string> __result)
-        {
-            FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
-                ?? throw new NullReferenceException("Could not get DialogueController");
+        __result = dialogueController.AcceptAllFriendRequests(sessionID);
+        return false;
+    }
+}
 
-            __result = dialogueController.AcceptFriendRequest(sessionID, request);
-            return false;
-        }
+public class AcceptFriendRequestOverride : AbstractPatch
+{
+    protected override MethodBase GetTargetMethod()
+    {
+        return typeof(DialogueCallbacks)
+            .GetMethod(nameof(DialogueCallbacks.AcceptFriendRequest));
     }
 
-    public class DeclineFriendRequestOverride : AbstractPatch
+    [PatchPrefix]
+    public static bool Prefix(AcceptFriendRequestData request, MongoId sessionID, ref ValueTask<string> __result)
     {
-        protected override MethodBase GetTargetMethod()
-        {
-            return typeof(DialogueCallbacks)
-                .GetMethod(nameof(DialogueCallbacks.DeclineFriendRequest));
-        }
+        FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
+            ?? throw new NullReferenceException("Could not get DialogueController");
 
-        [PatchPrefix]
-        public static bool Prefix(string url, DeclineFriendRequestData request, MongoId sessionID, ref ValueTask<string> __result)
-        {
-            FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
-                ?? throw new NullReferenceException("Could not get DialogueController");
+        __result = dialogueController.AcceptFriendRequest(sessionID, request);
+        return false;
+    }
+}
 
-            __result = dialogueController.DeclineFriendRequest(request.ProfileId, sessionID);
-            return false;
-        }
+public class DeclineFriendRequestOverride : AbstractPatch
+{
+    protected override MethodBase GetTargetMethod()
+    {
+        return typeof(DialogueCallbacks)
+            .GetMethod(nameof(DialogueCallbacks.DeclineFriendRequest));
     }
 
-    public class CancelFriendRequestOverride : AbstractPatch
+    [PatchPrefix]
+    public static bool Prefix(string url, DeclineFriendRequestData request, MongoId sessionID, ref ValueTask<string> __result)
     {
-        protected override MethodBase GetTargetMethod()
-        {
-            return typeof(DialogueCallbacks)
-                .GetMethod(nameof(DialogueCallbacks.CancelFriendRequest));
-        }
+        FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
+            ?? throw new NullReferenceException("Could not get DialogueController");
 
-        [PatchPrefix]
-        public static bool Prefix(string url, CancelFriendRequestData request, MongoId sessionID, ref ValueTask<string> __result)
-        {
-            Console.WriteLine("ASD");
-            FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
-                ?? throw new NullReferenceException("Could not get DialogueController");
+        __result = dialogueController.DeclineFriendRequest(request.ProfileId, sessionID);
+        return false;
+    }
+}
 
-            __result = dialogueController.CancelFriendRequest(sessionID, request.ProfileId);
-            return false;
-        }
+public class CancelFriendRequestOverride : AbstractPatch
+{
+    protected override MethodBase GetTargetMethod()
+    {
+        return typeof(DialogueCallbacks)
+            .GetMethod(nameof(DialogueCallbacks.CancelFriendRequest));
     }
 
-    public class DeleteFriendOverride : AbstractPatch
+    [PatchPrefix]
+    public static bool Prefix(string url, CancelFriendRequestData request, MongoId sessionID, ref ValueTask<string> __result)
     {
-        protected override MethodBase GetTargetMethod()
-        {
-            return typeof(DialogueCallbacks)
-                .GetMethod(nameof(DialogueCallbacks.DeleteFriend));
-        }
+        Console.WriteLine("ASD");
+        FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
+            ?? throw new NullReferenceException("Could not get DialogueController");
 
-        [PatchPrefix]
-        public static bool Prefix(string url, DeleteFriendRequest request, MongoId sessionID, ref ValueTask<string> __result)
-        {
-            FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
-                ?? throw new NullReferenceException("Could not get DialogueController");
+        __result = dialogueController.CancelFriendRequest(sessionID, request.ProfileId);
+        return false;
+    }
+}
 
-            __result = dialogueController.DeleteFriend(sessionID, request.FriendId);
-            return false;
-        }
+public class DeleteFriendOverride : AbstractPatch
+{
+    protected override MethodBase GetTargetMethod()
+    {
+        return typeof(DialogueCallbacks)
+            .GetMethod(nameof(DialogueCallbacks.DeleteFriend));
     }
 
-    public class IgnoreFriendOverride : AbstractPatch
+    [PatchPrefix]
+    public static bool Prefix(string url, DeleteFriendRequest request, MongoId sessionID, ref ValueTask<string> __result)
     {
-        protected override MethodBase GetTargetMethod()
-        {
-            return typeof(DialogueCallbacks)
-                .GetMethod(nameof(DialogueCallbacks.IgnoreFriend));
-        }
+        FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
+            ?? throw new NullReferenceException("Could not get DialogueController");
 
-        [PatchPrefix]
-        public static bool Prefix(UIDRequestData request, MongoId sessionID, ref ValueTask<string> __result)
-        {
-            FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
-                ?? throw new NullReferenceException("Could not get DialogueController");
+        __result = dialogueController.DeleteFriend(sessionID, request.FriendId);
+        return false;
+    }
+}
 
-            __result = dialogueController.IgnoreFriend(sessionID, request.Uid);
-            return false;
-        }
+public class IgnoreFriendOverride : AbstractPatch
+{
+    protected override MethodBase GetTargetMethod()
+    {
+        return typeof(DialogueCallbacks)
+            .GetMethod(nameof(DialogueCallbacks.IgnoreFriend));
     }
 
-    public class UnIgnoreFriendOverride : AbstractPatch
+    [PatchPrefix]
+    public static bool Prefix(UIDRequestData request, MongoId sessionID, ref ValueTask<string> __result)
     {
-        protected override MethodBase GetTargetMethod()
-        {
-            return typeof(DialogueCallbacks)
-                .GetMethod(nameof(DialogueCallbacks.UnIgnoreFriend));
-        }
+        FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
+            ?? throw new NullReferenceException("Could not get DialogueController");
 
-        [PatchPrefix]
-        public static bool Prefix(UIDRequestData request, MongoId sessionID, ref ValueTask<string> __result)
-        {
-            FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
-                ?? throw new NullReferenceException("Could not get DialogueController");
+        __result = dialogueController.IgnoreFriend(sessionID, request.Uid);
+        return false;
+    }
+}
 
-            __result = dialogueController.UnIgnoreFriend(sessionID, request.Uid);
-            return false;
-        }
+public class UnIgnoreFriendOverride : AbstractPatch
+{
+    protected override MethodBase GetTargetMethod()
+    {
+        return typeof(DialogueCallbacks)
+            .GetMethod(nameof(DialogueCallbacks.UnIgnoreFriend));
     }
 
+    [PatchPrefix]
+    public static bool Prefix(UIDRequestData request, MongoId sessionID, ref ValueTask<string> __result)
+    {
+        FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
+            ?? throw new NullReferenceException("Could not get DialogueController");
 
+        __result = dialogueController.UnIgnoreFriend(sessionID, request.Uid);
+        return false;
+    }
 }

@@ -17,170 +17,171 @@ using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.InRaid;
 using SPTarkov.Server.Core.Models.Utils;
 
-namespace FikaServer.Controllers
+namespace FikaServer.Controllers;
+
+[Injectable]
+public class RaidController(MatchService matchService, HeadlessHelper headlessHelper,
+    HeadlessService headlessService,
+    ISptLogger<RaidController> logger,
+    InRaidController inraidController, NotificationWebSocket notificationWebSocket)
 {
-    [Injectable]
-    public class RaidController(MatchService matchService, HeadlessHelper headlessHelper,
-        HeadlessService headlessService,
-        ISptLogger<RaidController> logger,
-        InRaidController inraidController, NotificationWebSocket notificationWebSocket)
+    /// <summary>
+    /// Handle /fika/raid/create
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    public async Task<FikaRaidCreateResponse> HandleRaidCreate(FikaRaidCreateRequestData request, MongoId sessionId)
     {
-        /// <summary>
-        /// Handle /fika/raid/create
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public async Task<FikaRaidCreateResponse> HandleRaidCreate(FikaRaidCreateRequestData request, MongoId sessionId)
+        string hostUsername = request.HostUsername;
+
+        if (headlessHelper.IsHeadlessClient(request.ServerId))
         {
-            string hostUsername = request.HostUsername;
-
-            if (headlessHelper.IsHeadlessClient(request.ServerId))
-            {
-                hostUsername = headlessHelper.GetHeadlessNickname(request.ServerId);
-            }
-
-            await notificationWebSocket.BroadcastAsync(new StartRaidNotification
-            {
-                Nickname = hostUsername,
-                Location = request.Settings.Location,
-                IsHeadlessRaid = headlessHelper.IsHeadlessClient(request.ServerId),
-                HeadlessRequesterName = headlessHelper.GetRequesterUsername(request.ServerId) ?? "",
-                RaidTime = request.Time
-            });
-
-            return new FikaRaidCreateResponse
-            {
-                Success = matchService.CreateMatch(request, sessionId)
-            };
+            hostUsername = headlessHelper.GetHeadlessNickname(request.ServerId);
         }
 
-        /// <summary>
-        /// Handle /fika/raid/join
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public FikaRaidJoinResponse HandleRaidJoin(FikaRaidJoinRequestData request)
+        await notificationWebSocket.BroadcastAsync(new StartRaidNotification
         {
-            FikaMatch match = matchService.GetMatch(request.ServerId);
+            Nickname = hostUsername,
+            Location = request.Settings.Location,
+            IsHeadlessRaid = headlessHelper.IsHeadlessClient(request.ServerId),
+            HeadlessRequesterName = headlessHelper.GetRequesterUsername(request.ServerId) ?? "",
+            RaidTime = request.Time
+        });
 
-            return new FikaRaidJoinResponse
-            {
-                ServerId = request.ServerId,
-                Timestamp = match.Timestamp,
-                GameVersion = match.GameVersion,
-                CRC32 = match.CRC32,
-                RaidCode = match.RaidCode,
-            };
+        return new FikaRaidCreateResponse
+        {
+            Success = matchService.CreateMatch(request, sessionId)
+        };
+    }
+
+    /// <summary>
+    /// Handle /fika/raid/join
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    public FikaRaidJoinResponse HandleRaidJoin(FikaRaidJoinRequestData request)
+    {
+        FikaMatch match = matchService.GetMatch(request.ServerId)!;
+
+        return new FikaRaidJoinResponse
+        {
+            ServerId = request.ServerId,
+            ServerGuid = match!.ServerGuid,
+            Timestamp = match.Timestamp,
+            GameVersion = match.GameVersion,
+            CRC32 = match.CRC32,
+            RaidCode = match.RaidCode,
+        };
+    }
+
+    /// <summary>
+    /// Handle /fika/raid/leave
+    /// </summary>
+    /// <param name="request"></param>
+    public void HandleRaidLeave(FikaRaidLeaveRequestData request)
+    {
+        if (request.ServerId == request.ProfileId)
+        {
+            matchService.EndMatch(request.ServerId, Models.Enums.EFikaMatchEndSessionMessage.HostShutdown);
+            return;
         }
 
-        /// <summary>
-        /// Handle /fika/raid/leave
-        /// </summary>
-        /// <param name="request"></param>
-        public void HandleRaidLeave(FikaRaidLeaveRequestData request)
-        {
-            if (request.ServerId == request.ProfileId)
-            {
-                matchService.EndMatch(request.ServerId, Models.Enums.EFikaMatchEndSessionMessage.HostShutdown);
-                return;
-            }
+        matchService.RemovePlayerFromMatch(request.ServerId, request.ProfileId);
+    }
 
-            matchService.RemovePlayerFromMatch(request.ServerId, request.ProfileId);
+    /// <summary>
+    /// Handle /fika/raid/gethost
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    public FikaRaidGethostResponse? HandleRaidGetHost(FikaRaidServerIdRequestData request)
+    {
+        FikaMatch? match = matchService.GetMatch(request.ServerId);
+
+        if (match == null)
+        {
+            return null;
         }
 
-        /// <summary>
-        /// Handle /fika/raid/gethost
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public FikaRaidGethostResponse? HandleRaidGetHost(FikaRaidServerIdRequestData request)
+        return new FikaRaidGethostResponse
         {
-            FikaMatch? match = matchService.GetMatch(request.ServerId);
+            Ips = match.Ips,
+            ServerGuid = match.ServerGuid,
+            Port = match.Port,
+            NatPunch = match.NatPunch,
+            IsHeadless = match.IsHeadless,
+        };
+    }
 
-            if (match == null)
-            {
-                return null;
-            }
+    /// <summary>
+    /// Handle /fika/raid/getsettings
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    public FikaRaidSettingsResponse? HandleRaidGetSettings(FikaRaidServerIdRequestData request)
+    {
+        FikaMatch? match = matchService.GetMatch(request.ServerId);
 
-            return new FikaRaidGethostResponse
-            {
-                Ips = match.Ips,
-                Port = match.Port,
-                NatPunch = match.NatPunch,
-                IsHeadless = match.IsHeadless,
-            };
+        if (match == null)
+        {
+            logger.Error($"Could not find match with id {request.ServerId}");
+            return null;
         }
 
-        /// <summary>
-        /// Handle /fika/raid/getsettings
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public FikaRaidSettingsResponse? HandleRaidGetSettings(FikaRaidServerIdRequestData request)
+        return new FikaRaidSettingsResponse
         {
-            FikaMatch? match = matchService.GetMatch(request.ServerId);
+            MetabolismDisabled = match.RaidConfig.MetabolismDisabled,
+            PlayersSpawnPlace = match.RaidConfig.PlayersSpawnPlace,
+            HourOfDay = match.RaidConfig.TimeAndWeatherSettings.HourOfDay,
+            TimeFlowType = match.RaidConfig.TimeAndWeatherSettings.TimeFlowType
+        };
+    }
 
-            if (match == null)
-            {
-                logger.Error($"Could not find match with id {request.ServerId}");
-                return null;
-            }
-
-            return new FikaRaidSettingsResponse
-            {
-                MetabolismDisabled = match.RaidConfig.MetabolismDisabled,
-                PlayersSpawnPlace = match.RaidConfig.PlayersSpawnPlace,
-                HourOfDay = match.RaidConfig.TimeAndWeatherSettings.HourOfDay,
-                TimeFlowType = match.RaidConfig.TimeAndWeatherSettings.TimeFlowType
-            };
-        }
-
-        /// <summary>
-        /// Handle /fika/raid/headless/start
-        /// </summary>
-        /// <param name="sessionID"></param>
-        /// <param name="info"></param>
-        /// <returns></returns>
-        public async Task<StartHeadlessResponse> HandleRaidStartHeadless(MongoId sessionID, StartHeadlessRequest info)
+    /// <summary>
+    /// Handle /fika/raid/headless/start
+    /// </summary>
+    /// <param name="sessionID"></param>
+    /// <param name="info"></param>
+    /// <returns></returns>
+    public async Task<StartHeadlessResponse> HandleRaidStartHeadless(MongoId sessionID, StartHeadlessRequest info)
+    {
+        if (!headlessHelper.IsHeadlessClientAvailable(info.HeadlessSessionID))
         {
-            if (!headlessHelper.IsHeadlessClientAvailable(info.HeadlessSessionID))
-            {
-                return new StartHeadlessResponse
-                {
-                    MatchId = null,
-                    Error = "This headless client is not available."
-                };
-            }
-
-            if (headlessHelper.IsHeadlessClient(sessionID))
-            {
-                return new StartHeadlessResponse
-                {
-                    MatchId = null,
-                    Error = "You are trying to connect to a headless client while having Fika.Headless installed. Please remove Fika.Headless from your client and try again."
-                };
-            }
-
-            string? headlessClientId = await headlessService.StartHeadlessRaid(info.HeadlessSessionID, sessionID, info);
-
-            logger.Info($"Sent WS FikaHeadlessStartRaid to {headlessClientId}");
-
             return new StartHeadlessResponse
             {
-                // This really isn't required, I just want to make sure on the client
-                MatchId = headlessClientId,
-                Error = null
+                MatchId = null,
+                Error = "This headless client is not available."
             };
         }
 
-        /// <summary>
-        /// Handle /fika/raid/registerPlayer
-        /// </summary>
-        /// <param name="SessionID"></param>
-        /// <param name="info"></param>
-        public void HandleRaidRegisterPlayer(MongoId SessionID, RegisterPlayerRequestData info)
+        if (headlessHelper.IsHeadlessClient(sessionID))
         {
-            inraidController.AddPlayer(SessionID, info);
+            return new StartHeadlessResponse
+            {
+                MatchId = null,
+                Error = "You are trying to connect to a headless client while having Fika.Headless installed. Please remove Fika.Headless from your client and try again."
+            };
         }
+
+        string? headlessClientId = await headlessService.StartHeadlessRaid(info.HeadlessSessionID, sessionID, info);
+
+        logger.Info($"Sent WS FikaHeadlessStartRaid to {headlessClientId}");
+
+        return new StartHeadlessResponse
+        {
+            // This really isn't required, I just want to make sure on the client
+            MatchId = headlessClientId,
+            Error = null
+        };
+    }
+
+    /// <summary>
+    /// Handle /fika/raid/registerPlayer
+    /// </summary>
+    /// <param name="SessionID"></param>
+    /// <param name="info"></param>
+    public void HandleRaidRegisterPlayer(MongoId SessionID, RegisterPlayerRequestData info)
+    {
+        inraidController.AddPlayer(SessionID, info);
     }
 }

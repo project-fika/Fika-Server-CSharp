@@ -1,8 +1,7 @@
-﻿namespace FikaServer.Models.Enums
+﻿namespace FikaServer.Models.Enums;
+
+public enum EHeadlessStatus
 {
-    public enum EHeadlessStatus
-    {
-        READY = 1,
-        IN_RAID = 2,
-    }
+    READY = 1,
+    IN_RAID = 2,
 }

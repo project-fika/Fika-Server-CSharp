@@ -1,11 +1,10 @@
-﻿namespace FikaServer.Models.Enums
+﻿namespace FikaServer.Models.Enums;
+
+public enum EFikaPlayerPresences
 {
-    public enum EFikaPlayerPresences
-    {
-        IN_MENU = 0,
-        IN_RAID = 1,
-        IN_STASH = 2,
-        IN_HIDEOUT = 3,
-        IN_FLEA = 4,
-    }
+    IN_MENU = 0,
+    IN_RAID = 1,
+    IN_STASH = 2,
+    IN_HIDEOUT = 3,
+    IN_FLEA = 4,
 }

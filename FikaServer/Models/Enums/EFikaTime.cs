@@ -1,8 +1,7 @@
-﻿namespace FikaServer.Models.Enums
+﻿namespace FikaServer.Models.Enums;
+
+public enum EFikaTime
 {
-    public enum EFikaTime
-    {
-        CURR = 0,
-        PAST = 1,
-    }
+    CURR = 0,
+    PAST = 1,
 }

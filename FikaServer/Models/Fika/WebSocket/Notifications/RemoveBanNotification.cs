@@ -2,11 +2,10 @@
 using SPTarkov.Server.Core.Models.Eft.Ws;
 using System.Text.Json.Serialization;
 
-namespace FikaServer.Models.Fika.WebSocket.Notifications
+namespace FikaServer.Models.Fika.WebSocket.Notifications;
+
+public record RemoveBanNotification : WsNotificationEvent
 {
-    public record RemoveBanNotification : WsNotificationEvent
-    {
-        [JsonPropertyName("banType")]
-        public BanType BanType { get; set; }
-    }
+    [JsonPropertyName("banType")]
+    public BanType BanType { get; set; }
 }

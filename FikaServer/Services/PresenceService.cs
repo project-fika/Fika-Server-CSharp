@@ -8,75 +8,74 @@ using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Utils;
 using System.Collections.Concurrent;
 
-namespace FikaServer.Services
+namespace FikaServer.Services;
+
+[Injectable(InjectionType.Singleton)]
+public class PresenceService(SaveServer saveServer, TimeUtil timeUtil, ISptLogger<PresenceService> logger)
 {
-    [Injectable(InjectionType.Singleton)]
-    public class PresenceService(SaveServer saveServer, TimeUtil timeUtil, ISptLogger<PresenceService> logger)
+    public List<FikaPlayerPresence> AllPlayersPresence
     {
-        public List<FikaPlayerPresence> AllPlayersPresence
+        get
         {
-            get
-            {
-                return [.. _onlinePlayers.Values];
-            }
+            return [.. _onlinePlayers.Values];
+        }
+    }
+
+    private readonly ConcurrentDictionary<MongoId, FikaPlayerPresence> _onlinePlayers = [];
+
+    public FikaPlayerPresence? GetPlayerPresence(MongoId profileId)
+    {
+        if (_onlinePlayers.TryGetValue(profileId, out FikaPlayerPresence? playerPresence))
+        {
+            return playerPresence;
         }
 
-        private readonly ConcurrentDictionary<MongoId, FikaPlayerPresence> _onlinePlayers = [];
+        return null;
+    }
 
-        public FikaPlayerPresence? GetPlayerPresence(MongoId profileId)
+    public void AddPlayerPresence(MongoId sessionID)
+    {
+        SptProfile profile = saveServer.GetProfile(sessionID);
+
+        if (profile == null)
         {
-            if (_onlinePlayers.TryGetValue(profileId, out FikaPlayerPresence? playerPresence))
-            {
-                return playerPresence;
-            }
-
-            return null;
+            return;
         }
 
-        public void AddPlayerPresence(MongoId sessionID)
+        FikaPlayerPresence data = new()
         {
-            SptProfile profile = saveServer.GetProfile(sessionID);
+            Nickname = profile.CharacterData.PmcData.Info.Nickname,
+            Level = profile.CharacterData.PmcData.Info.Level ?? 0,
+            Activity = EFikaPlayerPresences.IN_MENU,
+            ActivityStartedTimestamp = timeUtil.GetTimeStamp()
+        };
 
-            if (profile == null)
-            {
-                return;
-            }
+        logger.Debug($"[Fika Presence] Adding player: {data.Nickname}");
 
-            FikaPlayerPresence data = new()
-            {
-                Nickname = profile.CharacterData.PmcData.Info.Nickname,
-                Level = profile.CharacterData.PmcData.Info.Level ?? 0,
-                Activity = EFikaPlayerPresences.IN_MENU,
-                ActivityStartedTimestamp = timeUtil.GetTimeStamp()
-            };
+        _onlinePlayers.TryAdd(sessionID, data);
+    }
 
-            logger.Debug($"[Fika Presence] Adding player: {data.Nickname}");
-
-            _onlinePlayers.TryAdd(sessionID, data);
+    public void UpdatePlayerPresence(MongoId sessionID, FikaSetPresence NewPresence)
+    {
+        if (!_onlinePlayers.TryGetValue(sessionID, out FikaPlayerPresence currentPresence))
+        {
+            return;
         }
 
-        public void UpdatePlayerPresence(MongoId sessionID, FikaSetPresence NewPresence)
+        SptProfile profile = saveServer.GetProfile(sessionID);
+
+        _onlinePlayers.TryUpdate(sessionID, new FikaPlayerPresence
         {
-            if (!_onlinePlayers.TryGetValue(sessionID, out FikaPlayerPresence currentPresence))
-            {
-                return;
-            }
+            Nickname = profile.CharacterData.PmcData.Info.Nickname,
+            Level = profile.CharacterData.PmcData.Info.Level ?? 0,
+            Activity = NewPresence.Activity,
+            ActivityStartedTimestamp = timeUtil.GetTimeStamp(),
+            RaidInformation = NewPresence.RaidInformation
+        }, currentPresence);
+    }
 
-            SptProfile profile = saveServer.GetProfile(sessionID);
-
-            _onlinePlayers.TryUpdate(sessionID, new FikaPlayerPresence
-            {
-                Nickname = profile.CharacterData.PmcData.Info.Nickname,
-                Level = profile.CharacterData.PmcData.Info.Level ?? 0,
-                Activity = NewPresence.Activity,
-                ActivityStartedTimestamp = timeUtil.GetTimeStamp(),
-                RaidInformation = NewPresence.RaidInformation
-            }, currentPresence);
-        }
-
-        public void RemovePlayerPresence(MongoId sessionID)
-        {
-            _onlinePlayers.TryRemove(sessionID, out _);
-        }
+    public void RemovePlayerPresence(MongoId sessionID)
+    {
+        _onlinePlayers.TryRemove(sessionID, out _);
     }
 }

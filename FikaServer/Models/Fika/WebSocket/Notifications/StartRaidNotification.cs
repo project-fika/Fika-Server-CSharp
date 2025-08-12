@@ -1,26 +1,25 @@
 ﻿using FikaServer.Models.Enums;
 using System.Text.Json.Serialization;
 
-namespace FikaServer.Models.Fika.WebSocket.Notifications
+namespace FikaServer.Models.Fika.WebSocket.Notifications;
+
+public record StartRaidNotification : IFikaNotification
 {
-    public record StartRaidNotification : IFikaNotification
-    {
-        [JsonPropertyName("type")]
-        public EFikaNotification Type { get; set; } = EFikaNotification.StartedRaid;
+    [JsonPropertyName("type")]
+    public EFikaNotification Type { get; set; } = EFikaNotification.StartedRaid;
 
-        [JsonPropertyName("nickname")]
-        public string Nickname { get; set; } = string.Empty;
+    [JsonPropertyName("nickname")]
+    public string Nickname { get; set; } = string.Empty;
 
-        [JsonPropertyName("location")]
-        public string Location { get; set; } = string.Empty;
+    [JsonPropertyName("location")]
+    public string Location { get; set; } = string.Empty;
 
-        [JsonPropertyName("isHeadlessRaid")]
-        public bool IsHeadlessRaid { get; set; }
+    [JsonPropertyName("isHeadlessRaid")]
+    public bool IsHeadlessRaid { get; set; }
 
-        [JsonPropertyName("headlessRequesterName")]
-        public string HeadlessRequesterName { get; set; } = string.Empty;
+    [JsonPropertyName("headlessRequesterName")]
+    public string HeadlessRequesterName { get; set; } = string.Empty;
 
-        [JsonPropertyName("raidTime")]
-        public EFikaTime RaidTime { get; set; }
-    }
+    [JsonPropertyName("raidTime")]
+    public EFikaTime RaidTime { get; set; }
 }

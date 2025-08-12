@@ -10,73 +10,59 @@ using SPTarkov.Server.Core.Servers.Ws;
 using SPTarkov.Server.Core.Services;
 using System.Text.RegularExpressions;
 
-namespace FikaServer.ChatBot.Commands
+namespace FikaServer.ChatBot.Commands;
+
+[Injectable]
+public partial class ForceLogout(ConfigService configService, MailSendService mailSendService,
+    NotificationSendHelper sendHelper, SptWebSocketConnectionHandler websocketHandler,
+    FikaProfileService fikaProfileService) : IFikaCommand
 {
-    [Injectable]
-    public partial class ForceLogout(ConfigService configService, MailSendService mailSendService,
-        NotificationSendHelper sendHelper, SptWebSocketConnectionHandler websocketHandler,
-        FikaProfileService fikaProfileService) : IFikaCommand
+    [GeneratedRegex("^fika forcelogout (\\w+)$")]
+    private static partial Regex ForceLogoutCommandRegex();
+
+    public string Command
     {
-        [GeneratedRegex("^fika forcelogout (\\w+)$")]
-        private static partial Regex ForceLogoutCommandRegex();
-
-        public string Command
+        get
         {
-            get
-            {
-                return "forcelogout";
-            }
+            return "forcelogout";
         }
+    }
 
-        public string CommandHelp
+    public string CommandHelp
+    {
+        get
         {
-            get
-            {
-                return $"fika {Command}\nForces a client to logout if they are in the menu\nExample: fika forcelogout Nickname\nUse all to logout everyone (including you).";
-            }
+            return $"fika {Command}\nForces a client to logout if they are in the menu\nExample: fika forcelogout Nickname\nUse all to logout everyone (including you).";
         }
+    }
 
-        public ValueTask<string> PerformAction(UserDialogInfo commandHandler, MongoId sessionId, SendMessageRequest request)
+    public ValueTask<string> PerformAction(UserDialogInfo commandHandler, MongoId sessionId, SendMessageRequest request)
+    {
+        string value = request.DialogId;
+        bool isAdmin = configService.Config.Server.AdminIds.Contains(sessionId);
+        if (!isAdmin)
         {
-            string value = request.DialogId;
-            bool isAdmin = configService.Config.Server.AdminIds.Contains(sessionId);
-            if (!isAdmin)
-            {
-                mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
-                    "You are not an admin!");
-                return new(value);
-            }
-
-            string text = request.Text;
-            if (!ForceLogoutCommandRegex().IsMatch(text))
-            {
-                mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
-                    "Invalid use of the command.");
-                return new(value);
-            }
-
-            string[] split = text.Split(' ');
-            string nickname = split[2];
-
-            if (nickname == "all")
-            {
-                mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
-                "Everyone has been forced to log out.");
-                websocketHandler.SendMessageToAll(new WsNotificationEvent()
-                {
-                    EventType = NotificationEventType.ForceLogout,
-                    EventIdentifier = new()
-                });
-
-                return new(value);
-            }
-
             mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
-                $"'{nickname}' has been forced to log out.");
+                "You are not an admin!");
+            return new(value);
+        }
 
-            SptProfile? profile = fikaProfileService.GetProfileByNickname(nickname)
-                ?? throw new NullReferenceException($"Could not find profile {nickname}");
-            sendHelper.SendMessage(profile.ProfileInfo.ProfileId.GetValueOrDefault(), new WsNotificationEvent()
+        string text = request.Text;
+        if (!ForceLogoutCommandRegex().IsMatch(text))
+        {
+            mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
+                "Invalid use of the command.");
+            return new(value);
+        }
+
+        string[] split = text.Split(' ');
+        string nickname = split[2];
+
+        if (nickname == "all")
+        {
+            mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
+            "Everyone has been forced to log out.");
+            websocketHandler.SendMessageToAll(new WsNotificationEvent()
             {
                 EventType = NotificationEventType.ForceLogout,
                 EventIdentifier = new()
@@ -85,6 +71,19 @@ namespace FikaServer.ChatBot.Commands
             return new(value);
         }
 
+        mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
+            $"'{nickname}' has been forced to log out.");
 
+        SptProfile? profile = fikaProfileService.GetProfileByNickname(nickname)
+            ?? throw new NullReferenceException($"Could not find profile {nickname}");
+        sendHelper.SendMessage(profile.ProfileInfo.ProfileId.GetValueOrDefault(), new WsNotificationEvent()
+        {
+            EventType = NotificationEventType.ForceLogout,
+            EventIdentifier = new()
+        });
+
+        return new(value);
     }
+
+
 }

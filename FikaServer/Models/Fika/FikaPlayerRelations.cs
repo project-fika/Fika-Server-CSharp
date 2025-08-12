@@ -1,12 +1,11 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace FikaServer.Models.Fika
+namespace FikaServer.Models.Fika;
+
+public record FikaPlayerRelations
 {
-    public record FikaPlayerRelations
-    {
-        [JsonPropertyName("friends")]
-        public List<string> Friends { get; set; } = [];
-        [JsonPropertyName("ignore")]
-        public List<string> Ignore { get; set; } = [];
-    }
+    [JsonPropertyName("friends")]
+    public List<string> Friends { get; set; } = [];
+    [JsonPropertyName("ignore")]
+    public List<string> Ignore { get; set; } = [];
 }

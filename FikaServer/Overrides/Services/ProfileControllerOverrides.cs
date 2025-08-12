@@ -9,79 +9,78 @@ using SPTarkov.Server.Core.Models.Eft.Launcher;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using System.Reflection;
 
-namespace FikaServer.Overrides.Services
+namespace FikaServer.Overrides.Services;
+
+public class GetMiniProfilesOverride : AbstractPatch
 {
-    public class GetMiniProfilesOverride : AbstractPatch
+    protected override MethodBase GetTargetMethod()
     {
-        protected override MethodBase GetTargetMethod()
-        {
-            return typeof(ProfileController).GetMethod(nameof(ProfileController.GetMiniProfiles));
-        }
-
-        [PatchPrefix]
-        public static bool Prefix(ref List<MiniProfile> __result)
-        {
-            FikaConfig fikaConfig = ServiceLocator.ServiceProvider.GetService<ConfigService>().Config;
-
-            if (!fikaConfig.Server.LauncherListAllProfiles)
-            {
-                __result = [];
-
-                return false;
-            }
-
-            return true;
-        }
+        return typeof(ProfileController).GetMethod(nameof(ProfileController.GetMiniProfiles));
     }
 
-
-    public class GetFriendsOverride : AbstractPatch
+    [PatchPrefix]
+    public static bool Prefix(ref List<MiniProfile> __result)
     {
-        protected override MethodBase GetTargetMethod()
+        FikaConfig fikaConfig = ServiceLocator.ServiceProvider.GetService<ConfigService>().Config;
+
+        if (!fikaConfig.Server.LauncherListAllProfiles)
         {
-            return typeof(ProfileController).GetMethod(nameof(ProfileController.SearchProfiles));
-        }
+            __result = [];
 
-        [PatchPrefix]
-        public static bool Prefix(SearchProfilesRequestData request, MongoId sessionID, ref List<SearchFriendResponse> __result)
-        {
-            string searchNickname = request.Nickname.ToLower();
-
-            ProfileHelper profileHelper = ServiceLocator.ServiceProvider.GetService<ProfileHelper>();
-
-            Dictionary<MongoId, SptProfile> profiles = profileHelper.GetProfiles();
-            List<SearchFriendResponse> friends = [];
-
-            foreach (SptProfile profile in profiles.Values)
-            {
-                if (profile.ProfileInfo.Password == "fika-headless")
-                {
-                    continue;
-                }
-
-                if (profile.CharacterData?.PmcData?.Info != null)
-                {
-                    if (profile.CharacterData.PmcData.Info.Nickname.StartsWith(searchNickname, StringComparison.CurrentCultureIgnoreCase))
-                    {
-                        friends.Add(new SearchFriendResponse
-                        {
-                            Id = profile.CharacterData.PmcData.Id.Value,
-                            Aid = profile.CharacterData.PmcData.Aid,
-                            Info = new UserDialogDetails
-                            {
-                                Nickname = profile.CharacterData.PmcData.Info.Nickname,
-                                Side = profile.CharacterData.PmcData.Info.Side,
-                                Level = profile.CharacterData.PmcData.Info.Level,
-                                MemberCategory = profile.CharacterData.PmcData.Info.MemberCategory,
-                                SelectedMemberCategory = profile.CharacterData.PmcData.Info.SelectedMemberCategory
-                            }
-                        });
-                    }
-                }
-            }
-
-            __result = friends;
             return false;
         }
+
+        return true;
+    }
+}
+
+
+public class GetFriendsOverride : AbstractPatch
+{
+    protected override MethodBase GetTargetMethod()
+    {
+        return typeof(ProfileController).GetMethod(nameof(ProfileController.SearchProfiles));
+    }
+
+    [PatchPrefix]
+    public static bool Prefix(SearchProfilesRequestData request, MongoId sessionID, ref List<SearchFriendResponse> __result)
+    {
+        string searchNickname = request.Nickname.ToLower();
+
+        ProfileHelper profileHelper = ServiceLocator.ServiceProvider.GetService<ProfileHelper>();
+
+        Dictionary<MongoId, SptProfile> profiles = profileHelper.GetProfiles();
+        List<SearchFriendResponse> friends = [];
+
+        foreach (SptProfile profile in profiles.Values)
+        {
+            if (profile.ProfileInfo.Password == "fika-headless")
+            {
+                continue;
+            }
+
+            if (profile.CharacterData?.PmcData?.Info != null)
+            {
+                if (profile.CharacterData.PmcData.Info.Nickname.StartsWith(searchNickname, StringComparison.CurrentCultureIgnoreCase))
+                {
+                    friends.Add(new SearchFriendResponse
+                    {
+                        Id = profile.CharacterData.PmcData.Id.Value,
+                        Aid = profile.CharacterData.PmcData.Aid,
+                        Info = new UserDialogDetails
+                        {
+                            Nickname = profile.CharacterData.PmcData.Info.Nickname,
+                            Side = profile.CharacterData.PmcData.Info.Side,
+                            Level = profile.CharacterData.PmcData.Info.Level,
+                            MemberCategory = profile.CharacterData.PmcData.Info.MemberCategory,
+                            SelectedMemberCategory = profile.CharacterData.PmcData.Info.SelectedMemberCategory
+                        }
+                    });
+                }
+            }
+        }
+
+        __result = friends;
+        return false;
     }
 }
