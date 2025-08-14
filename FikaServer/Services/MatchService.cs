@@ -11,6 +11,7 @@ using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Services;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 namespace FikaServer.Services;
@@ -21,7 +22,7 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
     InsuranceService insuranceService, PresenceService presenceService)
 {
     public readonly ConcurrentDictionary<MongoId, FikaMatch> Matches = [];
-    protected readonly ConcurrentDictionary<MongoId, System.Timers.Timer> _timeoutIntervals = [];
+    protected readonly ConcurrentDictionary<MongoId, Timer> _timeoutIntervals = [];
 
     /// <summary>
     /// Adds a timeout interval for the given match
@@ -34,38 +35,40 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
             RemoveTimeoutInterval(matchId);
         }
 
-        System.Timers.Timer timer = new(60 * 1000);
-        timer.Elapsed += (sender, e) =>
+        Timer timer = new(_ =>
         {
             FikaMatch? match = GetMatch(matchId);
-
             if (match != null)
             {
-                match.Timeout++;
-
-                if (match.Timeout >= fikaConfig.Config.Server.SessionTimeout)
+                if (match.Timeout++ >= fikaConfig.Config.Server.SessionTimeout)
                 {
                     EndMatch(matchId, EFikaMatchEndSessionMessage.PingTimeout);
                 }
             }
 
-        };
-        timer.Start();
+        }, null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
+
+        if (!_timeoutIntervals.TryAdd(matchId, timer))
+        {
+            logger.Error($"Failed to add match {matchId} to timers");
+            timer.Dispose();
+        }
     }
 
     /// <summary>
     /// Removes the timeout interval for the given match
     /// </summary>
     /// <param name="matchId">The match ID to remove a timeout for</param>
-    private void RemoveTimeoutInterval(string matchId)
+    private void RemoveTimeoutInterval(MongoId matchId)
     {
-        if (_timeoutIntervals.TryGetValue(matchId, out System.Timers.Timer? timer))
+        if (_timeoutIntervals.TryRemove(matchId, out Timer? timer))
         {
-            timer.Stop();
             timer.Dispose();
         }
-
-        _timeoutIntervals.TryRemove(matchId, out _);
+        else
+        {
+            logger.Error($"Could not delete match {matchId} from timers");
+        }
     }
 
     /// <summary>
@@ -109,7 +112,7 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
     /// </summary>
     /// <param name="playerId">The ID of the player whose match ID is to be found.</param>
     /// <returns>The match ID containing the player, or null if the player isn't in a match.</returns>
-    public string? GetMatchIdByPlayer(MongoId playerId)
+    public MongoId? GetMatchIdByPlayer(MongoId playerId)
     {
         foreach ((MongoId matchId, FikaMatch match) in Matches)
         {
@@ -127,11 +130,11 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
     /// </summary>
     /// <param name="sessionId"></param>
     /// <returns></returns>
-    public string? GetMatchIdByProfile(MongoId sessionId)
+    public MongoId? GetMatchIdByProfile(MongoId sessionId)
     {
         SptProfile profile = saveServer.GetProfile(sessionId);
 
-        string? matchid = GetMatchIdByPlayer(profile.CharacterData.PmcData.Id.GetValueOrDefault())
+        MongoId? matchid = GetMatchIdByPlayer(profile.CharacterData.PmcData.Id.GetValueOrDefault())
             ?? GetMatchIdByPlayer(profile.CharacterData.ScavData.Id.GetValueOrDefault());
 
         return matchid;
@@ -271,10 +274,10 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
         if (Matches.TryGetValue(matchId, out FikaMatch? match))
         {
             match.Timeout = 0;
-            if (_timeoutIntervals.TryGetValue(matchId, out System.Timers.Timer? timer))
+            if (_timeoutIntervals.TryGetValue(matchId, out Timer? timer))
             {
-                timer.Stop();
-                timer.Start();
+                // Restart the 1-minute countdown
+                timer.Change(TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
             }
         }
     }
