@@ -130,10 +130,11 @@ public class RaidController(MatchService matchService, HeadlessHelper headlessHe
 
         return new FikaRaidSettingsResponse
         {
-            MetabolismDisabled = match.RaidConfig.MetabolismDisabled,
-            PlayersSpawnPlace = match.RaidConfig.PlayersSpawnPlace,
-            HourOfDay = match.RaidConfig.TimeAndWeatherSettings.HourOfDay,
-            TimeFlowType = match.RaidConfig.TimeAndWeatherSettings.TimeFlowType
+            Received = true,
+            MetabolismDisabled = match.RaidConfig!.MetabolismDisabled!.Value,
+            PlayersSpawnPlace = match.RaidConfig!.PlayersSpawnPlace!.Value,
+            HourOfDay = match.RaidConfig!.TimeAndWeatherSettings!.HourOfDay!.Value,
+            TimeFlowType = match.RaidConfig!.TimeAndWeatherSettings!.TimeFlowType!.Value
         };
     }
 
