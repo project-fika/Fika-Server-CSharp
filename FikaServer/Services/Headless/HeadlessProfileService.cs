@@ -66,11 +66,11 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
     private async Task<SptProfile> CreateHeadlessProfile()
     {
         // Generate a unique username
-        MongoId username = $"headless_{new MongoId()}";
+        string username = $"headless_{new MongoId()}";
         // Using a password allows us to know which profiles are headless client profiles.
-        string password = "fika-headless";
+        const string password = "fika-headless";
         // Random edition. Doesn't matter
-        string edition = "Standard";
+        const string edition = "Standard";
 
         // Create mini profile
         string profileId = await CreateMiniProfile(username, password, edition);
