@@ -26,4 +26,9 @@ public class SendItemEventRouter(SendItemCallbacks sendItemCallbacks) : ItemEven
     {
         return [new(FikaItemEventRouter.SENDTOPLAYER, false)];
     }
+
+    protected override ValueTask<ItemEventRouterResponse> HandleItemEventInternal(string url, PmcData pmcData, BaseInteractionRequestData body, MongoId sessionID, ItemEventRouterResponse output)
+    {
+        throw new NotImplementedException();
+    }
 }

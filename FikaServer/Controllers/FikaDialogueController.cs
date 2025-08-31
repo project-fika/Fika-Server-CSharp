@@ -79,20 +79,20 @@ public class FikaDialogueController(ISptLogger<FikaDialogueController> logger, D
         };
     }
 
-    public FriendRequestSendResponse? AddFriendRequest(MongoId from, MongoId? to)
+    public FriendRequestSendResponse? AddFriendRequest(MongoId from, MongoId to)
     {
-        if (from == default || to == null)
+        if (from == default || to == default)
         {
             throw new NullReferenceException($"From or to was null! [From]: {from}, [To]: {to}");
         }
 
-        if (friendRequestsService.HasFriendRequest(from, to.Value))
+        if (friendRequestsService.HasFriendRequest(from, to))
         {
             logger.Error($"{from} has already sent a request to {to}");
             return null;
         }
 
-        if (!saveServer.ProfileExists(to.Value))
+        if (!saveServer.ProfileExists(to))
         {
             logger.Error($"{from} tried to send a friend request to {to} who doesn't exist");
             return null;
@@ -103,7 +103,7 @@ public class FikaDialogueController(ISptLogger<FikaDialogueController> logger, D
         {
             Id = new MongoId(),
             From = from,
-            To = to.Value,
+            To = to,
             Date = timeUtil.GetTimeStamp()
         }).GetAwaiter().GetResult();
 
@@ -259,7 +259,7 @@ public class FikaDialogueController(ISptLogger<FikaDialogueController> logger, D
         senderDialog.Messages?.Add(message);
         receiverDialog.Messages?.Add(message);
 
-        socketConnectionHandler.SendMessage(receiverProfile.ProfileInfo.ProfileId, new WsChatMessageReceived()
+        socketConnectionHandler.SendMessage(receiverProfile.ProfileInfo.ProfileId.Value, new WsChatMessageReceived()
         {
             EventIdentifier = new(),
             EventType = NotificationEventType.new_message,
@@ -343,7 +343,7 @@ public class FikaDialogueController(ISptLogger<FikaDialogueController> logger, D
         return new(httpResponseUtil.GetBody(sentFriendRequests));
     }
 
-    public ValueTask<string> SendFriendRequest(MongoId fromProfileId, MongoId? toProfileId)
+    public ValueTask<string> SendFriendRequest(MongoId fromProfileId, MongoId toProfileId)
     {
         return new(httpResponseUtil.GetBody(AddFriendRequest(fromProfileId, toProfileId)));
     }
