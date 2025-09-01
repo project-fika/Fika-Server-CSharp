@@ -15,13 +15,13 @@ public class GetMiniProfilesOverride : AbstractPatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return typeof(ProfileController).GetMethod(nameof(ProfileController.GetMiniProfiles));
+        return typeof(ProfileController).GetMethod(nameof(ProfileController.GetMiniProfiles))!;
     }
 
     [PatchPrefix]
     public static bool Prefix(ref List<MiniProfile> __result)
     {
-        FikaConfig fikaConfig = ServiceLocator.ServiceProvider.GetService<ConfigService>().Config;
+        FikaConfig fikaConfig = ServiceLocator.ServiceProvider.GetService<ConfigService>()?.Config ?? throw new NullReferenceException("FikaConfig is null!");
 
         if (!fikaConfig.Server.LauncherListAllProfiles)
         {
@@ -39,7 +39,7 @@ public class GetFriendsOverride : AbstractPatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return typeof(ProfileController).GetMethod(nameof(ProfileController.SearchProfiles));
+        return typeof(ProfileController).GetMethod(nameof(ProfileController.SearchProfiles))!;
     }
 
     [PatchPrefix]
@@ -47,7 +47,7 @@ public class GetFriendsOverride : AbstractPatch
     {
         string searchNickname = request.Nickname.ToLower();
 
-        ProfileHelper profileHelper = ServiceLocator.ServiceProvider.GetService<ProfileHelper>();
+        ProfileHelper profileHelper = ServiceLocator.ServiceProvider.GetService<ProfileHelper>() ?? throw new NullReferenceException("ProfileHelper is null!");
 
         Dictionary<MongoId, SptProfile> profiles = profileHelper.GetProfiles();
         List<SearchFriendResponse> friends = [];

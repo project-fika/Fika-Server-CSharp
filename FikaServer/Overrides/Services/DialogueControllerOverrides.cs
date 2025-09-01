@@ -14,7 +14,7 @@ public class GetFriendListOverride : AbstractPatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return typeof(DialogueController).GetMethod(nameof(DialogueController.GetFriendList));
+        return typeof(DialogueController).GetMethod(nameof(DialogueController.GetFriendList))!;
     }
 
     [PatchPrefix]
@@ -32,15 +32,15 @@ public class SendMessageOverride : AbstractPatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return typeof(DialogueController).GetMethod(nameof(DialogueController.SendMessage));
+        return typeof(DialogueController).GetMethod(nameof(DialogueController.SendMessage))!;
     }
 
     [PatchPrefix]
     public static bool Prefix(MongoId sessionId, SendMessageRequest request, ref ValueTask<string> __result)
     {
-        FikaDialogueController? dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
+        FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
             ?? throw new NullReferenceException("Missing FikaDialogueController");
-        SaveServer? saveServer = ServiceLocator.ServiceProvider.GetService<SaveServer>()
+        SaveServer saveServer = ServiceLocator.ServiceProvider.GetService<SaveServer>()
             ?? throw new NullReferenceException("Missing SaveServer");
 
         Dictionary<MongoId, SptProfile> profiles = saveServer.GetProfiles();

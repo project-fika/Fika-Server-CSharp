@@ -28,7 +28,7 @@ public class HttpSendMessage(ConfigService configService, JsonUtil jsonUtil, Not
         {
             string rawData = await sr.ReadToEndAsync();
 
-            SendMessageRequest request = jsonUtil.Deserialize<SendMessageRequest>(rawData);
+            SendMessageRequest? request = jsonUtil.Deserialize<SendMessageRequest>(rawData);
             if (request != null)
             {
                 MongoId profileId = new(request.ProfileId);

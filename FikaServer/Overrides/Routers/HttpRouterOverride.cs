@@ -15,20 +15,22 @@ public class GetResponseOverride : AbstractPatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return typeof(HttpRouter).GetMethod(nameof(HttpRouter.GetResponse));
+        return typeof(HttpRouter).GetMethod(nameof(HttpRouter.GetResponse))!;
     }
 
     [PatchPostfix]
     public async static ValueTask<string?> Postfix(ValueTask<string?> __result, HttpRequest req)
     {
+        HttpServerHelper httpServerHelper = ServiceLocator.ServiceProvider.GetService<HttpServerHelper>() ?? throw new NullReferenceException("HttpServerHelper is null!");
+
         string? response = await __result;
 
         if (!StringValues.IsNullOrEmpty(req.Headers.Host))
         {
-            string originalHost = ServiceLocator.ServiceProvider.GetService<HttpServerHelper>().BuildUrl();
+            string originalHost = httpServerHelper.BuildUrl();
             string requestHost = req.Headers.Host.ToString();
 
-            response = response.Replace(originalHost, requestHost);
+            response = response?.Replace(originalHost, requestHost);
         }
 
         return response;

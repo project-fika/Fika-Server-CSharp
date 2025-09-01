@@ -40,7 +40,7 @@ public class HttpSendItemToAll(ConfigService configService, JsonUtil jsonUtil,
         using (StreamReader sr = new(req.Body))
         {
             string rawData = await sr.ReadToEndAsync();
-            SendItemToAllRequest request = jsonUtil.Deserialize<SendItemToAllRequest>(rawData);
+            SendItemToAllRequest? request = jsonUtil.Deserialize<SendItemToAllRequest>(rawData);
 
             if (request != null)
             {

@@ -15,22 +15,22 @@ public class StartLocalRaidOverride : AbstractPatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return typeof(LocationLifecycleService).GetMethod(nameof(LocationLifecycleService.StartLocalRaid));
+        return typeof(LocationLifecycleService).GetMethod(nameof(LocationLifecycleService.StartLocalRaid))!;
     }
 
     [PatchPrefix]
     public static bool Prefix(MongoId sessionId, StartLocalRaidRequestData request, ref StartLocalRaidResponseData __result)
     {
         LocationBase locationLoot;
-        MatchService matchService = ServiceLocator.ServiceProvider.GetService<MatchService>()!;
-        LocationLifecycleService locationLifeCycleService = ServiceLocator.ServiceProvider.GetService<LocationLifecycleService>()!;
+        MatchService matchService = ServiceLocator.ServiceProvider.GetService<MatchService>() ?? throw new NullReferenceException("MatchService is null!");
+        LocationLifecycleService locationLifeCycleService = ServiceLocator.ServiceProvider.GetService<LocationLifecycleService>() ?? throw new NullReferenceException("LocationLifecycleService is null!");
 
         string? matchId = matchService!.GetMatchIdByProfile(sessionId);
 
         if (string.IsNullOrEmpty(matchId))
         {
             // player isn't in a Fika match, generate new loot
-            locationLoot = locationLifeCycleService!.GenerateLocationAndLoot(sessionId, request.Location);
+            locationLoot = locationLifeCycleService.GenerateLocationAndLoot(sessionId, request.Location);
         }
         else
         {
@@ -42,16 +42,16 @@ public class StartLocalRaidOverride : AbstractPatch
                 match.Raids++;
                 if (match.Raids > 1)
                 {
-                    match.LocationData = locationLifeCycleService!.GenerateLocationAndLoot(sessionId, request.Location);
+                    match.LocationData = locationLifeCycleService.GenerateLocationAndLoot(sessionId, request.Location);
                 }
             }
 
             locationLoot = match.LocationData;
         }
 
-        DatabaseService databaseService = ServiceLocator.ServiceProvider.GetService<DatabaseService>()!;
-        ProfileHelper profileHelper = ServiceLocator.ServiceProvider.GetService<ProfileHelper>()!;
-        TimeUtil timeUtil = ServiceLocator.ServiceProvider.GetService<TimeUtil>()!;
+        DatabaseService databaseService = ServiceLocator.ServiceProvider.GetService<DatabaseService>() ?? throw new NullReferenceException("DatabaseService is null!");
+        ProfileHelper profileHelper = ServiceLocator.ServiceProvider.GetService<ProfileHelper>() ?? throw new NullReferenceException("ProfileHelper is null!");
+        TimeUtil timeUtil = ServiceLocator.ServiceProvider.GetService<TimeUtil>() ?? throw new NullReferenceException("TimeUtil is null!");
 
         PmcData? playerProfile = profileHelper.GetPmcProfile(sessionId);
 

@@ -14,14 +14,14 @@ public class EndLocalRaidOverride : AbstractPatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return typeof(LocationLifecycleService).GetMethod(nameof(LocationLifecycleService.EndLocalRaid));
+        return typeof(LocationLifecycleService).GetMethod(nameof(LocationLifecycleService.EndLocalRaid))!;
     }
 
     [PatchPrefix]
     public static bool Prefix(MongoId sessionId, EndLocalRaidRequestData request)
     {
-        MatchService matchService = ServiceLocator.ServiceProvider.GetService<MatchService>();
-        InsuranceService insuranceService = ServiceLocator.ServiceProvider.GetService<InsuranceService>();
+        MatchService matchService = ServiceLocator.ServiceProvider.GetService<MatchService>() ?? throw new NullReferenceException("MatchService is null!");
+        InsuranceService insuranceService = ServiceLocator.ServiceProvider.GetService<InsuranceService>() ?? throw new NullReferenceException("InsuranceService is null!");
 
         // Get match id from player session id
         string? matchId = matchService.GetMatchIdByPlayer(sessionId);

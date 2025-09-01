@@ -15,7 +15,7 @@ public class ListInboxOverride : AbstractPatch
     protected override MethodBase GetTargetMethod()
     {
         return typeof(DialogueCallbacks)
-            .GetMethod(nameof(DialogueCallbacks.ListInbox));
+            .GetMethod(nameof(DialogueCallbacks.ListInbox))!;
     }
 
     [PatchPrefix]
@@ -34,7 +34,7 @@ public class ListOutboxOverride : AbstractPatch
     protected override MethodBase GetTargetMethod()
     {
         return typeof(DialogueCallbacks)
-            .GetMethod(nameof(DialogueCallbacks.ListOutbox));
+            .GetMethod(nameof(DialogueCallbacks.ListOutbox))!;
     }
 
     [PatchPrefix]
@@ -53,7 +53,7 @@ public class SendFriendRequestOverride : AbstractPatch
     protected override MethodBase GetTargetMethod()
     {
         return typeof(DialogueCallbacks)
-            .GetMethod(nameof(DialogueCallbacks.SendFriendRequest));
+            .GetMethod(nameof(DialogueCallbacks.SendFriendRequest))!;
     }
 
     [PatchPrefix]
@@ -72,7 +72,7 @@ public class AcceptAllFriendRequestsOverride : AbstractPatch
     protected override MethodBase GetTargetMethod()
     {
         return typeof(DialogueCallbacks)
-            .GetMethod(nameof(DialogueCallbacks.AcceptAllFriendRequests));
+            .GetMethod(nameof(DialogueCallbacks.AcceptAllFriendRequests))!;
     }
 
     [PatchPrefix]
@@ -91,7 +91,7 @@ public class AcceptFriendRequestOverride : AbstractPatch
     protected override MethodBase GetTargetMethod()
     {
         return typeof(DialogueCallbacks)
-            .GetMethod(nameof(DialogueCallbacks.AcceptFriendRequest));
+            .GetMethod(nameof(DialogueCallbacks.AcceptFriendRequest))!;
     }
 
     [PatchPrefix]
@@ -110,7 +110,7 @@ public class DeclineFriendRequestOverride : AbstractPatch
     protected override MethodBase GetTargetMethod()
     {
         return typeof(DialogueCallbacks)
-            .GetMethod(nameof(DialogueCallbacks.DeclineFriendRequest));
+            .GetMethod(nameof(DialogueCallbacks.DeclineFriendRequest))!;
     }
 
     [PatchPrefix]
@@ -129,7 +129,7 @@ public class CancelFriendRequestOverride : AbstractPatch
     protected override MethodBase GetTargetMethod()
     {
         return typeof(DialogueCallbacks)
-            .GetMethod(nameof(DialogueCallbacks.CancelFriendRequest));
+            .GetMethod(nameof(DialogueCallbacks.CancelFriendRequest))!;
     }
 
     [PatchPrefix]
@@ -149,7 +149,7 @@ public class DeleteFriendOverride : AbstractPatch
     protected override MethodBase GetTargetMethod()
     {
         return typeof(DialogueCallbacks)
-            .GetMethod(nameof(DialogueCallbacks.DeleteFriend));
+            .GetMethod(nameof(DialogueCallbacks.DeleteFriend))!;
     }
 
     [PatchPrefix]
@@ -168,7 +168,7 @@ public class IgnoreFriendOverride : AbstractPatch
     protected override MethodBase GetTargetMethod()
     {
         return typeof(DialogueCallbacks)
-            .GetMethod(nameof(DialogueCallbacks.IgnoreFriend));
+            .GetMethod(nameof(DialogueCallbacks.IgnoreFriend))!;
     }
 
     [PatchPrefix]
@@ -187,7 +187,7 @@ public class UnIgnoreFriendOverride : AbstractPatch
     protected override MethodBase GetTargetMethod()
     {
         return typeof(DialogueCallbacks)
-            .GetMethod(nameof(DialogueCallbacks.UnIgnoreFriend));
+            .GetMethod(nameof(DialogueCallbacks.UnIgnoreFriend))!;
     }
 
     [PatchPrefix]

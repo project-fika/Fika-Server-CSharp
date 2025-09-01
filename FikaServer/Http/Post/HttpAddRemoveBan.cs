@@ -32,7 +32,7 @@ public class HttpAddRemoveBan(SaveServer saveServer, ConfigService configService
         {
             string rawData = await sr.ReadToEndAsync();
 
-            ProfileIdRequest request = jsonUtil.Deserialize<ProfileIdRequest>(rawData);
+            ProfileIdRequest? request = jsonUtil.Deserialize<ProfileIdRequest>(rawData);
             if (request != null)
             {
                 MongoId profileId = new(request.ProfileId);

@@ -27,6 +27,11 @@ public class LocaleService(FileUtil fileUtil, ConfigService fikaConfig, Database
         {
             lazyLoadedValue.AddTransformer(localeData =>
             {
+                if (localeData is null)
+                {
+                    return localeData;
+                }
+
                 var fikaLocales = _globalLocales[locale];
 
                 foreach (var fikaLocale in fikaLocales)

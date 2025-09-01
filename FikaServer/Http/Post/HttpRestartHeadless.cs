@@ -30,7 +30,7 @@ public class HttpRestartHeadless(ConfigService configService, JsonUtil jsonUtil,
         {
             string rawData = await sr.ReadToEndAsync();
 
-            ProfileIdRequest request = jsonUtil.Deserialize<ProfileIdRequest>(rawData);
+            ProfileIdRequest? request = jsonUtil.Deserialize<ProfileIdRequest>(rawData);
             if (request != null)
             {
                 MongoId profileId = new(request.ProfileId);

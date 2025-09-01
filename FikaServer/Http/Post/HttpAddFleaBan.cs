@@ -32,7 +32,7 @@ public class HttpAddFleaBan(SaveServer saveServer, ConfigService configService,
         {
             string rawData = await sr.ReadToEndAsync();
 
-            AddFleaBanRequest request = jsonUtil.Deserialize<AddFleaBanRequest>(rawData);
+            AddFleaBanRequest? request = jsonUtil.Deserialize<AddFleaBanRequest>(rawData);
             if (request != null)
             {
                 MongoId profileId = new(request.ProfileId);
