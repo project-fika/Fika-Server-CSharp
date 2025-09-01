@@ -2,13 +2,14 @@
 using FikaServer.Models.Fika.Routes.Client.Check;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.DI;
+using SPTarkov.Server.Core.Models.Eft.Common;
 using SPTarkov.Server.Core.Utils;
 
 namespace FikaServer.Routers.Static;
 
 [Injectable]
 public class ClientStaticRouter(ClientCallbacks fikaClientCallbacks, JsonUtil jsonUtil) : StaticRouter(jsonUtil, [
-        new RouteAction(
+        new RouteAction<EmptyRequestData>(
             "/fika/client/config",
             async (
                 url,
@@ -16,7 +17,7 @@ public class ClientStaticRouter(ClientCallbacks fikaClientCallbacks, JsonUtil js
                 sessionId,
                 output
             ) => await fikaClientCallbacks.HandleClientConfig(url, info, sessionId)),
-        new RouteAction(
+        new RouteAction<EmptyRequestData>(
             "/fika/natpunchserver/config",
             async (
                 url,
@@ -24,15 +25,15 @@ public class ClientStaticRouter(ClientCallbacks fikaClientCallbacks, JsonUtil js
                 sessionId,
                 output
             ) => await fikaClientCallbacks.HandleNatPunchConfig(url, info, sessionId)),
-        new RouteAction(
+        new RouteAction<FikaCheckModRequestData>(
             "/fika/client/check/mods",
             async (
                 url,
                 info,
                 sessionId,
                 output
-            ) => await fikaClientCallbacks.HandleCheckMods(url, info as FikaCheckModRequestData, sessionId)),
-        new RouteAction(
+            ) => await fikaClientCallbacks.HandleCheckMods(url, info, sessionId)),
+        new RouteAction<EmptyRequestData>(
             "/fika/profile/download",
             async (
                 url,
@@ -40,7 +41,7 @@ public class ClientStaticRouter(ClientCallbacks fikaClientCallbacks, JsonUtil js
                 sessionId,
                 output
             ) => await fikaClientCallbacks.HandleProfileDownload(url, info, sessionId)),
-        new RouteAction(
+        new RouteAction<EmptyRequestData>(
             "/fika/client/check/version",
             async (
                 url,

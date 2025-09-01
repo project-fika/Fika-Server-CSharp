@@ -9,65 +9,59 @@ namespace FikaServer.Routers.Static;
 
 [Injectable]
 public class UpdateStaticRouter(UpdateCallbacks fikaUpdateCallbacks, JsonUtil jsonUtil) : StaticRouter(jsonUtil, [
-        new RouteAction(
+        new RouteAction<FikaUpdatePingRequestData>(
             "/fika/update/ping",
             async (
                 url,
                 info,
                 sessionId,
                 output
-            ) => await fikaUpdateCallbacks.HandlePing(url, info as FikaUpdatePingRequestData, sessionId),
-            typeof(FikaUpdatePingRequestData)
+            ) => await fikaUpdateCallbacks.HandlePing(url, info, sessionId)
             ),
-        new RouteAction(
+        new RouteAction<FikaUpdatePlayerSpawnRequestData>(
             "/fika/update/playerspawn",
             async (
                 url,
                 info,
                 sessionId,
                 output
-            ) => await fikaUpdateCallbacks.HandlePlayerSpawn(url, info as FikaUpdatePlayerSpawnRequestData, sessionId),
-            typeof(FikaUpdatePlayerSpawnRequestData)
+            ) => await fikaUpdateCallbacks.HandlePlayerSpawn(url, info, sessionId)
             ),
-         new RouteAction(
+         new RouteAction<FikaUpdateSethostRequestData>(
             "/fika/update/sethost",
             async (
                 url,
                 info,
                 sessionId,
                 output
-            ) => await fikaUpdateCallbacks.HandleSetHost(url, info as FikaUpdateSethostRequestData, sessionId),
-            typeof(FikaUpdateSethostRequestData)
+            ) => await fikaUpdateCallbacks.HandleSetHost(url, info, sessionId)
             ),
-        new RouteAction(
+        new RouteAction<FikaUpdateSetStatusRequestData>(
             "/fika/update/setstatus",
             async (
                 url,
                 info,
                 sessionId,
                 output
-            ) => await fikaUpdateCallbacks.HandleSetStatus(url, info as FikaUpdateSetStatusRequestData, sessionId),
-            typeof(FikaUpdateSetStatusRequestData)
+            ) => await fikaUpdateCallbacks.HandleSetStatus(url, info, sessionId)
             ),
-        new RouteAction(
+        new RouteAction<FikaUpdateRaidAddPlayerData>(
             "/fika/update/addplayer",
             async (
                 url,
                 info,
                 sessionId,
                 output
-            ) => await fikaUpdateCallbacks.HandleRaidAddPlayer(url, info as FikaUpdateRaidAddPlayerData, sessionId),
-            typeof(FikaUpdateRaidAddPlayerData)
+            ) => await fikaUpdateCallbacks.HandleRaidAddPlayer(url, info, sessionId)
             ),
-        new RouteAction(
+        new RouteAction<FikaUpdateRaidAddPlayerData>(
             "/fika/update/playerdied",
             async (
                 url,
                 info,
                 sessionId,
                 output
-            ) => await fikaUpdateCallbacks.HandlePlayerDied(url, info as FikaUpdateRaidAddPlayerData, sessionId),
-            typeof(FikaUpdateRaidAddPlayerData)
+            ) => await fikaUpdateCallbacks.HandlePlayerDied(url, info, sessionId)
             ),
     ])
 {

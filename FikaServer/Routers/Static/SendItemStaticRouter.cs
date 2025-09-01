@@ -8,14 +8,13 @@ namespace FikaServer.Routers.Static;
 
 [Injectable]
 public class SendItemStaticRouter(SendItemCallbacks sendItemCallbacks, JsonUtil jsonUtil) : StaticRouter(jsonUtil, [
-        new RouteAction(
+        new RouteAction<SendItemAvailableReceiversRequestData>(
             "/fika/senditem/availablereceivers",
             async (
                 url,
                 info,
                 sessionId,
                 output
-            ) => await sendItemCallbacks.HandleAvailableReceivers(sessionId),
-            typeof(SendItemAvailableReceiversRequestData)
+            ) => await sendItemCallbacks.HandleAvailableReceivers(sessionId)
             )
     ]);

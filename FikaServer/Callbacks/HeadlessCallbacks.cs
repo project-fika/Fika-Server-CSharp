@@ -2,6 +2,8 @@
 using FikaServer.Models.Fika.Routes.Raid;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Common;
+using SPTarkov.Server.Core.Models.Eft.Common;
+using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Utils;
 
 namespace FikaServer.Callbacks;
@@ -16,7 +18,7 @@ public class HeadlessCallbacks(HttpResponseUtil httpResponseUtil, HeadlessContro
     /// <param name="info"></param>
     /// <param name="sessionID"></param>
     /// <returns></returns>
-    public ValueTask<string> HandleGetHeadlesses(string url, FikaRaidServerIdRequestData info, MongoId sessionID)
+    public ValueTask<string> HandleGetHeadlesses(string url, EmptyRequestData _, MongoId sessionID)
     {
         return new ValueTask<string>(httpResponseUtil.NoBody(headlessController.HandleGetHeadlesses()));
     }
@@ -28,7 +30,7 @@ public class HeadlessCallbacks(HttpResponseUtil httpResponseUtil, HeadlessContro
     /// <param name="info"></param>
     /// <param name="sessionID"></param>
     /// <returns></returns>
-    public ValueTask<string> HandleAvailableHeadlesses(string url, FikaRaidServerIdRequestData info, MongoId sessionID)
+    public ValueTask<string> HandleAvailableHeadlesses(string url, EmptyRequestData _, MongoId sessionID)
     {
         return new ValueTask<string>(httpResponseUtil.NoBody(headlessController.HandleGetAvailableHeadlesses()));
     }
@@ -40,7 +42,7 @@ public class HeadlessCallbacks(HttpResponseUtil httpResponseUtil, HeadlessContro
     /// <param name="info"></param>
     /// <param name="sessionID"></param>
     /// <returns></returns>
-    public ValueTask<string> HandleRestartAfterRaidAmount(string url, FikaRaidServerIdRequestData info, MongoId sessionID)
+    public ValueTask<string> HandleRestartAfterRaidAmount(string url, EmptyRequestData _, MongoId sessionID)
     {
         return new ValueTask<string>(httpResponseUtil.NoBody(headlessController.HandleRestartAfterRaidAmount()));
     }

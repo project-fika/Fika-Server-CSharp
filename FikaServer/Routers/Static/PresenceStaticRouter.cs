@@ -2,13 +2,14 @@
 using FikaServer.Models.Fika.Presence;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.DI;
+using SPTarkov.Server.Core.Models.Eft.Common;
 using SPTarkov.Server.Core.Utils;
 
 namespace FikaServer.Routers.Static;
 
 [Injectable]
 public class PresenceStaticRouter(PresenceCallbacks fikaPresenceCallbacks, JsonUtil jsonUtil) : StaticRouter(jsonUtil, [
-        new RouteAction(
+        new RouteAction<EmptyRequestData>(
             "/fika/presence/get",
             async (
                 url,
@@ -16,25 +17,23 @@ public class PresenceStaticRouter(PresenceCallbacks fikaPresenceCallbacks, JsonU
                 sessionId,
                 output
             ) => await fikaPresenceCallbacks.HandleGetPresence(url, info, sessionId)),
-        new RouteAction(
+        new RouteAction<FikaSetPresence>(
             "/fika/presence/set",
             async (
                 url,
                 info,
                 sessionId,
                 output
-            ) => await fikaPresenceCallbacks.HandleSetPresence(url, info as FikaSetPresence, sessionId),
-            typeof(FikaSetPresence)
+            ) => await fikaPresenceCallbacks.HandleSetPresence(url, info, sessionId)
             ),
-        new RouteAction(
+        new RouteAction<FikaSetPresence>(
             "/fika/presence/setget",
             async (
                 url,
                 info,
                 sessionId,
                 output
-            ) => await fikaPresenceCallbacks.HandleSetGetPresence(url, info as FikaSetPresence, sessionId),
-            typeof(FikaSetPresence)
+            ) => await fikaPresenceCallbacks.HandleSetGetPresence(url, info, sessionId)
             ),
     ])
 {

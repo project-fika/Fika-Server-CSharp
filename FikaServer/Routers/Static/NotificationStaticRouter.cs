@@ -8,15 +8,14 @@ namespace FikaServer.Routers.Static;
 
 [Injectable]
 public class NotificationStaticRouter(NotificationCallbacks fikaNotificationCallbacks, JsonUtil jsonUtil) : StaticRouter(jsonUtil, [
-        new RouteAction(
+        new RouteAction<PushNotification>(
             "/fika/notification/push",
             async (
                 url,
                 info,
                 sessionId,
                 output
-            ) => await fikaNotificationCallbacks.HandlePushNotification(url, info as PushNotification, sessionId),
-            typeof(PushNotification)
+            ) => await fikaNotificationCallbacks.HandlePushNotification(url, info, sessionId)
             )
     ])
 {

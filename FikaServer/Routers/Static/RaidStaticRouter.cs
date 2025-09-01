@@ -13,75 +13,68 @@ namespace FikaServer.Routers.Static;
 
 [Injectable]
 public class RaidStaticRouter(RaidCallbacks fikaRaidCallbacks, JsonUtil jsonUtil) : StaticRouter(jsonUtil, [
-        new RouteAction(
+        new RouteAction<FikaRaidCreateRequestData>(
             "/fika/raid/create",
             async (
                 url,
                 info,
                 sessionId,
                 output
-            ) => await fikaRaidCallbacks.HandleRaidCreate(url, info as FikaRaidCreateRequestData, sessionId),
-            typeof(FikaRaidCreateRequestData)
+            ) => await fikaRaidCallbacks.HandleRaidCreate(url, info, sessionId)
             ),
-        new RouteAction(
+        new RouteAction<FikaRaidJoinRequestData>(
             "/fika/raid/join",
             async (
                 url,
                 info,
                 sessionId,
                 output
-            ) => await fikaRaidCallbacks.HandleRaidJoin(url, info as FikaRaidJoinRequestData, sessionId),
-            typeof(FikaRaidJoinRequestData)
+            ) => await fikaRaidCallbacks.HandleRaidJoin(url, info, sessionId)
             ),
-         new RouteAction(
+         new RouteAction<FikaRaidLeaveRequestData>(
             "/fika/raid/leave",
             async (
                 url,
                 info,
                 sessionId,
                 output
-            ) => await fikaRaidCallbacks.HandleRaidLeave(url, info as FikaRaidLeaveRequestData, sessionId),
-            typeof(FikaRaidLeaveRequestData)
+            ) => await fikaRaidCallbacks.HandleRaidLeave(url, info, sessionId)
             ),
-        new RouteAction(
+        new RouteAction<FikaRaidServerIdRequestData>(
             "/fika/raid/gethost",
             async (
                 url,
                 info,
                 sessionId,
                 output
-            ) => await fikaRaidCallbacks.HandleRaidGetHost(url, info as FikaRaidServerIdRequestData, sessionId),
-            typeof(FikaRaidServerIdRequestData)
+            ) => await fikaRaidCallbacks.HandleRaidGetHost(url, info, sessionId)
             ),
-        new RouteAction(
+        new RouteAction<FikaRaidServerIdRequestData>(
             "/fika/raid/getsettings",
             async (
                 url,
                 info,
                 sessionId,
                 output
-            ) => await fikaRaidCallbacks.HandleRaidGetSettings(url, info as FikaRaidServerIdRequestData, sessionId),
-            typeof(FikaRaidServerIdRequestData)
+            ) => await fikaRaidCallbacks.HandleRaidGetSettings(url, info, sessionId)
             ),
-        new RouteAction(
+        new RouteAction<StartHeadlessRequest>(
             "/fika/raid/headless/start",
             async (
                 url,
                 info,
                 sessionId,
                 output
-            ) => await fikaRaidCallbacks.HandleRaidStartHeadless(url, info as StartHeadlessRequest, sessionId),
-            typeof(StartHeadlessRequest)
+            ) => await fikaRaidCallbacks.HandleRaidStartHeadless(url, info, sessionId)
             ),
-        new RouteAction(
+        new RouteAction<RegisterPlayerRequestData>(
             "/fika/raid/registerPlayer",
             async (
                 url,
                 info,
                 sessionId,
                 output
-            ) => await fikaRaidCallbacks.HandleRaidRegisterPlayer(url, info as RegisterPlayerRequestData, sessionId),
-            typeof(RegisterPlayerRequestData)
+            ) => await fikaRaidCallbacks.HandleRaidRegisterPlayer(url, info, sessionId)
             ),
     ])
 {
