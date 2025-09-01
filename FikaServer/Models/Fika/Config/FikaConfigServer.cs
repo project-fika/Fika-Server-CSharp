@@ -18,16 +18,16 @@ public record FikaConfigServer
     public bool SentItemsLoseFIR { get; set; } = true;
 
     [JsonPropertyName("launcherListAllProfiles")]
-    public bool LauncherListAllProfiles { get; set; } = false;
+    public bool LauncherListAllProfiles { get; set; } = true;
 
     [JsonPropertyName("sessionTimeout")]
     public int SessionTimeout { get; set; } = 5;
 
     [JsonPropertyName("showDevProfile")]
-    public bool ShowDevProfile { get; set; } = false;
+    public bool ShowDevProfile { get; set; } = true;
 
     [JsonPropertyName("showNonStandardProfile")]
-    public bool ShowNonStandardProfile { get; set; } = false;
+    public bool ShowNonStandardProfile { get; set; } = true;
 
     [JsonPropertyName("adminIds")]
     public List<MongoId> AdminIds { get; set; } = [];
