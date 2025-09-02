@@ -1,6 +1,7 @@
-﻿/*using FikaServer.Models.Servers;
+﻿using Fika.Core.Networking.LiteNetLib;
+using FikaServer.Models.Servers;
+using FikaServer.Networking.LiteNetLib;
 using FikaServer.Services;
-using LiteNetLib;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Utils;
 using System.Net;
@@ -155,4 +156,3 @@ public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer>
         // Do nothing
     }
 }
-*/

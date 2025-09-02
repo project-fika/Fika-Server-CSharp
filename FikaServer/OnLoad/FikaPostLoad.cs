@@ -1,5 +1,5 @@
 ﻿using FikaServer.Models.Fika.Config;
-/*using FikaServer.Servers;*/
+using FikaServer.Servers;
 using FikaServer.Services;
 using FikaServer.Services.Cache;
 using FikaServer.Services.Headless;
@@ -9,7 +9,6 @@ using SPTarkov.Server.Core.Models.Spt.Config;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Routers;
 using SPTarkov.Server.Core.Servers;
-using SPTarkov.Server.Core.Utils;
 
 namespace FikaServer.OnLoad;
 
@@ -17,16 +16,16 @@ namespace FikaServer.OnLoad;
 
 public class FikaPostLoad(ISptLogger<FikaPostLoad> logger, ConfigServer configServer, /*NatPunchServer natPunchServer,*/ ImageRouter imageRouter,
     HeadlessProfileService HeadlessProfileService, LocaleService localeService, PlayerRelationsService playerRelationsCacheService,
-    FriendRequestsService friendRequestsService, ClientService clientService, JsonUtil jsonUtil, ConfigService fikaConfig) : IOnLoad
+    FriendRequestsService friendRequestsService, ConfigService fikaConfig, NatPunchServer natPunchServer) : IOnLoad
 {
     public async Task OnLoad()
     {
         FikaConfig config = fikaConfig.Config;
 
-        /*if (config.NatPunchServer.Enable)
+        if (config.NatPunchServer.Enable)
         {
             natPunchServer.Start();
-        }*/
+        }
 
         if (config.Headless.Profiles.Amount > 0)
         {
@@ -57,9 +56,7 @@ public class FikaPostLoad(ISptLogger<FikaPostLoad> logger, ConfigServer configSe
 
         if (!fikaConfig.Config.Server.ShowNonStandardProfile)
         {
-            List<string> disallowedProfiles = ["Tournament", "SPT Easy start", "SPT Zero to hero"];
-
-            foreach (string profile in disallowedProfiles)
+            foreach (string profile in (string[])["Tournament", "SPT Easy start", "SPT Zero to hero"])
             {
                 profileBlacklist.Add(profile);
             }
