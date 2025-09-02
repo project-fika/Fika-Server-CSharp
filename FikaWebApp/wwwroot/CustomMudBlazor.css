@@ -2,3 +2,10 @@
     font-family: 'bender';
     src: url('fonts/bender.otf') format('opentype');
 }
+
+body {
+    background-image: url('/images/background.png');
+    background-repeat: repeat;
+    background-size: auto;
+    background-position: top left;
+}
