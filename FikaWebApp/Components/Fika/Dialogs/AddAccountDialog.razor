@@ -1,0 +1,138 @@
+﻿@using System.Text.RegularExpressions
+@using FikaWebApp.Data
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.Extensions.Options
+
+@inject RoleManager<IdentityRole> RoleManager
+@inject IOptions<IdentityOptions> IdentityOptions
+
+<MudDialog>
+	<DialogContent>
+		<MudForm @bind-IsValid="@_success" @bind-Errors="@_errors" Spacing="4">
+			<MudTextField T="string" Variant="Variant.Filled" Counter="10" MaxLength="10" Label="Username" Required="true" RequiredError="User name is required!" @ref="_usernameField"
+						  Validation="@(new Func<string, IEnumerable<string>>(UsernameLength))" Immediate="true" />
+			<MudTextField T="string" Variant="Variant.Filled" Counter="0" Label="Password" HelperText="Choose a strong password" @ref="_passwordField"
+						  InputType="InputType.Password" Validation="@(new Func<string, IEnumerable<string>>(PasswordStrength))" Required="true"
+						  RequiredError="Password is required!" Immediate="true" />
+			<MudTextField T="string" Variant="Variant.Filled" Counter="0"
+						  Label="Password" HelperText="Repeat the password" InputType="InputType.Password" Required="true"
+						  Validation="@(new Func<string, string>(PasswordMatch))" Immediate="true" />
+			<MudSelect MultiSelection="true" Placeholder="Select roles..." HelperText="Role Selection" @bind-Value="_roleValue" @bind-SelectedValues="_selectedRoles">
+				@foreach (var role in _availableRoles)
+				{
+					<MudSelectItem T="string" Value="@role">@role</MudSelectItem>
+				}
+			</MudSelect>
+			<MudStack Row Justify="Justify.Center" Spacing="2">
+				<MudPaper Class="pa-4 mt-4">
+					<MudButton StartIcon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!_success)" Class="ml-auto" OnClick="Submit">Add</MudButton>
+					<MudButton StartIcon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Secondary" Class="ml-auto" OnClick="Cancel">Cancel</MudButton>
+				</MudPaper>
+			</MudStack>
+		</MudForm>
+	</DialogContent>
+</MudDialog>
+
+@code {
+	[CascadingParameter]
+	private IMudDialogInstance MudDialog { get; set; }	
+
+	private IEnumerable<string> _selectedRoles = new HashSet<string>();
+	private string[] _availableRoles = [];
+	private string _roleValue = "None";
+
+	private bool _success;
+	private string[] _errors = { };
+	private MudTextField<string> _usernameField;
+	private MudTextField<string> _passwordField;
+
+	protected override void OnInitialized()
+	{
+		base.OnInitialized();
+
+		_availableRoles = RoleManager.Roles
+			.Select(r => r.Name)
+			.ToArray();
+	}
+
+	private void Submit()
+	{
+		Tuple<string, string, List<string>> value = new(_usernameField.Value, _passwordField.Value, _selectedRoles.ToList());
+		MudDialog.Close(value);
+	}
+
+	private void Cancel()
+	{
+		MudDialog.Cancel();
+	}
+
+	private IEnumerable<string> UsernameLength(string username)
+	{
+		if (string.IsNullOrWhiteSpace(username))
+		{
+			yield return "Username is required!";
+			yield break;
+		}
+
+		if (username.Length < 5)
+		{
+			yield return "Username must be at least of length 5";
+		}
+
+		if (username.Length > 10)
+		{
+			yield return "Username can not be longer than 10!";
+		}
+	}
+
+	private IEnumerable<string> PasswordStrength(string pw)
+	{
+		var pwOptions = IdentityOptions.Value.Password; // or IdentityOptionsAccessor.Value.Password in Blazor
+
+		if (string.IsNullOrWhiteSpace(pw))
+		{
+			yield return "Password is required!";
+			yield break;
+		}
+
+		if (pw.Length < pwOptions.RequiredLength)
+		{
+			yield return $"Password must be at least {pwOptions.RequiredLength} characters long";
+		}
+
+		if (pwOptions.RequireUppercase && !Regex.IsMatch(pw, @"[A-Z]"))
+		{
+			yield return "Password must contain at least one uppercase letter";
+		}
+
+		if (pwOptions.RequireLowercase && !Regex.IsMatch(pw, @"[a-z]"))
+		{
+			yield return "Password must contain at least one lowercase letter";
+		}
+
+		if (pwOptions.RequireDigit && !Regex.IsMatch(pw, @"[0-9]"))
+		{
+			yield return "Password must contain at least one digit";
+		}
+
+		if (pwOptions.RequireNonAlphanumeric && !Regex.IsMatch(pw, @"[\W_]"))
+		{
+			yield return "Password must contain at least one special character";
+		}
+
+		if (pwOptions.RequiredUniqueChars > 0 && pw.Distinct().Count() < pwOptions.RequiredUniqueChars)
+		{
+			yield return $"Password must contain at least {pwOptions.RequiredUniqueChars} unique characters";
+		}
+	}
+
+	private string? PasswordMatch(string arg)
+	{
+		if (_passwordField.Value != arg)
+		{
+			return "Passwords don't match";
+		}
+
+		return null;
+	}
+}

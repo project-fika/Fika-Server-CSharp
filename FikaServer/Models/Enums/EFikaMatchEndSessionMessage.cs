@@ -1,12 +1,8 @@
-﻿using SPTarkov.Server.Core.Utils.Json.Converters;
+﻿namespace FikaServer.Models.Enums;
 
-namespace FikaServer.Models.Enums
+public enum EFikaMatchEndSessionMessage
 {
-    [EftEnumConverter]
-    public enum EFikaMatchEndSessionMessage
-    {
-        HostShutdown = 0,
-        PingTimeout = 1,
-        NoPlayers = 2,
-    }
+    HostShutdown = 0,
+    PingTimeout = 1,
+    NoPlayers = 2,
 }

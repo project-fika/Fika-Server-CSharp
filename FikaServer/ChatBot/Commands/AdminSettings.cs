@@ -7,35 +7,34 @@ using SPTarkov.Server.Core.Models.Eft.Dialog;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Services;
 
-namespace FikaServer.ChatBot.Commands
+namespace FikaServer.ChatBot.Commands;
+
+[Injectable]
+public class AdminSettings(ConfigService configService, NotificationWebSocket notificationWebSocket, MailSendService mailSendService) : IFikaCommand
 {
-    [Injectable]
-    public class AdminSettings(ConfigService configService, NotificationWebSocket notificationWebSocket, MailSendService mailSendService) : IFikaCommand
+    public string Command
     {
-        public string Command
+        get
         {
-            get
-            {
-                return "adminsettings";
-            }
+            return "adminsettings";
         }
+    }
 
-        public string CommandHelp
+    public string CommandHelp
+    {
+        get
         {
-            get
-            {
-                return $"fika {Command}\n\nOpens the settings GUI if you are a registered admin.";
-            }
+            return $"fika {Command}\n\nOpens the settings GUI if you are a registered admin.";
         }
+    }
 
-        public async ValueTask<string> PerformAction(UserDialogInfo commandHandler, MongoId sessionId, SendMessageRequest request)
-        {
-            bool isAdmin = configService.Config.Server.AdminIds.Contains(sessionId);
-            await notificationWebSocket.SendAsync(sessionId, new OpenAdminMenuNotification(isAdmin));
+    public async ValueTask<string> PerformAction(UserDialogInfo commandHandler, MongoId sessionId, SendMessageRequest request)
+    {
+        bool isAdmin = configService.Config.Server.AdminIds.Contains(sessionId);
+        await notificationWebSocket.SendAsync(sessionId, new OpenAdminMenuNotification(isAdmin));
 
-            mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
-                isAdmin ? "Opening admin menu." : "You are not an admin!");
-            return new(request.DialogId);
-        }
+        mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
+            isAdmin ? "Opening admin menu." : "You are not an admin!");
+        return new(request.DialogId);
     }
 }

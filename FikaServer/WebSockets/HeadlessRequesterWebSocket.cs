@@ -8,86 +8,85 @@ using System.Collections.Concurrent;
 using System.Net.WebSockets;
 using System.Text;
 
-namespace FikaServer.WebSockets
+namespace FikaServer.WebSockets;
+
+[Injectable(InjectionType.Singleton)]
+public class HeadlessRequesterWebSocket(SaveServer saveServer, JsonUtil jsonUtil, ISptLogger<HeadlessRequesterWebSocket> logger) : IWebSocketConnectionHandler
 {
-    [Injectable(InjectionType.Singleton)]
-    public class HeadlessRequesterWebSocket(SaveServer saveServer, JsonUtil jsonUtil, ISptLogger<HeadlessRequesterWebSocket> logger) : IWebSocketConnectionHandler
+    private readonly ConcurrentDictionary<string, WebSocket> requesterWebSockets = [];
+
+    public string GetHookUrl()
     {
-        private readonly ConcurrentDictionary<string, WebSocket> requesterWebSockets = [];
+        return "/fika/headless/requester";
+    }
 
-        public string GetHookUrl()
+    public string GetSocketId()
+    {
+        return "Fika Headless Requester";
+    }
+
+    public async Task OnConnection(WebSocket ws, HttpContext context, string sessionIdContext)
+    {
+        string authHeader = context.Request.Headers.Authorization.ToString();
+
+        if (string.IsNullOrEmpty(authHeader))
         {
-            return "/fika/headless/requester";
+            await ws.CloseAsync(WebSocketCloseStatus.InvalidPayloadData, "", CancellationToken.None);
+            return;
         }
 
-        public string GetSocketId()
+        string base64EncodedString = authHeader.Split(' ')[1];
+        string decodedString = Encoding.UTF8.GetString(Convert.FromBase64String(base64EncodedString));
+        string[] authorization = decodedString.Split(':');
+        string userSessionID = authorization[0];
+
+        logger.Debug($"[{GetSocketId()}] User is {userSessionID}");
+
+        if (!saveServer.ProfileExists(userSessionID))
         {
-            return "Fika Headless Requester";
+            logger.Error($"[{GetSocketId()}] Invalid user {userSessionID} tried to authenticate!");
+            return;
         }
 
-        public async Task OnConnection(WebSocket ws, HttpContext context, string sessionIdContext)
+        requesterWebSockets.TryAdd(userSessionID, ws);
+    }
+
+    public Task OnMessage(byte[] rawData, WebSocketMessageType messageType, WebSocket ws, HttpContext context)
+    {
+        // Do nothing
+        return Task.CompletedTask;
+    }
+
+    public Task OnClose(WebSocket ws, HttpContext context, string sessionIdContext)
+    {
+        string userSessionID = requesterWebSockets.FirstOrDefault(x => x.Value == ws).Key;
+
+        if (!string.IsNullOrEmpty(userSessionID))
         {
-            string authHeader = context.Request.Headers.Authorization.ToString();
+            logger.Debug($"[{GetSocketId()}] Deleting requester {userSessionID}");
 
-            if (string.IsNullOrEmpty(authHeader))
-            {
-                await ws.CloseAsync(WebSocketCloseStatus.InvalidPayloadData, "", CancellationToken.None);
-                return;
-            }
-
-            string base64EncodedString = authHeader.Split(' ')[1];
-            string decodedString = Encoding.UTF8.GetString(Convert.FromBase64String(base64EncodedString));
-            string[] authorization = decodedString.Split(':');
-            string userSessionID = authorization[0];
-
-            logger.Debug($"[{GetSocketId()}] User is {userSessionID}");
-
-            if (!saveServer.ProfileExists(userSessionID))
-            {
-                logger.Error($"[{GetSocketId()}] Invalid user {userSessionID} tried to authenticate!");
-                return;
-            }
-
-            requesterWebSockets.TryAdd(userSessionID, ws);
+            requesterWebSockets.TryRemove(userSessionID, out _);
         }
 
-        public Task OnMessage(byte[] rawData, WebSocketMessageType messageType, WebSocket ws, HttpContext context)
+        return Task.CompletedTask;
+    }
+
+    public async Task SendAsync<T>(string sessionID, T message) where T : IHeadlessWSMessage
+    {
+        // Client is not online or not currently connected to the websocket.
+        if (!requesterWebSockets.TryGetValue(sessionID, out WebSocket ws))
         {
-            // Do nothing
-            return Task.CompletedTask;
+            logger.Warning($"[{GetSocketId()}] Requester ({sessionID}) is not connected yet?");
+            return;
         }
 
-        public Task OnClose(WebSocket ws, HttpContext context, string sessionIdContext)
+        // Client was formerly connected to the websocket, but may have connection issues as it didn't run onClose
+        if (ws.State == WebSocketState.Closed)
         {
-            string userSessionID = requesterWebSockets.FirstOrDefault(x => x.Value == ws).Key;
-
-            if (!string.IsNullOrEmpty(userSessionID))
-            {
-                logger.Debug($"[{GetSocketId()}] Deleting requester {userSessionID}");
-
-                requesterWebSockets.TryRemove(userSessionID, out _);
-            }
-
-            return Task.CompletedTask;
+            logger.Warning($"[{GetSocketId()}] Requester ({sessionID})'s websocket is closed?");
+            return;
         }
 
-        public async Task SendAsync<T>(string sessionID, T message) where T : IHeadlessWSMessage
-        {
-            // Client is not online or not currently connected to the websocket.
-            if (!requesterWebSockets.TryGetValue(sessionID, out WebSocket ws))
-            {
-                logger.Warning($"[{GetSocketId()}] Requester ({sessionID}) is not connected yet?");
-                return;
-            }
-
-            // Client was formerly connected to the websocket, but may have connection issues as it didn't run onClose
-            if (ws.State == WebSocketState.Closed)
-            {
-                logger.Warning($"[{GetSocketId()}] Requester ({sessionID})'s websocket is closed?");
-                return;
-            }
-
-            await ws.SendAsync(Encoding.UTF8.GetBytes(jsonUtil.Serialize(message)), WebSocketMessageType.Text, true, CancellationToken.None);
-        }
+        await ws.SendAsync(Encoding.UTF8.GetBytes(jsonUtil.Serialize(message)), WebSocketMessageType.Text, true, CancellationToken.None);
     }
 }

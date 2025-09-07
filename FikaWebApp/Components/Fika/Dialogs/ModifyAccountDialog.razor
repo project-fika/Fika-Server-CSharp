@@ -1,0 +1,65 @@
+﻿@using System.Text.RegularExpressions
+@using FikaWebApp.Data
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.Extensions.Options
+
+@inject RoleManager<IdentityRole> RoleManager
+@inject UserManager<ApplicationUser> UserManager
+@inject IOptions<IdentityOptions> IdentityOptions
+
+<MudDialog>
+	<DialogContent>
+		<MudForm @bind-IsValid="@_success" @bind-Errors="@_errors" Spacing="4">
+			
+			<MudSelect Immediate="true" MultiSelection="true" Placeholder="Select roles..." HelperText="Role Selection" @bind-Value="_roleValue" @bind-SelectedValues="_selectedRoles">
+				@foreach (var role in _availableRoles)
+				{
+					<MudSelectItem T="string" Value="@role">@role</MudSelectItem>
+				}
+			</MudSelect>
+			<MudStack Row Justify="Justify.Center" Spacing="2">
+				<MudPaper Class="pa-4 mt-4">
+					<MudButton StartIcon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!_success)" Class="ml-auto" OnClick="Submit">Save</MudButton>
+					<MudButton StartIcon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Secondary" Class="ml-auto" OnClick="Cancel">Cancel</MudButton>
+				</MudPaper>
+			</MudStack>
+		</MudForm>
+	</DialogContent>
+</MudDialog>
+
+@code {
+	[CascadingParameter]
+	private IMudDialogInstance MudDialog { get; set; }
+
+	[Parameter]
+	public ApplicationUser User { get; set; }
+
+	private IEnumerable<string> _selectedRoles = new HashSet<string>();
+	private string[] _availableRoles = [];
+	private string _roleValue = "None";
+
+	private bool _success;
+	private string[] _errors = { };
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+
+		_availableRoles = RoleManager.Roles
+			.Select(r => r.Name)
+			.ToArray();
+
+		var roles = await UserManager.GetRolesAsync(User);
+		_selectedRoles = new HashSet<string>(roles);
+	}
+
+	private void Submit()
+	{
+		MudDialog.Close(_selectedRoles.ToList());
+	}
+
+	private void Cancel()
+	{
+		MudDialog.Cancel();
+	}
+}

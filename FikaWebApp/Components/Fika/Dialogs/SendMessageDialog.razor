@@ -1,0 +1,26 @@
+﻿<MudDialog>
+	<DialogContent>
+		<FikaMultiLineTextField @bind-Value="@_message" />
+	</DialogContent>
+	<DialogActions>
+		<FikaPrimaryButton Text="Send" StartIcon="@Icons.Material.Filled.CheckCircle" OnClick="Confirm" />
+		<FikaSecondaryButton Text="Cancel" StartIcon="@Icons.Material.Filled.Cancel" OnClick="Cancel" />
+	</DialogActions>
+</MudDialog>
+
+@code {
+	[CascadingParameter]
+	private IMudDialogInstance MudDialog { get; set; }
+
+	private string _message = string.Empty;
+
+	private void Confirm()
+	{
+		MudDialog.Close(_message);
+	}
+
+	private void Cancel()
+	{
+		MudDialog.Cancel();
+	}
+}

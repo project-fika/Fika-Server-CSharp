@@ -1,13 +1,9 @@
-﻿using SPTarkov.Server.Core.Utils.Json.Converters;
+﻿namespace FikaServer.Models.Enums;
 
-namespace FikaServer.Models.Enums
+public enum EFikaHeadlessWSMessageType
 {
-    [EftEnumConverter]
-    public enum EFikaHeadlessWSMessageType
-    {
-        KeepAlive = 0,
-        HeadlessStartRaid = 1,
-        RequesterJoinMatch = 2,
-        ShutdownClient = 4
-    }
+    KeepAlive = 0,
+    HeadlessStartRaid = 1,
+    RequesterJoinMatch = 2,
+    ShutdownClient = 4
 }

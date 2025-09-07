@@ -1,10 +1,9 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace FikaServer.Models.Fika.Routes.Raid.Create
+namespace FikaServer.Models.Fika.Routes.Raid.Create;
+
+public record FikaRaidCreateResponse
 {
-    public record FikaRaidCreateResponse
-    {
-        [JsonPropertyName("success")]
-        public bool Success { get; set; }
-    }
+    [JsonPropertyName("success")]
+    public bool Success { get; set; }
 }

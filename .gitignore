@@ -361,4 +361,16 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Fika
 /FikaServer/Properties/launchSettings.json
+/FikaWebApp/fikaWebApp.db
+/FikaWebApp/fikaWebApp.db-shm
+/FikaWebApp/fikaWebApp.db-wal
+/FikaWebApp/ProtectedFiles/*
+/FikaWebApp/StoredData
+/FikaWebApp/StoredData/*
+/FikaWebApp/Properties/launchSettings.json
+/FikaWebApp/Properties/serviceDependencies.json
+/FikaWebApp/appsettings.json
+/FikaWebApp/appsettings.Development.json

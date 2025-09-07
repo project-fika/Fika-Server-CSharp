@@ -1,0 +1,225 @@
+﻿@page "/Fika/Manage/Configuration"
+
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Identity
+@using FikaWebApp.Data
+
+<PageTitle>Fika Management</PageTitle>
+
+<MudPaper Class="pa-4">
+	<MudExpansionPanels MultiExpansion="true">
+		<MudExpansionPanel Text="Client">
+			<MudPaper Class="pa-4" Elevation="0">
+				<MudStack>
+					<MudGrid>
+						<MudItem xs="6">
+							<MudCheckBox Value="_config.Client.UseBtr">Use BTR</MudCheckBox>
+							<MudCheckBox Value="_config.Client.FriendlyFire">Friendly Fire</MudCheckBox>
+							<MudCheckBox Value="_config.Client.DynamicVExfils">Dynamic VExfils</MudCheckBox>
+							<MudCheckBox Value="_config.Client.AllowFreeCam">Allow Freecam</MudCheckBox>
+							<MudCheckBox Value="_config.Client.AllowSpectateFreeCam">Allow Spectate Freecam</MudCheckBox>
+							<MudCheckBox Value="_config.Client.ForceSaveOnDeath">Force Save On Death</MudCheckBox>
+						</MudItem>
+						<MudItem xs="6">
+							<MudCheckBox Value="_config.Client.UseInertia">Use Inertia</MudCheckBox>
+							<MudCheckBox Value="_config.Client.SharedQuestProgression">Shared Quest Progression</MudCheckBox>
+							<MudCheckBox Value="_config.Client.CanEditRaidSettings">Can Edit Raid Settings</MudCheckBox>
+							<MudCheckBox Value="_config.Client.EnableTransits">Enable Transits</MudCheckBox>
+							<MudCheckBox Value="_config.Client.AnyoneCanStartRaid">Anyone Can Start Raid</MudCheckBox>
+						</MudItem>
+						<MudItem xs="4">
+							<MudStack>
+								<MudStack Row>
+									<MudTooltip Text="Add any MongoIds (item template ids) that should be blacklisted from being sent.">
+										<MudIcon Icon="@Icons.Material.Filled.Info" />
+									</MudTooltip>
+									<MudText>Blacklisted Items</MudText>
+								</MudStack>
+								<MudPaper Class="pa-2">
+									<MudChipSet T="string" @bind-Chips="_blacklistItemsChips" ChipInput="true" AllClosable OnClose="CloseBlacklistItemChip">
+										@foreach (var chip in _blacklistItemsChips)
+										{
+											<MudChip Text="@chip"></MudChip>
+										}
+									</MudChipSet>
+								</MudPaper>
+								<MudStack Row>
+									<MudTextField @bind-Value="_blacklistItemValue" Placeholder="Insert an MongoId..." Immediate MaxLength="24" />
+									<MudButton Variant="Variant.Filled" Color="Color.Primary"
+											   StartIcon="@Icons.Material.Filled.Add" OnClick="AddBlacklistItem"
+											   Disabled="@string.IsNullOrEmpty(_blacklistItemValue)">Add</MudButton>
+								</MudStack>
+							</MudStack>
+						</MudItem>
+						<MudItem xs="8">
+							<MudStack>
+								<MudStack Row>
+									<MudTooltip Text="Add any required mod GUIDs.">
+										<MudIcon Icon="@Icons.Material.Filled.Info" />
+									</MudTooltip>
+									<MudText>Required Mods</MudText>
+								</MudStack>
+								<MudPaper Class="pa-2">
+									<MudChipSet T="string" @bind-Chips="_requiredMods" ChipInput="true" AllClosable OnClose="CloseRequiredModsChip">
+										@foreach (var chip in _requiredMods)
+										{
+											<MudChip Text="@chip"></MudChip>
+										}
+									</MudChipSet>
+								</MudPaper>
+								<MudStack Row>
+									<MudTooltip Text="Add any optional mod GUIDs.">
+										<MudIcon Icon="@Icons.Material.Filled.Info" />
+									</MudTooltip>
+									<MudText>Optional Mods</MudText>
+								</MudStack>
+								<MudPaper Class="pa-2">
+									<MudChipSet T="string" @bind-Chips="_optionalMods" ChipInput="true" AllClosable OnClose="CloseOptionalModsChip">
+										@foreach (var chip in _optionalMods)
+										{
+											<MudChip Text="@chip"></MudChip>
+										}
+									</MudChipSet>
+								</MudPaper>
+								<MudStack Row>
+									<MudTextField @bind-Value="_modsValue" Placeholder="Add a mod GUID..." Immediate />
+									<MudButton Variant="Variant.Filled" Color="Color.Primary"
+											   StartIcon="@Icons.Material.Filled.Add" OnClick="@(() => AddMod(true))"
+											   Disabled="@string.IsNullOrEmpty(_modsValue)">Add Required</MudButton>
+									<MudButton Variant="Variant.Filled" Color="Color.Primary"
+											   StartIcon="@Icons.Material.Filled.Add" OnClick="@(() => AddMod(false))"
+											   Disabled="@string.IsNullOrEmpty(_modsValue)">Add Optional</MudButton>
+								</MudStack>
+							</MudStack>
+						</MudItem>
+					</MudGrid>
+				</MudStack>
+			</MudPaper>
+		</MudExpansionPanel>
+		<MudExpansionPanel Text="Server">
+			<MudPaper Class="pa-4" Elevation="0">
+				<MudStack>
+					<MudGrid>
+						<MudItem xs="6">
+							<MudCheckBox Value="_config.Server.AllowItemSending">Allow Item Sending</MudCheckBox>
+							<MudNumericField Value="_config.Server.ItemSendingStorageTime" Min="1" Max="31" Label="Item Sending Storage Time"
+								Adornment="Adornment.End" AdornmentText="days" Immediate/>
+							<MudCheckBox Value="_config.Server.SentItemsLoseFIR">Sent Items Lose FIR</MudCheckBox>
+							<MudCheckBox Value="_config.Server.LauncherListAllProfiles">List All Profiles In Launcher</MudCheckBox>							
+						</MudItem>
+						<MudItem xs="6">
+							<MudNumericField Value="_config.Server.SessionTimeout" Min="1" Max="10" Label="Session Timeout"
+											 Adornment="Adornment.End" AdornmentText="attempts" Immediate />
+							<MudCheckBox Value="_config.Server.ShowDevProfile">Show Dev Profile</MudCheckBox>
+							<MudCheckBox Value="_config.Server.ShowNonStandardProfile">Show Non Standard Profile</MudCheckBox>
+						</MudItem>
+						<MudItem xs="6">
+							<MudStack>
+								<MudStack Row>
+									<MudTooltip Text="Add any MongoIds (profile ids) that should be admins.">
+										<MudIcon Icon="@Icons.Material.Filled.Info" />
+									</MudTooltip>
+									<MudText>Admins</MudText>
+								</MudStack>
+								<MudPaper Class="pa-2">
+									<MudChipSet T="string" @bind-Chips="_adminIdsChips" ChipInput="true" AllClosable OnClose="CloseAdminIdChip">
+										@foreach (var chip in _adminIdsChips)
+										{
+											<MudChip Text="@chip"></MudChip>
+										}
+									</MudChipSet>
+								</MudPaper>
+								<MudStack Row>
+									<MudTextField @bind-Value="_adminIdValue" Placeholder="Insert a MongoId..." Immediate MaxLength="24" />
+									<MudButton Variant="Variant.Filled" Color="Color.Primary"
+											   StartIcon="@Icons.Material.Filled.Add" OnClick="AddAdmin"
+											   Disabled="@string.IsNullOrEmpty(_adminIdValue)">Add</MudButton>
+								</MudStack>
+							</MudStack>
+						</MudItem>
+						<MudItem xs="6">
+							<MudStack>
+								<MudStack Row>
+									<MudTooltip Text="HTTP values must be changed manually in the config">
+										<MudIcon Icon="@Icons.Material.Filled.Info" />
+									</MudTooltip>
+									<MudText>SPT</MudText>
+								</MudStack>
+								<MudStack>
+									<MudGrid>
+										<MudItem xs="6">
+											<MudTextField Label="IP" Value="_config.Server.SPT.Http.Ip" ReadOnly Disabled />
+											<MudTextField Label="Port" Value="_config.Server.SPT.Http.Port" ReadOnly Disabled />
+										</MudItem>
+										<MudItem xs="6">
+											<MudTextField Label="Backend IP" Value="_config.Server.SPT.Http.BackendIp" ReadOnly Disabled />
+											<MudTextField Label="Backend Port" Value="_config.Server.SPT.Http.BackendPort" ReadOnly Disabled />
+										</MudItem>
+									</MudGrid>
+									<MudCheckBox Value="_config.Server.SPT.DisableSPTChatBots">Disable SPT Chat Bots</MudCheckBox>
+								</MudStack>
+							</MudStack>
+						</MudItem>
+					</MudGrid>
+				</MudStack>
+			</MudPaper>
+		</MudExpansionPanel>
+		<MudExpansionPanel Text="NAT Punch Server">
+			<MudPaper Class="pa-4" Elevation="0">
+				<MudStack>
+					<MudCheckBox Value="_config.NatPunchServer.Enable">Enable NAT Punch</MudCheckBox>
+					<MudNumericField Value="_config.NatPunchServer.Port" Min="0" Max="65_535" Label="Port" Immediate />
+					<MudNumericField Value="_config.NatPunchServer.NatIntroduceAmount" Min="0" Max="100" Label="NAT Introduce Amount" Immediate />
+				</MudStack>
+			</MudPaper>
+		</MudExpansionPanel>
+		<MudExpansionPanel Text="Headless">
+			<MudPaper Class="pa-4" Elevation="0">
+				<MudGrid>
+					<MudItem xs="6">
+						<MudStack>							
+							<MudCheckBox Value="_config.Headless.Scripts.Generate">Generate Script</MudCheckBox>
+							<MudTextField Value="_config.Headless.Scripts.ForceIp" Label="Force IP" HelperText="The IP that the script will connect to"></MudTextField>
+							<MudCheckBox Value="_config.Headless.SetLevelToAverageOfLobby">Set Level To Average of Lobby</MudCheckBox>
+							<MudNumericField Value="_config.Headless.RestartAfterAmountOfRaids" Min="0" Max="10" Label="Restart After X Raids" Adornment="Adornment.End" AdornmentText="raids" Immediate />
+						</MudStack>
+					</MudItem>
+					<MudItem xs="6">
+						<MudStack Row>
+							<MudTooltip Text="How many profiles to generate and aliases">
+								<MudIcon Icon="@Icons.Material.Filled.Info" />
+							</MudTooltip>
+							<MudText>Profiles</MudText>
+						</MudStack>
+						<MudNumericField Value="_config.Headless.Profiles.Amount" Min="0" Max="10" Label="Amount" Immediate />
+						<MudStack>
+							<MudPaper Class="pa-2">
+								<MudDataGrid Items="_config.Headless.Profiles.Aliases">
+									<Columns>
+										<PropertyColumn Property="x => x.Key" Title="ProfileId" />
+										<PropertyColumn Property="x => x.Value" Title="Alias" />
+										<TemplateColumn Title="Action" CellClass="justify-center">
+											<CellTemplate Context="row">
+												<MudStack Row>
+													<MudTooltip Text="Remove">
+														<MudIconButton Variant="@Variant.Filled" Color="@Color.Primary" Icon="@Icons.Material.Filled.Delete" OnClick="@(() => RemoveAlias(row.Item.Key))" />
+													</MudTooltip>
+												</MudStack>
+											</CellTemplate>
+										</TemplateColumn>
+									</Columns>
+								</MudDataGrid>
+								<MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="AddAlias">Add Alias</MudButton>
+							</MudPaper>
+						</MudStack>
+					</MudItem>
+				</MudGrid>
+			</MudPaper>
+		</MudExpansionPanel>
+		<MudExpansionPanel Text="Launcher">
+			<MudPaper Class="pa-4" Elevation="0">
+				<MudCheckBox Value="_config.Background.Enable">Enable Background</MudCheckBox>
+			</MudPaper>
+		</MudExpansionPanel>
+	</MudExpansionPanels>
+</MudPaper>

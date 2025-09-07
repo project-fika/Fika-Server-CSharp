@@ -1,0 +1,10 @@
+﻿<MudTextField T="string" Label="Message" Counter="255" MaxLength="255" Value="@Value" ValueChanged="@ValueChanged"
+			  Immediate="true" Variant="Variant.Filled" AutoGrow="true" MaxLines="10" HelperText="Supports newlines" HelperTextOnFocus />
+
+@code {
+	[Parameter]
+	public string? Value { get; set; }
+
+	[Parameter]
+	public EventCallback<string> ValueChanged { get; set; }
+}

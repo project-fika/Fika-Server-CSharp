@@ -1,11 +1,7 @@
-﻿using SPTarkov.Server.Core.Utils.Json.Converters;
+﻿namespace FikaServer.Models.Enums;
 
-namespace FikaServer.Models.Enums
+public enum EFikaSide
 {
-    [EftEnumConverter]
-    public enum EFikaSide
-    {
-        PMC = 0,
-        Savage = 1,
-    }
+    PMC = 0,
+    Savage = 1,
 }

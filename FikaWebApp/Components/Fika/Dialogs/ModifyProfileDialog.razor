@@ -1,0 +1,26 @@
+﻿@using System.Net
+@using FikaShared
+@using FikaShared.Requests
+@using FikaShared.Responses
+@using MudBlazor
+
+<MudDialog ActionsClass="justify-center">
+	<DialogContent>
+		<MudStack Spacing="4">
+			<MudStack Row>
+				<FikaPrimaryButton Text="Add Flea Ban" StartIcon="@Icons.Material.Filled.AddCircle" OnClick="AddFleaBan" Disabled="Profile.HasFleaBan" FullWidth />
+				<FikaSecondaryButton Text="Remove Flea Ban" StartIcon="@Icons.Material.Filled.RemoveCircle" OnClick="RemoveFleaBan" Disabled="!Profile.HasFleaBan" FullWidth />
+			</MudStack>
+			<MudDivider DividerType="DividerType.Middle" />
+			<MudStack Row>
+				<FikaPrimaryButton Text="Send Item" StartIcon="@Icons.Material.Filled.AttachEmail" OnClick="SendItem" FullWidth />
+			</MudStack>
+		</MudStack>
+	</DialogContent>
+	<DialogActions>
+		<MudStack Row Justify="Justify.Center">
+			<MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.CheckCircle" OnClick="Close">Save</MudButton>
+			<MudButton Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Cancel" OnClick="Cancel">Cancel</MudButton>
+		</MudStack>
+	</DialogActions>
+</MudDialog>

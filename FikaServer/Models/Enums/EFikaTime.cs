@@ -1,11 +1,7 @@
-﻿using SPTarkov.Server.Core.Utils.Json.Converters;
+﻿namespace FikaServer.Models.Enums;
 
-namespace FikaServer.Models.Enums
+public enum EFikaTime
 {
-    [EftEnumConverter]
-    public enum EFikaTime
-    {
-        CURR = 0,
-        PAST = 1,
-    }
+    CURR = 0,
+    PAST = 1,
 }

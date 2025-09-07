@@ -1,0 +1,24 @@
+﻿@page "/Fika/Manage"
+
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Identity
+@using FikaWebApp.Data
+
+<PageTitle>Fika Management</PageTitle>
+
+<MudPaper Class="pa-4">
+	<MudCard>
+		<MudCardHeader>
+			<MudText Typo="Typo.h4">Server Status</MudText>
+		</MudCardHeader>
+		<MudCardContent>
+			<MudStack>
+				<MudStack Row Spacing="2">
+					<MudAvatar Size="Size.Small" Class="me-2" Color="@StatusColor" />
+					<MudText>@StatusText</MudText>
+				</MudStack>
+				<MudText Typo="Typo.subtitle1">@LastRefreshMinutes</MudText>
+			</MudStack>
+		</MudCardContent>
+	</MudCard>
+</MudPaper>

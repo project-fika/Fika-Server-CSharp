@@ -1,0 +1,16 @@
+﻿@using FikaWebApp.Components.Account.Shared
+<CascadingAuthenticationState>
+	<Router AppAssembly="typeof(Program).Assembly">
+		<Found Context="routeData">
+			<AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)">
+				<NotAuthorized>
+					<RedirectToLogin />
+				</NotAuthorized>
+			</AuthorizeRouteView>
+			<FocusOnNavigate RouteData="routeData" Selector="h1" />
+		</Found>
+		<NotFound>
+			<MudText Typo="Typo.h3">Nothing exists at this address</MudText>
+		</NotFound>
+	</Router>
+</CascadingAuthenticationState>

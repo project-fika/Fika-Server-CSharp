@@ -1,11 +1,7 @@
-﻿using SPTarkov.Server.Core.Utils.Json.Converters;
+﻿namespace FikaServer.Models.Enums;
 
-namespace FikaServer.Models.Enums
+public enum EHeadlessStatus
 {
-    [EftEnumConverter]
-    public enum EHeadlessStatus
-    {
-        READY = 1,
-        IN_RAID = 2,
-    }
+    READY = 1,
+    IN_RAID = 2,
 }

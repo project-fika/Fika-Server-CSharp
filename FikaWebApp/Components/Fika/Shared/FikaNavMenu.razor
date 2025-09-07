@@ -1,0 +1,36 @@
+﻿@using FikaWebApp.Data
+
+<MudNavMenu Style="background-color: #282828; border-radius: 6px; padding: 6px;">
+	<AuthorizeView>
+		<Authorized>
+			<MudNavLink Href="Fika/Manage" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
+		</Authorized>
+	</AuthorizeView>
+
+	<AuthorizeView Roles="Admin">
+		<Authorized>
+			<MudNavLink Href="Fika/Manage/Accounts" Icon="@Icons.Material.Filled.AdminPanelSettings">Accounts</MudNavLink>
+			<MudNavLink Href="Fika/Manage/Configuration" Icon="@Icons.Material.Filled.Settings">Configuration</MudNavLink>
+		</Authorized>
+	</AuthorizeView>
+
+	<AuthorizeView Roles="Admin, Moderator">
+		<Authorized>
+			<MudNavLink Href="Fika/Manage/Profiles" Icon="@Icons.Material.Filled.Person">Profiles</MudNavLink>
+			<MudNavLink Href="Fika/Manage/Tools" Icon="@Icons.Material.Filled.HomeRepairService">Tools</MudNavLink>
+		</Authorized>
+	</AuthorizeView>
+
+	<AuthorizeView>
+		<Authorized>
+			<MudNavLink Href="Fika/Manage/Players" Icon="@Icons.Material.Filled.People">Players</MudNavLink>
+			<MudNavLink Href="Fika/Manage/Statistics" Icon="@Icons.Material.Filled.PieChart">Statistics</MudNavLink>
+			<MudNavLink Href="Fika/Manage/Headless" Icon="@Icons.Material.Filled.PeopleAlt">Headless</MudNavLink>
+			<MudNavLink Href="Fika/Manage/FileManager" Icon="@Icons.Material.Filled.FolderShared">File Manager</MudNavLink>
+		</Authorized>
+	</AuthorizeView>
+</MudNavMenu>
+
+@code {
+
+}

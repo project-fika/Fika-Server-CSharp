@@ -1,0 +1,52 @@
+﻿@using FikaShared.Requests
+@using System.Globalization
+
+<MudDialog ContentStyle="overflow: hidden;">
+	<DialogContent>
+		<MudStack Spacing="4">
+			<MudText>Select an item and an amount to send</MudText>
+			<MudStack Row>
+				<MudAutocomplete T="string" VAndUrlalue="_model.ItemName" ValueChanged="GetImageAndUrl" Variant="Variant.Filled" Label="Item" Placeholder="Select an item..."
+					SearchFunc="Search" MaxItems="100" Dense Clearable Modal ResetValueOnEmptyText ShowProgressIndicator="_searching" SelectValueOnTab Required />
+				<MudTooltip Text="@_itemDescription" Color="Color.Info" Delay="100" Placement="Placement.Top" Arrow>
+					<ChildContent>
+						<MudLink Href="@_url" Target="_blank" Disabled="_url == null">
+							<div style="position: relative; width: 64px; height: 64px; overflow: visible;">
+								<MudImage Src="@_img" Elevation="20" Width="64" Height="64" FallbackSrc="@_defaultImg" Style="display: block; border: 2px solid #2d2d2f;" />
+								@if (!string.IsNullOrEmpty(_model.ItemName))
+								{
+									<MudIcon Icon="@Icons.Material.Filled.Info" Style="position: absolute; bottom: 0px; right: 0px; transform: translate(25%, 25%); color: white" />
+								}
+							</div>
+						</MudLink>
+					</ChildContent>
+					<TooltipContent>
+						<MudStack Row AlignItems="AlignItems.Center">
+							<MudIcon Icon="@Icons.Material.Filled.Info" />
+							<MudText Typo="Typo.caption" Style="word-wrap: break-word; max-width: 600px;">@_itemDescription</MudText>
+						</MudStack>
+					</TooltipContent>
+				</MudTooltip>
+			</MudStack>
+			<MudNumericField Label="Amount of items" HelperText="@($"How many items to send (max {_maxItems.ToString("N0", CultureInfo.CurrentCulture)})")" @bind-Value="@_model.Amount" Placeholder="How many items to send"
+				Min="1" Max="@_maxItems" Adornment="Adornment.End" AdornmentText="item(s)" Required HelperTextOnFocus />
+			<FikaMultiLineTextField @bind-Value="@_model.Message" />
+			<MudNumericField Label="Days until expiration" HelperText="How many days until the message expires" @bind-Value="@_model.ExpirationDays" Placeholder="Days until message expires"
+							 Min="1" Max="31" Adornment="Adornment.End" AdornmentText="day(s)" Required HelperTextOnFocus />
+			<MudStack Row>
+				<MudCheckBox Label="Found In Raid" @bind-Value="_model.FoundInRaid" Color="Color.Primary" />
+				<MudCheckBox Label="Specific Date" @bind-Value="_model.UseDate" Color="Color.Info" />
+			</MudStack>
+			<MudCollapse Expanded="_model.UseDate" Style="overflow: hidden;">
+				<MudStack Class="pa-2" Style="overflow: hidden;">
+					<MudDatePicker Label="Send Date" Editable="true" @bind-Date="_model.Date" Placeholder="Select Date" Disabled="!_model.UseDate" IsDateDisabledFunc="CheckDate" ImmediateText />
+					<MudTimePicker Label="Send Time" Editable="true" @bind-Time="_time" Placeholder="Select Time" Disabled="!_model.UseDate" MinuteSelectionStep="5" ImmediateText />
+				</MudStack>
+			</MudCollapse>
+		</MudStack>
+	</DialogContent>
+	<DialogActions>
+		<MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.CheckCircle" Disabled="CantConfirm" OnClick="Confirm">Confirm</MudButton>
+		<MudButton Variant="Variant.Filled" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Cancel" OnClick="Cancel">Cancel</MudButton>
+	</DialogActions>
+</MudDialog>

@@ -1,0 +1,77 @@
+﻿@inherits LayoutComponentBase
+
+<MudThemeProvider IsDarkMode="true" Theme="BenderTheme"/>
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<AuthorizeView Context="authContext">
+	<Authorized>
+		<MudLayout>
+			<MudAppBar Elevation="1">
+				<MudStaticNavDrawerToggle DrawerId="nav-drawer" Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" />
+				<MudText Style="font-family:bender" Typo="Typo.h5" Class="ml-3">Fika Web Management</MudText>
+				<MudImage Src="images/fika_logo.png" Elevation="25" Height="32" Width="32" Class="ml-2" />
+				<MudSpacer />
+				<MudText Typo="Typo.caption" Align="Align.Center" Class="ml-2 text-secondary">
+					© @DateTime.Now.Year Project Fika. All rights reserved.
+				</MudText>
+				<AuthorizeView>
+					<Authorized>
+						<MudAvatar Color="Color.Info" Variant="Variant.Outlined" Class="ml-4">
+							@char.ToUpper(@context.User.Identity?.Name?[0] ?? ' ')
+						</MudAvatar>
+					</Authorized>
+				</AuthorizeView>
+				<MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" Href="https://github.com/project-fika/fika-server-csharp" Target="_blank" />
+				@* <MudSpacer />
+			<MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" /> *@
+			</MudAppBar>
+			<MudDrawer id="nav-drawer" @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
+				<NavMenu />
+			</MudDrawer>
+			<MudMainContent Class="pt-16 pa-4">
+				@Body
+			</MudMainContent>
+		</MudLayout>
+	</Authorized>
+	<NotAuthorized>
+		<MudMainContent Class="pt-16 pa-4">
+			@Body
+		</MudMainContent>
+	</NotAuthorized>
+</AuthorizeView>
+
+
+<div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">🗙</span>
+</div>
+
+@code {
+	private bool _drawerOpen = true;
+
+	MudTheme BenderTheme = new()
+	{
+		Typography = new Typography()
+		{
+			Default = new DefaultTypography()
+			{
+				FontFamily = new[] { "bender" }
+			}
+		},
+		PaletteDark = new()
+		{
+			Primary = new("#807054"),
+			Secondary = new("#992d22"),
+			Background = new("#2d2d2d"),
+			Surface = new("#323232"),
+			DrawerBackground = new("#282828"),
+			AppbarBackground = new("#232323"),
+			BackgroundGray = new("#1e1e1e")
+		}
+	};
+}
+
+

@@ -1,0 +1,26 @@
+﻿<MudDialog>
+	<DialogContent>
+		<MudText Align="Align.Center">
+			Are you sure?
+		</MudText>
+	</DialogContent>
+	<DialogActions>
+		<FikaPrimaryButton Text="Yes" StartIcon="@Icons.Material.Filled.CheckCircle" OnClick="Confirm" />
+		<FikaSecondaryButton Text="No" StartIcon="@Icons.Material.Filled.Cancel" OnClick="Cancel" />
+	</DialogActions>
+</MudDialog>
+
+@code {
+	[CascadingParameter]
+	private IMudDialogInstance MudDialog { get; set; }
+
+	private void Confirm()
+	{
+		MudDialog.Close();
+	}
+
+	private void Cancel()
+	{
+		MudDialog.Cancel();
+	}
+}
