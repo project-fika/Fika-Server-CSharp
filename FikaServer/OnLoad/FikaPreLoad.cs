@@ -19,7 +19,7 @@ public class FikaPreLoad(ISptLogger<FikaPreLoad> logger, ClientService clientSer
     PlayerRelationsService playerRelationsCacheService, FriendRequestsService friendRequestsService,
     JsonUtil jsonUtil) : IOnLoad
 {
-    private bool _overridesInjected = false;
+    private bool _overridesInjected;
     private readonly List<AbstractPatch> _abstractPatches =
     [
         new GetResponseOverride(),
