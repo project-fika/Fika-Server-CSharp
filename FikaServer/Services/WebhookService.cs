@@ -11,29 +11,49 @@ public class WebhookService(ISptLogger<ConfigService> logger, ConfigService conf
 
     public async Task<bool> VerifyWebhook()
     {
-        Uri? url = null;
+        var webhookUrl = configService.Config.Server.Webhook.Url;
+        if (string.IsNullOrWhiteSpace(webhookUrl))
+        {
+            logger.Error("Webhook URL is null or empty.");
+            return false;
+        }
+
+        Uri url;
         try
         {
-            url = new Uri(configService.Config.Server.Webhook.Url);
+            url = new Uri(webhookUrl);
         }
         catch (UriFormatException ex)
         {
-            logger.Error($"Unable to parse url: {configService.Config.Server.Webhook.Url}", ex);
+            logger.Error($"Unable to parse url: {webhookUrl}", ex);
             return false;
         }
 
         var message = new DiscordWebhook("Fika Server", "", "Server starting");
-        var response = await _httpClient.PutAsJsonAsync(url, message);
+        HttpResponseMessage? response = null;
         try
         {
+            response = await _httpClient.PutAsJsonAsync(url, message).ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
+            return true;
+        }
+        catch (HttpRequestException ex)
+        {
+            logger.Error($"HTTP request failed for webhook URL: {webhookUrl}", ex);
+        }
+        catch (TaskCanceledException ex)
+        {
+            logger.Error($"HTTP request timed out for webhook URL: {webhookUrl}", ex);
         }
         catch (Exception ex)
         {
-            logger.Error($"Unable to send webhook", ex);
-            return false;
+            logger.Error($"Unexpected error sending webhook to URL: {webhookUrl}", ex);
+        }
+        finally
+        {
+            response?.Dispose();
         }
 
-        return true;
+        return false;
     }
 }
