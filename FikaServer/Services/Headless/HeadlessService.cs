@@ -16,9 +16,11 @@ using System.Text;
 namespace FikaServer.Services.Headless;
 
 [Injectable(InjectionType.Singleton)]
-public class HeadlessService(ISptLogger<HeadlessService> logger, HeadlessRequesterWebSocket headlessRequesterWebSocket, JsonUtil jsonUtil, ConfigService fikaConfigService, SaveServer saveServer)
+public class HeadlessService(ISptLogger<HeadlessService> logger,
+    HeadlessRequesterWebSocket headlessRequesterWebSocket, JsonUtil jsonUtil,
+    ConfigService fikaConfigService, SaveServer saveServer)
 {
-    public ConcurrentDictionary<MongoId, HeadlessClientInfo> HeadlessClients { get; private set; } = [];
+    public ConcurrentDictionary<MongoId, HeadlessClientInfo> HeadlessClients { get; } = [];
 
     /// <summary>
     /// Begin setting up a raid for a headless client
@@ -52,7 +54,8 @@ public class HeadlessService(ISptLogger<HeadlessService> logger, HeadlessRequest
         headlessClientInfo.StartRaid(requesterSessionID);
 
         StartHeadlessRaid startHeadlessRequest = new(info);
-        string data = jsonUtil.Serialize(startHeadlessRequest) ?? throw new NullReferenceException("StartHeadlessRaid:: Data was null after serializing");
+        string data = jsonUtil.Serialize(startHeadlessRequest)
+            ?? throw new NullReferenceException("StartHeadlessRaid:: Data was null after serializing");
         await webSocket.SendAsync(Encoding.UTF8.GetBytes(data),
             WebSocketMessageType.Text, true, CancellationToken.None);
 

@@ -35,8 +35,7 @@ public class HeadlessHelper(ConfigService fikaConfig, SaveServer saveServer, Con
     public bool IsHeadlessClient(MongoId sessionId)
     {
         return headlessProfileService.HeadlessProfiles
-            .Where(x => x.ProfileInfo?.ProfileId == sessionId)
-            .Any();
+            .Any(x => x.ProfileInfo?.ProfileId == sessionId);
     }
 
     /// <summary>

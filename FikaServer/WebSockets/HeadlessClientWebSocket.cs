@@ -12,9 +12,10 @@ using System.Text;
 namespace FikaServer.WebSockets;
 
 [Injectable(InjectionType.Singleton)]
-public class HeadlessClientWebSocket(HeadlessHelper headlessHelper, HeadlessService headlessService, MatchService matchService, ISptLogger<HeadlessClientWebSocket> logger) : IWebSocketConnectionHandler
+public class HeadlessClientWebSocket(HeadlessHelper headlessHelper, HeadlessService headlessService,
+    MatchService matchService, ISptLogger<HeadlessClientWebSocket> logger, WebhookService webhookService) : IWebSocketConnectionHandler
 {
-    private readonly ConcurrentDictionary<string, WebSocket> headlessWebSockets = [];
+    private readonly ConcurrentDictionary<string, WebSocket> _headlessWebSockets = [];
 
     public string GetHookUrl()
     {
@@ -49,14 +50,21 @@ public class HeadlessClientWebSocket(HeadlessHelper headlessHelper, HeadlessServ
             return;
         }
 
-        headlessWebSockets.TryAdd(userSessionID, ws);
+        _headlessWebSockets.TryAdd(userSessionID, ws);
 
         if (!string.IsNullOrEmpty(matchService.GetMatchIdByProfile(userSessionID)))
         {
             matchService.DeleteMatch(userSessionID);
         }
 
-        headlessService.HeadlessClients.TryAdd(userSessionID, new HeadlessClientInfo(ws, Models.Enums.EHeadlessStatus.READY));
+        if (!headlessService.HeadlessClients.TryAdd(userSessionID, new HeadlessClientInfo(ws, Models.Enums.EHeadlessStatus.READY)))
+        {
+            logger.Error($"failed to add headless {userSessionID} to the headless clients list");
+        }
+        else
+        {
+            await webhookService.SendWebhookMessage($"Headless client {userSessionID} has connected");
+        }
     }
 
     public Task OnMessage(byte[] rawData, WebSocketMessageType messageType, WebSocket ws, HttpContext context)
@@ -67,14 +75,14 @@ public class HeadlessClientWebSocket(HeadlessHelper headlessHelper, HeadlessServ
 
     public Task OnClose(WebSocket ws, HttpContext context, string sessionIdContext)
     {
-        string userSessionID = headlessWebSockets.FirstOrDefault(x => x.Value == ws).Key;
+        string userSessionID = _headlessWebSockets.FirstOrDefault(x => x.Value == ws).Key;
 
         if (!string.IsNullOrEmpty(userSessionID))
         {
             logger.Debug($"[{GetSocketId()}] Deleting client {userSessionID}");
 
             headlessService.HeadlessClients.TryRemove(userSessionID, out _);
-            headlessWebSockets.TryRemove(userSessionID, out _);
+            _headlessWebSockets.TryRemove(userSessionID, out _);
         }
 
         return Task.CompletedTask;
