@@ -1,4 +1,5 @@
-﻿using SPTarkov.DI.Annotations;
+﻿using FikaServer.Models.Fika;
+using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Controllers;
 using SPTarkov.Server.Core.Helpers;
 using SPTarkov.Server.Core.Models.Common;
@@ -9,12 +10,14 @@ using SPTarkov.Server.Core.Models.Spt.Config;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Utils;
+using Path = System.IO.Path;
 
 namespace FikaServer.Services.Headless;
 
 [Injectable(InjectionType.Singleton)]
 public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, SaveServer saveServer, ConfigService configService,
-    ConfigServer configServer, HashUtil hashUtil, ProfileController profileController, InventoryHelper inventoryHelper)
+    ConfigServer configServer, HashUtil hashUtil, ProfileController profileController, InventoryHelper inventoryHelper,
+    JsonUtil jsonUtil)
 {
     private readonly CoreConfig _sptCoreConfig = configServer.GetConfig<CoreConfig>();
     public List<SptProfile> HeadlessProfiles { get; set; } = [];
@@ -125,8 +128,30 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
 
     private void GenerateLaunchScript(MongoId profileId, string backendUrl, string scriptsFolderPath)
     {
-        //Todo: Stub for now, implement method.
-        // This will become a generator for a json that will be used in the new headless launcher
+        var modPath = configService.ModPath;
+        var scriptsPath = Path.Combine(modPath, "assets/scripts/");
+        var newFolderPath = Path.Combine(scriptsPath, profileId);
+
+        try
+        {
+            Directory.CreateDirectory(newFolderPath);
+        }
+        catch (Exception ex)
+        {
+            logger.Error($"Failed to create headless launch settings for {profileId}", ex);
+            return;
+        }
+
+        var launchSettings = new HeadlessLaunchSettings()
+        {
+            ProfileId = profileId,
+            BackendUrl = new Uri(backendUrl)
+        };
+
+        var serialized = jsonUtil.Serialize(launchSettings, true);
+        var newFile = Path.Combine(newFolderPath, "HeadlessConfig.json");
+        File.WriteAllText(newFile, serialized);
+        logger.Info($"Created new launch settings in {newFile} for headless profile {profileId}");
     }
 
     private void ClearUnecessaryHeadlessItems(PmcData pmcProfile, MongoId sessionId)
@@ -136,8 +161,7 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
             throw new NullReferenceException("ClearUnecessaryHeadlessItems:: PmcProfile was null");
         }
 
-        List<string?> itemsToDelete = GetAllHeadlessItems(pmcProfile);
-        foreach (string? item in itemsToDelete)
+        foreach (string? item in GetAllHeadlessItems(pmcProfile))
         {
             inventoryHelper.RemoveItem(pmcProfile, item, sessionId);
         }
