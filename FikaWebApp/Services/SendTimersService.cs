@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace FikaWebApp.Services
 {
-    public class SendTimersService
+    public class SendTimersService(ILogger<SendTimersService> logger, HttpClient httpClient)
     {
         public Dictionary<Timer, SendItemRequest> Timers
         {
@@ -22,9 +22,6 @@ namespace FikaWebApp.Services
             }
         }
 
-        private readonly HttpClient _httpClient;
-        private readonly ILogger<SendTimersService> _logger;
-
         private readonly Dictionary<Timer, SendItemRequest> _timers = [];
         private readonly Dictionary<Timer, SendItemToAllRequest> _toAllTimers = [];
         private readonly Lock _lock = new();
@@ -37,14 +34,6 @@ namespace FikaWebApp.Services
         private const string _dataFolder = "StoredData";
         private const string _fileName = "storedTimers.json";
 
-        public SendTimersService(ILogger<SendTimersService> logger, HttpClient client)
-        {
-            _httpClient = client;
-            _logger = logger;
-
-            Load();
-        }
-
         public record TimerSaveData
         {
             [JsonPropertyName("singleRequests")]
@@ -54,15 +43,15 @@ namespace FikaWebApp.Services
             public required Dictionary<long, SendItemToAllRequest> ToAllRequests { get; set; }
         }
 
-        private Task Load()
+        public async Task Load()
         {
             var filePath = Path.Combine(_dataFolder, _fileName);
             if (!File.Exists(filePath))
             {
-                Save();
+                await Save();
             }
 
-            var raw = File.ReadAllText(filePath);
+            var raw = await File.ReadAllTextAsync(filePath);
             if (raw != null)
             {
                 var saveData = JsonSerializer.Deserialize<TimerSaveData>(raw, _serializerOptions);
@@ -77,7 +66,7 @@ namespace FikaWebApp.Services
                     if (dt < DateTime.Now)
                     {
                         dt = DateTime.Now.AddMinutes(1);
-                        _logger.LogWarning("Found expired timer, forcing to send in 1 minute...");
+                        logger.LogWarning("Found expired timer, forcing to send in 1 minute...");
                     }
                     sendRequest.SendDate = dt;
                     AddTimer(sendRequest, dt, false);
@@ -89,15 +78,14 @@ namespace FikaWebApp.Services
                     if (dt < DateTime.Now)
                     {
                         dt = DateTime.Now.AddMinutes(1);
-                        _logger.LogWarning("Found expired timer, forcing to send in 1 minute...");
+                        logger.LogWarning("Found expired timer, forcing to send in 1 minute...");
                     }
                     sendRequest.SendDate = dt;
                     AddTimer(sendRequest, dt, false);
                 }
             }
 
-            Save();
-            return Task.CompletedTask;
+            await Save();
         }
 
         private Task Save()
@@ -122,7 +110,7 @@ namespace FikaWebApp.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError("There was an error saving the timers: {Error}", ex.Message);
+                    logger.LogError("There was an error saving the timers: {Error}", ex.Message);
                 }
             }
 
@@ -156,19 +144,19 @@ namespace FikaWebApp.Services
             {
                 try
                 {
-                    var result = await _httpClient.PostAsJsonAsync("post/senditem", request);
+                    var result = await httpClient.PostAsJsonAsync("post/senditem", request);
                     if (!result.IsSuccessStatusCode)
                     {
-                        _logger.LogError("Failed to send item to {ProfileId}", request.ProfileId);
+                        logger.LogError("Failed to send item to {ProfileId}", request.ProfileId);
                     }
                     else
                     {
-                        _logger.LogInformation("Sent item to {ProfileId}", request.ProfileId);
+                        logger.LogInformation("Sent item to {ProfileId}", request.ProfileId);
                     }
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error while sending item");
+                    logger.LogError(ex, "Error while sending item");
                 }
                 finally
                 {
@@ -190,7 +178,7 @@ namespace FikaWebApp.Services
                 }
             }
 
-            _logger.LogInformation("Added a timer which will send items in {Hours}h {Minutes}m {Seconds}s", (int)delay.TotalHours, delay.Minutes, delay.Seconds);
+            logger.LogInformation("Added a timer which will send items in {Hours}h {Minutes}m {Seconds}s", (int)delay.TotalHours, delay.Minutes, delay.Seconds);
         }
 
         public void AddTimer(SendItemToAllRequest request, DateTime targetTime, bool save = true)
@@ -206,7 +194,7 @@ namespace FikaWebApp.Services
                 try
                 {
                     int failed = 0;
-                    var result = await _httpClient.PostAsJsonAsync("post/senditemtoall", request);
+                    var result = await httpClient.PostAsJsonAsync("post/senditemtoall", request);
                     if (!result.IsSuccessStatusCode)
                     {
                         failed++;
@@ -217,11 +205,11 @@ namespace FikaWebApp.Services
                     {
                         message += $" {failed} failed to send.";
                     }
-                    _logger.LogInformation("{Message}", message);
+                    logger.LogInformation("{Message}", message);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error while sending to all");
+                    logger.LogError(ex, "Error while sending to all");
                 }
                 finally
                 {
@@ -243,7 +231,7 @@ namespace FikaWebApp.Services
                 }
             }
 
-            _logger.LogInformation("Added a timer which will send items in {Hours}h {Minutes}m {Seconds}s", (int)delay.TotalHours, delay.Minutes, delay.Seconds);
+            logger.LogInformation("Added a timer which will send items in {Hours}h {Minutes}m {Seconds}s", (int)delay.TotalHours, delay.Minutes, delay.Seconds);
         }
 
         public void RemoveTimer(Timer timer)
@@ -254,19 +242,19 @@ namespace FikaWebApp.Services
                 {
                     timer.Dispose();
                     _timers.Remove(timer);
-                    _logger.LogInformation("Cancelled timer for ProfileId {ProfileId}", request.ProfileId);
+                    logger.LogInformation("Cancelled timer for ProfileId {ProfileId}", request.ProfileId);
                     Save();
                 }
                 else if (_toAllTimers.TryGetValue(timer, out var _))
                 {
                     timer.Dispose();
                     _toAllTimers.Remove(timer);
-                    _logger.LogInformation("Cancelled timer that was queued for everyone");
+                    logger.LogInformation("Cancelled timer that was queued for everyone");
                     Save();
                 }
                 else
                 {
-                    _logger.LogWarning("No timer found");
+                    logger.LogWarning("No timer found");
                 }
             }
         }

@@ -2,24 +2,13 @@
 
 namespace FikaWebApp.Services
 {
-    public class ItemCacheService
+    public class ItemCacheService(ILogger<ItemCacheService> logger, HttpClient client)
     {
-        public ItemCacheService(ILogger<ItemCacheService> logger, HttpClient client)
-        {
-            _logger = logger;
-            _client = client;
-
-            _itemDict = [];
-            _names = [];
-
-            _ = PopulateDictionary();
-        }
-
-        private async Task PopulateDictionary()
+        public async Task PopulateDictionary()
         {
             try
             {
-                var result = await _client.GetFromJsonAsync<GetItemsResponse>("get/items");
+                var result = await client.GetFromJsonAsync<GetItemsResponse>("get/items");
                 if (result != null)
                 {
                     var amount = result.Items.Count;
@@ -49,17 +38,17 @@ namespace FikaWebApp.Services
                     _names = [.. _itemDict.Values
                         .Select(x => x.Name)];
 
-                    _logger.LogInformation("Loaded {Amount} item(s) to the database", _itemDict.Count);
+                    logger.LogInformation("Loaded {Amount} item(s) to the database", _itemDict.Count);
                 }
                 else
                 {
                     _itemDict = [];
-                    _logger.LogError("Unable to get items from server");
+                    logger.LogError("Unable to get items from server");
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError("There was an error retrieving the items from the server: {Exception}", ex);
+                logger.LogError("There was an error retrieving the items from the server: {Exception}", ex);
             }
         }
 
@@ -79,10 +68,8 @@ namespace FikaWebApp.Services
             }
         }
 
-        private readonly ILogger<ItemCacheService> _logger;
-        private readonly HttpClient _client;
-        private OrderedDictionary<string, ItemData> _itemDict;
-        private string[] _names;
+        private OrderedDictionary<string, ItemData> _itemDict = [];
+        private string[] _names = [];
 
         public ItemData IdToName(string tpl)
         {

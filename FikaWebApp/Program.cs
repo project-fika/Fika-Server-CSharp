@@ -81,10 +81,9 @@ namespace FikaWebApp
             builder.Services.AddSingleton<SendTimersService>();
             builder.Services.AddSingleton<ItemCacheService>();
             builder.Services.AddSingleton<HeartbeatService>();
+            builder.Services.AddHostedService<BackgroundInitializerService>();
 
             var app = builder.Build();
-
-            _ = InstantiateSingletons(app);
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -118,17 +117,7 @@ namespace FikaWebApp
             await CreateSecureFileFolder(app);
             await CheckForDataFolder(app);
 
-            app.Run();
-        }
-
-        private static async Task InstantiateSingletons(WebApplication app)
-        {
-            // this is ugly but it works for now...
-
-            await Task.Delay(TimeSpan.FromSeconds(1)); // artifical delay
-            var sendTimerService = app.Services.GetRequiredService<SendTimersService>();
-            var itemCacheService = app.Services.GetRequiredService<ItemCacheService>();
-            var heartbeatService = app.Services.GetRequiredService<HeartbeatService>();
+            await app.RunAsync();
         }
 
         private static Task CheckForDataFolder(WebApplication app)
