@@ -26,7 +26,7 @@ public partial class FilesManagerPage
 
     private bool _uploading;
     private string? _uploadingText;
-    private readonly long _maxSize = 28 * 1024 * 1024; // ~28mb
+    private readonly long _maxSize = 200 * 1024 * 1024; // ~200mb
 
     protected override void OnInitialized()
     {
@@ -182,7 +182,7 @@ public partial class FilesManagerPage
         }
 
         var uploadPath = Path.GetFullPath("ProtectedFiles");
-        int filesUploaded = 0;
+        var filesUploaded = 0;
 
         try
         {
@@ -203,7 +203,7 @@ public partial class FilesManagerPage
                 }
 
                 await using FileStream writeStream = new(filePath, FileMode.Create);
-                using var readStream = file.OpenReadStream(_maxSize);
+                await using var readStream = file.OpenReadStream(_maxSize);
                 var bytesRead = 0;
                 var totalRead = 0;
                 var buffer = new byte[1024 * 10];
