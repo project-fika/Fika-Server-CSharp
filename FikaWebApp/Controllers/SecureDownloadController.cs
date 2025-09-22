@@ -33,10 +33,9 @@ public class SecureDownloadController : ControllerBase
             return NotFound();
         }
 
-        var fileBytes = System.IO.File.ReadAllBytes(fullPath);
-        var contentType = "application/octet-stream";
+        const string contentType = "application/octet-stream";
 
         // Only return the actual filename, not the full relative path
-        return File(fileBytes, contentType, Path.GetFileName(fullPath));
+        return PhysicalFile(fullPath, contentType, Path.GetFileName(fullPath));
     }
 }
