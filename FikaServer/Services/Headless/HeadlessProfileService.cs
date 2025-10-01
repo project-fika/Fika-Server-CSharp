@@ -144,7 +144,7 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
         }
 
         var backendUrl = configService.Config.Headless.Scripts.ForceIp;
-        backendUrl = string.IsNullOrEmpty(backendUrl) ? "https://127.0.0.1" : backendUrl;
+        backendUrl = string.IsNullOrEmpty(backendUrl) ? "https://127.0.0.1:6969" : backendUrl;
 
         if (!Uri.TryCreate(backendUrl, UriKind.Absolute, out Uri uri))
         {
