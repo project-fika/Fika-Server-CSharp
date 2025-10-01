@@ -61,6 +61,7 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
             SptProfile profile = await CreateHeadlessProfile();
             createdProfiles.Add(profile);
             HeadlessProfiles.Add(profile);
+            GenerateLaunchScript(profile.ProfileInfo.ProfileId.Value);
         }
 
         return createdProfiles;
@@ -126,7 +127,7 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
         return profile;
     }
 
-    private void GenerateLaunchScript(MongoId profileId, string backendUrl, string scriptsFolderPath)
+    private void GenerateLaunchScript(MongoId profileId)
     {
         var modPath = configService.ModPath;
         var scriptsPath = Path.Combine(modPath, "assets/scripts/");
@@ -142,10 +143,19 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
             return;
         }
 
+        var backendUrl = configService.Config.Headless.Scripts.ForceIp;
+        backendUrl = string.IsNullOrEmpty(backendUrl) ? "https://127.0.0.1" : backendUrl;
+
+        if (!Uri.TryCreate(backendUrl, UriKind.Absolute, out Uri uri))
+        {
+            logger.Error($"Could not parse {backendUrl} as a valid URL, please delete the headless profile and try again.");
+            return;
+        }
+
         var launchSettings = new HeadlessLaunchSettings()
         {
             ProfileId = profileId,
-            BackendUrl = new Uri(backendUrl)
+            BackendUrl = uri
         };
 
         var serialized = jsonUtil.Serialize(launchSettings, true);
