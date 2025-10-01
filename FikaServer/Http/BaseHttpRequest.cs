@@ -16,14 +16,14 @@ public abstract class BaseHttpRequest(ConfigService configService) : IHttpListen
     /// </summary>
     public abstract string Method { get; }
 
-    public bool CanHandle(MongoId sessionId, HttpRequest req)
+    public bool CanHandle(MongoId sessionId, HttpContext context)
     {
-        if (req.Method != Method)
+        if (context.Request.Method != Method)
         {
             return false;
         }
 
-        if (!string.Equals(req.Path.Value, Path, StringComparison.OrdinalIgnoreCase))
+        if (!string.Equals(context.Request.Path.Value, Path, StringComparison.OrdinalIgnoreCase))
         {
             return false;
         }
@@ -40,17 +40,17 @@ public abstract class BaseHttpRequest(ConfigService configService) : IHttpListen
     /// <returns></returns>
     public abstract Task HandleRequest(HttpRequest req, HttpResponse resp);
 
-    public async Task Handle(MongoId sessionId, HttpRequest req, HttpResponse resp)
+    public async Task Handle(MongoId sessionId, HttpContext context)
     {
-        if (IsAuth(req))
+        if (IsAuth(context.Request))
         {
-            await HandleRequest(req, resp);
+            await HandleRequest(context.Request, context.Response);
         }
         else
         {
-            resp.StatusCode = 403;
-            await resp.StartAsync();
-            await resp.CompleteAsync();
+            context.Response.StatusCode = 403;
+            await context.Response.StartAsync();
+            await context.Response.CompleteAsync();
         }
     }
 
