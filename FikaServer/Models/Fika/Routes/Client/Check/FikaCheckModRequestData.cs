@@ -1,3 +1,5 @@
-﻿namespace FikaServer.Models.Fika.Routes.Client.Check;
+﻿using SPTarkov.Server.Core.Models.Utils;
 
-public class FikaCheckModRequestData : Dictionary<string, int> { }
+namespace FikaServer.Models.Fika.Routes.Client.Check;
+
+public class FikaCheckModRequestData : Dictionary<string, uint>, IRequestData;
