@@ -24,7 +24,7 @@
 	
 	
   <ItemGroup>
-    <Content Include="Assets\**">
+    <Content Include="assets\**">
     <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
