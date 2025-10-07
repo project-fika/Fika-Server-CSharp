@@ -8,6 +8,9 @@ public record FikaConfigServer
     [JsonPropertyName("SPT")]
     public FikaSPTServerConfig SPT { get; set; } = new();
 
+    [JsonPropertyName("webhook")]
+    public FikaWebhookConfig Webhook { get; set; } = new();
+
     [JsonPropertyName("allowItemSending")]
     public bool AllowItemSending { get; set; } = true;
 
@@ -58,4 +61,19 @@ public record FikaSPTHttpServerConfig
 
     [JsonPropertyName("backendPort")]
     public int BackendPort { get; set; } = 6969;
+}
+
+public record FikaWebhookConfig
+{
+    [JsonPropertyName("enabled")]
+    public bool Enabled { get; set; }
+
+    [JsonPropertyName("name")]
+    public string Name { get; set; } = "Fika Server";
+
+    [JsonPropertyName("avatarUrl")]
+    public string AvatarURL { get; set; } = "https://github.com/project-fika/Fika-Server-CSharp/blob/main/FikaWebApp/wwwroot/images/FIKA_LOGO.png?raw=true";
+
+    [JsonPropertyName("url")]
+    public string Url { get; set; } = string.Empty;
 }

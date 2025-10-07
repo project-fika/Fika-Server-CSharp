@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using static System.Net.WebRequestMethods;
 
 namespace FikaServer.Models.Fika.Config;
 
@@ -32,5 +33,5 @@ public record FikaConfigHeadlessScripts
     public bool Generate { get; set; } = true;
 
     [JsonPropertyName("forceIp")]
-    public string ForceIp { get; set; } = string.Empty;
+    public string ForceIp { get; set; } = "https://127.0.0.1:6969";
 }

@@ -84,9 +84,7 @@ public class SendItemController(ISptLogger<SendItemController> logger, EventOutp
 
         SptProfile sender = saveServer.GetProfile(sessionID);
 
-        Dictionary<MongoId, SptProfile> profiles = saveServer.GetProfiles();
-
-        foreach (KeyValuePair<MongoId, SptProfile> profileKvP in profiles)
+        foreach (KeyValuePair<MongoId, SptProfile> profileKvP in saveServer.GetProfiles())
         {
             SptProfile profile = profileKvP.Value;
 
@@ -97,7 +95,7 @@ public class SendItemController(ISptLogger<SendItemController> logger, EventOutp
             }
 
             // Skip headless clients
-            if (profile.ProfileInfo?.Password == "fika-headless")
+            if (profile.IsHeadlessProfile())
             {
                 continue;
             }

@@ -14,7 +14,7 @@ namespace FikaServer.Services;
 [Injectable(InjectionType.Singleton)]
 public class InsuranceService(SaveServer saveServer, ItemHelper itemHelper, ISptLogger<InsuranceService> logger)
 {
-    private ConcurrentDictionary<string, List<FikaInsurancePlayer>> _matchInsuranceInfo = [];
+    private readonly ConcurrentDictionary<string, List<FikaInsurancePlayer>> _matchInsuranceInfo = [];
 
     /// <summary>
     /// Gets the match the player is part of
@@ -173,8 +173,7 @@ public class InsuranceService(SaveServer saveServer, ItemHelper itemHelper, ISpt
             foreach (string? itemId in ids)
             {
                 Item? item = insurance.Items
-                    .Where(x => x.Id == itemId)
-                    .FirstOrDefault();
+                    .FirstOrDefault(x => x.Id == itemId);
 
                 if (item is null)
                 {

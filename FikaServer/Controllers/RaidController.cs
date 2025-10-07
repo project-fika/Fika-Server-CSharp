@@ -23,7 +23,9 @@ namespace FikaServer.Controllers;
 public class RaidController(MatchService matchService, HeadlessHelper headlessHelper,
     HeadlessService headlessService,
     ISptLogger<RaidController> logger,
-    InRaidController inraidController, NotificationWebSocket notificationWebSocket)
+    InRaidController inraidController,
+    NotificationWebSocket notificationWebSocket,
+    WebhookService webhookService)
 {
     /// <summary>
     /// Handle /fika/raid/create
@@ -48,6 +50,8 @@ public class RaidController(MatchService matchService, HeadlessHelper headlessHe
             RaidTime = request.Time
         });
 
+        await webhookService.SendWebhookMessage($"{hostUsername} has started a raid on {request.Settings.Location}");
+
         return new FikaRaidCreateResponse
         {
             Success = matchService.CreateMatch(request, sessionId)
@@ -57,8 +61,8 @@ public class RaidController(MatchService matchService, HeadlessHelper headlessHe
     /// <summary>
     /// Handle /fika/raid/join
     /// </summary>
-    /// <param name="request"></param>
-    /// <returns></returns>
+    /// <param name="request">The join request data</param>
+    /// <returns>A new <see cref="FikaRaidJoinResponse"/></returns>
     public FikaRaidJoinResponse HandleRaidJoin(FikaRaidJoinRequestData request)
     {
         FikaMatch match = matchService.GetMatch(request.ServerId)!;

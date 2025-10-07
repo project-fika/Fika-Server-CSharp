@@ -2,41 +2,40 @@ using FikaWebApp.Services;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
-namespace FikaWebApp.Components.Fika.Pages
+namespace FikaWebApp.Components.Fika.Pages;
+
+public partial class IndexPage
 {
-    public partial class IndexPage
+    [Inject]
+    private HeartbeatService HeartbeatService { get; set; } = default!;
+
+    private Color StatusColor
     {
-        [Inject]
-        private HeartbeatService HeartbeatService { get; set; } = default!;
-
-        private Color StatusColor
+        get
         {
-            get
-            {
-                return HeartbeatService.IsRunning ? Color.Success : Color.Error;
-            }
+            return HeartbeatService.IsRunning ? Color.Success : Color.Error;
         }
+    }
 
-        private string StatusText
+    private string StatusText
+    {
+        get
         {
-            get
-            {
-                return HeartbeatService.IsRunning ? "Running" : "Not running";
-            }
+            return HeartbeatService.IsRunning ? "Running" : "Not running";
         }
+    }
 
-        private string LastRefreshMinutes
+    private string LastRefreshMinutes
+    {
+        get
         {
-            get
+            var timeSpan = DateTime.Now - HeartbeatService.LastRefresh;
+            if (timeSpan.TotalMinutes < 1)
             {
-                var timeSpan = DateTime.Now - HeartbeatService.LastRefresh;
-                if (timeSpan.TotalMinutes < 1)
-                {
-                    return "Last update was less than a minute ago";
-                }
-
-                return $"Last update was {(int)timeSpan.TotalMinutes} minute(s) ago";
+                return "Last update was less than a minute ago";
             }
+
+            return $"Last update was {(int)timeSpan.TotalMinutes} minute(s) ago";
         }
     }
 }

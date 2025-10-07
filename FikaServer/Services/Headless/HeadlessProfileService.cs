@@ -1,20 +1,24 @@
-﻿using SPTarkov.DI.Annotations;
+﻿using FikaServer.Models.Fika;
+using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Controllers;
 using SPTarkov.Server.Core.Helpers;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Common;
 using SPTarkov.Server.Core.Models.Eft.Common.Tables;
 using SPTarkov.Server.Core.Models.Eft.Profile;
+using SPTarkov.Server.Core.Models.Enums;
 using SPTarkov.Server.Core.Models.Spt.Config;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Utils;
+using Path = System.IO.Path;
 
 namespace FikaServer.Services.Headless;
 
 [Injectable(InjectionType.Singleton)]
 public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, SaveServer saveServer, ConfigService configService,
-    ConfigServer configServer, HashUtil hashUtil, ProfileController profileController, InventoryHelper inventoryHelper)
+    ConfigServer configServer, HashUtil hashUtil, ProfileController profileController, InventoryHelper inventoryHelper,
+    JsonUtil jsonUtil)
 {
     private readonly CoreConfig _sptCoreConfig = configServer.GetConfig<CoreConfig>();
     public List<SptProfile> HeadlessProfiles { get; set; } = [];
@@ -45,7 +49,7 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
     private void LoadHeadlessProfiles()
     {
         HeadlessProfiles = [.. saveServer.GetProfiles().Values
-            .Where(x => x.ProfileInfo?.Password == "fika-headless")];
+            .Where(x => x.IsHeadlessProfile())];
     }
 
     private async Task<List<SptProfile>> CreateHeadlessProfiles(int amount)
@@ -58,6 +62,7 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
             SptProfile profile = await CreateHeadlessProfile();
             createdProfiles.Add(profile);
             HeadlessProfiles.Add(profile);
+            GenerateLaunchScript(profile.ProfileInfo.ProfileId.Value);
         }
 
         return createdProfiles;
@@ -67,13 +72,11 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
     {
         // Generate a unique username
         string username = $"headless_{new MongoId()}";
-        // Using a password allows us to know which profiles are headless client profiles.
-        const string password = "fika-headless";
         // Random edition. Doesn't matter
         const string edition = "Standard";
 
         // Create mini profile
-        string profileId = await CreateMiniProfile(username, password, edition);
+        string profileId = await CreateMiniProfile(username, edition);
 
         // Random character configs. Doesn't matter.
         ProfileCreateRequestData newProfileData = new()
@@ -87,7 +90,7 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
         return await CreateFullProfile(newProfileData, profileId);
     }
 
-    private async Task<MongoId> CreateMiniProfile(string username, string password, string edition)
+    private async Task<MongoId> CreateMiniProfile(string username, string edition)
     {
         MongoId profileId = new();
         MongoId scavId = new();
@@ -98,7 +101,6 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
             ScavengerId = scavId,
             Aid = hashUtil.GenerateAccountId(),
             Username = username,
-            Password = password,
             IsWiped = true,
             Edition = edition
         };
@@ -120,13 +122,46 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
 
         ClearUnecessaryHeadlessItems(profile.CharacterData.PmcData, profileId);
 
+        profile.CharacterData.PmcData.Info.MemberCategory = MemberCategory.UnitTest;
+
         return profile;
     }
 
-    private void GenerateLaunchScript(MongoId profileId, string backendUrl, string scriptsFolderPath)
+    private void GenerateLaunchScript(MongoId profileId)
     {
-        //Todo: Stub for now, implement method.
-        // This will become a generator for a json that will be used in the new headless launcher
+        var modPath = configService.ModPath;
+        var scriptsPath = Path.Combine(modPath, "assets/scripts/");
+        var newFolderPath = Path.Combine(scriptsPath, profileId);
+
+        try
+        {
+            Directory.CreateDirectory(newFolderPath);
+        }
+        catch (Exception ex)
+        {
+            logger.Error($"Failed to create headless launch settings for {profileId}", ex);
+            return;
+        }
+
+        var backendUrl = configService.Config.Headless.Scripts.ForceIp;
+        backendUrl = string.IsNullOrEmpty(backendUrl) ? "https://127.0.0.1:6969" : backendUrl;
+
+        if (!Uri.TryCreate(backendUrl, UriKind.Absolute, out Uri uri))
+        {
+            logger.Error($"Could not parse {backendUrl} as a valid URL, please delete the headless profile and try again.");
+            return;
+        }
+
+        var launchSettings = new HeadlessLaunchSettings()
+        {
+            ProfileId = profileId,
+            BackendUrl = uri
+        };
+
+        var serialized = jsonUtil.Serialize(launchSettings, true);
+        var newFile = Path.Combine(newFolderPath, "HeadlessConfig.json");
+        File.WriteAllText(newFile, serialized);
+        logger.Info($"Created new launch settings in {newFile} for headless profile {profileId}");
     }
 
     private void ClearUnecessaryHeadlessItems(PmcData pmcProfile, MongoId sessionId)
@@ -136,8 +171,7 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
             throw new NullReferenceException("ClearUnecessaryHeadlessItems:: PmcProfile was null");
         }
 
-        List<string?> itemsToDelete = GetAllHeadlessItems(pmcProfile);
-        foreach (string? item in itemsToDelete)
+        foreach (string? item in GetAllHeadlessItems(pmcProfile))
         {
             inventoryHelper.RemoveItem(pmcProfile, item, sessionId);
         }

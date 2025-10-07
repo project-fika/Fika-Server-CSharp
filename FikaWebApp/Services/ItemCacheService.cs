@@ -1,122 +1,108 @@
 ﻿using FikaShared.Responses;
 
-namespace FikaWebApp.Services
+namespace FikaWebApp.Services;
+
+public class ItemCacheService(ILogger<ItemCacheService> logger, HttpClient client)
 {
-    public class ItemCacheService
+    public async Task PopulateDictionary()
     {
-        public ItemCacheService(ILogger<ItemCacheService> logger, HttpClient client)
+        try
         {
-            _logger = logger;
-            _client = client;
-
-            _itemDict = [];
-            _names = [];
-
-            _ = PopulateDictionary();
-        }
-
-        private async Task PopulateDictionary()
-        {
-            try
+            var result = await client.GetFromJsonAsync<GetItemsResponse>("get/items");
+            if (result != null)
             {
-                var result = await _client.GetFromJsonAsync<GetItemsResponse>("get/items");
-                if (result != null)
+                var amount = result.Items.Count;
+                _itemDict = new(amount);
+
+                var valueCounts = new Dictionary<string, int>();
+
+                foreach (var (key, value) in result.Items.OrderBy(x => x.Value.Name))
                 {
-                    var amount = result.Items.Count;
-                    _itemDict = new(amount);
-
-                    var valueCounts = new Dictionary<string, int>();
-
-                    foreach (var (key, value) in result.Items.OrderBy(x => x.Value.Name))
+                    if (!valueCounts.TryGetValue(value.Name, out int count))
                     {
-                        if (!valueCounts.TryGetValue(value.Name, out int count))
-                        {
-                            count = 1;
-                            valueCounts[value.Name] = count;
-                        }
-                        else
-                        {
-                            count++;
-                            valueCounts[value.Name] = count;
-                        }
-
-                        var newValue = (count > 1) ? $"{value.Name} ({count})" : value.Name;
-                        value.Name = newValue;
-
-                        _itemDict.Add(key, value);
+                        count = 1;
+                        valueCounts[value.Name] = count;
+                    }
+                    else
+                    {
+                        count++;
+                        valueCounts[value.Name] = count;
                     }
 
-                    _names = [.. _itemDict.Values
-                        .Select(x => x.Name)];
+                    var newValue = (count > 1) ? $"{value.Name} ({count})" : value.Name;
+                    value.Name = newValue;
 
-                    _logger.LogInformation("Loaded {Amount} item(s) to the database", _itemDict.Count);
+                    _itemDict.Add(key, value);
                 }
-                else
-                {
-                    _itemDict = [];
-                    _logger.LogError("Unable to get items from server");
-                }
+
+                _names = [.. _itemDict.Values
+                    .Select(x => x.Name)];
+
+                logger.LogInformation("Loaded {Amount} item(s) to the database", _itemDict.Count);
             }
-            catch (Exception ex)
+            else
             {
-                _logger.LogError("There was an error retrieving the items from the server: {Exception}", ex);
+                _itemDict = [];
+                logger.LogError("Unable to get items from server");
             }
         }
-
-        public OrderedDictionary<string, ItemData> Items
+        catch (Exception ex)
         {
-            get
-            {
-                return _itemDict;
-            }
+            logger.LogError("There was an error retrieving the items from the server: {Exception}", ex);
         }
+    }
 
-        public string[] ItemNames
+    public OrderedDictionary<string, ItemData> Items
+    {
+        get
         {
-            get
-            {
-                return _names;
-            }
+            return _itemDict;
         }
+    }
 
-        private readonly ILogger<ItemCacheService> _logger;
-        private readonly HttpClient _client;
-        private OrderedDictionary<string, ItemData> _itemDict;
-        private string[] _names;
-
-        public ItemData IdToName(string tpl)
+    public string[] ItemNames
+    {
+        get
         {
-            return _itemDict[tpl];
+            return _names;
         }
+    }
 
-        public string NameToId(string itemName)
-        {
-            return _itemDict
-                .Where(x => x.Value.Name.Contains(itemName, StringComparison.InvariantCultureIgnoreCase))
-                .Select(x => x.Key)
-                .FirstOrDefault()!;
-        }
+    private OrderedDictionary<string, ItemData> _itemDict = [];
+    private string[] _names = [];
 
-        public ItemData NameToData(string itemName)
-        {
-            return _itemDict.
-                Where(x => x.Value.Name.Contains(itemName, StringComparison.InvariantCultureIgnoreCase))
-                .Select(x => x.Value)
-                .FirstOrDefault()!;
-        }
+    public ItemData IdToName(string tpl)
+    {
+        return _itemDict[tpl];
+    }
 
-        public KeyValuePair<string, ItemData> NameToKvp(string itemName)
-        {
-            return _itemDict
-                .Where(x => x.Value.Name.Contains(itemName, StringComparison.InvariantCultureIgnoreCase))
-                .FirstOrDefault();
-        }
+    public string NameToId(string itemName)
+    {
+        return _itemDict
+            .Where(x => x.Value.Name.Contains(itemName, StringComparison.InvariantCultureIgnoreCase))
+            .Select(x => x.Key)
+            .FirstOrDefault()!;
+    }
 
-        public IEnumerable<string> NameToIdSearch(string itemName)
-        {
-            return _itemDict
-                .Where(x => x.Value.Name.Contains(itemName, StringComparison.InvariantCultureIgnoreCase))
-                .Select(x => x.Value.Name);
-        }
+    public ItemData NameToData(string itemName)
+    {
+        return _itemDict.
+            Where(x => x.Value.Name.Contains(itemName, StringComparison.InvariantCultureIgnoreCase))
+            .Select(x => x.Value)
+            .FirstOrDefault()!;
+    }
+
+    public KeyValuePair<string, ItemData> NameToKvp(string itemName)
+    {
+        return _itemDict
+            .Where(x => x.Value.Name.Contains(itemName, StringComparison.InvariantCultureIgnoreCase))
+            .FirstOrDefault();
+    }
+
+    public IEnumerable<string> NameToIdSearch(string itemName)
+    {
+        return _itemDict
+            .Where(x => x.Value.Name.Contains(itemName, StringComparison.InvariantCultureIgnoreCase))
+            .Select(x => x.Value.Name);
     }
 }

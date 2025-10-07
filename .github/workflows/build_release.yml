@@ -1,0 +1,68 @@
+name: Build And Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release Tag (e.g., v1.0.0)'
+        required: true
+      release_name:
+        description: 'Release Title (e.g., Fika Server Release 1.0.0)'
+        required: true
+      build_type:
+        type: choice
+        description: The build configuration (e.g., Release)
+        required: true
+        options: 
+        - Release
+        - Debug
+      release_notes:
+        description: 'Release Notes (optional)'
+        required: false
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+          cache: true
+          cache-dependency-path: 'FikaServer/packages.lock.json'
+
+      - name: Install 7-Zip
+        run: sudo apt-get update && sudo apt-get install -y p7zip-full
+
+      - name: Restore dependencies
+        run: dotnet restore FikaServer.sln
+
+      - name: Publish the project
+        run: dotnet publish FikaServer/FikaServer.csproj --configuration ${{ inputs.build_type }} --no-restore --output output/
+
+      - name: Copy loose files
+        run: |
+          mkdir -p user/mods/fika-server
+          cp -r output/FikaServer.dll user/mods/fika-server
+          cp -r output/FikaShared.dll user/mods/fika-server
+          cp -r FikaServer/Assets user/mods/fika-server/assets
+          cp LICENSE.md user/mods/fika-server
+
+      - name: Archive build with 7z
+        run: 7z a "${{ inputs.release_name }}.7z" user/mods/fika-server
+
+      - name: Create GitHub Release Draft
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.release_tag }}
+          name: ${{ inputs.release_name }}
+          body: ${{ inputs.release_notes }}
+          draft: true
+          files: |
+            ${{ inputs.release_name }}.7z
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}

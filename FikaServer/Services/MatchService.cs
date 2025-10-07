@@ -126,13 +126,17 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
     }
 
     /// <summary>
-    /// 
+    /// Retrieves the match identifier associated with the specified profile session.
     /// </summary>
-    /// <param name="sessionId"></param>
-    /// <returns></returns>
+    /// <param name="sessionId">The unique identifier of the profile session for which to retrieve the match ID.</param>
+    /// <returns>A nullable match identifier associated with the profile, or null if no match is found or the profile does exist.</returns>
     public MongoId? GetMatchIdByProfile(MongoId sessionId)
     {
         SptProfile profile = saveServer.GetProfile(sessionId);
+        if (profile == null)
+        {
+            return null;
+        }
 
         MongoId? matchid = GetMatchIdByPlayer(profile.CharacterData.PmcData.Id.GetValueOrDefault())
             ?? GetMatchIdByPlayer(profile.CharacterData.ScavData.Id.GetValueOrDefault());
@@ -141,10 +145,15 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
     }
 
     /// <summary>
-    /// Creates a new coop match
+    /// Creates a new match with the specified configuration and associates it with the given session.
     /// </summary>
-    /// <param name="data"></param>
-    /// <returns></returns>
+    /// <remarks>If a match with the same server ID already exists, it is deleted before creating the new
+    /// match. The method also initializes the match with the provided settings and adds the host player to the
+    /// match.</remarks>
+    /// <param name="data">The configuration data for the match to be created, including server information, host details, and raid
+    /// settings. Cannot be null.</param>
+    /// <param name="sessionId">The unique identifier of the session to associate with the new match.</param>
+    /// <returns>true if the match was successfully created and registered; otherwise, false.</returns>
     public bool CreateMatch(FikaRaidCreateRequestData data, MongoId sessionId)
     {
         if (Matches.ContainsKey(data.ServerId))
@@ -152,7 +161,7 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
             DeleteMatch(data.ServerId);
         }
 
-        SPTarkov.Server.Core.Models.Eft.Common.LocationBase locationData = locationLifecycleService.GenerateLocationAndLoot(sessionId, data.Settings.Location);
+        var locationData = locationLifecycleService.GenerateLocationAndLoot(sessionId, data.Settings.Location);
 
         FikaMatch match = new()
         {

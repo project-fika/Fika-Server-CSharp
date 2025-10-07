@@ -100,7 +100,7 @@ public class ClientService(ISptLogger<ClientService> logger, SaveServer saveServ
 
         foreach (string pluginId in request.Keys)
         {
-            int hash = request[pluginId];
+            uint hash = request[pluginId];
 
             // check if the mod isn't allowed
             if (!_allowedMods.Contains(pluginId))

@@ -24,7 +24,7 @@ public record FikaRaidCreateRequestData : IRequestData
     public long Timestamp { get; set; }
 
     [JsonPropertyName("settings")]
-    public GetRaidConfigurationRequestData? Settings { get; set; }
+    public required GetRaidConfigurationRequestData Settings { get; set; }
 
     [JsonPropertyName("gameVersion")]
     public string GameVersion { get; set; } = string.Empty;
