@@ -43,14 +43,14 @@ jobs:
 
       - name: Copy loose files
         run: |
-          mkdir -p user/mods/fika-server
-          cp -r output/FikaServer.dll user/mods/fika-server
-          cp -r output/FikaShared.dll user/mods/fika-server
-          cp -r FikaServer/Assets user/mods/fika-server/assets
-          cp LICENSE.md user/mods/fika-server
+          mkdir -p SPT/user/mods/fika-server
+          cp -r output/FikaServer.dll SPT/user/mods/fika-server
+          cp -r output/FikaShared.dll SPT/user/mods/fika-server
+          cp -r FikaServer/Assets SPT/user/mods/fika-server/assets
+          cp LICENSE.md SPT/user/mods/fika-server
 
       - name: Zip the build and loose files
-        run: zip -r "${{ inputs.release_name }}.zip" user/mods/fika-server
+        run: zip -r "${{ inputs.release_name }}.zip" SPT/user/mods/fika-server
 
       - name: Create GitHub Release Draft
         uses: softprops/action-gh-release@v2
