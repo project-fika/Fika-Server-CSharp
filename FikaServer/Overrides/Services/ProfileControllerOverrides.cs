@@ -54,7 +54,7 @@ public class GetFriendsOverride : AbstractPatch
 
         foreach (SptProfile profile in profiles.Values)
         {
-            if (profile.ProfileInfo.Password == "fika-headless")
+            if (profile.IsHeadlessProfile())
             {
                 continue;
             }

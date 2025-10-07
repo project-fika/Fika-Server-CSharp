@@ -6,6 +6,7 @@ using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Common;
 using SPTarkov.Server.Core.Models.Eft.Common.Tables;
 using SPTarkov.Server.Core.Models.Eft.Profile;
+using SPTarkov.Server.Core.Models.Enums;
 using SPTarkov.Server.Core.Models.Spt.Config;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
@@ -48,7 +49,7 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
     private void LoadHeadlessProfiles()
     {
         HeadlessProfiles = [.. saveServer.GetProfiles().Values
-            .Where(x => x.ProfileInfo?.Password == "fika-headless")];
+            .Where(x => x.IsHeadlessProfile())];
     }
 
     private async Task<List<SptProfile>> CreateHeadlessProfiles(int amount)
@@ -71,13 +72,11 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
     {
         // Generate a unique username
         string username = $"headless_{new MongoId()}";
-        // Using a password allows us to know which profiles are headless client profiles.
-        const string password = "fika-headless";
         // Random edition. Doesn't matter
         const string edition = "Standard";
 
         // Create mini profile
-        string profileId = await CreateMiniProfile(username, password, edition);
+        string profileId = await CreateMiniProfile(username, edition);
 
         // Random character configs. Doesn't matter.
         ProfileCreateRequestData newProfileData = new()
@@ -91,7 +90,7 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
         return await CreateFullProfile(newProfileData, profileId);
     }
 
-    private async Task<MongoId> CreateMiniProfile(string username, string password, string edition)
+    private async Task<MongoId> CreateMiniProfile(string username, string edition)
     {
         MongoId profileId = new();
         MongoId scavId = new();
@@ -102,7 +101,6 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
             ScavengerId = scavId,
             Aid = hashUtil.GenerateAccountId(),
             Username = username,
-            Password = password,
             IsWiped = true,
             Edition = edition
         };
@@ -123,6 +121,8 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
             ?? throw new NullReferenceException("CreateFullProfile:: Could not find profile");
 
         ClearUnecessaryHeadlessItems(profile.CharacterData.PmcData, profileId);
+
+        profile.CharacterData.PmcData.Info.MemberCategory = MemberCategory.UnitTest;
 
         return profile;
     }

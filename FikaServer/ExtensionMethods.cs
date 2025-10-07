@@ -3,6 +3,7 @@ using FikaServer.Models.Fika.Dialog;
 using FikaServer.Models.Fika.Presence;
 using SPTarkov.Server.Core.Models.Eft.Common;
 using SPTarkov.Server.Core.Models.Eft.Profile;
+using SPTarkov.Server.Core.Models.Enums;
 using static FikaShared.Enums;
 
 namespace FikaServer;
@@ -109,5 +110,15 @@ public static class ExtensionMethods
             "woods" => EFikaLocation.Streets,
             _ => EFikaLocation.None,
         };
+    }
+
+    /// <summary>
+    /// Checks if the given profile is a headless profile
+    /// </summary>
+    /// <param name="profile">The profile to check</param>
+    /// <returns><see langword="true"/> if it's a headless profile</returns>
+    public static bool IsHeadlessProfile(this SptProfile profile)
+    {
+        return profile?.CharacterData?.PmcData?.Info?.MemberCategory is MemberCategory.UnitTest;
     }
 }
