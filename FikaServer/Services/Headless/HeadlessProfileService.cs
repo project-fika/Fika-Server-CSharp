@@ -46,6 +46,28 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
         }
     }
 
+    public async Task<SptProfile> CreateHeadlessProfile()
+    {
+        // Generate a unique username
+        string username = $"headless_{new MongoId()}";
+        // Random edition. Doesn't matter
+        const string edition = "Standard";
+
+        // Create mini profile
+        string profileId = await CreateMiniProfile(username, edition);
+
+        // Random character configs. Doesn't matter.
+        ProfileCreateRequestData newProfileData = new()
+        {
+            Side = "usec",
+            Nickname = username, // Use the username as the nickname to ensure it is unique.
+            HeadId = HEAD_USEC_4,
+            VoiceId = VOICE_USEC_4
+        };
+
+        return await CreateFullProfile(newProfileData, profileId);
+    }
+
     private void LoadHeadlessProfiles()
     {
         HeadlessProfiles = [.. saveServer.GetProfiles().Values
@@ -66,28 +88,6 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
         }
 
         return createdProfiles;
-    }
-
-    private async Task<SptProfile> CreateHeadlessProfile()
-    {
-        // Generate a unique username
-        string username = $"headless_{new MongoId()}";
-        // Random edition. Doesn't matter
-        const string edition = "Standard";
-
-        // Create mini profile
-        string profileId = await CreateMiniProfile(username, edition);
-
-        // Random character configs. Doesn't matter.
-        ProfileCreateRequestData newProfileData = new()
-        {
-            Side = "usec",
-            Nickname = username, // Use the username as the nickname to ensure it is unique.
-            HeadId = HEAD_USEC_4,
-            VoiceId = VOICE_USEC_4
-        };
-
-        return await CreateFullProfile(newProfileData, profileId);
     }
 
     private async Task<MongoId> CreateMiniProfile(string username, string edition)
