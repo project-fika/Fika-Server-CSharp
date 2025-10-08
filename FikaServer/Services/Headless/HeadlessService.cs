@@ -137,7 +137,12 @@ public class HeadlessService(ISptLogger<HeadlessService> logger,
                 continue;
             }
 
-            baseHeadlessLevel += profile.CharacterData.PmcData.Info.Level.GetValueOrDefault(1);
+            if (profile.IsHeadlessProfile())
+            {
+                continue;
+            }
+
+            baseHeadlessLevel += profile.CharacterData.PmcData.Info.Level ?? 1;
         }
 
         baseHeadlessLevel /= players;
