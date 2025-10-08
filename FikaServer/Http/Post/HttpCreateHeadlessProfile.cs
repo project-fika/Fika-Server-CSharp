@@ -31,7 +31,7 @@ public class HttpCreateHeadlessProfile(ConfigService configService, HeadlessProf
     {
         if (headlessProfileService == null)
         {
-            resp.StatusCode = 404;
+            resp.StatusCode = StatusCodes.Status500InternalServerError;
             await resp.StartAsync();
             await resp.CompleteAsync();
 
@@ -42,7 +42,7 @@ public class HttpCreateHeadlessProfile(ConfigService configService, HeadlessProf
 
         if (headlessProfile == null)
         {
-            resp.StatusCode = 404;
+            resp.StatusCode = StatusCodes.Status500InternalServerError;
             await resp.StartAsync();
             await resp.CompleteAsync();
 
@@ -53,7 +53,7 @@ public class HttpCreateHeadlessProfile(ConfigService configService, HeadlessProf
 
         if (headlessProfileId == null)
         {
-            resp.StatusCode = 404;
+            resp.StatusCode = StatusCodes.Status500InternalServerError;
             await resp.StartAsync();
             await resp.CompleteAsync();
 
@@ -65,8 +65,9 @@ public class HttpCreateHeadlessProfile(ConfigService configService, HeadlessProf
             Id = headlessProfileId
         };
 
-        resp.StatusCode = 200;
+        resp.StatusCode = StatusCodes.Status200OK;
         resp.ContentType = ContentTypes.Json;
+
         await resp.Body.WriteAsync(Encoding.UTF8.GetBytes(httpResponseUtil.NoBody(createHeadlessProfileResponse)));
         await resp.StartAsync();
         await resp.CompleteAsync();
