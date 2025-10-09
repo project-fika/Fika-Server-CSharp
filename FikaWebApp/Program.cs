@@ -10,6 +10,7 @@ using Microsoft.Extensions.Options;
 using MudBlazor.Services;
 using MudExtensions.Services;
 using Serilog;
+using System.Net.Http.Headers;
 
 namespace FikaWebApp;
 
@@ -194,7 +195,7 @@ public class Program
         FikaConfig config = provider.GetRequiredService<FikaConfig>();
 
         client.BaseAddress = config.BaseUrl;
-        client.DefaultRequestHeaders.Add("Auth", config.APIKey);
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", config.APIKey);
         client.DefaultRequestHeaders.Add("requestcompressed", "0");
     }
 }

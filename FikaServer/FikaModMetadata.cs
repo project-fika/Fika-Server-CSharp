@@ -1,8 +1,9 @@
 using SPTarkov.Server.Core.Models.Spt.Mod;
+using SPTarkov.Server.Web;
 
 namespace FikaServer;
 
-public record FikaModMetadata : AbstractModMetadata
+public record FikaModMetadata : AbstractModMetadata, IModWebMetadata
 {
     public override string Name { get; init; } = "server";
     public override string Author { get; init; } = "Fika";

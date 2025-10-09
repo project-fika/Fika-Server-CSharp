@@ -1,29 +1,29 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <RootNamespace>FikaServer</RootNamespace>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <OutputType>Library</OutputType>
-    <Version>3.0.0</Version>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <EnableDefaultContentItems>false</EnableDefaultContentItems>
-	<NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
-	  
-	<!-- LiteNetLib requires unsafe blocks-->
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<RootNamespace>FikaServer</RootNamespace>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<OutputType>Library</OutputType>
+		<Version>3.0.0</Version>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<EnableDefaultContentItems>false</EnableDefaultContentItems>
+		<NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
 
-	<!--<ItemGroup>
-		<PackageReference Include="SPTarkov.Common" Version="4.0.0-prerelease20" />
-		<PackageReference Include="SPTarkov.DI" Version="4.0.0-prerelease20" />
-		<PackageReference Include="SPTarkov.Reflection" Version="4.0.0-prerelease20" />
-		<PackageReference Include="SPTarkov.Server.Core" Version="4.0.0-prerelease20" />
-	</ItemGroup>-->
-	
-	
-  <ItemGroup>
+		<!-- LiteNetLib requires unsafe blocks-->
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="SPTarkov.Common" Version="4.0.0-pre.20251007.1604" />
+		<PackageReference Include="SPTarkov.DI" Version="4.0.0-pre.20251007.1604" />
+		<PackageReference Include="SPTarkov.Reflection" Version="4.0.0-pre.20251007.1604" />
+		<PackageReference Include="SPTarkov.Server.Core" Version="4.0.0-pre.20251007.1604" />
+		<PackageReference Include="SPTarkov.Server.Web	" Version="4.0.0-pre.20251007.1604" />
+	</ItemGroup>
+
+	<ItemGroup>
     <Content Include="assets\**">
     <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -39,7 +39,7 @@
     <ProjectReference Include="..\FikaShared\FikaShared.csproj" />
   </ItemGroup>
 	
-	
+<!--
   <ItemGroup>
     <Reference Include="SPTarkov.Common">
       <HintPath>tref\SPTarkov.Common.dll</HintPath>
@@ -58,4 +58,5 @@
       <Private>False</Private>
     </Reference>
   </ItemGroup>
+  -->
 </Project>

@@ -1,28 +1,16 @@
-﻿
-using FikaServer.Services;
+﻿using FikaServer.Models;
 using FikaShared.Responses;
-using SPTarkov.DI.Annotations;
+using Microsoft.AspNetCore.Mvc;
 using SPTarkov.Server.Core.Servers;
-using SPTarkov.Server.Core.Utils;
-using System.Text;
 
-namespace FikaServer.Http.Get;
+namespace FikaServer.API;
 
-[Injectable(TypePriority = 0)]
-public class HttpGetStatistics(ConfigService configService, SaveServer saveServer,
-    PresenceService presenceService, HttpResponseUtil httpResponseUtil) : BaseHttpRequest(configService)
+[ApiController]
+[Route("fika/api/statistics")]
+[RequireApiKey]
+public class GetStatisticsController(SaveServer saveServer) : ControllerBase
 {
-    public override string Path { get; set; } = "/get/statistics";
-
-    public override string Method
-    {
-        get
-        {
-            return HttpMethods.Get;
-        }
-    }
-
-    public override async Task HandleRequest(HttpRequest req, HttpResponse resp)
+    public IActionResult HandleRequest()
     {
         var players = saveServer.GetProfiles().Values
             .Where(x => x.HasProfileData());
@@ -72,10 +60,6 @@ public class HttpGetStatistics(ConfigService configService, SaveServer saveServe
             Players = statisticsPlayers
         };
 
-        resp.StatusCode = 200;
-        resp.ContentType = ContentTypes.Json;
-        await resp.Body.WriteAsync(Encoding.UTF8.GetBytes(httpResponseUtil.NoBody(response)));
-        await resp.StartAsync();
-        await resp.CompleteAsync();
+        return Ok(response);
     }
 }
