@@ -1,17 +1,16 @@
-﻿using FikaServer.Services;
+﻿using FikaServer.Models;
 using FikaShared.Responses;
-using SPTarkov.DI.Annotations;
+using Microsoft.AspNetCore.Mvc;
 using SPTarkov.Server.Core.Extensions;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Services;
-using SPTarkov.Server.Core.Utils;
-using System.Text;
 
-namespace FikaServer.Http.Get;
+namespace FikaServer.API;
 
-[Injectable(TypePriority = 0)]
-public class HttpGetItems(DatabaseService databaseService, SPTarkov.Server.Core.Services.LocaleService localeService,
-    HttpResponseUtil httpResponseUtil, ConfigService configService) : BaseHttpRequest(configService)
+[ApiController]
+[Route("fika/api/items")]
+[RequireApiKey]
+public class GetItemsController(DatabaseService databaseService, LocaleService localeService) : ControllerBase
 {
     private readonly static HashSet<MongoId> _ignoredItems = [
         new("5e85aac65505fa48730d8af2"),
@@ -24,17 +23,8 @@ public class HttpGetItems(DatabaseService databaseService, SPTarkov.Server.Core.
         new("5ede47641cf3836a88318df1")
         ];
 
-    public override string Path { get; set; } = "/get/items";
-
-    public override string Method
-    {
-        get
-        {
-            return HttpMethods.Get;
-        }
-    }
-
-    public override async Task HandleRequest(HttpRequest req, HttpResponse resp)
+    [HttpGet]
+    public IActionResult HandleRequest()
     {
         var allItems = databaseService.GetItems();
         var locale = localeService.GetLocaleDb("en");
@@ -83,10 +73,6 @@ public class HttpGetItems(DatabaseService databaseService, SPTarkov.Server.Core.
             Items = items
         };
 
-        resp.StatusCode = 200;
-        resp.ContentType = ContentTypes.Json;
-        await resp.Body.WriteAsync(Encoding.UTF8.GetBytes(httpResponseUtil.NoBody(response)));
-        await resp.StartAsync();
-        await resp.CompleteAsync();
+        return Ok(response);
     }
 }

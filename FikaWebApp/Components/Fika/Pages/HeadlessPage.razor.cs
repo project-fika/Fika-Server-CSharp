@@ -55,7 +55,7 @@ public partial class HeadlessPage
 #else
         try
         {
-            var clients = await HttpClient.GetFromJsonAsync<GetHeadlessResponse>("get/headless");
+            var clients = await HttpClient.GetFromJsonAsync<GetHeadlessResponse>("fika/api/headless");
             _headlessClients.AddRange(clients.HeadlessClients);
         }
         catch (Exception ex)

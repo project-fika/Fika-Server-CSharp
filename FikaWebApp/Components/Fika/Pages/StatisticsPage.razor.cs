@@ -29,7 +29,7 @@ public partial class StatisticsPage
 
         try
         {
-            var result = await HttpClient.GetFromJsonAsync<GetStatisticsResponse>("get/statistics");
+            var result = await HttpClient.GetFromJsonAsync<GetStatisticsResponse>("fika/api/statistics");
             _players.AddRange(result!.Players);
 
             _nicknames = [.. _players.Select(p => p.Nickname)];

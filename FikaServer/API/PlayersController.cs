@@ -1,32 +1,22 @@
-﻿
+﻿using FikaServer.Models;
 using FikaServer.Services;
 using FikaServer.Services.Cache;
 using FikaShared;
 using FikaShared.Responses;
-using SPTarkov.DI.Annotations;
+using Microsoft.AspNetCore.Mvc;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Servers;
-using SPTarkov.Server.Core.Utils;
-using System.Text;
 using static FikaShared.Enums;
 
-namespace FikaServer.Http.Get;
+namespace FikaServer.API;
 
-[Injectable(TypePriority = 0)]
-public class HttpGetPlayers(ConfigService configService, FikaProfileService profileService,
-    SaveServer saveServer, PresenceService presenceService, HttpResponseUtil httpResponseUtil) : BaseHttpRequest(configService)
+[ApiController]
+[Route("fika/api/players")]
+[RequireApiKey]
+public class PlayersController(FikaProfileService profileService, SaveServer saveServer, PresenceService presenceService) : ControllerBase
 {
-    public override string Path { get; set; } = "/get/players";
-
-    public override string Method
-    {
-        get
-        {
-            return HttpMethods.Get;
-        }
-    }
-
-    public override async Task HandleRequest(HttpRequest req, HttpResponse resp)
+    [HttpGet]
+    public IActionResult HandleRequest()
     {
         var players = profileService.GetAllProfiles();
         var profiles = new List<SptProfile>(players.Count);
@@ -71,10 +61,6 @@ public class HttpGetPlayers(ConfigService configService, FikaProfileService prof
             Players = onlinePlayers
         };
 
-        resp.StatusCode = 200;
-        resp.ContentType = ContentTypes.Json;
-        await resp.Body.WriteAsync(Encoding.UTF8.GetBytes(httpResponseUtil.NoBody(playersResponse)));
-        await resp.StartAsync();
-        await resp.CompleteAsync();
+        return Ok(playersResponse);
     }
 }

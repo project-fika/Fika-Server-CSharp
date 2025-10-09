@@ -49,7 +49,7 @@ public class HeartbeatService
         {
             try
             {
-                var result = await _client.GetAsync("get/heartbeat");
+                var result = await _client.GetAsync("fika/api/heartbeat");
                 IsRunning = result.IsSuccessStatusCode;
             }
             catch (Exception ex)

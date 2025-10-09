@@ -144,7 +144,7 @@ public class SendTimersService(ILogger<SendTimersService> logger, HttpClient htt
         {
             try
             {
-                var result = await httpClient.PostAsJsonAsync("post/senditem", request);
+                var result = await httpClient.PostAsJsonAsync("fika/api/senditem", request);
                 if (!result.IsSuccessStatusCode)
                 {
                     logger.LogError("Failed to send item to {ProfileId}", request.ProfileId);
@@ -194,7 +194,7 @@ public class SendTimersService(ILogger<SendTimersService> logger, HttpClient htt
             try
             {
                 int failed = 0;
-                var result = await httpClient.PostAsJsonAsync("post/senditemtoall", request);
+                var result = await httpClient.PostAsJsonAsync("/fika/api/senditemtoall", request);
                 if (!result.IsSuccessStatusCode)
                 {
                     failed++;
