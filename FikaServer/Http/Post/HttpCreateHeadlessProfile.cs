@@ -2,8 +2,6 @@
 using FikaServer.Services.Headless;
 using FikaShared.Responses;
 using SPTarkov.DI.Annotations;
-using SPTarkov.Server.Core.Models.Eft.Profile;
-using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Utils;
 using System.Text;
 
@@ -11,7 +9,7 @@ namespace FikaServer.Http.Post;
 
 [Injectable]
 public class HttpCreateHeadlessProfile(ConfigService configService, HeadlessProfileService headlessProfileService,
-    SaveServer saveServer, HttpResponseUtil httpResponseUtil) : BaseHttpRequest(configService)
+    HttpResponseUtil httpResponseUtil) : BaseHttpRequest(configService)
 {
     public override string Path { get; set; } = "/post/createheadlessprofile";
 
@@ -34,7 +32,8 @@ public class HttpCreateHeadlessProfile(ConfigService configService, HeadlessProf
             return;
         }
 
-        SptProfile headlessProfile = await headlessProfileService.CreateHeadlessProfile();
+        var headlessProfiles = await headlessProfileService.CreateHeadlessProfiles(1);
+        var headlessProfile = headlessProfiles[0];
 
         if (headlessProfile == null)
         {
@@ -55,11 +54,6 @@ public class HttpCreateHeadlessProfile(ConfigService configService, HeadlessProf
 
             return;
         }
-
-        headlessProfileService.HeadlessProfiles.Add(headlessProfile);
-        headlessProfileService.GenerateLaunchScript(headlessProfileId);
-
-        await saveServer.SaveProfileAsync(headlessProfileId);
 
         CreateHeadlessProfileResponse createHeadlessProfileResponse = new()
         {

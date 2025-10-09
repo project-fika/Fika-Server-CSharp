@@ -46,7 +46,29 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
         }
     }
 
-    public async Task<SptProfile> CreateHeadlessProfile()
+    internal async Task<List<SptProfile>> CreateHeadlessProfiles(int amount)
+    {
+        int profileCount = HeadlessProfiles.Count;
+        int profileAmountToCreate = amount - profileCount;
+        List<SptProfile> createdProfiles = [];
+        for (int i = 0; i < profileAmountToCreate; i++)
+        {
+            SptProfile profile = await CreateHeadlessProfile();
+            createdProfiles.Add(profile);
+            HeadlessProfiles.Add(profile);
+            GenerateLaunchScript(profile.ProfileInfo.ProfileId.Value);
+        }
+
+        return createdProfiles;
+    }
+
+    private void LoadHeadlessProfiles()
+    {
+        HeadlessProfiles = [.. saveServer.GetProfiles().Values
+            .Where(x => x.IsHeadlessProfile())];
+    }
+
+    private async Task<SptProfile> CreateHeadlessProfile()
     {
         // Generate a unique username
         string username = $"headless_{new MongoId()}";
@@ -68,7 +90,7 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
         return await CreateFullProfile(newProfileData, profileId);
     }
 
-    public void GenerateLaunchScript(MongoId profileId)
+    private void GenerateLaunchScript(MongoId profileId)
     {
         var modPath = configService.ModPath;
         var scriptsPath = Path.Combine(modPath, "assets/scripts/");
@@ -105,28 +127,6 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
         logger.Info($"Created new launch settings in {newFile} for headless profile {profileId}");
     }
 
-    private void LoadHeadlessProfiles()
-    {
-        HeadlessProfiles = [.. saveServer.GetProfiles().Values
-            .Where(x => x.IsHeadlessProfile())];
-    }
-
-    private async Task<List<SptProfile>> CreateHeadlessProfiles(int amount)
-    {
-        int profileCount = HeadlessProfiles.Count;
-        int profileAmountToCreate = amount - profileCount;
-        List<SptProfile> createdProfiles = [];
-        for (int i = 0; i < profileAmountToCreate; i++)
-        {
-            SptProfile profile = await CreateHeadlessProfile();
-            createdProfiles.Add(profile);
-            HeadlessProfiles.Add(profile);
-            GenerateLaunchScript(profile.ProfileInfo.ProfileId.Value);
-        }
-
-        return createdProfiles;
-    }
-
     private async Task<MongoId> CreateMiniProfile(string username, string edition)
     {
         MongoId profileId = new();
@@ -160,6 +160,8 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
         ClearUnecessaryHeadlessItems(profile.CharacterData.PmcData, profileId);
 
         profile.CharacterData.PmcData.Info.MemberCategory = MemberCategory.UnitTest;
+
+        await saveServer.SaveProfileAsync(profileId);
 
         return profile;
     }
