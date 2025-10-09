@@ -2,11 +2,10 @@
 using System.Diagnostics.CodeAnalysis;
 using static System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes;
 
-namespace FikaServer.Networking.LiteNetLib
+namespace FikaServer.Networking.LiteNetLib;
+
+internal static class Trimming
 {
-    internal static class Trimming
-    {
-        internal const DynamicallyAccessedMemberTypes SerializerMemberTypes = PublicProperties | NonPublicProperties;
-    }
+    internal const DynamicallyAccessedMemberTypes SerializerMemberTypes = PublicProperties | NonPublicProperties;
 }
 #endif
