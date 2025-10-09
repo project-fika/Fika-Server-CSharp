@@ -18,7 +18,18 @@ public class HeadlessProfileController(HeadlessProfileService headlessProfileSer
             return StatusCode(StatusCodes.Status500InternalServerError, "Headless profile service not available.");
         }
 
-        var headlessProfiles = await headlessProfileService.CreateHeadlessProfiles(1);
+        var headlessProfiles = await headlessProfileService.CreateHeadlessProfiles(1, true);
+
+        if (headlessProfiles == null)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, "Failed to generate headless profile.");
+        }
+
+        if (headlessProfiles.Count == 0)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, "Failed to generate headless profile.");
+        }
+
         var headlessProfile = headlessProfiles[0];
 
         if (headlessProfile == null)

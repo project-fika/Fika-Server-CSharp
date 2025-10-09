@@ -31,7 +31,7 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
         LoadHeadlessProfiles();
         logger.Log(SPTarkov.Server.Core.Models.Spt.Logging.LogLevel.Info, $"Found {HeadlessProfiles.Count} headless profiles");
 
-        int profileAmount = configService.Config.Headless.Profiles.Amount;
+        var profileAmount = configService.Config.Headless.Profiles.Amount;
 
         if (HeadlessProfiles.Count < profileAmount)
         {
@@ -46,12 +46,12 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
         }
     }
 
-    internal async Task<List<SptProfile>> CreateHeadlessProfiles(int amount)
+    internal async Task<List<SptProfile>> CreateHeadlessProfiles(int amount, bool ignoreCurrent = false)
     {
-        int profileCount = HeadlessProfiles.Count;
-        int profileAmountToCreate = amount - profileCount;
+        var profileCount = HeadlessProfiles.Count;
+        var profileAmountToCreate = ignoreCurrent ? amount : amount - profileCount;
         List<SptProfile> createdProfiles = [];
-        for (int i = 0; i < profileAmountToCreate; i++)
+        for (var i = 0; i < profileAmountToCreate; i++)
         {
             SptProfile profile = await CreateHeadlessProfile();
             createdProfiles.Add(profile);
@@ -71,7 +71,7 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
     private async Task<SptProfile> CreateHeadlessProfile()
     {
         // Generate a unique username
-        string username = $"headless_{new MongoId()}";
+        var username = $"headless_{new MongoId()}";
         // Random edition. Doesn't matter
         const string edition = "Standard";
 
@@ -173,7 +173,7 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
             throw new NullReferenceException("ClearUnecessaryHeadlessItems:: PmcProfile was null");
         }
 
-        foreach (string? item in GetAllHeadlessItems(pmcProfile))
+        foreach (var item in GetAllHeadlessItems(pmcProfile))
         {
             inventoryHelper.RemoveItem(pmcProfile, item, sessionId);
         }
