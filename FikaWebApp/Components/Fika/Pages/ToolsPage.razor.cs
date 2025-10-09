@@ -6,22 +6,26 @@ using FikaWebApp.Services;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using System.Globalization;
+using Microsoft.AspNetCore.Components.Web;
 
 namespace FikaWebApp.Components.Fika.Pages;
 
 public partial class ToolsPage
 {
     [Inject]
-    private HttpClient HttpClient { get; set; }
+    private HttpClient HttpClient { get; set; } = default!;
 
     [Inject]
-    private IDialogService DialogService { get; set; }
+    private IDialogService DialogService { get; set; } = default!;
 
     [Inject]
-    private ISnackbar Snackbar { get; set; }
+    private ISnackbar Snackbar { get; set; } = default!;
 
     [Inject]
-    private SendTimersService SendTimersService { get; set; }
+    private SendTimersService SendTimersService { get; set; } = default!;
+
+    [Inject]
+    private ItemCacheService ItemCacheService { get; set; } = default!;
 
     private async Task SendItemToEveryone()
     {
@@ -94,5 +98,18 @@ public partial class ToolsPage
             FullWidth = true
         };
         var dialog = DialogService.ShowAsync<ViewQueuedSendItemsDialog>("Queued Items", options);
+    }
+
+    private async Task RefreshItemDatabase(MouseEventArgs arg)
+    {
+        var success = await ItemCacheService.PopulateDictionary();
+        if (success)
+        {
+            Snackbar.Add("Items successfully refreshed", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add("There was an error refreshing the database", Severity.Error);
+        }
     }
 }

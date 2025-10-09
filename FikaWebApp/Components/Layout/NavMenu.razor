@@ -3,12 +3,12 @@
 @inject NavigationManager NavigationManager
 
 <MudNavMenu>
-    <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
+    @* <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink> *@
 
     @* <MudNavLink Href="auth" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Lock">Auth Required</MudNavLink> *@
     <AuthorizeView>
         <Authorized>
-			<MudNavLink Href="Fika/Manage" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Storage">Fika</MudNavLink>
+			<MudNavLink Href="" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Storage">Fika</MudNavLink>
             <MudNavLink Href="Account/Manage" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Person">@context.User.Identity?.Name</MudNavLink>
             <form action="Account/Logout" method="post">
                 <AntiforgeryToken />
