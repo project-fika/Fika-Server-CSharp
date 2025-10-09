@@ -5,7 +5,7 @@ using SPTarkov.Server.Core.Models.Eft.Common.Tables;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Servers;
 
-namespace FikaServer.Http;
+namespace FikaServer.API;
 
 [ApiController]
 [Route("fika/api/profiles")]
