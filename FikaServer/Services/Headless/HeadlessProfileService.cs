@@ -68,6 +68,43 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
         return await CreateFullProfile(newProfileData, profileId);
     }
 
+    public void GenerateLaunchScript(MongoId profileId)
+    {
+        var modPath = configService.ModPath;
+        var scriptsPath = Path.Combine(modPath, "assets/scripts/");
+        var newFolderPath = Path.Combine(scriptsPath, profileId);
+
+        try
+        {
+            Directory.CreateDirectory(newFolderPath);
+        }
+        catch (Exception ex)
+        {
+            logger.Error($"Failed to create headless launch settings for {profileId}", ex);
+            return;
+        }
+
+        var backendUrl = configService.Config.Headless.Scripts.ForceIp;
+        backendUrl = string.IsNullOrEmpty(backendUrl) ? "https://127.0.0.1:6969" : backendUrl;
+
+        if (!Uri.TryCreate(backendUrl, UriKind.Absolute, out Uri uri))
+        {
+            logger.Error($"Could not parse {backendUrl} as a valid URL, please delete the headless profile and try again.");
+            return;
+        }
+
+        var launchSettings = new HeadlessLaunchSettings()
+        {
+            ProfileId = profileId,
+            BackendUrl = uri
+        };
+
+        var serialized = jsonUtil.Serialize(launchSettings, true);
+        var newFile = Path.Combine(newFolderPath, "HeadlessConfig.json");
+        File.WriteAllText(newFile, serialized);
+        logger.Info($"Created new launch settings in {newFile} for headless profile {profileId}");
+    }
+
     private void LoadHeadlessProfiles()
     {
         HeadlessProfiles = [.. saveServer.GetProfiles().Values
@@ -125,43 +162,6 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
         profile.CharacterData.PmcData.Info.MemberCategory = MemberCategory.UnitTest;
 
         return profile;
-    }
-
-    private void GenerateLaunchScript(MongoId profileId)
-    {
-        var modPath = configService.ModPath;
-        var scriptsPath = Path.Combine(modPath, "assets/scripts/");
-        var newFolderPath = Path.Combine(scriptsPath, profileId);
-
-        try
-        {
-            Directory.CreateDirectory(newFolderPath);
-        }
-        catch (Exception ex)
-        {
-            logger.Error($"Failed to create headless launch settings for {profileId}", ex);
-            return;
-        }
-
-        var backendUrl = configService.Config.Headless.Scripts.ForceIp;
-        backendUrl = string.IsNullOrEmpty(backendUrl) ? "https://127.0.0.1:6969" : backendUrl;
-
-        if (!Uri.TryCreate(backendUrl, UriKind.Absolute, out Uri uri))
-        {
-            logger.Error($"Could not parse {backendUrl} as a valid URL, please delete the headless profile and try again.");
-            return;
-        }
-
-        var launchSettings = new HeadlessLaunchSettings()
-        {
-            ProfileId = profileId,
-            BackendUrl = uri
-        };
-
-        var serialized = jsonUtil.Serialize(launchSettings, true);
-        var newFile = Path.Combine(newFolderPath, "HeadlessConfig.json");
-        File.WriteAllText(newFile, serialized);
-        logger.Info($"Created new launch settings in {newFile} for headless profile {profileId}");
     }
 
     private void ClearUnecessaryHeadlessItems(PmcData pmcProfile, MongoId sessionId)

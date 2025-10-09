@@ -60,6 +60,9 @@ public class HttpCreateHeadlessProfile(ConfigService configService, HeadlessProf
             return;
         }
 
+        headlessProfileService.HeadlessProfiles.Add(headlessProfile);
+        headlessProfileService.GenerateLaunchScript(headlessProfileId);
+
         CreateHeadlessProfileResponse createHeadlessProfileResponse = new()
         {
             Id = headlessProfileId
