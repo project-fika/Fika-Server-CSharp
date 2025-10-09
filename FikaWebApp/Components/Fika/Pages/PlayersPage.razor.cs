@@ -22,7 +22,7 @@ public partial class PlayersPage
 
 		try
 		{
-			var result = await HttpClient.GetFromJsonAsync<GetOnlinePlayersResponse>("get/players");
+			var result = await HttpClient.GetFromJsonAsync<GetOnlinePlayersResponse>("fika/api/players");
 			if (result != null)
 			{
 				_players = result.Players;
@@ -71,7 +71,7 @@ public partial class PlayersPage
 
                 try
                 {
-                    var postResult = await HttpClient.PostAsJsonAsync("post/sendmessage", request);
+                    var postResult = await HttpClient.PostAsJsonAsync("fika/api/sendmessage", request);
                     Snackbar.Add($"Message sent to {player.Nickname}", Severity.Success);
                 }
                 catch (Exception ex)
@@ -107,7 +107,7 @@ public partial class PlayersPage
 
         try
         {
-            var result = await HttpClient.PostAsJsonAsync("post/logout", request);
+            var result = await HttpClient.PostAsJsonAsync("fika/api/logout", request);
             Snackbar.Add($"Sent logout message to {player.Nickname}", Severity.Success);
         }
         catch (Exception ex)

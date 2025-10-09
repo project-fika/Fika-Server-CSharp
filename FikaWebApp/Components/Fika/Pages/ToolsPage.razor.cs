@@ -51,7 +51,7 @@ public partial class ToolsPage
                 List<ProfileResponse> profiles = [];
                 try
                 {
-                    var serverProfiles = await HttpClient.GetFromJsonAsync<List<ProfileResponse>>("get/profiles");
+                    var serverProfiles = await HttpClient.GetFromJsonAsync<List<ProfileResponse>>("/fika/api/profiles");
                     profiles.AddRange(serverProfiles);
                 }
                 catch (Exception ex)

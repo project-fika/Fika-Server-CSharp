@@ -60,7 +60,7 @@ public partial class ProfilesPage
         _profiles.Clear();
         try
         {
-            var result = await HttpClient.GetFromJsonAsync<List<ProfileResponse>>("get/profiles");
+            var result = await HttpClient.GetFromJsonAsync<List<ProfileResponse>>("fika/api/profiles");
             _profiles.AddRange(result!);
         }
         catch (Exception ex)
@@ -75,7 +75,7 @@ public partial class ProfilesPage
     {
         try
         {
-            var result = await HttpClient.GetStringAsync($"get/rawprofile?profileId={Uri.EscapeDataString(row.ProfileId)}")
+            var result = await HttpClient.GetStringAsync($"fika/api/rawprofile?profileId={Uri.EscapeDataString(row.ProfileId)}")
                 ?? throw new NullReferenceException("The data was empty");
 
             /*var jsonElement = JsonSerializer.Deserialize<JsonElement>(result);
@@ -155,7 +155,7 @@ public partial class ProfilesPage
                 using (var fs = new StreamReader(stream))
                 {
                     var data = await fs.ReadToEndAsync();
-                    var result = await HttpClient.PostAsync("post/uploadprofile", new StringContent(data));
+                    var result = await HttpClient.PostAsync("fika/api/uploadprofile", new StringContent(data));
 
                     if (result.IsSuccessStatusCode)
                     {

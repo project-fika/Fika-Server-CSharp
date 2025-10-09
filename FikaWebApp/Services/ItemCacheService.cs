@@ -8,7 +8,7 @@ public class ItemCacheService(ILogger<ItemCacheService> logger, HttpClient clien
     {
         try
         {
-            var result = await client.GetFromJsonAsync<GetItemsResponse>("get/items");
+            var result = await client.GetFromJsonAsync<GetItemsResponse>("fika/api/items");
             if (result != null)
             {
                 var amount = result.Items.Count;

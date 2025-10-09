@@ -63,7 +63,7 @@ public partial class ModifyProfileDialog
                 {
                     try
                     {
-                        var postResult = await HttpClient.PostAsJsonAsync("post/senditem", sendItemRequest);
+                        var postResult = await HttpClient.PostAsJsonAsync("fika/api/senditem", sendItemRequest);
                         if (postResult.IsSuccessStatusCode)
                         {
                             Snackbar.Add($"[{model.ItemName}] was successfully sent to {Profile.Nickname}", Severity.Success);
@@ -93,7 +93,7 @@ public partial class ModifyProfileDialog
             if (result.Data is int amountOfDays)
             {
                 amountOfDays = Math.Clamp(amountOfDays, 0, 9999);
-                var response = await HttpClient.PostAsJsonAsync("post/addfleaban", new AddFleaBanRequest()
+                var response = await HttpClient.PostAsJsonAsync("fika/api/fleaban", new AddFleaBanRequest()
                 {
                     ProfileId = Profile.ProfileId,
                     AmountOfDays = amountOfDays
@@ -111,10 +111,17 @@ public partial class ModifyProfileDialog
 
         if (!result.Canceled)
         {
-            var response = await HttpClient.PostAsJsonAsync("post/removefleaban", new ProfileIdRequest()
+            var request = new HttpRequestMessage
             {
-                ProfileId = Profile.ProfileId
-            });
+                Method = HttpMethod.Delete,
+                RequestUri = new Uri("fika/api/fleaban", UriKind.Relative),
+                Content = JsonContent.Create(new ProfileIdRequest
+                {
+                    ProfileId = Profile.ProfileId
+                })
+            };
+
+            var response = await HttpClient.SendAsync(request);
 
             if (response.StatusCode is HttpStatusCode.OK)
             {
