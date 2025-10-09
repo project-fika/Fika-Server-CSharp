@@ -13,6 +13,7 @@ using System.Text;
 
 namespace FikaServer.Http.Post;
 
+[Injectable]
 public class HttpCreateHeadlessProfile(ConfigService configService, HeadlessProfileService headlessProfileService, 
     HttpResponseUtil httpResponseUtil) : BaseHttpRequest(configService)
 {
