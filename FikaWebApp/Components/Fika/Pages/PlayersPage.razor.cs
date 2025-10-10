@@ -23,7 +23,7 @@ public partial class PlayersPage
 		try
 		{
 			var result = await HttpClient.GetFromJsonAsync<GetOnlinePlayersResponse>("fika/api/players");
-			if (result != null)
+			if (result != null && result.Players.Count > 0)
 			{
 				_players = result.Players;
 			}
