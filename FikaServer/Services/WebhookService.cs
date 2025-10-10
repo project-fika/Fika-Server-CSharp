@@ -1,6 +1,7 @@
 ﻿using FikaServer.Models.Fika.Config;
 using FikaServer.Models.Webhook;
 using SPTarkov.DI.Annotations;
+using SPTarkov.Server.Core.Models.Logging;
 using SPTarkov.Server.Core.Models.Utils;
 
 namespace FikaServer.Services;
@@ -44,13 +45,14 @@ public class WebhookService(ISptLogger<ConfigService> logger, ConfigService conf
             return false;
         }
 
-        var message = new DiscordWebhook(WebhookConfig.Name, WebhookConfig.AvatarURL, "Server starting");
+        var message = new DiscordWebhook(WebhookConfig.Name, WebhookConfig.AvatarURL, "Server starting...");
         HttpResponseMessage? response = null;
         try
         {
-            response = await _httpClient.PutAsJsonAsync(url, message);
+            response = await _httpClient.PostAsJsonAsync(url, message);
             response.EnsureSuccessStatusCode();
             _verified = true;
+            logger.LogWithColor("Fika webhook verified", LogTextColor.Green);
             return true;
         }
         catch (HttpRequestException ex)

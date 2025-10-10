@@ -16,7 +16,7 @@ namespace FikaServer.OnLoad;
 
 public class FikaPostLoad(ISptLogger<FikaPostLoad> logger, ConfigServer configServer, /*NatPunchServer natPunchServer,*/ ImageRouter imageRouter,
     HeadlessProfileService HeadlessProfileService, LocaleService localeService, PlayerRelationsService playerRelationsCacheService,
-    FriendRequestsService friendRequestsService, ConfigService fikaConfig, NatPunchServer natPunchServer) : IOnLoad
+    FriendRequestsService friendRequestsService, ConfigService fikaConfig, NatPunchServer natPunchServer, WebhookService webhookService) : IOnLoad
 {
     public async Task OnLoad()
     {
@@ -36,6 +36,11 @@ public class FikaPostLoad(ISptLogger<FikaPostLoad> logger, ConfigServer configSe
         BlacklistSpecialProfiles();
         await playerRelationsCacheService.OnPostLoad();
         friendRequestsService.OnPostLoad();
+
+        if (config.Server.Webhook.Enabled)
+        {
+            await webhookService.VerifyWebhook();
+        }
 
         if (config.Background.Enable)
         {

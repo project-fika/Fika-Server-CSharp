@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 
 namespace FikaServer.Models.Webhook;
 
@@ -12,7 +13,12 @@ public record DiscordWebhook
         Content = content;
     }
 
+    [JsonPropertyName("username")]
     public required string Username { get; set; } = "Fika Server";
+
+    [JsonPropertyName("avatar_url")]
     public required string AvatarURL { get; set; } = string.Empty;
+
+    [JsonPropertyName("content")]
     public required string Content { get; set; } = string.Empty;
 }
