@@ -21,7 +21,7 @@ public partial class SendItemDialog
     private string _itemDescription = "Select an item";
     private int _maxItems = 10;
 
-    private static readonly string _defaultImg = "images/missing_item.png";
+    private const string _defaultImg = "images/missing_item.png";
 
     private bool CantConfirm
     {
