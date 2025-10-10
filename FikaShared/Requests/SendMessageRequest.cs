@@ -1,10 +1,11 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
-namespace FikaShared.Requests
+namespace FikaShared.Requests;
+
+public record SendMessageRequest : ProfileIdRequest
 {
-    public record SendMessageRequest : ProfileIdRequest
-    {
-        [JsonPropertyName("message")]
-        public required string Message { get; init; }
-    }
+    [JsonPropertyName("message")]
+    [MaxLength(255)]
+    public required string Message { get; init; }
 }

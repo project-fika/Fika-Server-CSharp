@@ -1,10 +1,9 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace FikaShared.Requests
+namespace FikaShared.Requests;
+
+public record SendItemRequest : BaseSendItemRequest
 {
-    public record SendItemRequest : BaseSendItemRequest
-    {
-        [JsonPropertyName("profileId")]
-        public required string ProfileId { get; init; }
-    }
+    [JsonPropertyName("profileId")]
+    public required string ProfileId { get; init; }
 }

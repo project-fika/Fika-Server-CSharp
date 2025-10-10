@@ -1,10 +1,9 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace FikaShared.Responses
+namespace FikaShared.Responses;
+
+public record CreateHeadlessProfileResponse
 {
-    public record CreateHeadlessProfileResponse
-    {
-        [JsonPropertyName("id")]
-        public required string Id { get; init; }
-    }
+    [JsonPropertyName("id")]
+    public required string Id { get; init; }
 }
