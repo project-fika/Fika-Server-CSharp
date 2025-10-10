@@ -1,5 +1,4 @@
 ﻿using FikaServer.Helpers;
-using FikaServer.Models.Fika.Dialog;
 using FikaServer.Models.Fika.WebSocket;
 using FikaServer.Services;
 using FikaServer.Services.Cache;
@@ -8,11 +7,11 @@ using SPTarkov.Server.Core.Controllers;
 using SPTarkov.Server.Core.Helpers;
 using SPTarkov.Server.Core.Helpers.Dialogue;
 using SPTarkov.Server.Core.Models.Common;
-using SPTarkov.Server.Core.Models.Eft.Common;
 using SPTarkov.Server.Core.Models.Eft.Dialog;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Eft.Ws;
 using SPTarkov.Server.Core.Models.Enums;
+using SPTarkov.Server.Core.Models.Spt.Config;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Servers.Ws;
@@ -29,6 +28,7 @@ public class FikaDialogueController(ISptLogger<FikaDialogueController> logger, D
     IEnumerable<IDialogueChatBot> dialogueChatBots)
 {
     protected readonly List<IDialogueChatBot> _dialogueChatBots = [.. dialogueChatBots];
+    private bool _filtered;
 
     /// <summary>
     /// Gets a list of all friends for the specified profileId
@@ -37,8 +37,27 @@ public class FikaDialogueController(ISptLogger<FikaDialogueController> logger, D
     /// <returns>A new <see cref="GetFriendListDataResponse"/></returns>
     public GetFriendListDataResponse GetFriendsList(MongoId sessionId)
     {
-        var botsAndFriends = configService.Config.Server.SPT.DisableSPTChatBots
-            ? [] : dialogueController.GetActiveChatBots();
+        if (!_filtered && configService.Config.Server.SPT.DisableSPTChatBots)
+        {
+            var sptBots = dialogueController.GetActiveChatBots();
+            for (var i = _dialogueChatBots.Count - 1; i >= 0; i--)
+            {
+                var bot = _dialogueChatBots[i];
+                var chatBot = _dialogueChatBots[i].GetChatBot();
+                if (sptBots.Any(x => x.Id == chatBot.Id))
+                {
+                    _dialogueChatBots.RemoveAt(i);
+                }
+            }
+
+            _filtered = true;
+        }
+
+        List<UserDialogInfo> botsAndFriends = [];
+        foreach (var item in _dialogueChatBots)
+        {
+            botsAndFriends.Add(item.GetChatBot());
+        }
 
         foreach (var friend in playerRelationsHelper.GetFriendsList(sessionId))
         {
