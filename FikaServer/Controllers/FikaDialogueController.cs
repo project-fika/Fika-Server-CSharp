@@ -37,14 +37,12 @@ public class FikaDialogueController(ISptLogger<FikaDialogueController> logger, D
     /// <returns>A new <see cref="GetFriendListDataResponse"/></returns>
     public GetFriendListDataResponse GetFriendsList(MongoId sessionId)
     {
-        List<UserDialogInfo> botsAndFriends = configService.Config.Server.SPT.DisableSPTChatBots
+        var botsAndFriends = configService.Config.Server.SPT.DisableSPTChatBots
             ? [] : dialogueController.GetActiveChatBots();
 
-        List<string> friends = playerRelationsHelper.GetFriendsList(sessionId);
-
-        foreach (string friend in friends)
+        foreach (var friend in playerRelationsHelper.GetFriendsList(sessionId))
         {
-            PmcData? profile = profileHelper.GetPmcProfile(friend);
+            var profile = profileHelper.GetPmcProfile(friend);
             if (profile == null)
             {
                 playerRelationsHelper.RemoveFriend(sessionId, friend);
@@ -66,7 +64,7 @@ public class FikaDialogueController(ISptLogger<FikaDialogueController> logger, D
             });
         }
 
-        foreach (IDialogueChatBot item in _dialogueChatBots)
+        foreach (var item in _dialogueChatBots)
         {
             botsAndFriends.Add(item.GetChatBot());
         }
@@ -107,7 +105,7 @@ public class FikaDialogueController(ISptLogger<FikaDialogueController> logger, D
             Date = timeUtil.GetTimeStamp()
         }).GetAwaiter().GetResult();
 
-        SptProfile fromProfile = saveServer.GetProfile(from)
+        var fromProfile = saveServer.GetProfile(from)
             ?? throw new NullReferenceException($"{from} did not exist in the database");
 
         socketConnectionHandler.SendMessage(to, new WsFriendListAdd()
@@ -134,8 +132,8 @@ public class FikaDialogueController(ISptLogger<FikaDialogueController> logger, D
     /// <returns>The id of the message sent</returns>
     public string SendMessage(MongoId sessionId, SendMessageRequest request, Dictionary<MongoId, SptProfile> profiles)
     {
-        SptProfile receiverProfile = profiles[request.DialogId];
-        SptProfile senderProfile = profiles[sessionId];
+        var receiverProfile = profiles[request.DialogId];
+        var senderProfile = profiles[sessionId];
 
         if (!senderProfile.DialogueRecords.ContainsKey(request.DialogId))
         {
@@ -151,7 +149,7 @@ public class FikaDialogueController(ISptLogger<FikaDialogueController> logger, D
             });
         }
 
-        Dialogue senderDialog = senderProfile.DialogueRecords[request.DialogId];
+        var senderDialog = senderProfile.DialogueRecords[request.DialogId];
         senderDialog.Users = [
             new()
             {
@@ -195,7 +193,7 @@ public class FikaDialogueController(ISptLogger<FikaDialogueController> logger, D
             });
         }
 
-        Dialogue receiverDialog = receiverProfile.DialogueRecords[sessionId];
+        var receiverDialog = receiverProfile.DialogueRecords[sessionId];
         receiverDialog.New++;
         receiverDialog.Users = [
             new()
@@ -249,7 +247,7 @@ public class FikaDialogueController(ISptLogger<FikaDialogueController> logger, D
 
         if (!string.IsNullOrEmpty(request.ReplyTo))
         {
-            ReplyTo? replyMessage = GetMessageToReplyTo(request.DialogId, request.ReplyTo, sessionId);
+            var replyMessage = GetMessageToReplyTo(request.DialogId, request.ReplyTo, sessionId);
             if (replyMessage != null)
             {
                 message.ReplyTo = replyMessage;
@@ -279,14 +277,14 @@ public class FikaDialogueController(ISptLogger<FikaDialogueController> logger, D
     /// <returns>A new <see cref="ReplyTo"/> containing data for the message to reply to</returns>
     private ReplyTo? GetMessageToReplyTo(string recipientId, string replyToId, string dialogueId)
     {
-        Dialogue? currentDialogue = dialogueHelper.GetDialogueFromProfile(recipientId, dialogueId);
+        var currentDialogue = dialogueHelper.GetDialogueFromProfile(recipientId, dialogueId);
         if (currentDialogue == null)
         {
             logger.Warning($"Could not find dialogue {dialogueId} from sender");
             return null;
         }
 
-        Message? message = currentDialogue.Messages
+        var message = currentDialogue.Messages
             .Where(x => x.Id == replyToId)
             .FirstOrDefault();
 
@@ -307,11 +305,11 @@ public class FikaDialogueController(ISptLogger<FikaDialogueController> logger, D
 
     public ValueTask<string> ListInbox(MongoId sessionID)
     {
-        List<FriendRequestListResponse> receivedFriendRequests = friendRequestsService.GetReceivedFriendRequests(sessionID);
+        var receivedFriendRequests = friendRequestsService.GetReceivedFriendRequests(sessionID);
 
-        foreach (FriendRequestListResponse receivedFriendRequest in receivedFriendRequests)
+        foreach (var receivedFriendRequest in receivedFriendRequests)
         {
-            PmcData? profile = profileHelper.GetPmcProfile(receivedFriendRequest.From);
+            var profile = profileHelper.GetPmcProfile(receivedFriendRequest.From);
 
             if (profile == null)
             {
@@ -326,11 +324,11 @@ public class FikaDialogueController(ISptLogger<FikaDialogueController> logger, D
 
     public ValueTask<string> ListOutBox(MongoId sessionID)
     {
-        List<FriendRequestListResponse> sentFriendRequests = friendRequestsService.GetSentFriendRequests(sessionID);
+        var sentFriendRequests = friendRequestsService.GetSentFriendRequests(sessionID);
 
-        foreach (FriendRequestListResponse sentFriendRequest in sentFriendRequests)
+        foreach (var sentFriendRequest in sentFriendRequests)
         {
-            PmcData? profile = profileHelper.GetPmcProfile(sentFriendRequest.To);
+            var profile = profileHelper.GetPmcProfile(sentFriendRequest.To);
 
             if (profile == null)
             {
@@ -350,9 +348,9 @@ public class FikaDialogueController(ISptLogger<FikaDialogueController> logger, D
 
     public ValueTask<string> AcceptAllFriendRequests(MongoId sessionID)
     {
-        List<FriendRequestListResponse> receivedFriendRequests = friendRequestsService.GetReceivedFriendRequests(sessionID);
+        var receivedFriendRequests = friendRequestsService.GetReceivedFriendRequests(sessionID);
 
-        foreach (FriendRequestListResponse receivedFriendRequest in receivedFriendRequests)
+        foreach (var receivedFriendRequest in receivedFriendRequests)
         {
             if (playerRelationsHelper.RemoveFriendRequest(receivedFriendRequest.From, receivedFriendRequest.To, ERemoveFriendReason.Accept))
             {

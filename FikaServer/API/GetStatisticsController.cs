@@ -19,6 +19,11 @@ public class GetStatisticsController(SaveServer saveServer) : ControllerBase
         var statisticsPlayers = new List<StatisticsPlayer>();
         foreach (var player in players)
         {
+            if (player.IsHeadlessProfile())
+            {
+                continue; // ignore headless
+            }
+
             var statPlayer = new StatisticsPlayer
             {
                 Nickname = player.CharacterData.PmcData.Info.Nickname,
