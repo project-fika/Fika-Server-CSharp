@@ -27,6 +27,10 @@ public partial class PlayersPage
 			{
 				_players = result.Players;
 			}
+            else
+            {
+                Snackbar.Add("No players online", Severity.Info);
+            }
 		}
 		catch (Exception ex)
 		{
