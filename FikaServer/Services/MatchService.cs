@@ -200,8 +200,6 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
             IsSpectator = data.IsSpectator
         });
 
-        Task.Run(() => webhookService.SendWebhookMessage($"{data.HostUsername} has started a raid on {data.Settings.Location}."));
-
         return Matches.ContainsKey(data.ServerId) && _timeoutIntervals.ContainsKey(data.ServerId);
     }
 

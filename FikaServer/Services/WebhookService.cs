@@ -79,6 +79,7 @@ public class WebhookService(ISptLogger<ConfigService> logger, ConfigService conf
     {
         if (!_verified || !WebhookConfig.Enabled)
         {
+            logger.Error("A webhook broadcast was attempted when it's not verified or disabled.");
             return;
         }
 
@@ -86,7 +87,7 @@ public class WebhookService(ISptLogger<ConfigService> logger, ConfigService conf
         HttpResponseMessage? response = null;
         try
         {
-            response = await _httpClient.PutAsJsonAsync(WebhookConfig.Url, webhookMessage);
+            response = await _httpClient.PostAsJsonAsync(WebhookConfig.Url, webhookMessage);
             response.EnsureSuccessStatusCode();
         }
         catch (HttpRequestException ex)
