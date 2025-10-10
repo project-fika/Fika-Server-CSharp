@@ -252,11 +252,15 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
         if (Matches.TryGetValue(matchId, out var match))
         {
             match.Status = status;
-        }
 
-        if (status == EFikaMatchStatus.COMPLETE)
+            if (status == EFikaMatchStatus.COMPLETE && match.IsHeadless)
+            {
+                await headlessService.SendJoinMessageToRequester(matchId);
+            }
+        }
+        else
         {
-            await headlessService.SendJoinMessageToRequester(matchId);
+            logger.Error($"Failed to find match {matchId} when trying to set status to {status}");
         }
     }
 
