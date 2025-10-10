@@ -6,6 +6,7 @@ using FikaServer.Models.Fika.Routes.Raid.Create;
 using FikaServer.Services.Headless;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Common;
+using SPTarkov.Server.Core.Models.Eft.Common.Tables;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
@@ -13,13 +14,15 @@ using SPTarkov.Server.Core.Services;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace FikaServer.Services;
 
 [Injectable(InjectionType.Singleton)]
 public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleService locationLifecycleService,
     SaveServer saveServer, ConfigService fikaConfig, HeadlessHelper headlessHelper, HeadlessService headlessService,
-    InsuranceService insuranceService, PresenceService presenceService)
+    InsuranceService insuranceService, PresenceService presenceService, WebhookService webhookService)
 {
     public readonly ConcurrentDictionary<MongoId, FikaMatch> Matches = [];
     protected readonly ConcurrentDictionary<MongoId, Timer> _timeoutIntervals = [];
@@ -37,7 +40,7 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
 
         Timer timer = new(_ =>
         {
-            FikaMatch? match = GetMatch(matchId);
+            var match = GetMatch(matchId);
             if (match != null)
             {
                 if (match.Timeout++ >= fikaConfig.Config.Server.SessionTimeout)
@@ -61,7 +64,7 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
     /// <param name="matchId">The match ID to remove a timeout for</param>
     private void RemoveTimeoutInterval(MongoId matchId)
     {
-        if (_timeoutIntervals.TryRemove(matchId, out Timer? timer))
+        if (_timeoutIntervals.TryRemove(matchId, out var timer))
         {
             timer.Dispose();
         }
@@ -78,7 +81,7 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
     /// <returns>Returns the match object if a match is found with this match ID, returns null if not.</returns>
     public FikaMatch? GetMatch(MongoId matchId)
     {
-        if (Matches.TryGetValue(matchId, out FikaMatch? match))
+        if (Matches.TryGetValue(matchId, out var match))
         {
             return match;
         }
@@ -94,12 +97,12 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
     /// <returns>Returns a FikaPlayer object if the player is found, returns null if not.</returns>
     public FikaPlayer? GetPlayerInMatch(MongoId matchId, MongoId playerId)
     {
-        if (!Matches.TryGetValue(matchId, out FikaMatch? match))
+        if (!Matches.TryGetValue(matchId, out var match))
         {
             return null;
         }
 
-        if (!match.Players.TryGetValue(playerId, out FikaPlayer? value))
+        if (!match.Players.TryGetValue(playerId, out var value))
         {
             return null;
         }
@@ -114,7 +117,7 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
     /// <returns>The match ID containing the player, or null if the player isn't in a match.</returns>
     public MongoId? GetMatchIdByPlayer(MongoId playerId)
     {
-        foreach ((MongoId matchId, FikaMatch match) in Matches)
+        foreach ((var matchId, var match) in Matches)
         {
             if (match.Players.ContainsKey(playerId))
             {
@@ -132,16 +135,14 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
     /// <returns>A nullable match identifier associated with the profile, or null if no match is found or the profile does exist.</returns>
     public MongoId? GetMatchIdByProfile(MongoId sessionId)
     {
-        SptProfile profile = saveServer.GetProfile(sessionId);
+        var profile = saveServer.GetProfile(sessionId);
         if (profile == null)
         {
             return null;
         }
 
-        MongoId? matchid = GetMatchIdByPlayer(profile.CharacterData.PmcData.Id.GetValueOrDefault())
+        return GetMatchIdByPlayer(profile.CharacterData.PmcData.Id.GetValueOrDefault())
             ?? GetMatchIdByPlayer(profile.CharacterData.ScavData.Id.GetValueOrDefault());
-
-        return matchid;
     }
 
     /// <summary>
@@ -199,6 +200,8 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
             IsSpectator = data.IsSpectator
         });
 
+        Task.Run(() => webhookService.SendWebhookMessage($"{data.HostUsername} has started a raid on {data.Settings.Location}."));
+
         return Matches.ContainsKey(data.ServerId) && _timeoutIntervals.ContainsKey(data.ServerId);
     }
 
@@ -206,12 +209,14 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
     /// Deletes a coop match and removes the timeout interval
     /// </summary>
     /// <param name="matchId">The match Id to remove</param>
-    public void DeleteMatch(MongoId matchId)
+    public async ValueTask DeleteMatch(MongoId matchId)
     {
-        if (Matches.TryRemove(matchId, out FikaMatch? match))
+        if (Matches.TryRemove(matchId, out var match))
         {
             RemoveTimeoutInterval(matchId);
             logger.Info($"Deleted match [{matchId}]");
+
+            await webhookService.SendWebhookMessage($"{match.HostUsername}'s raid has ended.");
         }
         else
         {
@@ -224,7 +229,7 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
     /// </summary>
     /// <param name="matchId"></param>
     /// <param name="reason"></param>
-    public void EndMatch(MongoId matchId, EFikaMatchEndSessionMessage reason)
+    public async ValueTask EndMatch(MongoId matchId, EFikaMatchEndSessionMessage reason)
     {
         logger.Info($"Coop session {matchId} has ended {Enum.GetName(reason)}");
 
@@ -234,7 +239,7 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
         }
 
         insuranceService.OnMatchEnd(matchId);
-        DeleteMatch(matchId);
+        await DeleteMatch(matchId);
     }
 
     /// <summary>
@@ -244,7 +249,7 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
     /// <param name="status"></param>
     public async Task SetMatchStatus(MongoId matchId, EFikaMatchStatus status)
     {
-        if (Matches.TryGetValue(matchId, out FikaMatch? match))
+        if (Matches.TryGetValue(matchId, out var match))
         {
             match.Status = status;
         }
@@ -265,7 +270,7 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
     /// <param name="isHeadless"></param>
     public void SetMatchHost(MongoId matchId, string[] ips, int port, bool natPunch, bool isHeadless)
     {
-        if (Matches.TryGetValue(matchId, out FikaMatch? match))
+        if (Matches.TryGetValue(matchId, out var match))
         {
             match.Ips = ips;
             match.Port = port;
@@ -280,10 +285,10 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
     /// <param name="matchId"></param>
     public void ResetTimeout(MongoId matchId)
     {
-        if (Matches.TryGetValue(matchId, out FikaMatch? match))
+        if (Matches.TryGetValue(matchId, out var match))
         {
             match.Timeout = 0;
-            if (_timeoutIntervals.TryGetValue(matchId, out Timer? timer))
+            if (_timeoutIntervals.TryGetValue(matchId, out var timer))
             {
                 // Restart the 1-minute countdown
                 timer.Change(TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
@@ -299,7 +304,7 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
     /// <param name="data"></param>
     public void AddPlayerToMatch(MongoId matchId, MongoId playerId, FikaPlayer data)
     {
-        if (Matches.TryGetValue(matchId, out FikaMatch? match))
+        if (Matches.TryGetValue(matchId, out var match))
         {
             match.Players.Add(playerId, data);
         }
@@ -335,9 +340,9 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
     /// <param name="playerId"></param>
     public void SetPlayerDead(MongoId matchId, MongoId playerId)
     {
-        if (Matches.TryGetValue(matchId, out FikaMatch? match))
+        if (Matches.TryGetValue(matchId, out var match))
         {
-            if (!match.Players.TryGetValue(playerId, out FikaPlayer? value))
+            if (!match.Players.TryGetValue(playerId, out var value))
             {
                 return;
             }
@@ -354,9 +359,9 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
     /// <param name="groupId"></param>
     public void SetPlayerGroup(MongoId matchId, MongoId playerId, string groupId)
     {
-        if (Matches.TryGetValue(matchId, out FikaMatch? match))
+        if (Matches.TryGetValue(matchId, out var match))
         {
-            if (!match.Players.TryGetValue(playerId, out FikaPlayer? value))
+            if (!match.Players.TryGetValue(playerId, out var value))
             {
                 return;
             }
@@ -372,7 +377,7 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
     /// <param name="playerId"></param>
     public void RemovePlayerFromMatch(MongoId matchId, MongoId playerId)
     {
-        if (Matches.TryGetValue(matchId, out FikaMatch? match))
+        if (Matches.TryGetValue(matchId, out var match))
         {
             match.Players.Remove(playerId);
 
