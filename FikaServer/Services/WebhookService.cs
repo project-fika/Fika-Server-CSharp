@@ -45,7 +45,7 @@ public class WebhookService(ISptLogger<ConfigService> logger, ConfigService conf
             return false;
         }
 
-        var message = new DiscordWebhook(WebhookConfig.Name, WebhookConfig.AvatarURL, "Server starting...");
+        var message = new DiscordWebhook(WebhookConfig.Name, WebhookConfig.AvatarURL, "Server started");
         HttpResponseMessage? response = null;
         try
         {
