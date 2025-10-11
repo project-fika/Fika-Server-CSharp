@@ -83,11 +83,6 @@ public class FikaDialogueController(ISptLogger<FikaDialogueController> logger, D
             });
         }
 
-        foreach (var item in _dialogueChatBots)
-        {
-            botsAndFriends.Add(item.GetChatBot());
-        }
-
         return new()
         {
             Friends = botsAndFriends,

@@ -14,14 +14,14 @@ public class GetFriendListOverride : AbstractPatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return typeof(DialogueController).GetMethod(nameof(DialogueController.GetFriendList))!;
+        return typeof(DialogueController)
+            .GetMethod(nameof(DialogueController.GetFriendList))!;
     }
 
     [PatchPrefix]
     public static bool Prefix(MongoId sessionId, ref GetFriendListDataResponse __result)
     {
         FikaDialogueController? dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>();
-
         __result = dialogueController.GetFriendsList(sessionId);
 
         return false;
@@ -32,7 +32,8 @@ public class SendMessageOverride : AbstractPatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return typeof(DialogueController).GetMethod(nameof(DialogueController.SendMessage))!;
+        return typeof(DialogueController)
+            .GetMethod(nameof(DialogueController.SendMessage))!;
     }
 
     [PatchPrefix]
