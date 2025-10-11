@@ -75,7 +75,7 @@ public partial class HeadlessPage
             {
                 ProfileId = headless.ProfileId
             };
-            var result = await HttpClient.PostAsJsonAsync<ProfileIdRequest>("post/restartheadless", request);
+            var result = await HttpClient.PostAsJsonAsync("fika/api/restartheadless", request);
 
             if (!result.IsSuccessStatusCode)
             {
