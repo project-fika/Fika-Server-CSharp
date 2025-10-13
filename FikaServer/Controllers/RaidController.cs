@@ -51,7 +51,7 @@ public class RaidController(MatchService matchService, HeadlessHelper headlessHe
             RaidTime = request.Time
         });
 
-        await webhookService.SendWebhookMessage($"{hostUsername} has started a raid on {request.Settings.Location}.");
+        await webhookService.SendWebhookMessage($"{hostUsername} has started a raid on {request.Settings.Location.ToFikaLocation()}.");
 
         return new FikaRaidCreateResponse
         {
