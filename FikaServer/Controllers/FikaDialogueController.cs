@@ -30,6 +30,9 @@ public class FikaDialogueController(ISptLogger<FikaDialogueController> logger, D
     protected readonly List<IDialogueChatBot> _dialogueChatBots = [.. dialogueChatBots];
     private bool _filtered;
 
+    private const string _commandoId = "6723fd51c5924c57ce0ca01e";
+    private const string _sptFriendId = "6723fd51c5924c57ce0ca01f";
+
     /// <summary>
     /// Gets a list of all friends for the specified profileId
     /// </summary>
@@ -39,12 +42,10 @@ public class FikaDialogueController(ISptLogger<FikaDialogueController> logger, D
     {
         if (!_filtered && configService.Config.Server.SPT.DisableSPTChatBots)
         {
-            var sptBots = dialogueController.GetActiveChatBots();
             for (var i = _dialogueChatBots.Count - 1; i >= 0; i--)
             {
-                var bot = _dialogueChatBots[i];
                 var chatBot = _dialogueChatBots[i].GetChatBot();
-                if (sptBots.Any(x => x.Id == chatBot.Id))
+                if (chatBot.Id == _commandoId || chatBot.Id == _sptFriendId)
                 {
                     _dialogueChatBots.RemoveAt(i);
                 }

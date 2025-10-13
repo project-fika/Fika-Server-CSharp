@@ -308,11 +308,14 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
     {
         if (Matches.TryGetValue(matchId, out var match))
         {
-            match.Players.Add(playerId, data);
+            if (!match.Players.TryAdd(playerId, data))
+            {
+                logger.Error($"Could not add player ({playerId}) to match {matchId}, they were most likely already in it");
+            }
         }
         else
         {
-            logger.Error($"Could not add player({playerId}) to match {matchId}");
+            logger.Error($"Could not add player ({playerId}) to match {matchId}");
             return;
         }
 

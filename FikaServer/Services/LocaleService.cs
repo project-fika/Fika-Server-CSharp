@@ -23,7 +23,7 @@ public class LocaleService(FileUtil fileUtil, ConfigService fikaConfig, Database
     {
         _globalLocales = await RecursiveLoadFiles(_globalLocaleDir);
 
-        foreach ((string locale, var lazyLoadedValue) in databaseServer.GetTables().Locales.Global)
+        foreach ((var locale, var lazyLoadedValue) in databaseServer.GetTables().Locales.Global)
         {
             lazyLoadedValue.AddTransformer(localeData =>
             {
@@ -36,14 +36,7 @@ public class LocaleService(FileUtil fileUtil, ConfigService fikaConfig, Database
 
                 foreach (var fikaLocale in fikaLocales)
                 {
-                    if (localeData.ContainsKey(fikaLocale.Key))
-                    {
-                        localeData[fikaLocale.Key] = fikaLocale.Value;
-                    }
-                    else
-                    {
-                        localeData.Add(fikaLocale.Key, fikaLocale.Value);
-                    }
+                    localeData[fikaLocale.Key] = fikaLocale.Value;
                 }
 
                 return localeData;

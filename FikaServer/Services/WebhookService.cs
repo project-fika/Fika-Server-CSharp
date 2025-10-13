@@ -77,7 +77,12 @@ public class WebhookService(ISptLogger<ConfigService> logger, ConfigService conf
 
     public async Task SendWebhookMessage(string message)
     {
-        if (!_verified || !WebhookConfig.Enabled)
+        if (!WebhookConfig.Enabled)
+        {
+            return;
+        }
+
+        if (!_verified)
         {
             logger.Error("A webhook broadcast was attempted when it's not verified or disabled.");
             return;

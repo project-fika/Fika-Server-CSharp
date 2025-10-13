@@ -21,8 +21,8 @@ public class GetFriendListOverride : AbstractPatch
     [PatchPrefix]
     public static bool Prefix(MongoId sessionId, ref GetFriendListDataResponse __result)
     {
-        FikaDialogueController? dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>();
-        __result = dialogueController.GetFriendsList(sessionId);
+        var dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>();
+        __result = dialogueController!.GetFriendsList(sessionId);
 
         return false;
     }
@@ -39,12 +39,12 @@ public class SendMessageOverride : AbstractPatch
     [PatchPrefix]
     public static bool Prefix(MongoId sessionId, SendMessageRequest request, ref ValueTask<string> __result)
     {
-        FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
+        var dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
             ?? throw new NullReferenceException("Missing FikaDialogueController");
-        SaveServer saveServer = ServiceLocator.ServiceProvider.GetService<SaveServer>()
+        var saveServer = ServiceLocator.ServiceProvider.GetService<SaveServer>()
             ?? throw new NullReferenceException("Missing SaveServer");
 
-        Dictionary<MongoId, SptProfile> profiles = saveServer.GetProfiles();
+        var profiles = saveServer.GetProfiles();
         if (!profiles.ContainsKey(sessionId) || !profiles.ContainsKey(request.DialogId))
         {
             return true;
