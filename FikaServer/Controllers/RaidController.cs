@@ -42,7 +42,7 @@ public class RaidController(MatchService matchService, HeadlessHelper headlessHe
             hostUsername = headlessHelper.GetHeadlessNickname(request.ServerId);
         }
 
-        var requesterName = headlessHelper.GetRequesterUsername(request.ServerId) ?? "";
+        var requesterName = headlessHelper.GetRequesterUsername(request.ServerId) ?? hostUsername;
 
         await notificationWebSocket.BroadcastAsync(new StartRaidNotification
         {
@@ -53,7 +53,7 @@ public class RaidController(MatchService matchService, HeadlessHelper headlessHe
             RaidTime = request.Time
         });
 
-        await webhookService.SendWebhookMessage($"{requesterName ?? hostUsername} has started a raid on {request.Settings.Location.ToLower().ToFikaLocation()}.");
+        await webhookService.SendWebhookMessage($"{requesterName} has started a raid on {request.Settings.Location.ToLower().ToFikaLocation()}.");
 
         return new FikaRaidCreateResponse
         {
