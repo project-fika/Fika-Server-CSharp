@@ -362,6 +362,9 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
+# Rider
+/.idea/*
+
 # Fika
 /FikaServer/Properties/launchSettings.json
 /FikaWebApp/fikaWebApp.db
@@ -374,4 +377,4 @@ FodyWeavers.xsd
 /FikaWebApp/Properties/serviceDependencies.json
 /FikaWebApp/appsettings.json
 /FikaWebApp/appsettings.Development.json
-/.idea/*
+/FikaWebApp/database
