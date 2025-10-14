@@ -6,24 +6,9 @@ namespace FikaWebApp.Services;
 
 public class SendTimersService(ILogger<SendTimersService> logger, HttpClient httpClient)
 {
-    public Dictionary<Timer, SendItemRequest> Timers
-    {
-        get
-        {
-            return _timers;
-        }
-    }
+    public Dictionary<Timer, SendItemRequest> Timers { get; } = [];
+    public Dictionary<Timer, SendItemToAllRequest> ToAllTimers { get; } = [];
 
-    public Dictionary<Timer, SendItemToAllRequest> ToAllTimers
-    {
-        get
-        {
-            return _toAllTimers;
-        }
-    }
-
-    private readonly Dictionary<Timer, SendItemRequest> _timers = [];
-    private readonly Dictionary<Timer, SendItemToAllRequest> _toAllTimers = [];
     private readonly Lock _lock = new();
 
     private readonly JsonSerializerOptions _serializerOptions = new(JsonSerializerDefaults.Web)
@@ -94,11 +79,11 @@ public class SendTimersService(ILogger<SendTimersService> logger, HttpClient htt
         {
             TimerSaveData data = new()
             {
-                SingleRequests = _timers.Count != 0
-                    ? _timers.Values.ToDictionary(r => r.SendDate.GetValueOrDefault().Ticks)
+                SingleRequests = Timers.Count != 0
+                    ? Timers.Values.ToDictionary(r => r.SendDate.GetValueOrDefault().Ticks)
                     : [],
-                ToAllRequests = _toAllTimers.Count != 0
-                    ? _toAllTimers.Values.ToDictionary(r => r.SendDate.GetValueOrDefault().Ticks)
+                ToAllRequests = ToAllTimers.Count != 0
+                    ? ToAllTimers.Values.ToDictionary(r => r.SendDate.GetValueOrDefault().Ticks)
                     : []
             };
 
@@ -121,12 +106,12 @@ public class SendTimersService(ILogger<SendTimersService> logger, HttpClient htt
     {
         lock (_lock)
         {
-            foreach (var timer in _timers.Keys.Concat(_toAllTimers.Keys))
+            foreach (var timer in Timers.Keys.Concat(ToAllTimers.Keys))
             {
                 timer.Dispose();
             }
-            _timers.Clear();
-            _toAllTimers.Clear();
+            Timers.Clear();
+            ToAllTimers.Clear();
         }
 
         Save();
@@ -162,7 +147,7 @@ public class SendTimersService(ILogger<SendTimersService> logger, HttpClient htt
             {
                 lock (_lock)
                 {
-                    _timers.Remove(timer!);
+                    Timers.Remove(timer!);
                     timer!.Dispose();
                 }
                 await Save();
@@ -171,7 +156,7 @@ public class SendTimersService(ILogger<SendTimersService> logger, HttpClient htt
 
         lock (_lock)
         {
-            _timers.Add(timer, request);
+            Timers.Add(timer, request);
             if (save)
             {
                 Save();
@@ -215,7 +200,7 @@ public class SendTimersService(ILogger<SendTimersService> logger, HttpClient htt
             {
                 lock (_lock)
                 {
-                    _toAllTimers.Remove(timer!);
+                    ToAllTimers.Remove(timer!);
                     timer!.Dispose();
                 }
                 await Save();
@@ -224,7 +209,7 @@ public class SendTimersService(ILogger<SendTimersService> logger, HttpClient htt
 
         lock (_lock)
         {
-            _toAllTimers.Add(timer, request);
+            ToAllTimers.Add(timer, request);
             if (save)
             {
                 Save();
@@ -238,17 +223,17 @@ public class SendTimersService(ILogger<SendTimersService> logger, HttpClient htt
     {
         lock (_lock)
         {
-            if (_timers.TryGetValue(timer, out var request))
+            if (Timers.TryGetValue(timer, out var request))
             {
                 timer.Dispose();
-                _timers.Remove(timer);
+                Timers.Remove(timer);
                 logger.LogInformation("Cancelled timer for ProfileId {ProfileId}", request.ProfileId);
                 Save();
             }
-            else if (_toAllTimers.TryGetValue(timer, out var _))
+            else if (ToAllTimers.TryGetValue(timer, out var _))
             {
                 timer.Dispose();
-                _toAllTimers.Remove(timer);
+                ToAllTimers.Remove(timer);
                 logger.LogInformation("Cancelled timer that was queued for everyone");
                 Save();
             }
