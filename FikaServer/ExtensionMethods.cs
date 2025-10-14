@@ -78,7 +78,7 @@ public static class ExtensionMethods
             "sandbox" or "sandbox_high" => EFikaLocation.GroundZero,
             "shoreline" => EFikaLocation.Shoreline,
             "tarkovstreets" => EFikaLocation.Streets,
-            "woods" => EFikaLocation.Streets,
+            "woods" => EFikaLocation.Woods,
             _ => EFikaLocation.None,
         };
     }
@@ -107,7 +107,7 @@ public static class ExtensionMethods
             "sandbox" or "sandbox_high" => EFikaLocation.GroundZero,
             "shoreline" => EFikaLocation.Shoreline,
             "tarkovstreets" => EFikaLocation.Streets,
-            "woods" => EFikaLocation.Streets,
+            "woods" => EFikaLocation.Woods,
             _ => EFikaLocation.None,
         };
     }
