@@ -13,6 +13,7 @@ public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer>
 {
     private readonly Dictionary<string, NatPunchServerPeer> _servers = [];
     private NetManager? _netServer;
+    private CancellationTokenSource _pollEventsCts;
 
     public void Start()
     {
@@ -30,6 +31,9 @@ public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer>
             _netServer.Start(fikaConfig.Config.Server.SPT.Http.Ip, "", fikaConfig.Config.NatPunchServer.Port);
             _netServer.NatPunchModule.Init(this);
 
+            _pollEventsCts = new CancellationTokenSource();
+            Task.Run(PollEventsTask, _pollEventsCts.Token);
+
             logger.Success($"[Fika NatPunch] NatPunchServer started on {fikaConfig.Config.Server.SPT.Http.Ip}:{_netServer.LocalPort}");
         }
         catch (Exception ex)
@@ -41,6 +45,7 @@ public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer>
     public void Stop()
     {
         _netServer?.Stop();
+        _pollEventsCts?.Cancel();
     }
 
     public void PollEvents()
@@ -153,5 +158,20 @@ public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer>
     public void OnPeerDisconnected(NetPeer peer, DisconnectInfo disconnectInfo)
     {
         // Do nothing
+    }
+
+    private async Task PollEventsTask()
+    {
+        while (_netServer != null)
+        {
+            if (_pollEventsCts.IsCancellationRequested)
+            {
+                break;
+            }
+
+            PollEvents();
+
+            await Task.Delay(TimeSpan.FromMilliseconds(100));
+        }
     }
 }
