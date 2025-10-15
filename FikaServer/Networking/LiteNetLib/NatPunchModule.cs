@@ -218,7 +218,6 @@ public sealed class NatPunchModule
     //We got request and must introduce
     private void OnNatIntroductionRequest(NatIntroduceRequestPacket req, IPEndPoint senderEndPoint)
     {
-        Console.WriteLine("OnNatIntroductionRequest");
         if (UnsyncedEvents)
         {
             _natPunchListener.OnNatIntroductionRequest(

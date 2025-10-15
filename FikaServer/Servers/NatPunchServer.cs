@@ -3,6 +3,7 @@ using FikaServer.Models.Servers;
 using FikaServer.Services;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Utils;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 
@@ -11,9 +12,9 @@ namespace FikaServer.Servers;
 [Injectable(InjectionType.Singleton)]
 public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer> logger) : INatPunchListener, INetEventListener
 {
-    private readonly Dictionary<string, NatPunchServerPeer> _servers = [];
+    private readonly Dictionary<string, NatPunchServerPeer> _natPunchServerPeers = [];
     private NetManager? _netServer;
-    private CancellationTokenSource _pollEventsCts;
+    private CancellationTokenSource? _pollEventsRoutine;
 
     public void Start()
     {
@@ -31,8 +32,8 @@ public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer>
             _netServer.Start(fikaConfig.Config.Server.SPT.Http.Ip, "", fikaConfig.Config.NatPunchServer.Port);
             _netServer.NatPunchModule.Init(this);
 
-            _pollEventsCts = new CancellationTokenSource();
-            Task.Run(PollEventsTask, _pollEventsCts.Token);
+            _pollEventsRoutine = new CancellationTokenSource();
+            Task.Run(PollEventsRoutine, _pollEventsRoutine.Token);
 
             logger.Success($"[Fika NatPunch] NatPunchServer started on {fikaConfig.Config.Server.SPT.Http.Ip}:{_netServer.LocalPort}");
         }
@@ -45,7 +46,7 @@ public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer>
     public void Stop()
     {
         _netServer?.Stop();
-        _pollEventsCts?.Cancel();
+        _pollEventsRoutine?.Cancel();
     }
 
     public void PollEvents()
@@ -58,7 +59,6 @@ public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer>
     {
         string introductionType;
         string sessionId;
-        NatPunchServerPeer sPeer;
 
         try
         {
@@ -74,7 +74,7 @@ public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer>
         switch (introductionType)
         {
             case "server":
-                if (_servers.TryGetValue(sessionId, out sPeer))
+                if (_natPunchServerPeers.ContainsKey(sessionId))
                 {
                     logger.Info($"[Fika NatPunch] KeepAlive {sessionId} ({remoteEndPoint})");
                 }
@@ -83,11 +83,11 @@ public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer>
                     logger.Info($"[Fika NatPunch] Added {sessionId} ({remoteEndPoint}) to server list");
                 }
 
-                _servers[sessionId] = new NatPunchServerPeer(localEndPoint, remoteEndPoint);
+                _natPunchServerPeers[sessionId] = new(localEndPoint, remoteEndPoint);
                 break;
 
             case "client":
-                if (_servers.TryGetValue(sessionId, out sPeer))
+                if (_natPunchServerPeers.TryGetValue(sessionId, out NatPunchServerPeer? sPeer))
                 {
                     logger.Info($"[Fika NatPunch] Introducing server {sessionId} ({sPeer.ExternalAddr}) to client ({remoteEndPoint})");
 
@@ -160,18 +160,38 @@ public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer>
         // Do nothing
     }
 
-    private async Task PollEventsTask()
+    private void RemoveInactiveServerPeers()
     {
-        while (_netServer != null)
+        DateTime dateTimeNow = DateTime.UtcNow;
+
+        foreach (string sessionId in _natPunchServerPeers.Keys)
         {
-            if (_pollEventsCts.IsCancellationRequested)
+            NatPunchServerPeer peer = _natPunchServerPeers[sessionId];
+
+            if (peer != null)
+            {
+                if (dateTimeNow - peer.CreationTime > TimeSpan.FromMinutes(1))
+                {
+                    _natPunchServerPeers.Remove(sessionId);
+                    logger.Info($"[Fika NatPunch] Removed inactive server: {sessionId} ({peer.ExternalAddr})");
+                }
+            }
+        }
+    }
+
+    private async Task PollEventsRoutine()
+    {
+        while (_netServer != null && _pollEventsRoutine != null)
+        {
+            if (_pollEventsRoutine.IsCancellationRequested)
             {
                 break;
             }
 
             PollEvents();
+            RemoveInactiveServerPeers();
 
-            await Task.Delay(TimeSpan.FromMilliseconds(100));
+            await Task.Delay(TimeSpan.FromSeconds(1));
         }
     }
 }
