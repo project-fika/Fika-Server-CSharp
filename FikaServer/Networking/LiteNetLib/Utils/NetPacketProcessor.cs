@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using Fika.Core.Networking.LiteNetLib;
+using System.Diagnostics.CodeAnalysis;
 
 namespace FikaServer.Networking.LiteNetLib.Utils;
 

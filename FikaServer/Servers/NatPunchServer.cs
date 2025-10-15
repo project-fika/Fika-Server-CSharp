@@ -1,6 +1,5 @@
 ﻿using Fika.Core.Networking.LiteNetLib;
 using FikaServer.Models.Servers;
-using FikaServer.Networking.LiteNetLib;
 using FikaServer.Services;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Utils;

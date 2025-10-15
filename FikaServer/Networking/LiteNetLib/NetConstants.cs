@@ -1,4 +1,4 @@
-﻿namespace FikaServer.Networking.LiteNetLib;
+﻿namespace Fika.Core.Networking.LiteNetLib;
 
 /// <summary>
 /// Sending method type

@@ -1,5 +1,4 @@
 ﻿#nullable disable
-using FikaServer.Networking.LiteNetLib;
 using System.Net;
 
 namespace Fika.Core.Networking.LiteNetLib;

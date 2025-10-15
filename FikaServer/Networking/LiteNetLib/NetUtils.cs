@@ -1,11 +1,10 @@
 ﻿#nullable disable
-using Fika.Core.Networking.LiteNetLib;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 
-namespace FikaServer.Networking.LiteNetLib;
+namespace Fika.Core.Networking.LiteNetLib;
 
 /// <summary>
 /// Address type that you want to receive from NetUtils.GetLocalIp method

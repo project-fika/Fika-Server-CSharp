@@ -1,5 +1,4 @@
 ﻿using FikaServer.Callbacks;
-using FikaServer.Models.Fika.Routes.Raid;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Models.Eft.Common;
