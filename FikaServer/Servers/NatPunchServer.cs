@@ -14,7 +14,7 @@ public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer>
 {
     private readonly Dictionary<string, NatPunchServerPeer> _natPunchServerPeers = [];
     private NetManager? _netServer;
-    private CancellationTokenSource? _pollEventsRoutine;
+    private CancellationTokenSource? _pollEventsRoutineCts;
 
     public void Start()
     {
@@ -32,8 +32,8 @@ public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer>
             _netServer.Start(fikaConfig.Config.Server.SPT.Http.Ip, "", fikaConfig.Config.NatPunchServer.Port);
             _netServer.NatPunchModule.Init(this);
 
-            _pollEventsRoutine = new CancellationTokenSource();
-            Task.Run(PollEventsRoutine, _pollEventsRoutine.Token);
+            _pollEventsRoutineCts = new CancellationTokenSource();
+            Task.Run(PollEventsRoutine, _pollEventsRoutineCts.Token);
 
             logger.Success($"[Fika NatPunch] NatPunchServer started on {fikaConfig.Config.Server.SPT.Http.Ip}:{_netServer.LocalPort}");
         }
@@ -46,7 +46,7 @@ public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer>
     public void Stop()
     {
         _netServer?.Stop();
-        _pollEventsRoutine?.Cancel();
+        _pollEventsRoutineCts?.Cancel();
     }
 
     public void PollEvents()
@@ -181,9 +181,9 @@ public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer>
 
     private async Task PollEventsRoutine()
     {
-        while (_netServer != null && _pollEventsRoutine != null)
+        while (_netServer != null && _pollEventsRoutineCts != null)
         {
-            if (_pollEventsRoutine.IsCancellationRequested)
+            if (_pollEventsRoutineCts.IsCancellationRequested)
             {
                 break;
             }
