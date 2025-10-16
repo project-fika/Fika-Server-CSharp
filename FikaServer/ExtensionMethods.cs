@@ -83,35 +83,6 @@ public static class ExtensionMethods
         };
     }
 
-    public static EFikaLocation ToFikaLocation(this FikaPlayerPresence presence)
-    {
-        if (presence.RaidInformation != null)
-        {
-            return presence.RaidInformation.Location switch
-            {
-                "bigmap" => EFikaLocation.Customs,
-                "factory4_day" or "factory4_night" => EFikaLocation.Factory,
-                "interchange" => EFikaLocation.Interchange,
-                "laboratory" => EFikaLocation.Laboratory,
-                "labyrinth" => EFikaLocation.Labyrinth,
-                "lighthouse" => EFikaLocation.Lighthouse,
-                "rezervbase" => EFikaLocation.Reserve,
-                "sandbox" or "sandbox_high" => EFikaLocation.GroundZero,
-                "shoreline" => EFikaLocation.Shoreline,
-                "tarkovstreets" => EFikaLocation.Streets,
-                "woods" => EFikaLocation.Woods,
-                _ => EFikaLocation.None,
-            };
-        }
-
-        if (presence.Activity is EFikaPlayerPresences.IN_HIDEOUT)
-        {
-            return EFikaLocation.Hideout;
-        }
-
-        return EFikaLocation.None;
-    }
-
     /// <summary>
     /// Checks if the given profile is a headless profile
     /// </summary>
