@@ -16,7 +16,6 @@ using SPTarkov.Server.Core.Controllers;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.InRaid;
 using SPTarkov.Server.Core.Models.Utils;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace FikaServer.Controllers;
 
@@ -42,7 +41,7 @@ public class RaidController(MatchService matchService, HeadlessHelper headlessHe
             hostUsername = headlessHelper.GetHeadlessNickname(request.ServerId);
         }
 
-        var requesterName = headlessHelper.GetRequesterUsername(request.ServerId) ?? "";
+        var requesterName = headlessHelper.GetRequesterUsername(request.ServerId) ?? hostUsername;
 
         await notificationWebSocket.BroadcastAsync(new StartRaidNotification
         {
@@ -53,7 +52,7 @@ public class RaidController(MatchService matchService, HeadlessHelper headlessHe
             RaidTime = request.Time
         });
 
-        await webhookService.SendWebhookMessage($"{requesterName ?? hostUsername} has started a raid on {request.Settings.Location.ToFikaLocation()}.");
+        await webhookService.SendWebhookMessage($"{requesterName} has started a raid on {request.Settings.Location.ToLower().ToFikaLocation()}.");
 
         return new FikaRaidCreateResponse
         {

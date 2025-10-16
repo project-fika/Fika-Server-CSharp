@@ -54,8 +54,13 @@ public class Program
             })
             .AddIdentityCookies();*/
 
+        if (!Directory.Exists("database"))
+        {
+            Directory.CreateDirectory("database"); 
+        }
+
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlite("Data Source = fikaWebApp.db"));
+            options.UseSqlite("Data Source = database/fikaWebApp.db"));
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
         builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>

@@ -2,6 +2,8 @@
 #if NETCOREAPP3_0_OR_GREATER || NETCOREAPP3_1 || NET5_0
 using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics.X86;
+using Fika.Core.Networking.LiteNetLib;
+
 
 
 #endif

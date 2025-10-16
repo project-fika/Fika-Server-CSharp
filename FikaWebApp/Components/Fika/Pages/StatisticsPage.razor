@@ -1,48 +1,53 @@
 ﻿@page "/Fika/Manage/Statistics"
 
-<MudPaper Class="pa-2">
-	<MudGrid Justify="Justify.SpaceEvenly">
-		<MudItem xs="3">
-			<MudStack AlignItems="AlignItems.Center">
-				<MudText Typo="Typo.h6">Kills</MudText>
-				<MudChart ChartType="ChartType.Donut" InputData="@_kills" InputLabels="@_nicknames" />
-			</MudStack>
-		</MudItem>
-		<MudItem xs="3">
-			<MudStack AlignItems="AlignItems.Center">
-				<MudText Typo="Typo.h6">Deaths</MudText>
-				<MudChart ChartType="ChartType.Donut" InputData="@_deaths" InputLabels="@_nicknames" />
-			</MudStack>
-		</MudItem>
-		<MudItem xs="3">
-			<MudStack AlignItems="AlignItems.Center">
-				<MudText Typo="Typo.h6">Ammo Used</MudText>
-				<MudChart ChartType="ChartType.Donut" InputData="@_ammoUsed" InputLabels="@_nicknames" />
-			</MudStack>
-		</MudItem>
-		<MudItem xs="3">
-			<MudStack AlignItems="AlignItems.Center">
-				<MudText Typo="Typo.h6">Body Damage</MudText>
-				<MudChart ChartType="ChartType.Donut" InputData="@_bodyDamage" InputLabels="@_nicknames" />
-			</MudStack>
-		</MudItem>
-		<MudItem xs="3">
-			<MudStack AlignItems="AlignItems.Center">
-				<MudText Typo="Typo.h6">Armor Damage</MudText>
-				<MudChart ChartType="ChartType.Donut" InputData="@_armorDamage" InputLabels="@_nicknames" />
-			</MudStack>
-		</MudItem>
-		<MudItem xs="3">
-			<MudStack AlignItems="AlignItems.Center">
-				<MudText Typo="Typo.h6">Headshots</MudText>
-				<MudChart ChartType="ChartType.Donut" InputData="@_headshots" InputLabels="@_nicknames" />
-			</MudStack>
-		</MudItem>
-		<MudItem xs="3">
-			<MudStack AlignItems="AlignItems.Center">
-				<MudText Typo="Typo.h6">Boss Kills</MudText>
-				<MudChart ChartType="ChartType.Donut" InputData="@_bossKills" InputLabels="@_nicknames" />
-			</MudStack>
-		</MudItem>
-	</MudGrid>
+<MudPaper Class="pa-2" MinHeight="100%" Style="position: relative;">
+	<MudLoading Loading="_loading" Darken="true" Overlap="true" Text="Waiting for server...">
+		@if (!_loading && _players.Count > 0)
+		{
+			<MudGrid Justify="Justify.SpaceEvenly">
+				<MudItem xs="3">
+					<MudStack AlignItems="AlignItems.Center">
+						<MudText Typo="Typo.h6">Kills</MudText>
+						<MudChart ChartType="ChartType.Donut" InputData="@_kills" InputLabels="@_nicknames"/>
+					</MudStack>
+				</MudItem>
+				<MudItem xs="3">
+					<MudStack AlignItems="AlignItems.Center">
+						<MudText Typo="Typo.h6">Deaths</MudText>
+						<MudChart ChartType="ChartType.Donut" InputData="@_deaths" InputLabels="@_nicknames"/>
+					</MudStack>
+				</MudItem>
+				<MudItem xs="3">
+					<MudStack AlignItems="AlignItems.Center">
+						<MudText Typo="Typo.h6">Ammo Used</MudText>
+						<MudChart ChartType="ChartType.Donut" InputData="@_ammoUsed" InputLabels="@_nicknames"/>
+					</MudStack>
+				</MudItem>
+				<MudItem xs="3">
+					<MudStack AlignItems="AlignItems.Center">
+						<MudText Typo="Typo.h6">Body Damage</MudText>
+						<MudChart ChartType="ChartType.Donut" InputData="@_bodyDamage" InputLabels="@_nicknames"/>
+					</MudStack>
+				</MudItem>
+				<MudItem xs="3">
+					<MudStack AlignItems="AlignItems.Center">
+						<MudText Typo="Typo.h6">Armor Damage</MudText>
+						<MudChart ChartType="ChartType.Donut" InputData="@_armorDamage" InputLabels="@_nicknames"/>
+					</MudStack>
+				</MudItem>
+				<MudItem xs="3">
+					<MudStack AlignItems="AlignItems.Center">
+						<MudText Typo="Typo.h6">Headshots</MudText>
+						<MudChart ChartType="ChartType.Donut" InputData="@_headshots" InputLabels="@_nicknames"/>
+					</MudStack>
+				</MudItem>
+				<MudItem xs="3">
+					<MudStack AlignItems="AlignItems.Center">
+						<MudText Typo="Typo.h6">Boss Kills</MudText>
+						<MudChart ChartType="ChartType.Donut" InputData="@_bossKills" InputLabels="@_nicknames"/>
+					</MudStack>
+				</MudItem>
+			</MudGrid>
+		}
+	</MudLoading>
 </MudPaper>

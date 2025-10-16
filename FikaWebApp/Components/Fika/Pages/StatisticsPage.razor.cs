@@ -11,8 +11,12 @@ public partial class StatisticsPage
 
     [Inject]
     private ILogger<StatisticsPage> Logger { get; set; } = default!;
+    
+    [Inject]
+    private ISnackbar Snackbar { get; set; } = default!;
 
     private readonly List<StatisticsPlayer> _players = [];
+    private bool _loading;
 
     private string[]? _nicknames;
     private double[]? _kills;
@@ -29,6 +33,7 @@ public partial class StatisticsPage
 
         try
         {
+            _loading = true;
             var result = await HttpClient.GetFromJsonAsync<GetStatisticsResponse>("fika/api/statistics");
             _players.AddRange(result!.Players);
 
@@ -44,6 +49,9 @@ public partial class StatisticsPage
         catch (Exception ex)
         {
             Logger.LogError("There was an error retrieving the statistics: {Exception}", ex.Message);
+            Snackbar.Add($"There was an error retrieving the statistics: {ex.Message}", Severity.Error);
         }
+
+        _loading = false;
     }
 }

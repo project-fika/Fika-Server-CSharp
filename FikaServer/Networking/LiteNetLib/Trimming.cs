@@ -2,7 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using static System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes;
 
-namespace FikaServer.Networking.LiteNetLib;
+namespace Fika.Core.Networking.LiteNetLib;
 
 internal static class Trimming
 {

@@ -1,7 +1,4 @@
-﻿using FikaServer.Networking.LiteNetLib;
-using System;
-
-namespace Fika.Core.Networking.LiteNetLib;
+﻿namespace Fika.Core.Networking.LiteNetLib;
 
 public partial class NetManager
 {

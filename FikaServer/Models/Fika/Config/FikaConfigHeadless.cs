@@ -1,5 +1,4 @@
 ﻿using System.Text.Json.Serialization;
-using static System.Net.WebRequestMethods;
 
 namespace FikaServer.Models.Fika.Config;
 
