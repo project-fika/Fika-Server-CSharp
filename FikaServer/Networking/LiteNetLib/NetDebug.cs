@@ -1,7 +1,7 @@
 ﻿#nullable disable
 using System.Diagnostics;
 
-namespace FikaServer.Networking.LiteNetLib;
+namespace Fika.Core.Networking.LiteNetLib;
 
 public class InvalidPacketException : ArgumentException
 {

@@ -1,5 +1,5 @@
-﻿using FikaServer.Networking.LiteNetLib.Utils;
-using System;
+﻿using Fika.Core.Networking.LiteNetLib;
+using FikaServer.Networking.LiteNetLib.Utils;
 using System.Net;
 
 namespace FikaServer.Networking.LiteNetLib.Layers;

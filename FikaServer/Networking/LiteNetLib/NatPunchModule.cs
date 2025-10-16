@@ -1,12 +1,11 @@
 ﻿#nullable disable
-using Fika.Core.Networking.LiteNetLib;
 using FikaServer.Networking.LiteNetLib.Utils;
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Sockets;
 
-namespace FikaServer.Networking.LiteNetLib;
+namespace Fika.Core.Networking.LiteNetLib;
 
 public enum NatAddressType
 {
@@ -219,7 +218,6 @@ public sealed class NatPunchModule
     //We got request and must introduce
     private void OnNatIntroductionRequest(NatIntroduceRequestPacket req, IPEndPoint senderEndPoint)
     {
-        Console.WriteLine("OnNatIntroductionRequest");
         if (UnsyncedEvents)
         {
             _natPunchListener.OnNatIntroductionRequest(

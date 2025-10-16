@@ -1,10 +1,9 @@
 ﻿#nullable disable
-using Fika.Core.Networking.LiteNetLib;
 using FikaServer.Networking.LiteNetLib.Utils;
 using System.Net;
 using System.Net.Sockets;
 
-namespace FikaServer.Networking.LiteNetLib;
+namespace Fika.Core.Networking.LiteNetLib;
 
 /// <summary>
 /// Type of message that you receive in OnNetworkReceiveUnconnected event

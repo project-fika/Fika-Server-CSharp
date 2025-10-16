@@ -1,7 +1,5 @@
 ﻿#nullable disable
-using Fika.Core.Networking.LiteNetLib;
-
-namespace FikaServer.Networking.LiteNetLib;
+namespace Fika.Core.Networking.LiteNetLib;
 
 internal sealed class ReliableChannel : BaseChannel
 {

@@ -1,9 +1,8 @@
 #nullable disable
-using Fika.Core.Networking.LiteNetLib;
 using FikaServer.Networking.LiteNetLib.Utils;
 using System.Net;
 
-namespace FikaServer.Networking.LiteNetLib;
+namespace Fika.Core.Networking.LiteNetLib;
 
 internal sealed class NetConnectRequestPacket
 {

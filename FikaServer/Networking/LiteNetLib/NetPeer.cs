@@ -2,14 +2,13 @@
 #if DEBUG
 #define STATS_ENABLED
 #endif
-using Fika.Core.Networking.LiteNetLib;
 using FikaServer.Networking.LiteNetLib.Utils;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Net;
 using System.Runtime.CompilerServices;
 
-namespace FikaServer.Networking.LiteNetLib;
+namespace Fika.Core.Networking.LiteNetLib;
 
 /// <summary>
 /// Peer connection state
