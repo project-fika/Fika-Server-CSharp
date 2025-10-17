@@ -43,7 +43,10 @@ public class PlayersController(FikaProfileService profileService, SaveServer sav
             EFikaLocation location;
             if (presence != null)
             {
-                logger.LogInformation("Presence was not null, {Location}", presence.RaidInformation.Location);
+                if (presence.RaidInformation != null)
+                {
+                    logger.LogInformation("Presence was not null, {Location}", presence.RaidInformation.Location); 
+                }
                 location = ToFikaLocation(presence);
                 logger.LogInformation("Location was {Location}", location);
             }
