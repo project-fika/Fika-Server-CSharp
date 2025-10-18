@@ -18,6 +18,23 @@ namespace FikaServer.API;
 public class PlayersController(FikaProfileService profileService, SaveServer saveServer, PresenceService presenceService,
     ILogger<PlayersController> logger) : ControllerBase
 {
+    private static readonly Dictionary<string, EFikaLocation> _locationMap = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["bigmap"] = EFikaLocation.Customs,
+        ["factory4_day"] = EFikaLocation.Factory,
+        ["factory4_night"] = EFikaLocation.Factory,
+        ["interchange"] = EFikaLocation.Interchange,
+        ["laboratory"] = EFikaLocation.Laboratory,
+        ["labyrinth"] = EFikaLocation.Labyrinth,
+        ["lighthouse"] = EFikaLocation.Lighthouse,
+        ["rezervbase"] = EFikaLocation.Reserve,
+        ["sandbox"] = EFikaLocation.GroundZero,
+        ["sandbox_high"] = EFikaLocation.GroundZero,
+        ["shoreline"] = EFikaLocation.Shoreline,
+        ["tarkovstreets"] = EFikaLocation.Streets,
+        ["woods"] = EFikaLocation.Woods
+    };
+
     [HttpGet]
     public IActionResult HandleRequest()
     {
@@ -43,12 +60,7 @@ public class PlayersController(FikaProfileService profileService, SaveServer sav
             EFikaLocation location;
             if (presence != null)
             {
-                if (presence.RaidInformation != null)
-                {
-                    logger.LogInformation("Presence was not null, {Location}", presence.RaidInformation.Location); 
-                }
                 location = ToFikaLocation(presence);
-                logger.LogInformation("Location was {Location}", location);
             }
             else
             {
@@ -77,36 +89,13 @@ public class PlayersController(FikaProfileService profileService, SaveServer sav
     {
         if (presence.RaidInformation != null)
         {
-            switch (presence.RaidInformation.Location)
+            if (_locationMap.TryGetValue(presence.RaidInformation.Location, out var eLocation))
             {
-                case "bigmap":
-                    return EFikaLocation.Customs;
-                case "factory4_day":
-                case "factory4_night":
-                    return EFikaLocation.Factory;
-                case "interchange":
-                    return EFikaLocation.Interchange;
-                case "laboratory":
-                    return EFikaLocation.Laboratory;
-                case "labyrinth":
-                    return EFikaLocation.Labyrinth;
-                case "lighthouse":
-                    return EFikaLocation.Lighthouse;
-                case "rezervbase":
-                    return EFikaLocation.Reserve;
-                case "sandbox":
-                case "sandbox_high":
-                    return EFikaLocation.GroundZero;
-                case "shoreline":
-                    return EFikaLocation.Shoreline;
-                case "tarkovstreets":
-                    return EFikaLocation.Streets;
-                case "woods":
-                    return EFikaLocation.Woods;
-                default:
-                    logger.LogWarning("Location was incorrect when getting presense for {Nickname}", presence.Nickname);
-                    return EFikaLocation.None;
+                return eLocation;
             }
+
+            logger.LogWarning("Location was incorrect when getting presense for {Nickname}", presence.Nickname);
+            return EFikaLocation.None;
         }
 
         if (presence.Activity is EFikaPlayerPresences.IN_HIDEOUT)
