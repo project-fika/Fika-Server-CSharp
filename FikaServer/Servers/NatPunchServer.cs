@@ -106,10 +106,10 @@ public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer>
                 {
                     _netServer?.NatPunchModule.NatIntroduce(
                         serverPeer.InternalAddr,
-                         serverPeer.ExternalAddr,
-                         localEndPoint,
-                         remoteEndPoint,
-                         token
+                        serverPeer.ExternalAddr,
+                        localEndPoint,
+                        remoteEndPoint,
+                        token
                     );
                 }
 
