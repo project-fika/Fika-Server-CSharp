@@ -112,7 +112,6 @@ public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer>
                         token
                     );
                 }
-
             }
             else
             {
