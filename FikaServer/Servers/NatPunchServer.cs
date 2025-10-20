@@ -102,13 +102,17 @@ public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer>
             {
                 Console.WriteLine($"[Fika NatPunch] Introducing server {serverPeer.SessionId} ({serverPeer.ExternalAddr}) to client ({remoteEndPoint})");
 
-                _netServer?.NatPunchModule.NatIntroduce(
-                     serverPeer.InternalAddr,
-                     serverPeer.ExternalAddr,
-                     localEndPoint,
-                     remoteEndPoint,
-                     token
-                     );
+                for (int i = 0; i < fikaConfig.Config.NatPunchServer.NatIntroduceAmount; i++)
+                {
+                    _netServer?.NatPunchModule.NatIntroduce(
+                        serverPeer.InternalAddr,
+                         serverPeer.ExternalAddr,
+                         localEndPoint,
+                         remoteEndPoint,
+                         token
+                    );
+                }
+
             }
             else
             {
