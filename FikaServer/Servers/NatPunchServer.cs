@@ -6,13 +6,14 @@ using SPTarkov.Server.Core.Models.Utils;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using static Fika.Core.Networking.LiteNetLib.EventBasedNatPunchListener;
 
 namespace FikaServer.Servers;
 
 [Injectable(InjectionType.Singleton)]
 public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer> logger) : INatPunchListener, INetEventListener
 {
-    private readonly Dictionary<string, NatPunchServerPeer> _natPunchServerPeers = [];
+    private readonly List<NatPunchServerPeer> _serverPeers = [];
     private NetManager? _netServer;
     private CancellationTokenSource? _pollEventsRoutineCts;
 
@@ -51,67 +52,68 @@ public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer>
 
     public void PollEvents()
     {
-        _netServer?.PollEvents();
         _netServer?.NatPunchModule.PollEvents();
     }
 
     public void OnNatIntroductionRequest(IPEndPoint localEndPoint, IPEndPoint remoteEndPoint, string token)
     {
-        string introductionType;
-        string sessionId;
+        DateTime dateTimeNow = DateTime.UtcNow;
+
+        NatIntroductionRequest? natIntroductionRequest;
 
         try
         {
-            introductionType = token.Split(':')[0];
-            sessionId = token.Split(':')[1];
+            natIntroductionRequest = GetNatIntroductionRequestFromToken(token);
         }
-        catch (Exception ex)
+        catch
         {
-            logger.Error($"[Fika NatPunch] Error when parsing NatIntroductionRequest: {ex.Message}");
+            Console.WriteLine($"[Fika NatPunch] Error when parsing token: {token}");
             return;
         }
 
-        switch (introductionType)
+        if (natIntroductionRequest == null)
         {
-            case "server":
-                if (_natPunchServerPeers.ContainsKey(sessionId))
-                {
-                    logger.Info($"[Fika NatPunch] KeepAlive {sessionId} ({remoteEndPoint})");
-                }
-                else
-                {
-                    logger.Info($"[Fika NatPunch] Added {sessionId} ({remoteEndPoint}) to server list");
-                }
+            Console.WriteLine($"[Fika NatPunch] Malformed Nat Introduction Request sent by client: {remoteEndPoint}. Token: {token}");
+            return;
+        }
 
-                _natPunchServerPeers[sessionId] = new(localEndPoint, remoteEndPoint);
-                break;
+        NatPunchServerPeer? serverPeer = _serverPeers.FirstOrDefault(peer => peer.SessionId == natIntroductionRequest.SessionId);
 
-            case "client":
-                if (_natPunchServerPeers.TryGetValue(sessionId, out NatPunchServerPeer? sPeer))
-                {
-                    logger.Info($"[Fika NatPunch] Introducing server {sessionId} ({sPeer.ExternalAddr}) to client ({remoteEndPoint})");
+        if (natIntroductionRequest.Type == NatIntroductionType.Server)
+        {
+            if (serverPeer != null)
+            {
+                serverPeer.LastKeepAliveTime = dateTimeNow;
 
-                    for (int i = 0; i < fikaConfig.Config.NatPunchServer.NatIntroduceAmount; i++)
-                    {
-                        _netServer?.NatPunchModule.NatIntroduce(
-                            sPeer.InternalAddr,
-                            sPeer.ExternalAddr,
-                            localEndPoint,
-                            remoteEndPoint,
-                            token
-                            );
-                    }
-                }
-                else
-                {
-                    logger.Info($"[Fika NatPunch] Unknown ServerId provided by client.");
-                }
-                break;
+                Console.WriteLine($"[Fika NatPunch] KeepAlive {natIntroductionRequest.SessionId} ({remoteEndPoint})");
+            }
+            else
+            {
+                serverPeer = new(natIntroductionRequest.SessionId, localEndPoint, remoteEndPoint);
+                _serverPeers.Add(serverPeer);
 
-            default:
-                logger.Info($"[Fika NatPunch] Unknown request received: {token}");
-                break;
+                Console.WriteLine($"[Fika NatPunch] Added {serverPeer.SessionId} ({serverPeer.ExternalAddr}) to server list");
+            }
+        }
 
+        if (natIntroductionRequest.Type == NatIntroductionType.Client)
+        {
+            if (serverPeer != null)
+            {
+                Console.WriteLine($"[Fika NatPunch] Introducing server {serverPeer.SessionId} ({serverPeer.ExternalAddr}) to client ({remoteEndPoint})");
+
+                _netServer?.NatPunchModule.NatIntroduce(
+                     serverPeer.InternalAddr,
+                     serverPeer.ExternalAddr,
+                     localEndPoint,
+                     remoteEndPoint,
+                     token
+                     );
+            }
+            else
+            {
+                Console.WriteLine($"Unknown sessionId ({natIntroductionRequest.SessionId}) provided by client: {remoteEndPoint}");
+            }
         }
     }
 
@@ -160,23 +162,11 @@ public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer>
         // Do nothing
     }
 
-    private void RemoveInactiveServerPeers()
+    private void RemoteInactivePeers()
     {
         DateTime dateTimeNow = DateTime.UtcNow;
 
-        foreach (string sessionId in _natPunchServerPeers.Keys)
-        {
-            NatPunchServerPeer peer = _natPunchServerPeers[sessionId];
-
-            if (peer != null)
-            {
-                if (dateTimeNow - peer.CreationTime > TimeSpan.FromMinutes(1))
-                {
-                    _natPunchServerPeers.Remove(sessionId);
-                    logger.Info($"[Fika NatPunch] Removed inactive server: {sessionId} ({peer.ExternalAddr})");
-                }
-            }
-        }
+        _serverPeers.RemoveAll(peer => dateTimeNow - peer.LastKeepAliveTime > TimeSpan.FromMinutes(1));
     }
 
     private async Task PollEventsRoutine()
@@ -189,9 +179,37 @@ public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer>
             }
 
             PollEvents();
-            RemoveInactiveServerPeers();
+            RemoteInactivePeers();
 
-            await Task.Delay(TimeSpan.FromSeconds(1));
+            await Task.Delay(TimeSpan.FromMilliseconds(500));
         }
+    }
+
+    private NatIntroductionRequest? GetNatIntroductionRequestFromToken(string token)
+    {
+        if (!token.Contains(':'))
+        {
+            return null;
+        }
+
+        string introductionType = token.Split(':')[0];
+        string sessionId = token.Split(':')[1];
+
+        if (introductionType != "Client" && introductionType != "Server")
+        {
+            return null;
+        }
+
+        if (sessionId.Length != 24)
+        {
+            return null;
+        }
+
+        if (Enum.TryParse(introductionType, out NatIntroductionType natIntroductionType))
+        {
+            return new(natIntroductionType, sessionId);
+        }
+
+        return null;
     }
 }
