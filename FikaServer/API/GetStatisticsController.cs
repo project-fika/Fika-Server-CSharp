@@ -42,11 +42,11 @@ public class GetStatisticsController(SaveServer saveServer) : ControllerBase
                 BodyDamage = (player.CharacterData?.PmcData?.Stats?.Eft?.OverallCounters?.Items?
                     .Where(x => x.Key?.Count == 1 && x.Key.Contains("CauseBodyDamage"))
                     .Select(x => x.Value)
-                    .FirstOrDefault() ?? 0.0),
+                    .FirstOrDefault() / 100f ?? 0.0),
                 ArmorDamage = (player.CharacterData?.PmcData?.Stats?.Eft?.OverallCounters?.Items?
                     .Where(x => x.Key?.Count == 1 && x.Key.Contains("CauseArmorDamage"))
                     .Select(x => x.Value)
-                    .FirstOrDefault() ?? 0.0),
+                    .FirstOrDefault() / 100f ?? 0.0),
                 Headshots = (player.CharacterData?.PmcData?.Stats?.Eft?.OverallCounters?.Items?
                     .Where(x => x.Key?.Count == 1 && x.Key.Contains("HeadShots"))
                     .Select(x => x.Value)

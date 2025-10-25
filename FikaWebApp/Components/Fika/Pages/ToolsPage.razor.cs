@@ -79,8 +79,8 @@ public partial class ToolsPage
                 {
                     try
                     {
-                        await HttpClient.PostAsJsonAsync("post/senditemtoall", request);
-                        Snackbar.Add($"The item was sent to everyone.", Severity.Success);
+                        await HttpClient.PostAsJsonAsync("fika/api/senditemtoall", request);
+                        Snackbar.Add("The item was sent to everyone.", Severity.Success);
                     }
                     catch (Exception ex)
                     {

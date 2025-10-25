@@ -6,6 +6,7 @@ using FikaServer.Models.Fika.Routes.Raid.Create;
 using FikaServer.Services.Headless;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Common;
+using SPTarkov.Server.Core.Models.Eft.Common.Tables;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Services;
@@ -208,7 +209,10 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
             RemoveTimeoutInterval(matchId);
             logger.Info($"Deleted match [{matchId}]");
 
-            await webhookService.SendWebhookMessage($"{match.HostUsername}'s raid has ended.");
+            var requesterName = headlessHelper.GetRequesterUsername(matchId)
+                ?? match.HostUsername;
+
+            await webhookService.SendWebhookMessage($"{requesterName}'s raid has ended.");
         }
         else
         {

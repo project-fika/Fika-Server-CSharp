@@ -1,4 +1,6 @@
 ﻿using FikaServer.Models;
+using FikaServer.Models.Enums;
+using FikaServer.Models.Fika.Presence;
 using FikaServer.Services;
 using FikaServer.Services.Cache;
 using FikaShared;
@@ -13,8 +15,26 @@ namespace FikaServer.API;
 [ApiController]
 [Route("fika/api/players")]
 [RequireApiKey]
-public class PlayersController(FikaProfileService profileService, SaveServer saveServer, PresenceService presenceService) : ControllerBase
+public class PlayersController(FikaProfileService profileService, SaveServer saveServer, PresenceService presenceService,
+    ILogger<PlayersController> logger) : ControllerBase
 {
+    private static readonly Dictionary<string, EFikaLocation> _locationMap = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["bigmap"] = EFikaLocation.Customs,
+        ["factory4_day"] = EFikaLocation.Factory,
+        ["factory4_night"] = EFikaLocation.Factory,
+        ["interchange"] = EFikaLocation.Interchange,
+        ["laboratory"] = EFikaLocation.Laboratory,
+        ["labyrinth"] = EFikaLocation.Labyrinth,
+        ["lighthouse"] = EFikaLocation.Lighthouse,
+        ["rezervbase"] = EFikaLocation.Reserve,
+        ["sandbox"] = EFikaLocation.GroundZero,
+        ["sandbox_high"] = EFikaLocation.GroundZero,
+        ["shoreline"] = EFikaLocation.Shoreline,
+        ["tarkovstreets"] = EFikaLocation.Streets,
+        ["woods"] = EFikaLocation.Woods
+    };
+
     [HttpGet]
     public IActionResult HandleRequest()
     {
@@ -40,10 +60,11 @@ public class PlayersController(FikaProfileService profileService, SaveServer sav
             EFikaLocation location;
             if (presence != null)
             {
-                location = presence.ToFikaLocation();
+                location = ToFikaLocation(presence);
             }
             else
             {
+                logger.LogWarning("Present was null when trying to fetch info for {Nickname}", profile.CharacterData?.PmcData?.Info?.Nickname ?? profileId);
                 location = EFikaLocation.None;
             }
 
@@ -62,5 +83,26 @@ public class PlayersController(FikaProfileService profileService, SaveServer sav
         };
 
         return Ok(playersResponse);
+    }
+
+    private EFikaLocation ToFikaLocation(FikaPlayerPresence presence)
+    {
+        if (presence.RaidInformation != null)
+        {
+            if (_locationMap.TryGetValue(presence.RaidInformation.Location, out var eLocation))
+            {
+                return eLocation;
+            }
+
+            logger.LogWarning("Location was incorrect when getting presense for {Nickname}", presence.Nickname);
+            return EFikaLocation.None;
+        }
+
+        if (presence.Activity is EFikaPlayerPresences.IN_HIDEOUT)
+        {
+            return EFikaLocation.Hideout;
+        }
+
+        return EFikaLocation.None;
     }
 }
