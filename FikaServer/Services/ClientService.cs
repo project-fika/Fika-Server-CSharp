@@ -14,30 +14,27 @@ public class ClientService(ISptLogger<ClientService> logger, SaveServer saveServ
 {
     private readonly List<string> _requiredMods = ["com.fika.core", "com.SPT.custom", "com.SPT.singleplayer", "com.SPT.core", "com.SPT.debugging"];
     private readonly List<string> _allowedMods = ["com.bepis.bepinex.configurationmanager", "com.fika.headless"];
-    private bool _hasRequiredOrOptionalMods = false;
+    private bool _hasRequiredOrOptionalMods;
 
     public void OnPreLoad()
     {
-        FikaConfig config = fikaConfig.Config;
+        var config = fikaConfig.Config;
 
-        List<string> sanitizedRequiredMods = FilterEmptyMods(config.Client.Mods.Required);
-        List<string> sanitizedOptionalMods = FilterEmptyMods(config.Client.Mods.Optional);
+        var sanitizedRequiredMods = FilterEmptyMods(config.Client.Mods.Required);
+        var sanitizedOptionalMods = FilterEmptyMods(config.Client.Mods.Optional);
 
-        if (sanitizedRequiredMods.Count == 0 && sanitizedOptionalMods.Count == 0)
+        if (sanitizedRequiredMods.Count > 0 || sanitizedOptionalMods.Count > 0)
         {
-            _hasRequiredOrOptionalMods = false;
+            _hasRequiredOrOptionalMods = true;
         }
 
-        foreach (string mod in sanitizedRequiredMods)
+        foreach (var mod in sanitizedRequiredMods)
         {
             _requiredMods.Add(mod);
             _allowedMods.Add(mod);
         }
 
-        foreach (string mod in sanitizedOptionalMods)
-        {
-            _allowedMods.Add(mod);
-        }
+        _allowedMods.AddRange(sanitizedOptionalMods);
     }
 
     protected List<string> FilterEmptyMods(List<string> list)
@@ -84,7 +81,7 @@ public class ClientService(ISptLogger<ClientService> logger, SaveServer saveServ
         }
 
         // check for missing required mods first
-        foreach (string pluginId in _requiredMods)
+        foreach (var pluginId in _requiredMods)
         {
             if (!request.ContainsKey(pluginId))
             {
@@ -98,9 +95,9 @@ public class ClientService(ISptLogger<ClientService> logger, SaveServer saveServ
             return mismatchedMods;
         }
 
-        foreach (string pluginId in request.Keys)
+        foreach (var pluginId in request.Keys)
         {
-            uint hash = request[pluginId];
+            var hash = request[pluginId];
 
             // check if the mod isn't allowed
             if (!_allowedMods.Contains(pluginId))
@@ -127,7 +124,7 @@ public class ClientService(ISptLogger<ClientService> logger, SaveServer saveServ
 
     public SptProfile? GetProfileBySessionID(MongoId sessionId)
     {
-        SptProfile profile = saveServer.GetProfile(sessionId);
+        var profile = saveServer.GetProfile(sessionId);
 
         if (profile != null)
         {
