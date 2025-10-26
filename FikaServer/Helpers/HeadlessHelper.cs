@@ -12,8 +12,8 @@ using System.Collections.Concurrent;
 namespace FikaServer.Helpers;
 
 [Injectable]
-public class HeadlessHelper(ConfigService fikaConfig, SaveServer saveServer, ConfigServer configServer,
-    HeadlessService headlessService, HeadlessProfileService headlessProfileService, ISptLogger<HeadlessHelper> logger)
+public class HeadlessHelper(ConfigService fikaConfig, SaveServer saveServer, HeadlessService headlessService,
+    HeadlessProfileService headlessProfileService, ISptLogger<HeadlessHelper> logger)
 {
     /// <summary>
     /// Gets all currently logged in headlesses

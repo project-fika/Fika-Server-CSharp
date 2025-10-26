@@ -54,7 +54,7 @@ public class HeadlessClientWebSocket(HeadlessHelper headlessHelper, HeadlessServ
 
         if (!string.IsNullOrEmpty(matchService.GetMatchIdByProfile(userSessionID)))
         {
-            matchService.DeleteMatch(userSessionID);
+            await matchService.DeleteMatch(userSessionID);
         }
 
         if (!headlessService.HeadlessClients.TryAdd(userSessionID, new HeadlessClientInfo(ws, Models.Enums.EHeadlessStatus.READY)))
@@ -63,7 +63,7 @@ public class HeadlessClientWebSocket(HeadlessHelper headlessHelper, HeadlessServ
         }
         else
         {
-            await webhookService.SendWebhookMessage($"Headless client {userSessionID} has connected");
+            await webhookService.SendWebhookMessage($"Headless client {headlessHelper.GetHeadlessNickname(userSessionID)} has connected");
         }
     }
 
