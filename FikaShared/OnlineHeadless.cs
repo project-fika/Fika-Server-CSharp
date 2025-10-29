@@ -8,6 +8,9 @@ public record OnlineHeadless
     [JsonPropertyName("profileId")]
     public required string ProfileId { get; set; }
 
+    [JsonPropertyName("nickname")]
+    public required string Nickname { get; set; }
+
     [JsonPropertyName("state")]
     public required EHeadlessState State { get; set; }
 

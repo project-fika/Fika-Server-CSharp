@@ -11,12 +11,12 @@ namespace FikaWebApp.Components.Fika.Pages;
 public partial class HeadlessPage
 {
     [Inject]
-    public HttpClient HttpClient { get; set; }
+    public HttpClient HttpClient { get; set; } = default!;
 
     [Inject]
-    public ISnackbar Snackbar { get; set; }
+    public ISnackbar Snackbar { get; set; } = default!;
 
-    private List<OnlineHeadless> _headlessClients = [];
+    private readonly List<OnlineHeadless> _headlessClients = [];
     private bool _loading;
 
     protected override async Task OnInitializedAsync()

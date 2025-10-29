@@ -1,4 +1,5 @@
-﻿using FikaServer.Models;
+﻿using FikaServer.Helpers;
+using FikaServer.Models;
 using FikaServer.Services.Headless;
 using FikaShared;
 using FikaShared.Responses;
@@ -11,7 +12,7 @@ namespace FikaServer.API;
 [ApiController]
 [Route("fika/api/headless")]
 [RequireApiKey]
-public class HeadlessController(HeadlessService headlessService) : ControllerBase
+public class HeadlessController(HeadlessService headlessService, HeadlessHelper headlessHelper) : ControllerBase
 {
     [HttpGet]
     public IActionResult HandleRequest()
@@ -20,12 +21,13 @@ public class HeadlessController(HeadlessService headlessService) : ControllerBas
         var clients = new List<OnlineHeadless>(headlessClients.Count);
         foreach ((var profileId, var headlessClient) in headlessClients)
         {
-            EHeadlessState state = headlessClient.WebSocket.State is WebSocketState.Open ? EHeadlessState.Ready : EHeadlessState.NotReady;
+            var state = headlessClient.WebSocket.State is WebSocketState.Open ? EHeadlessState.Ready : EHeadlessState.NotReady;
             clients.Add(new()
             {
                 ProfileId = profileId,
+                Nickname = headlessHelper.GetHeadlessNickname(profileId),
                 State = state,
-                Players = headlessClient.Players != null ? headlessClient.Players.Count : 0
+                Players = (headlessClient.Players?.Count) ?? 0
             });
         }
 
