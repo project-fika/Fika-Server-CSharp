@@ -35,4 +35,8 @@
     <Folder Include="wwwroot\images\maps\" />
   </ItemGroup>
 
+	<ItemGroup>
+		<Content Include="wwwroot\**\*" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
+
 </Project>
