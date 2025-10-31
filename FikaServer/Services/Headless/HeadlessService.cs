@@ -145,7 +145,7 @@ public class HeadlessService(ISptLogger<HeadlessService> logger,
             baseHeadlessLevel += profile.CharacterData.PmcData.Info.Level ?? 1;
         }
 
-        baseHeadlessLevel /= players;
+        baseHeadlessLevel = Math.Max(1, baseHeadlessLevel / players);
 
         logger.Log(SPTarkov.Server.Core.Models.Spt.Logging.LogLevel.Debug,
             $"[{headlessClientId}] Settings headless level to: {baseHeadlessLevel} | Players: {players}");
