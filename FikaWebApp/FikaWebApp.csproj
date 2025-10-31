@@ -31,7 +31,6 @@
   <ItemGroup>
     <Folder Include="ProtectedFiles\" />
     <Folder Include="StoredData\" />
-	<Folder Include="wwwroot\**\*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>
