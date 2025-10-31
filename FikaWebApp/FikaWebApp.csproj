@@ -31,12 +31,7 @@
   <ItemGroup>
     <Folder Include="ProtectedFiles\" />
     <Folder Include="StoredData\" />
-    <Folder Include="wwwroot\files\" />
-    <Folder Include="wwwroot\images\maps\" />
+	<Folder Include="wwwroot\**\*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
-
-	<ItemGroup>
-		<Content Include="wwwroot\**\*" CopyToOutputDirectory="PreserveNewest" />
-	</ItemGroup>
 
 </Project>
