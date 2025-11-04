@@ -31,24 +31,28 @@ public partial class HeadlessPage
         _headlessClients.Add(new()
         {
             ProfileId = "TEST",
+            Nickname = "TEST",
             State = Enums.EHeadlessState.Ready,
             Players = Random.Shared.Next(0, 5)
         });
         _headlessClients.Add(new()
         {
             ProfileId = "TEST2",
+            Nickname = "TEST2",
             State = Enums.EHeadlessState.NotReady,
             Players = Random.Shared.Next(0, 5)
         });
         _headlessClients.Add(new()
         {
             ProfileId = "TEST3",
+            Nickname = "TEST3",
             State = Enums.EHeadlessState.NotReady,
             Players = Random.Shared.Next(0, 5)
         });
         _headlessClients.Add(new()
         {
             ProfileId = "TEST4",
+            Nickname = "TEST4",
             State = Enums.EHeadlessState.Ready,
             Players = Random.Shared.Next(0, 5)
         });

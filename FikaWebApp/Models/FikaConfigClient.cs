@@ -11,19 +11,19 @@ public record FikaConfigClient
     public bool FriendlyFire { get; set; } = true;
 
     [JsonPropertyName("dynamicVExfils")]
-    public bool DynamicVExfils { get; set; } = false;
+    public bool DynamicVExfils { get; set; }
 
     [JsonPropertyName("allowFreeCam")]
-    public bool AllowFreeCam { get; set; } = false;
+    public bool AllowFreeCam { get; set; }
 
     [JsonPropertyName("allowSpectateFreeCam")]
-    public bool AllowSpectateFreeCam { get; set; } = false;
+    public bool AllowSpectateFreeCam { get; set; }
 
     [JsonPropertyName("blacklistedItems")]
     public string[] BlacklistedItems { get; set; } = [];
 
     [JsonPropertyName("forceSaveOnDeath")]
-    public bool ForceSaveOnDeath { get; set; } = false;
+    public bool ForceSaveOnDeath { get; set; }
 
     [JsonPropertyName("mods")]
     public FikaConfigClientMods Mods { get; set; } = new();
@@ -32,7 +32,7 @@ public record FikaConfigClient
     public bool UseInertia { get; set; } = true;
 
     [JsonPropertyName("sharedQuestProgression")]
-    public bool SharedQuestProgression { get; set; } = false;
+    public bool SharedQuestProgression { get; set; }
 
     [JsonPropertyName("canEditRaidSettings")]
     public bool CanEditRaidSettings { get; set; } = true;
@@ -41,7 +41,10 @@ public record FikaConfigClient
     public bool EnableTransits { get; set; } = true;
 
     [JsonPropertyName("anyoneCanStartRaid")]
-    public bool AnyoneCanStartRaid { get; set; } = false;
+    public bool AnyoneCanStartRaid { get; set; }
+
+    [JsonPropertyName("allowNamePlates")]
+    public bool AllowNamePlates { get; set; } = true;
 }
 
 public record FikaConfigClientMods

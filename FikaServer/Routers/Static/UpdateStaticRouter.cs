@@ -27,7 +27,7 @@ public class UpdateStaticRouter(UpdateCallbacks fikaUpdateCallbacks, JsonUtil js
                 output
             ) => await fikaUpdateCallbacks.HandlePlayerSpawn(url, info, sessionId)
             ),
-         new RouteAction<FikaUpdateSethostRequestData>(
+         new RouteAction<FikaUpdateSetHostRequestData>(
             "/fika/update/sethost",
             async (
                 url,
