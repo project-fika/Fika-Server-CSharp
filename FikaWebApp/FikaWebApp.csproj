@@ -31,8 +31,6 @@
   <ItemGroup>
     <Folder Include="ProtectedFiles\" />
     <Folder Include="StoredData\" />
-    <Folder Include="wwwroot\files\" />
-    <Folder Include="wwwroot\images\maps\" />
   </ItemGroup>
 
 </Project>

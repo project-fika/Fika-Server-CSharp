@@ -118,7 +118,8 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
         var launchSettings = new HeadlessLaunchSettings()
         {
             ProfileId = profileId,
-            BackendUrl = uri
+            BackendUrl = uri,
+            StartMinimized = false
         };
 
         var serialized = jsonUtil.Serialize(launchSettings, true);

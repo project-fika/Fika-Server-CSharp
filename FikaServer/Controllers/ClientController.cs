@@ -1,9 +1,9 @@
 ﻿using FikaServer.Models.Fika.Config;
+using FikaServer.Models.Fika.Routes.Client;
 using FikaServer.Models.Fika.Routes.Client.Check;
 using FikaServer.Services;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Common;
-using SPTarkov.Server.Core.Models.Eft.Profile;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -17,7 +17,7 @@ public class ClientController(ClientService fikaClientService)
     /// </summary>
     public string HandleClientConfig()
     {
-        FikaConfigClient clientConfig = fikaClientService.GetClientConfig();
+        var clientConfig = fikaClientService.GetClientConfig();
 
         // Here be dragons, this is technically not in the client config, or well it was.. But it was decided it was better for this configuration
         // To be together with 'sentItemsLoseFIR' so users could find both options easier.
@@ -46,9 +46,9 @@ public class ClientController(ClientService fikaClientService)
     }
 
     /// <summary>
-    /// Handle /fika/client/check/mods
+    /// Handle /fika/profile/download
     /// </summary>
-    public SptProfile? HandleProfileDownload(MongoId sessionId)
+    public DownloadProfileResponse? HandleProfileDownload(MongoId sessionId)
     {
         return fikaClientService.GetProfileBySessionID(sessionId);
     }

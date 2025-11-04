@@ -45,7 +45,7 @@ public class UpdateCallbacks(HttpResponseUtil httpResponseUtil, UpdateController
     /// <param name="info"></param>
     /// <param name="sessionID"></param>
     /// <returns></returns>
-    public ValueTask<string> HandleSetHost(string url, FikaUpdateSethostRequestData info, MongoId sessionID)
+    public ValueTask<string> HandleSetHost(string url, FikaUpdateSetHostRequestData info, MongoId sessionID)
     {
         updateController.HandleSetHost(info);
 
