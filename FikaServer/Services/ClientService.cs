@@ -1,8 +1,8 @@
 ﻿using FikaServer.Models.Fika.Config;
+using FikaServer.Models.Fika.Routes.Client;
 using FikaServer.Models.Fika.Routes.Client.Check;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Common;
-using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
 
@@ -122,17 +122,44 @@ public class ClientService(ISptLogger<ClientService> logger, SaveServer saveServ
         return mismatchedMods;
     }
 
-    public SptProfile? GetProfileBySessionID(MongoId sessionId)
+    public DownloadProfileResponse? GetProfileBySessionID(MongoId sessionId)
     {
         var profile = saveServer.GetProfile(sessionId);
 
-        if (profile != null)
+        if (profile == null)
         {
-            logger.Info($"{sessionId} has downloaded their profile");
-            return profile;
+            logger.Info($"{sessionId} wants to download their profile but we don't have it");
+            return null;
+
         }
 
-        logger.Info($"{sessionId} wants to download their profile but we don't have it");
-        return null;
+        var path = Path.Combine("user/profileData/", sessionId);
+        if (Directory.Exists(path))
+        {
+            var files = Directory.GetFiles(path);
+            Dictionary<string, string> allData = new(files.Length);
+            foreach (var fullFile in files)
+            {
+                var modData = File.ReadAllText(fullFile);
+                var name = Path.GetFileNameWithoutExtension(fullFile);
+                if (modData != null)
+                {
+                    allData.Add(name, modData);
+                }
+            }
+
+            logger.Success($"{sessionId} has downloaded their profile with {allData.Count} custom mod data");
+            return new()
+            {
+                Profile = profile,
+                ModData = allData
+            };
+        }
+
+        logger.Success($"{sessionId} has downloaded their profile");
+        return new()
+        {
+            Profile = profile
+        };
     }
 }
