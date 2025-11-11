@@ -4,7 +4,6 @@ using FikaServer.Models.Fika.Routes.Headless;
 using FikaServer.WebSockets;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Common;
-using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Logging;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
@@ -28,7 +27,7 @@ public class HeadlessService(ISptLogger<HeadlessService> logger,
     /// <returns>returns the SessionID of the headless client that is starting this raid, returns null if no client could be found or there was an error.</returns>
     public async Task<string?> StartHeadlessRaid(string headlessSessionID, string requesterSessionID, StartHeadlessRequest info)
     {
-        if (!HeadlessClients.TryGetValue(headlessSessionID, out HeadlessClientInfo? headlessClientInfo))
+        if (!HeadlessClients.TryGetValue(headlessSessionID, out var headlessClientInfo))
         {
             logger.LogWithColor($"Could not find HeadlessSessionID '{headlessSessionID}'", LogTextColor.Red);
             return null;
@@ -40,7 +39,7 @@ public class HeadlessService(ISptLogger<HeadlessService> logger,
             return null;
         }
 
-        WebSocket webSocket = headlessClientInfo.WebSocket;
+        var webSocket = headlessClientInfo.WebSocket;
         if (webSocket == null)
         {
             return null;
@@ -54,7 +53,7 @@ public class HeadlessService(ISptLogger<HeadlessService> logger,
         headlessClientInfo.StartRaid(requesterSessionID);
 
         StartHeadlessRaid startHeadlessRequest = new(info);
-        string data = jsonUtil.Serialize(startHeadlessRequest)
+        var data = jsonUtil.Serialize(startHeadlessRequest)
             ?? throw new NullReferenceException("StartHeadlessRaid:: Data was null after serializing");
         await webSocket.SendAsync(Encoding.UTF8.GetBytes(data),
             WebSocketMessageType.Text, true, CancellationToken.None);
@@ -67,7 +66,7 @@ public class HeadlessService(ISptLogger<HeadlessService> logger,
     /// </summary>
     public async Task SendJoinMessageToRequester(string headlessClientId)
     {
-        if (!HeadlessClients.TryGetValue(headlessClientId, out HeadlessClientInfo? headlessClientInfo))
+        if (!HeadlessClients.TryGetValue(headlessClientId, out var headlessClientInfo))
         {
             logger.LogWithColor($"Could not find HeadlessSessionID '{headlessClientId}'", LogTextColor.Red);
             return;
@@ -87,7 +86,7 @@ public class HeadlessService(ISptLogger<HeadlessService> logger,
 
     public void AddPlayerToHeadlessMatch(string headlessClientId, string sessionID)
     {
-        if (HeadlessClients.TryGetValue(headlessClientId, out HeadlessClientInfo? headlessClientInfo))
+        if (HeadlessClients.TryGetValue(headlessClientId, out var headlessClientInfo))
         {
             if (headlessClientInfo == null)
             {
@@ -113,7 +112,7 @@ public class HeadlessService(ISptLogger<HeadlessService> logger,
 
     public void SetHeadlessLevel(string headlessClientId)
     {
-        if (!HeadlessClients.TryGetValue(headlessClientId, out HeadlessClientInfo? headlessClientInfo))
+        if (!HeadlessClients.TryGetValue(headlessClientId, out var headlessClientInfo))
         {
             throw new NullReferenceException($"SetHeadlessLevel:: Could not find headlessClientId '{headlessClientId}'");
         }
@@ -123,32 +122,36 @@ public class HeadlessService(ISptLogger<HeadlessService> logger,
             return;
         }
 
-        SptProfile headlessProfile = saveServer.GetProfile(headlessClientId)
+        var headlessProfile = saveServer.GetProfile(headlessClientId)
             ?? throw new NullReferenceException($"Could not find headlessProfile {headlessClientId}");
 
-        int baseHeadlessLevel = 0;
-        int players = headlessClientInfo.Players.Count;
+        var baseHeadlessLevel = 1;
+        var countedPlayers = 0; // count only valid, non-headless players
 
-        foreach (string profileId in headlessClientInfo.Players)
+        foreach (var profileId in headlessClientInfo.Players)
         {
-            SptProfile profile = saveServer.GetProfile(profileId);
-            if (profile == null)
-            {
-                continue;
-            }
-
-            if (profile.IsHeadlessProfile())
+            var profile = saveServer.GetProfile(profileId);
+            if (profile?.IsHeadlessProfile() != false)
             {
                 continue;
             }
 
             baseHeadlessLevel += profile.CharacterData.PmcData.Info.Level ?? 1;
+            countedPlayers++;
         }
 
-        baseHeadlessLevel = Math.Max(1, baseHeadlessLevel / players);
+        // avoid division by zero
+        if (countedPlayers > 0)
+        {
+            baseHeadlessLevel = Math.Max(1, baseHeadlessLevel / countedPlayers);
+        }
+        else
+        {
+            baseHeadlessLevel = 1;
+        }
 
         logger.Log(SPTarkov.Server.Core.Models.Spt.Logging.LogLevel.Debug,
-            $"[{headlessClientId}] Settings headless level to: {baseHeadlessLevel} | Players: {players}");
+            $"[{headlessClientId}] Settings headless level to: {baseHeadlessLevel} | Players: {countedPlayers}");
 
         headlessProfile.CharacterData.PmcData.Info.Level = baseHeadlessLevel;
     }
@@ -158,7 +161,7 @@ public class HeadlessService(ISptLogger<HeadlessService> logger,
     /// </summary>
     public void EndHeadlessRaid(string headlessClientId)
     {
-        if (!HeadlessClients.TryGetValue(headlessClientId, out HeadlessClientInfo? headlessClientInfo))
+        if (!HeadlessClients.TryGetValue(headlessClientId, out var headlessClientInfo))
         {
             logger.LogWithColor($"EndHeadlessRaid:: Could not find '{headlessClientId}' to remove");
             return;
