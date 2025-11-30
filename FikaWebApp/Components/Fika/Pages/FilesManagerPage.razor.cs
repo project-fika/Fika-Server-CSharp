@@ -35,7 +35,7 @@ public partial class FilesManagerPage
 
     private void RefreshFiles()
     {
-        var basePath = Path.Combine(Directory.GetCurrentDirectory(), "ProtectedFiles");
+        var basePath = Path.Combine(Directory.GetCurrentDirectory(), "protectedfiles");
 
         if (!Directory.Exists(basePath))
         {
@@ -181,7 +181,7 @@ public partial class FilesManagerPage
             _files.Add(file);
         }
 
-        var uploadPath = Path.GetFullPath("ProtectedFiles");
+        var uploadPath = Path.GetFullPath("protectedfiles");
         var filesUploaded = 0;
 
         try
@@ -258,7 +258,7 @@ public partial class FilesManagerPage
         }
 
         // Root directory where secure files are stored
-        var rootPath = Path.GetFullPath("ProtectedFiles");
+        var rootPath = Path.GetFullPath("protectedfiles");
 
         // Combine root path with requested filename
         var fullPath = Path.GetFullPath(Path.Combine(rootPath, SelectedValue));

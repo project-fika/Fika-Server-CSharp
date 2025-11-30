@@ -16,7 +16,7 @@ public class SendTimersService(ILogger<SendTimersService> logger, HttpClient htt
         WriteIndented = true
     };
 
-    private const string _dataFolder = "StoredData";
+    private const string _dataFolder = "storeddata";
     private const string _fileName = "storedTimers.json";
 
     public record TimerSaveData

@@ -128,7 +128,7 @@ public class Program
 
     private static Task CheckForDataFolder(WebApplication app)
     {
-        var dataPath = Path.Combine(app.Environment.ContentRootPath, "StoredData");
+        var dataPath = Path.Combine(app.Environment.ContentRootPath, "storeddata");
         if (!Directory.Exists(dataPath))
         {
             Directory.CreateDirectory(dataPath);
@@ -139,7 +139,7 @@ public class Program
 
     private static Task CreateSecureFileFolder(WebApplication app)
     {
-        var protectedFilesPath = Path.Combine(app.Environment.ContentRootPath, "ProtectedFiles");
+        var protectedFilesPath = Path.Combine(app.Environment.ContentRootPath, "protectedfiles");
         if (!Directory.Exists(protectedFilesPath))
         {
             Directory.CreateDirectory(protectedFilesPath);
