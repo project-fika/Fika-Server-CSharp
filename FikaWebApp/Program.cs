@@ -73,9 +73,26 @@ public class Program
 
         builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
+#if DEBUG
         builder.Services.Configure<FikaConfig>(builder.Configuration.GetSection("FikaConfig"));
+
         builder.Services.AddSingleton(resolver =>
             resolver.GetRequiredService<IOptions<FikaConfig>>().Value);
+#else
+        var apiKey = Environment.GetEnvironmentVariable("API_KEY")
+            ?? throw new Exception("Missing API_KEY");
+        var baseUrl = Environment.GetEnvironmentVariable("BASE_URL")
+            ?? throw new Exception("Missing BASE_URL");
+
+        var fikaConfig = new FikaConfig()
+        {
+            APIKey = apiKey,
+            BaseUrl = new Uri(baseUrl),
+            HeartbeatInterval = 5
+        };
+
+        builder.Services.AddSingleton(fikaConfig);
+#endif
 
         builder.Services.AddHttpClient(Options.DefaultName, SetupHttpClient)
             .ConfigurePrimaryHttpMessageHandler(() =>

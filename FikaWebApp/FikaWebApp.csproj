@@ -7,7 +7,6 @@
     <UserSecretsId>aspnet-FikaWebApp-d8d35568-a8ac-4267-9b84-60455cbb4ea4</UserSecretsId>
   </PropertyGroup>
 
-
   <ItemGroup>
     <PackageReference Include="Brism" Version="1.0.1" />
     <PackageReference Include="CodeBeam.MudBlazor.Extensions" Version="8.2.4" />
@@ -22,15 +21,17 @@
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
   </ItemGroup>
 
-
   <ItemGroup>
     <ProjectReference Include="..\FikaShared\FikaShared.csproj" />
   </ItemGroup>
-
 
   <ItemGroup>
     <Folder Include="ProtectedFiles\" />
     <Folder Include="StoredData\" />
   </ItemGroup>
+
+	<Target Name="PostPublishArchive" AfterTargets="Publish">
+		<Exec Command="tar -czf $(PublishDir)/fikawebapp.tar.gz -C $(PublishDir) *" />
+	</Target>
 
 </Project>
