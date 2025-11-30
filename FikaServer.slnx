@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="FikaServer/FikaServer.csproj" />
+  <Project Path="FikaShared/FikaShared.csproj" />
+  <Project Path="FikaWebApp/FikaWebApp.csproj" />
+</Solution>

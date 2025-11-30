@@ -10,7 +10,9 @@
 	<AuthorizeView Roles="Admin">
 		<Authorized>
 			<MudNavLink Href="Fika/Manage/Accounts" Icon="@Icons.Material.Filled.AdminPanelSettings">Accounts</MudNavLink>
-			<MudNavLink Href="Fika/Manage/Configuration" Icon="@Icons.Material.Filled.Settings">Configuration</MudNavLink>
+			<MudTooltip Text="Not yet implemented">
+				<MudNavLink Disabled="true" Href="Fika/Manage/Configuration" Icon="@Icons.Material.Filled.Settings">Configuration</MudNavLink>
+			</MudTooltip>
 		</Authorized>
 	</AuthorizeView>
 
