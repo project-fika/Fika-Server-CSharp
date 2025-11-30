@@ -56,7 +56,7 @@ public class Program
 
         if (!Directory.Exists("database"))
         {
-            Directory.CreateDirectory("database"); 
+            Directory.CreateDirectory("database");
         }
 
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -156,7 +156,6 @@ public class Program
         await dbContext.Database.EnsureCreatedAsync();
 
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
         var roleExists = await roleManager.RoleExistsAsync("Admin");
@@ -197,7 +196,7 @@ public class Program
 
     private static void SetupHttpClient(IServiceProvider provider, HttpClient client)
     {
-        FikaConfig config = provider.GetRequiredService<FikaConfig>();
+        var config = provider.GetRequiredService<FikaConfig>();
 
         client.BaseAddress = config.BaseUrl;
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", config.APIKey);
