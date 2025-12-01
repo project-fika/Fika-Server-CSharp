@@ -25,11 +25,6 @@
     <ProjectReference Include="..\FikaShared\FikaShared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="ProtectedFiles\" />
-    <Folder Include="StoredData\" />
-  </ItemGroup>
-
 	<Target Name="PostPublishArchive" AfterTargets="Publish">
 		<Exec Command="tar -czf $(PublishDir)/fikawebapp.tar.gz -C $(PublishDir) *" />
 	</Target>

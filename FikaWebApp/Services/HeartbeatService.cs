@@ -2,7 +2,7 @@
 
 public class HeartbeatService
 {
-    public HeartbeatService(HttpClient client, FikaConfig fikaConfig, ILogger<HeartbeatService> logger)
+    public HeartbeatService(HttpClient client, WebAppConfig fikaConfig, ILogger<HeartbeatService> logger)
     {
         _client = client;
         _interval = fikaConfig.HeartbeatInterval;

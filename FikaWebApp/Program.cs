@@ -14,7 +14,7 @@ using System.Net.Http.Headers;
 
 namespace FikaWebApp;
 
-public class Program
+public static class Program
 {
     public static async Task Main(string[] args)
     {
@@ -22,7 +22,7 @@ public class Program
 
         Log.Logger = new LoggerConfiguration()
             .WriteTo.Console()
-            .WriteTo.File("Logs/log-.log", rollingInterval: RollingInterval.Day, retainedFileCountLimit: 7)
+            .WriteTo.File($"{WebAppConfig.LogsPath}/log-.log", rollingInterval: RollingInterval.Day, retainedFileCountLimit: 7)
             .Enrich.FromLogContext()
             .CreateLogger();
 
@@ -47,20 +47,20 @@ public class Program
         builder.Services.AddScoped<IdentityRedirectManager>();
         builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
 
-        /*builder.Services.AddAuthentication(options =>
-            {
-                options.DefaultScheme = IdentityConstants.ApplicationScheme;
-                options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
-            })
-            .AddIdentityCookies();*/
-
-        if (!Directory.Exists("database"))
+        var dataDir = WebAppConfig.DataPath;
+        if (!Directory.Exists(dataDir))
         {
-            Directory.CreateDirectory("database");
+            Directory.CreateDirectory(dataDir);
+        }
+
+        var dbDir = WebAppConfig.DatabasePath;
+        if (!Directory.Exists(dbDir))
+        {
+            Directory.CreateDirectory(dbDir);
         }
 
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlite("Data Source = database/fikaWebApp.db"));
+            options.UseSqlite($"Data Source = {Path.Combine(dbDir, "fikaWebApp.db")}"));
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
         builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
@@ -74,10 +74,10 @@ public class Program
         builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
 #if DEBUG
-        builder.Services.Configure<FikaConfig>(builder.Configuration.GetSection("FikaConfig"));
+        builder.Services.Configure<WebAppConfig>(builder.Configuration.GetSection("FikaConfig"));
 
         builder.Services.AddSingleton(resolver =>
-            resolver.GetRequiredService<IOptions<FikaConfig>>().Value);
+            resolver.GetRequiredService<IOptions<WebAppConfig>>().Value);
 #else
         var apiKey = Environment.GetEnvironmentVariable("API_KEY")
             ?? throw new Exception("Missing API_KEY");
@@ -137,15 +137,15 @@ public class Program
             await InitializeDatabase(scope);
         }
 
-        await CreateSecureFileFolder(app);
-        await CheckForDataFolder(app);
+        await CheckForSecureFileFolder();
+        await CheckForDataFolder();
 
         await app.RunAsync();
     }
 
-    private static Task CheckForDataFolder(WebApplication app)
+    private static Task CheckForDataFolder()
     {
-        var dataPath = Path.Combine(app.Environment.ContentRootPath, "storeddata");
+        var dataPath = WebAppConfig.StoredDataPath;
         if (!Directory.Exists(dataPath))
         {
             Directory.CreateDirectory(dataPath);
@@ -154,9 +154,9 @@ public class Program
         return Task.CompletedTask;
     }
 
-    private static Task CreateSecureFileFolder(WebApplication app)
+    private static Task CheckForSecureFileFolder()
     {
-        var protectedFilesPath = Path.Combine(app.Environment.ContentRootPath, "protectedfiles");
+        var protectedFilesPath = WebAppConfig.ProtectedFilesPath;
         if (!Directory.Exists(protectedFilesPath))
         {
             Directory.CreateDirectory(protectedFilesPath);
@@ -213,7 +213,7 @@ public class Program
 
     private static void SetupHttpClient(IServiceProvider provider, HttpClient client)
     {
-        var config = provider.GetRequiredService<FikaConfig>();
+        var config = provider.GetRequiredService<WebAppConfig>();
 
         client.BaseAddress = config.BaseUrl;
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", config.APIKey);

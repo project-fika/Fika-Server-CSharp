@@ -1,3 +1,4 @@
+using FikaWebApp.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
@@ -35,7 +36,7 @@ public partial class FilesManagerPage
 
     private void RefreshFiles()
     {
-        var basePath = Path.Combine(Directory.GetCurrentDirectory(), "protectedfiles");
+        var basePath = WebAppConfig.ProtectedFilesPath;
 
         if (!Directory.Exists(basePath))
         {
@@ -181,7 +182,7 @@ public partial class FilesManagerPage
             _files.Add(file);
         }
 
-        var uploadPath = Path.GetFullPath("protectedfiles");
+        var uploadPath = WebAppConfig.ProtectedFilesPath;
         var filesUploaded = 0;
 
         try
@@ -258,7 +259,7 @@ public partial class FilesManagerPage
         }
 
         // Root directory where secure files are stored
-        var rootPath = Path.GetFullPath("protectedfiles");
+        var rootPath = WebAppConfig.ProtectedFilesPath;
 
         // Combine root path with requested filename
         var fullPath = Path.GetFullPath(Path.Combine(rootPath, SelectedValue));

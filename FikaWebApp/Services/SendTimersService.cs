@@ -16,7 +16,6 @@ public class SendTimersService(ILogger<SendTimersService> logger, HttpClient htt
         WriteIndented = true
     };
 
-    private const string _dataFolder = "storeddata";
     private const string _fileName = "storedTimers.json";
 
     public record TimerSaveData
@@ -30,7 +29,7 @@ public class SendTimersService(ILogger<SendTimersService> logger, HttpClient htt
 
     public async Task Load()
     {
-        var filePath = Path.Combine(_dataFolder, _fileName);
+        var filePath = Path.Combine(WebAppConfig.StoredDataPath, _fileName);
         if (!File.Exists(filePath))
         {
             await Save();
@@ -88,7 +87,7 @@ public class SendTimersService(ILogger<SendTimersService> logger, HttpClient htt
             };
 
             var serialized = JsonSerializer.Serialize(data, _serializerOptions);
-            var filePath = Path.Combine(_dataFolder, _fileName);
+            var filePath = Path.Combine(WebAppConfig.StoredDataPath, _fileName);
             try
             {
                 File.WriteAllText(filePath, serialized.AsSpan());

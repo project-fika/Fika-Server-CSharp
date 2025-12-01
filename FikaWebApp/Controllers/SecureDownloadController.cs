@@ -17,7 +17,7 @@ public class SecureDownloadController : ControllerBase
         }
 
         // Root directory where secure files are stored
-        var rootPath = Path.GetFullPath("protectedfiles");
+        var rootPath = Path.GetFullPath("data/protectedfiles");
 
         // Combine root path with requested filename
         var fullPath = Path.GetFullPath(Path.Combine(rootPath, filename));
