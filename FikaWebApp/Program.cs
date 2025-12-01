@@ -84,7 +84,7 @@ public static class Program
         var baseUrl = Environment.GetEnvironmentVariable("BASE_URL")
             ?? throw new Exception("Missing BASE_URL");
 
-        var fikaConfig = new FikaConfig()
+        var fikaConfig = new WebAppConfig()
         {
             APIKey = apiKey,
             BaseUrl = new Uri(baseUrl),
