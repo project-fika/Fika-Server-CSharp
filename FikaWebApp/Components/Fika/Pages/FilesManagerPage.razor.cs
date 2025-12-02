@@ -95,7 +95,7 @@ public partial class FilesManagerPage
         // Add files in this directory
         foreach (var file in dir.GetFiles())
         {
-            folderItem.Children ??= new List<TreeItemData<string>>();
+            folderItem.Children ??= [];
             folderItem.Children.Add(new TreeItemPresenter(file.Name, ExtensionToIcon(file.Extension))
             {
                 Value = Path.GetRelativePath(basePath, file.FullName),
@@ -238,6 +238,7 @@ public partial class FilesManagerPage
         StateHasChanged();
         RefreshFiles();
     }
+
     private async Task DeleteFile()
     {
         if (string.IsNullOrEmpty(SelectedValue))

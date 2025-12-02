@@ -140,7 +140,51 @@ public static class Program
         await CheckForSecureFileFolder();
         await CheckForDataFolder();
 
+        if (args.Contains("--reset-admin"))
+        {
+            await ResetAdminPassword(app);
+        }
+
         await app.RunAsync();
+    }
+
+    private static async Task ResetAdminPassword(WebApplication app)
+    {
+        using var scope = app.Services.CreateScope();
+
+        var logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>()
+                                          .CreateLogger("AdminReset");
+
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+        logger.LogInformation("Starting admin password reset...");
+
+        var admin = await userManager.FindByNameAsync("admin");
+
+        if (admin == null)
+        {
+            logger.LogWarning("Admin user not found!");
+            return;
+        }
+
+        var token = await userManager.GeneratePasswordResetTokenAsync(admin);
+        var newPassword = "Admin123!";
+
+        var result = await userManager.ResetPasswordAsync(admin, token, newPassword);
+
+        if (!result.Succeeded)
+        {
+            logger.LogError("Admin password reset failed!");
+
+            foreach (var err in result.Errors)
+            {
+                logger.LogError("ResetAdminPassword::{Error}", err.Description);
+            }
+
+            return;
+        }
+
+        logger.LogInformation("Admin password reset successful. New password: {Password}", newPassword);
     }
 
     private static Task CheckForDataFolder()

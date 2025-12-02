@@ -6,60 +6,38 @@
 @inject RoleManager<IdentityRole> RoleManager
 @inject UserManager<ApplicationUser> UserManager
 @inject IOptions<IdentityOptions> IdentityOptions
+@inject ISnackbar Snackbar;
 
-<MudDialog>
-	<DialogContent>
-		<MudForm @bind-IsValid="@_success" @bind-Errors="@_errors" Spacing="4">
-			
-			<MudSelect Immediate="true" MultiSelection="true" Placeholder="Select roles..." HelperText="Role Selection" @bind-Value="_roleValue" @bind-SelectedValues="_selectedRoles">
-				@foreach (var role in _availableRoles)
-				{
-					<MudSelectItem T="string" Value="@role">@role</MudSelectItem>
-				}
-			</MudSelect>
-			<MudStack Row Justify="Justify.Center" Spacing="2">
-				<MudPaper Class="pa-4 mt-4">
-					<MudButton StartIcon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!_success)" Class="ml-auto" OnClick="Submit">Save</MudButton>
-					<MudButton StartIcon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Secondary" Class="ml-auto" OnClick="Cancel">Cancel</MudButton>
-				</MudPaper>
-			</MudStack>
-		</MudForm>
-	</DialogContent>
-</MudDialog>
+<AuthorizeView Roles="Admin">
+	<Authorized>
+		<MudDialog ContentStyle="min-width:400px;">
+			<DialogContent>
+				<MudForm @bind-IsValid="@_success" @bind-Errors="@_errors" Spacing="4">
 
-@code {
-	[CascadingParameter]
-	private IMudDialogInstance MudDialog { get; set; }
+					<MudSelect Immediate="true" MultiSelection="true" Placeholder="Select roles..." HelperText="Role Selection" @bind-Value="_roleValue" @bind-SelectedValues="_selectedRoles">
+						@foreach (var role in _availableRoles)
+						{
+							<MudSelectItem T="string" Value="@role">@role</MudSelectItem>
+						}
+					</MudSelect>
 
-	[Parameter]
-	public ApplicationUser User { get; set; }
+					<MudTextField T="string" Variant="Variant.Filled" Counter="0" Label="Password" HelperText="Choose a strong password" @ref="_passwordField"
+								  InputType="InputType.Password" Validation="@(new Func<string, IEnumerable<string>>(PasswordStrength))" Required="true"
+								  RequiredError="Password is required!" Immediate="true" />
+					<MudTextField T="string" Variant="Variant.Filled" Counter="0"
+								  Label="Password" HelperText="Repeat the password" InputType="InputType.Password" Required="true"
+								  Validation="@(new Func<string, string>(PasswordMatch))" Immediate="true" />
+					<MudButton StartIcon="@Icons.Material.Filled.Key" Variant="Variant.Filled" Color="Color.Success" Disabled="@(!_success)" OnClick="ChangePassword">Change Password</MudButton>
 
-	private IEnumerable<string> _selectedRoles = new HashSet<string>();
-	private string[] _availableRoles = [];
-	private string _roleValue = "None";
+					<MudStack Row Justify="Justify.Center" Spacing="2" Style="width:100%;">
+						<MudButton StartIcon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="Color.Primary" OnClick="Submit">Save</MudButton>
+						<MudButton StartIcon="@Icons.Material.Filled.Cancel" Variant="Variant.Filled" Color="Color.Secondary" OnClick="Cancel">Cancel</MudButton>
+					</MudStack>
+				</MudForm>
+			</DialogContent>
+		</MudDialog>
+	</Authorized>
+	<NotAuthorized>
 
-	private bool _success;
-	private string[] _errors = { };
-
-	protected override async Task OnInitializedAsync()
-	{
-		await base.OnInitializedAsync();
-
-		_availableRoles = RoleManager.Roles
-			.Select(r => r.Name)
-			.ToArray();
-
-		var roles = await UserManager.GetRolesAsync(User);
-		_selectedRoles = new HashSet<string>(roles);
-	}
-
-	private void Submit()
-	{
-		MudDialog.Close(_selectedRoles.ToList());
-	}
-
-	private void Cancel()
-	{
-		MudDialog.Cancel();
-	}
-}
+	</NotAuthorized>
+</AuthorizeView>
