@@ -2,6 +2,7 @@
 
 @using System.ComponentModel.DataAnnotations
 @using FikaWebApp.Components.Account
+@using FikaWebApp.Components.Account.Shared
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Identity
 @using FikaWebApp.Data
@@ -25,7 +26,9 @@
 		<EditForm Model="Input" method="post" OnValidSubmit="LoginUser" FormName="login">
 			<DataAnnotationsValidator />
 
-			<MudText GutterBottom="true" Typo="Typo.body1">Use a local account to log in.</MudText>
+			<StatusMessage Message="@_errorMessage" />
+
+			<MudText GutterBottom="true" Typo="Typo.body1">Use an account to log in.</MudText>
 
 			<MudGrid>
 				<MudItem md="12">
@@ -59,7 +62,7 @@
 
 @code {
 
-	private string? errorMessage;
+	private string? _errorMessage;
 
 	[CascadingParameter]
 	private HttpContext HttpContext { get; set; } = default!;
@@ -103,7 +106,8 @@
 		else
 		{
 			Logger.LogWarning("Invalid login attempt.");
-			errorMessage = "Error: Invalid login attempt.";
+			_errorMessage = "Error: Invalid login attempt.";
+			RedirectManager.RedirectToCurrentPageWithStatus("Error: Invalid login attempt", HttpContext);
 		}
 	}
 
