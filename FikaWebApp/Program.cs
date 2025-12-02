@@ -10,6 +10,7 @@ using Microsoft.Extensions.Options;
 using MudBlazor.Services;
 using MudExtensions.Services;
 using Serilog;
+using Serilog.Events;
 using System.Net.Http.Headers;
 
 namespace FikaWebApp;
@@ -19,8 +20,10 @@ public static class Program
     public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+        var silenceLogs = args.Contains("--quiet-logs");
 
         Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Override("Microsoft", silenceLogs ? LogEventLevel.Warning : LogEventLevel.Information)
             .WriteTo.Console()
             .WriteTo.File($"{WebAppConfig.LogsPath}/log-.log", rollingInterval: RollingInterval.Day, retainedFileCountLimit: 7)
             .Enrich.FromLogContext()
