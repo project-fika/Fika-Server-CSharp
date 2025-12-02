@@ -47,6 +47,8 @@ public static class Program
         // Add Controllers
         builder.Services.AddControllers();
 
+        builder.WebHost.UseStaticWebAssets();
+
         builder.Services.AddCascadingAuthenticationState();
         builder.Services.AddScoped<IdentityUserAccessor>();
         builder.Services.AddScoped<IdentityRedirectManager>();
