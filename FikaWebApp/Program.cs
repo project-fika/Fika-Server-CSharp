@@ -128,11 +128,6 @@ public static class Program
             app.UseHsts();
         }
 
-        var forwardedHeadersOptions = new ForwardedHeadersOptions
-        {
-            ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-        };
-
         //app.UseHttpsRedirection();
 
         app.UseAntiforgery();
