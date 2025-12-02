@@ -29,6 +29,7 @@
   </ItemGroup>
 
 	<Target Name="PostPublishArchive" AfterTargets="Publish">
+		<Delete Files="$(PublishDir)/fikawebapp.tar.gz" />
 		<Exec Command="tar -czf $(PublishDir)/fikawebapp.tar.gz -C $(PublishDir) *" />
 	</Target>
 
