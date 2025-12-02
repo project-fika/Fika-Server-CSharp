@@ -7,6 +7,7 @@ public class WebAppConfig
     public static string ProtectedFilesPath { get; set; } = Path.Combine(AppContext.BaseDirectory, "data/protectedfiles");
     public static string StoredDataPath { get; set; } = Path.Combine(AppContext.BaseDirectory, "data/storeddata");
     public static string LogsPath { get; set; } = Path.Combine(AppContext.BaseDirectory, "data/logs");
+    public static string KeysPath { get; set; } = Path.Combine(AppContext.BaseDirectory, "data/keys");
 
 
     public string? APIKey { get; set; }

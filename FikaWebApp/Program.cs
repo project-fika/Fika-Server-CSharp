@@ -4,6 +4,8 @@ using FikaWebApp.Components.Account;
 using FikaWebApp.Data;
 using FikaWebApp.Services;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -109,6 +111,10 @@ public static class Program
         builder.Services.AddSingleton<HeartbeatService>();
         builder.Services.AddHostedService<BackgroundInitializerService>();
 
+        builder.Services.AddDataProtection()
+            .PersistKeysToFileSystem(new DirectoryInfo(WebAppConfig.KeysPath))
+            .SetApplicationName("FikaWebApp");
+
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
@@ -119,11 +125,15 @@ public static class Program
         else
         {
             app.UseExceptionHandler("/Error");
-            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
             app.UseHsts();
         }
 
-        app.UseHttpsRedirection();
+        var forwardedHeadersOptions = new ForwardedHeadersOptions
+        {
+            ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+        };
+
+        //app.UseHttpsRedirection();
 
         app.UseAntiforgery();
         app.MapControllers();
