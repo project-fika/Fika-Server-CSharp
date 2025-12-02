@@ -11,12 +11,14 @@
 			<MudAppBar Elevation="1">
 				<MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="ToggleDraw"></MudIconButton>
 				<MudSpacer />
-				<MudContainer Class="d-flex flex-column justify-end align-end ">
-					<MudText Style="font-family:bender" Typo="Typo.h5" Class="ml-3">Fika Web Management</MudText>
-					<MudText Typo="Typo.caption" Align="Align.Center" Class="ml-2 text-secondary">
-						© @DateTime.Now.Year Project Fika. All rights reserved.
-					</MudText>
-				</MudContainer>
+				<MudHidden Breakpoint="Breakpoint.Xs" Invert="false">
+					<MudContainer Class="d-flex flex-column justify-end align-end">
+						<MudText Style="font-family:bender" Typo="Typo.h5" Class="ml-3">Fika Web Management</MudText>
+						<MudText Typo="Typo.caption" Align="Align.Center">
+							© @DateTime.Now.Year Project Fika. All rights reserved.
+						</MudText>
+					</MudContainer>
+				</MudHidden>
 				<MudImage Src="images/fika_logo.png" Elevation="25" Height="32" Width="32" Class="ml-2" />
 			</MudAppBar>
 			<MudDrawer id="nav-drawer" @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2" Variant="DrawerVariant.Temporary">
