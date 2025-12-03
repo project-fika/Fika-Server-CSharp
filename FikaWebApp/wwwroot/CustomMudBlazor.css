@@ -22,4 +22,13 @@ body {
         margin-inline-start: auto;
         margin-inline-end: -14px;
     }
+
+    .mud-table .mud-table-pagination .mud-table-pagination-toolbar {
+        flex-wrap: wrap;
+        padding-top: 16px;
+        padding-right: 16px;
+        padding-inline-end: 16px;
+        padding-inline-start: unset;
+        min-height: 100px;
+    }
 }
