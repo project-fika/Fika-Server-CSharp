@@ -78,6 +78,12 @@ public static class Program
         .AddEntityFrameworkStores<ApplicationDbContext>()
         .AddDefaultTokenProviders();
 
+        builder.Services.ConfigureApplicationCookie(options =>
+        {
+            options.ExpireTimeSpan = TimeSpan.FromDays(1);
+            options.SlidingExpiration = false;
+        });
+
         builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
 #if DEBUG
@@ -105,7 +111,7 @@ public static class Program
             .ConfigurePrimaryHttpMessageHandler(() =>
                 new HttpClientHandler
                 {
-                    ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                    ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,
                 });
 
         builder.Services.AddSingleton<SendTimersService>();
