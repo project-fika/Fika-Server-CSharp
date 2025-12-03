@@ -2,6 +2,12 @@
   "version": 1,
   "dependencies": {
     "net10.0": {
+      "Blazor-ApexCharts": {
+        "type": "Direct",
+        "requested": "[6.0.2, )",
+        "resolved": "6.0.2",
+        "contentHash": "bnEYiZTH8JKt4xrOdKrjOdzeXmZ2LMpRWRZW02MpM4z6hILzMaE36VNHwCUEe967xJfqqnFwmpNQlnTR5eZG7Q=="
+      },
       "Brism": {
         "type": "Direct",
         "requested": "[1.0.1, )",

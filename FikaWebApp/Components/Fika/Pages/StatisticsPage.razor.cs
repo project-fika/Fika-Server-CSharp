@@ -18,33 +18,75 @@ public partial class StatisticsPage
     private readonly List<StatisticsPlayer> _players = [];
     private bool _loading;
 
-    private string[]? _nicknames;
-    private double[]? _kills;
-    private double[]? _deaths;
-    private double[]? _ammoUsed;
-    private double[]? _bodyDamage;
-    private double[]? _armorDamage;
-    private double[]? _headshots;
-    private double[]? _bossKills;
-
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
 
+#if DEBUG
+        _loading = true;
+        _players.Add(new StatisticsPlayer
+        {
+            AmmoUsed = Random.Shared.NextDouble() * 100_000,
+            ArmorDamage = Random.Shared.NextDouble() * 100_000,
+            BodyDamage = Random.Shared.NextDouble() * 100_000,
+            BossKills = Random.Shared.NextDouble() * 100,
+            Deaths = Random.Shared.NextDouble() * 1000,
+            Headshots = Random.Shared.NextDouble() * 100,
+            Kills = Random.Shared.NextDouble() * 10_000,
+            Nickname = "Test1"
+        });
+        _players.Add(new StatisticsPlayer
+        {
+            AmmoUsed = Random.Shared.NextDouble() * 100_000,
+            ArmorDamage = Random.Shared.NextDouble() * 100_000,
+            BodyDamage = Random.Shared.NextDouble() * 100_000,
+            BossKills = Random.Shared.NextDouble() * 100,
+            Deaths = Random.Shared.NextDouble() * 1000,
+            Headshots = Random.Shared.NextDouble() * 100,
+            Kills = Random.Shared.NextDouble() * 10_000,
+            Nickname = "Test2"
+        });
+        _players.Add(new StatisticsPlayer
+        {
+            AmmoUsed = Random.Shared.NextDouble() * 100_000,
+            ArmorDamage = Random.Shared.NextDouble() * 100_000,
+            BodyDamage = Random.Shared.NextDouble() * 100_000,
+            BossKills = Random.Shared.NextDouble() * 100,
+            Deaths = Random.Shared.NextDouble() * 1000,
+            Headshots = Random.Shared.NextDouble() * 100,
+            Kills = Random.Shared.NextDouble() * 10_000,
+            Nickname = "Test3"
+        });
+        _players.Add(new StatisticsPlayer
+        {
+            AmmoUsed = Random.Shared.NextDouble() * 100_000,
+            ArmorDamage = Random.Shared.NextDouble() * 100_000,
+            BodyDamage = Random.Shared.NextDouble() * 100_000,
+            BossKills = Random.Shared.NextDouble() * 100,
+            Deaths = Random.Shared.NextDouble() * 1000,
+            Headshots = Random.Shared.NextDouble() * 100,
+            Kills = Random.Shared.NextDouble() * 10_000,
+            Nickname = "Test4"
+        });
+        _players.Add(new StatisticsPlayer
+        {
+            AmmoUsed = Random.Shared.NextDouble() * 100_000,
+            ArmorDamage = Random.Shared.NextDouble() * 100_000,
+            BodyDamage = Random.Shared.NextDouble() * 100_000,
+            BossKills = Random.Shared.NextDouble() * 100,
+            Deaths = Random.Shared.NextDouble() * 1000,
+            Headshots = Random.Shared.NextDouble() * 100,
+            Kills = Random.Shared.NextDouble() * 10_000,
+            Nickname = "Test5"
+        });
+        await Task.Delay(TimeSpan.FromSeconds(1)); // simulate loading
+        _loading = false;
+#else
         try
         {
             _loading = true;
             var result = await HttpClient.GetFromJsonAsync<GetStatisticsResponse>("fika/api/statistics");
             _players.AddRange(result!.Players);
-
-            _nicknames = [.. _players.Select(p => p.Nickname)];
-            _kills = [.. _players.Select(p => p.Kills)];
-            _deaths = [.. _players.Select(p => p.Deaths)];
-            _ammoUsed = [.. _players.Select(p => p.AmmoUsed)];
-            _bodyDamage = [.. _players.Select(p => p.BodyDamage)];
-            _armorDamage = [.. _players.Select(p => p.ArmorDamage)];
-            _headshots = [.. _players.Select(p => p.Headshots)];
-            _bossKills = [.. _players.Select(p => p.BossKills)];
         }
         catch (Exception ex)
         {
@@ -53,5 +95,7 @@ public partial class StatisticsPage
         }
 
         _loading = false;
+#endif
+
     }
 }

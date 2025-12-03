@@ -50,7 +50,7 @@ public class ItemCacheService(ILogger<ItemCacheService> logger, HttpClient clien
         }
         catch (Exception ex)
         {
-            logger.LogError("There was an error retrieving the items from the server: {Exception}", ex);
+            logger.LogError("There was an error retrieving the items from the server: {Exception}", ex.Message);
             return false;
         }
     }

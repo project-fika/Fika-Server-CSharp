@@ -1,11 +1,11 @@
-﻿using Brism;
+﻿using ApexCharts;
+using Brism;
 using FikaWebApp.Components;
 using FikaWebApp.Components.Account;
 using FikaWebApp.Data;
 using FikaWebApp.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -54,6 +54,64 @@ public static class Program
         builder.Services.AddScoped<IdentityRedirectManager>();
         builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
 
+        builder.Services.AddApexCharts(e =>
+        {
+            e.GlobalOptions = new ApexChartBaseOptions
+            {
+                Theme = new Theme
+                {
+                    Palette = PaletteType.Palette1,
+                    Mode = Mode.Dark
+                },
+                Chart = new Chart
+                {
+                    Background = "transparent",
+                    FontFamily = "bender"
+                },
+                Yaxis =
+                [
+                    new YAxis
+                    {
+                        DecimalsInFloat = 0,
+                        ForceNiceScale = true,
+                        Labels = new YAxisLabels
+                        {
+                            Style = new AxisLabelStyle
+                            {
+                                FontFamily = "bender"
+                            },
+                            Formatter = "function(val) { return Math.round(val).toLocaleString(); }"
+                        }
+                    }
+                ],
+                DataLabels = new DataLabels
+                {
+                    Enabled = true,
+                    Style = new DataLabelsStyle
+                    {
+                        FontFamily = "bender"
+                    }
+                },
+                Tooltip = new Tooltip
+                {
+                    Style = new TooltipStyle
+                    {
+                        FontFamily = "bender"
+                    },
+                    Y = new TooltipY
+                    {
+                        Formatter = "function (val) { " +
+                        "   return val === null || val === undefined ? val : Math.round(val).toLocaleString();" +
+                        "}"
+                    }
+                },
+                Legend = new Legend
+                {
+                    FontFamily = "bender"
+                }
+            };
+        });
+
         var dataDir = WebAppConfig.DataPath;
         if (!Directory.Exists(dataDir))
         {
@@ -77,6 +135,12 @@ public static class Program
         })
         .AddEntityFrameworkStores<ApplicationDbContext>()
         .AddDefaultTokenProviders();
+
+        builder.Services.ConfigureApplicationCookie(options =>
+        {
+            options.ExpireTimeSpan = TimeSpan.FromDays(1);
+            options.SlidingExpiration = false;
+        });
 
         builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
@@ -105,7 +169,7 @@ public static class Program
             .ConfigurePrimaryHttpMessageHandler(() =>
                 new HttpClientHandler
                 {
-                    ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                    ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,
                 });
 
         builder.Services.AddSingleton<SendTimersService>();
