@@ -6,64 +6,60 @@
 @using FikaWebApp.Data
 @using Microsoft.AspNetCore.Identity
 
-<MudPaper Class="pa-2" MinHeight="100%" Style="position: relative;">
-	<MudLoading Loading="_loading" Darken="true" Overlap="true" Text="Waiting for server...">
-		@if (!_loading && _profiles.Count > 0)
-		{
-			<MudStack>
-				<MudDataGrid @ref="_dataGrid" Items="_profiles" SortMode="SortMode.Single" Filterable QuickFilter="@QuickFilter" RowsPerPage="10">
-					<ToolBarContent>
-						<MudText Typo="Typo.h6">All Profiles</MudText>
-						<MudSpacer />
-						<MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate
-									  AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0" />
-					</ToolBarContent>
-					<Columns>
-						<PropertyColumn Property="x => x.Nickname" />
-						<PropertyColumn Property="x => x.ProfileId" />
-						<PropertyColumn Property="x => x.Level" />
-						<TemplateColumn Title="Flea Banned" CellClass="justify-center">
-							<CellTemplate Context="row">
-								<MudCheckBox Value="@row.Item.HasFleaBan" ReadOnly />
-							</CellTemplate>
-						</TemplateColumn>
-						<TemplateColumn CellClass="d-flex justify-end">
-							<CellTemplate Context="row">
-								<MudStack Row>
-									<MudButton Size="@Size.Small" Variant="@Variant.Filled" Color="@Color.Primary" OnClick="@(() => OpenModifyDialog(row.Item))">Modify</MudButton>
-									<MudTooltip Color="Color.Error" Text="WARNING: Can be slow">
-										<MudButton Size="@Size.Small" Variant="@Variant.Filled" Color="@Color.Primary" OnClick="@(() => ViewProfile(row.Item))">View</MudButton>
-									</MudTooltip>
-								</MudStack>
-							</CellTemplate>
-						</TemplateColumn>
-					</Columns>
-					<RowLoadingContent>
-						<tr class="mud-table-row">
-							<td class="mud-table-cell" colspan="1000">
-								Loading...
-							</td>
-						</tr>
-					</RowLoadingContent>
-					<PagerContent>
-						<MudDataGridPager T="ProfileResponse" />
-					</PagerContent>
-				</MudDataGrid>
+<MudLoading Loading="_loading" Darken="true" Overlap="true" Text="Waiting for server...">
+	@if (!_loading && _profiles.Count > 0)
+	{
+		<MudStack>
+			<MudDataGrid @ref="_dataGrid" Items="_profiles" SortMode="SortMode.Single" Filterable
+			             QuickFilter="@QuickFilter" RowsPerPage="10" Breakpoint="Breakpoint.None">
+				<ToolBarContent>
+					<MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" Immediate
+					              AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"/>
+				</ToolBarContent>
+				<Columns>
+					<PropertyColumn Property="x => x.Nickname"/>
+					<PropertyColumn Property="x => x.ProfileId"/>
+					<PropertyColumn Property="x => x.Level"/>
+					<TemplateColumn Title="Flea Banned" CellClass="justify-center">
+						<CellTemplate Context="row">
+							<MudCheckBox Value="@row.Item.HasFleaBan" ReadOnly/>
+						</CellTemplate>
+					</TemplateColumn>
+					<TemplateColumn CellClass="d-flex justify-end">
+						<CellTemplate Context="row">
+							<MudStack Row>
+								<MudButton Size="@Size.Small" Variant="@Variant.Filled" Color="@Color.Primary"
+								           OnClick="@(() => OpenModifyDialog(row.Item))">Modify
+								</MudButton>
+								<MudTooltip Color="Color.Error" Text="WARNING: Can be slow">
+									<MudButton Size="@Size.Small" Variant="@Variant.Filled" Color="@Color.Primary"
+									           OnClick="@(() => ViewProfile(row.Item))">View
+									</MudButton>
+								</MudTooltip>
+							</MudStack>
+						</CellTemplate>
+					</TemplateColumn>
+				</Columns>
+				<RowLoadingContent>
+					<tr class="mud-table-row">
+						<td class="mud-table-cell" colspan="1000">
+							Loading...
+						</td>
+					</tr>
+				</RowLoadingContent>
+				<PagerContent>
+					<MudDataGridPager T="ProfileResponse"/>
+				</PagerContent>
+			</MudDataGrid>
 
-				<MudFileUpload T="IReadOnlyList<IBrowserFile>" Accept=".json" FilesChanged="UploadProfile" MaximumFileCount="1" MaxFileSize="10 * 1024 * 1024">
-					<ActivatorContent>
-						<FikaPrimaryButton StartIcon="@Icons.Material.Filled.Upload" Text="Upload Profile" />
-					</ActivatorContent>
-				</MudFileUpload>
+			<MudFileUpload T="IReadOnlyList<IBrowserFile>" Accept=".json" FilesChanged="UploadProfile"
+			               MaximumFileCount="1" MaxFileSize="10 * 1024 * 1024">
+				<ActivatorContent>
+					<FikaPrimaryButton StartIcon="@Icons.Material.Filled.Upload" Text="Upload Profile"/>
+				</ActivatorContent>
+			</MudFileUpload>
 
-			</MudStack>
-		}
-		</MudLoading>
-</MudPaper>
-
-<style>
-	.blur-background {
-		backdrop-filter: blur(10px);
+		</MudStack>
 	}
-</style>
+</MudLoading>
 
