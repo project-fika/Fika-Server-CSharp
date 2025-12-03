@@ -3,8 +3,16 @@
 @using ApexCharts;
 @using FikaShared.Responses;
 
-<MudPaper Class="pa-2" Width="100%">
-	<MudLoading Loading="_loading" Darken="true" Overlap="true" Text="Waiting for server...">
+@if (_loading)
+{
+	<MudStack AlignItems="AlignItems.Center" Row="false" >
+		<MudProgressCircular Indeterminate="true" />
+		<MudText>Waiting for server...</MudText>
+	</MudStack>
+}
+else
+{
+    <MudPaper Class="pa-2" Width="100%">
 		@if (!_loading && _players.Count > 0)
 		{
 			<MudGrid Justify="Justify.SpaceEvenly">
@@ -101,5 +109,5 @@
 				</MudItem>
 			</MudGrid>
 		}
-	</MudLoading>
 </MudPaper>
+}

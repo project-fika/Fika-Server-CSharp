@@ -9,15 +9,24 @@
 @inject ISnackbar Snackbar
 @inject IDialogService DialogService
 
-<MudPaper Class="mud-width-full pa-2" MinHeight="100%" Style="position: relative;">
-	<MudLoading Loading="_loading" Darken="true" Overlap="true" Text="Waiting for server...">
+@if (_loading)
+{
+	<MudStack AlignItems="AlignItems.Center" Row="false" >
+		<MudProgressCircular Indeterminate="true" />
+		<MudText>Waiting for server...</MudText>
+	</MudStack>
+}
+else
+{
+	<MudPaper Class="mud-width-full pa-2" MinHeight="100%" Style="position: relative;">
 		<MudStack Row>
 			<MudGrid>
 				@foreach (var player in _players)
 				{
 					<MudItem xs="12" sm="6" md="3">
 						<MudCard Outlined="true">
-							<MudCardMedia Image="@(player.Location.ToMapURL())" Height="200" Title="@player.Location.ToString()" />
+							<MudCardMedia Image="@(player.Location.ToMapURL())" Height="200"
+							              Title="@player.Location.ToString()"/>
 							<MudCardHeader>
 								<MudStack>
 									<MudText Typo="Typo.h6">@player.Nickname</MudText>
@@ -30,8 +39,12 @@
 							<AuthorizeView Roles="Admin, Moderator">
 								<MudCardActions>
 									<MudButtonGroup Color="Color.Primary" Variant="Variant.Filled" FullWidth="true">
-										<FikaPrimaryButton Text="Logout" StartIcon="@Icons.Material.Filled.Logout" OnClick="@(() => LogoutPlayer(player))" Disabled="@IsRestricted(player.Location)" />
-										<FikaPrimaryButton Text="Send Message" StartIcon="@Icons.Material.Filled.Send" OnClick="@(() => SendMessage(player))" Disabled="@IsRestricted(player.Location)" />
+										<FikaPrimaryButton Text="Logout" StartIcon="@Icons.Material.Filled.Logout"
+										                   OnClick="@(() => LogoutPlayer(player))"
+										                   Disabled="@IsRestricted(player.Location)"/>
+										<FikaPrimaryButton Text="Send Message" StartIcon="@Icons.Material.Filled.Send"
+										                   OnClick="@(() => SendMessage(player))"
+										                   Disabled="@IsRestricted(player.Location)"/>
 									</MudButtonGroup>
 								</MudCardActions>
 							</AuthorizeView>
@@ -40,7 +53,7 @@
 				}
 			</MudGrid>
 		</MudStack>
-	</MudLoading>
-</MudPaper>
+	</MudPaper>
+}
 
 

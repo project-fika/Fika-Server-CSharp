@@ -6,8 +6,14 @@
 @using FikaWebApp.Data
 @using Microsoft.AspNetCore.Identity
 
-<MudLoading Loading="_loading" Darken="true" Overlap="true" Text="Waiting for server...">
-	@if (!_loading && _profiles.Count > 0)
+@if (_loading)
+{
+	<MudStack AlignItems="AlignItems.Center" Row="false" >
+		<MudProgressCircular Indeterminate="true" />
+		<MudText>Waiting for server...</MudText>
+	</MudStack>
+}
+@if (!_loading && _profiles.Count > 0)
 	{
 		<MudStack>
 			<MudDataGrid @ref="_dataGrid" Items="_profiles" SortMode="SortMode.Single" Filterable
@@ -61,5 +67,3 @@
 
 		</MudStack>
 	}
-</MudLoading>
-

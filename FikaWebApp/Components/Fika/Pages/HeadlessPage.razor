@@ -2,7 +2,15 @@
 
 @using FikaShared
 
-<MudLoading Loading="_loading" Darken="true" Overlap="true" Text="Waiting for server...">
+@if (_loading)
+{
+	<MudStack AlignItems="AlignItems.Center" Row="false" >
+		<MudProgressCircular Indeterminate="true" />
+		<MudText>Waiting for server...</MudText>
+	</MudStack>
+}
+else
+{
 	<MudDataGrid Items="_headlessClients" Breakpoint="Breakpoint.None" RowsPerPage="10" SortMode="SortMode.Single">
 		<Columns>
 			<PropertyColumn Property="p => p.ProfileId" />
@@ -19,4 +27,4 @@
 			<MudDataGridPager T="OnlineHeadless"/>
 		</PagerContent>
 	</MudDataGrid>
-</MudLoading>
+}
