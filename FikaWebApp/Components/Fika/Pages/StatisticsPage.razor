@@ -1,50 +1,116 @@
 ﻿@page "/Fika/Manage/Statistics"
 
+@using ApexCharts;
+@using FikaShared.Responses;
+
 <MudPaper Class="pa-2" MinHeight="100%" Style="position: relative;">
 	<MudLoading Loading="_loading" Darken="true" Overlap="true" Text="Waiting for server...">
 		@if (!_loading && _players.Count > 0)
 		{
 			<MudGrid Justify="Justify.SpaceEvenly">
-				<MudItem xs="3">
+				<MudItem xs="4">
 					<MudStack AlignItems="AlignItems.Center">
-						<MudText Typo="Typo.h6">Kills</MudText>
-						<MudChart ChartType="ChartType.Donut" InputData="@_kills" InputLabels="@_nicknames"/>
+						<ApexChart TItem="StatisticsPlayer" Title="Kills">
+							<ApexPointSeries TItem="StatisticsPlayer"
+								Items="_players"
+								Name="Kills"
+								SeriesType="SeriesType.Pie"
+								XValue="@(p => p.Nickname)"
+								YAggregate="@(ps => ps.Sum(p => (decimal)p.Kills))"
+								OrderByDescending="p => p.Y"
+								ShowDataLabels
+								/>
+						</ApexChart>
 					</MudStack>
 				</MudItem>
-				<MudItem xs="3">
+				<MudItem xs="4">
 					<MudStack AlignItems="AlignItems.Center">
-						<MudText Typo="Typo.h6">Deaths</MudText>
-						<MudChart ChartType="ChartType.Donut" InputData="@_deaths" InputLabels="@_nicknames"/>
+						<ApexChart TItem="StatisticsPlayer" Title="Deaths">
+							<ApexPointSeries TItem="StatisticsPlayer"
+								Items="_players"
+								Name="Deaths"
+								SeriesType="SeriesType.Pie"
+								XValue="@(p => p.Nickname)"
+								YAggregate="@(ps => ps.Sum(p => (decimal)p.Deaths))"
+								OrderByDescending="p => p.Y"
+								ShowDataLabels
+								/>
+						</ApexChart>
 					</MudStack>
 				</MudItem>
-				<MudItem xs="3">
+				<MudItem xs="4">
 					<MudStack AlignItems="AlignItems.Center">
-						<MudText Typo="Typo.h6">Ammo Used</MudText>
-						<MudChart ChartType="ChartType.Donut" InputData="@_ammoUsed" InputLabels="@_nicknames"/>
+						<ApexChart TItem="StatisticsPlayer" Title="Ammo Used">
+							<ApexPointSeries TItem="StatisticsPlayer"
+								Items="_players"
+								Name="Ammo Used"
+								SeriesType="SeriesType.Pie"
+								XValue="@(p => p.Nickname)"
+								YAggregate="@(ps => ps.Sum(p => (decimal)p.AmmoUsed))"
+								OrderByDescending="p => p.Y"
+								ShowDataLabels
+								/>
+						</ApexChart>
 					</MudStack>
 				</MudItem>
-				<MudItem xs="3">
+				<MudItem xs="4">
 					<MudStack AlignItems="AlignItems.Center">
-						<MudText Typo="Typo.h6">Body Damage</MudText>
-						<MudChart ChartType="ChartType.Donut" InputData="@_bodyDamage" InputLabels="@_nicknames"/>
+						<ApexChart TItem="StatisticsPlayer" Title="Body Damage">
+							<ApexPointSeries TItem="StatisticsPlayer"
+								Items="_players"
+								Name="Body Damage"
+								SeriesType="SeriesType.Pie"
+								XValue="@(p => p.Nickname)"
+								YAggregate="@(ps => ps.Sum(p => (decimal)p.BodyDamage))"
+								OrderByDescending="p => p.Y"
+								ShowDataLabels
+								/>
+						</ApexChart>
 					</MudStack>
 				</MudItem>
-				<MudItem xs="3">
+				<MudItem xs="4">
 					<MudStack AlignItems="AlignItems.Center">
-						<MudText Typo="Typo.h6">Armor Damage</MudText>
-						<MudChart ChartType="ChartType.Donut" InputData="@_armorDamage" InputLabels="@_nicknames"/>
+						<ApexChart TItem="StatisticsPlayer" Title="Armor Damage">
+							<ApexPointSeries TItem="StatisticsPlayer"
+								Items="_players"
+								Name="Armor Damage"
+								SeriesType="SeriesType.Pie"
+								XValue="@(p => p.Nickname)"
+								YAggregate="@(ps => ps.Sum(p => (decimal)p.ArmorDamage))"
+								OrderByDescending="p => p.Y"
+								ShowDataLabels
+								/>
+						</ApexChart>
 					</MudStack>
 				</MudItem>
-				<MudItem xs="3">
+				<MudItem xs="4">
 					<MudStack AlignItems="AlignItems.Center">
-						<MudText Typo="Typo.h6">Headshots</MudText>
-						<MudChart ChartType="ChartType.Donut" InputData="@_headshots" InputLabels="@_nicknames"/>
+						<ApexChart TItem="StatisticsPlayer" Title="Headshots">
+							<ApexPointSeries TItem="StatisticsPlayer"
+								Items="_players"
+								Name="Headshots"
+								SeriesType="SeriesType.Pie"
+								XValue="@(p => p.Nickname)"
+								YAggregate="@(ps => ps.Sum(p => (decimal)p.Headshots))"
+								OrderByDescending="p => p.Y"
+								ShowDataLabels
+								/>
+						</ApexChart>
 					</MudStack>
 				</MudItem>
-				<MudItem xs="3">
+				<MudItem xs="4">
 					<MudStack AlignItems="AlignItems.Center">
-						<MudText Typo="Typo.h6">Boss Kills</MudText>
-						<MudChart ChartType="ChartType.Donut" InputData="@_bossKills" InputLabels="@_nicknames"/>
+						<ApexChart TItem="StatisticsPlayer" Title="Boss Kills">
+							<ApexPointSeries TItem="StatisticsPlayer"
+								Items="_players"
+								Name="Boss Kills"
+								SeriesType="SeriesType.Pie"
+								XValue="@(p => p.Nickname)"
+								YAggregate="@(ps => ps.Sum(p => (decimal)p.BossKills))"
+								OrderByDescending="p => p.Y"
+								ShowDataLabels
+								/>
+						</ApexChart>
 					</MudStack>
 				</MudItem>
 			</MudGrid>
