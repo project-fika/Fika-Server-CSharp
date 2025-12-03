@@ -7,12 +7,13 @@
 				<MudButton OnClick="ToggleExpand">@(_expanded ? "Hide Info" : "Show Info")</MudButton>
 				<MudCollapse Expanded="_expanded">
 					<MudText>
-						You can download files that have been uploaded by the server admin here. <br />
+						You can download files that have been uploaded by the server admin here. <br/>
 						NOTE: Files over 250mb are not recommended.
 					</MudText>
 				</MudCollapse>
 			</MudStack>
-			<MudTreeView Items="@TreeItems" SelectionMode="SelectionMode.SingleSelection" @bind-SelectedValue="SelectedValue" CheckBoxColor="Color.Info">
+			<MudTreeView Items="@TreeItems" SelectionMode="SelectionMode.SingleSelection"
+			             @bind-SelectedValue="SelectedValue" CheckBoxColor="Color.Info">
 				<ItemTemplate>
 					@{
 						// Casting context from TreeItemData<string> to our own derived class TreeItemPresenter
@@ -20,24 +21,41 @@
 						var presenter = context as TreeItemPresenter;
 					}
 					<MudTreeViewItem @bind-Expanded="@context.Expanded" Items="@context.Children" Value="@context.Value"
-									 Icon="@context.Icon" Text="@context.Text" EndText="@presenter?.EndText" EndTextTypo="@Typo.caption" />
+					                 Icon="@context.Icon" Text="@context.Text" EndText="@presenter?.EndText"
+					                 EndTextTypo="@Typo.caption"/>
 				</ItemTemplate>
 			</MudTreeView>
 		</MudPaper>
 
-		<MudStack Row Justify="Justify.Center" Style="width: 100%">
-			@* <MudText Typo="@Typo.subtitle1">Selected Files: <MudChip T="string">@SelectedValues.Count</MudChip></MudText> *@
-			<MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FileDownload" Disabled="@(SelectedValue == null)" OnClick="DownloadFile">Download</MudButton>
-			<AuthorizeView Roles="Admin">
-				<Authorized>
-					<MudFileUpload T="IReadOnlyList<IBrowserFile>" FilesChanged="UploadFiles">
-						<ActivatorContent>
-							<MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.UploadFile">Upload</MudButton>
-						</ActivatorContent>
-					</MudFileUpload>
-					<MudButton Color="Color.Primary" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.DeleteForever" OnClick="DeleteFile" Disabled="SelectedValue == null">Delete</MudButton>
-				</Authorized>
-			</AuthorizeView>
-		</MudStack>
+		<MudPaper Width="100%" Elevation="0" Class="pa-2">
+			<MudBreakpointProvider OnBreakpointChanged="OnBreakPointChanged">
+				<MudStack Row="@(Breakpoint != Breakpoint.Xs)" Justify="Justify.FlexStart" Style="width: 100%">
+					@* <MudText Typo="@Typo.subtitle1">Selected Files: <MudChip T="string">@SelectedValues.Count</MudChip></MudText> *@
+					<FikaPrimaryButton StartIcon="@Icons.Material.Filled.FileDownload"
+					                   Disabled="@(SelectedValue == null)" OnClick="DownloadFile" Text="Download"
+					                   FullWidth="@(Breakpoint == Breakpoint.Xs)"/>
+					<AuthorizeView Roles="Admin">
+						<Authorized>
+							<MudFileUpload T="IReadOnlyList<IBrowserFile>" FilesChanged="UploadFiles">
+								<ActivatorContent>
+									<FikaPrimaryButton StartIcon="@Icons.Material.Filled.UploadFile" Text="Upload"
+									                   FullWidth="@(Breakpoint == Breakpoint.Xs)"/>
+								</ActivatorContent>
+							</MudFileUpload>
+							<FikaPrimaryButton StartIcon="@Icons.Material.Filled.DeleteForever"
+							                   Disabled="@(SelectedValue == null)" OnClick="DeleteFile" Text="Delete"
+							                   FullWidth="@(Breakpoint == Breakpoint.Xs)"/>
+						</Authorized>
+					</AuthorizeView>
+				</MudStack>
+			</MudBreakpointProvider>
+		</MudPaper>
 	</MudLoading>
 </MudStack>
+
+@code
+{
+	private Breakpoint Breakpoint { get; set; }
+
+	private void OnBreakPointChanged(Breakpoint bp) => Breakpoint = bp;
+}

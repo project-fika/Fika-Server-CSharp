@@ -10,33 +10,27 @@
 		<MudLayout>
 			<MudAppBar Elevation="1">
 				<MudStaticNavDrawerToggle DrawerId="nav-drawer" Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" />
-				<MudText Style="font-family:bender" Typo="Typo.h5" Class="ml-3">Fika Web Management</MudText>
-				<MudImage Src="images/fika_logo.png" Elevation="25" Height="32" Width="32" Class="ml-2" />
 				<MudSpacer />
-				<MudText Typo="Typo.caption" Align="Align.Center" Class="ml-2 text-secondary">
-					© @DateTime.Now.Year Project Fika. All rights reserved.
-				</MudText>
-				<AuthorizeView>
-					<Authorized>
-						<MudAvatar Color="Color.Info" Variant="Variant.Outlined" Class="ml-4">
-							@char.ToUpper(@context.User.Identity?.Name?[0] ?? ' ')
-						</MudAvatar>
-					</Authorized>
-				</AuthorizeView>
-				<MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" Href="https://github.com/project-fika/fika-server-csharp" Target="_blank" />
-				@* <MudSpacer />
-			<MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" /> *@
+				<MudHidden Breakpoint="Breakpoint.Xs" Invert="false">
+					<MudContainer Class="d-flex flex-column justify-end align-end">
+						<MudText Style="font-family:bender" Typo="Typo.h5" Class="ml-3">Fika Web Management</MudText>
+						<MudText Typo="Typo.caption" Align="Align.Center">
+							© @DateTime.Now.Year Project Fika. All rights reserved.
+						</MudText>
+					</MudContainer>
+				</MudHidden>
+				<MudImage Src="images/fika_logo.png" Elevation="25" Height="32" Width="32" Class="ml-2" />
 			</MudAppBar>
-			<MudDrawer id="nav-drawer" @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
+			<MudDrawer id="nav-drawer" ClipMode="DrawerClipMode.Always" Elevation="2" Variant="DrawerVariant.Temporary">
 				<NavMenu />
 			</MudDrawer>
-			<MudMainContent Class="pt-16 pa-4">
+			<MudMainContent Class="mt-16 ma-2 pa-4">
 				@Body
 			</MudMainContent>
 		</MudLayout>
 	</Authorized>
 	<NotAuthorized>
-		<MudMainContent Class="pt-16 pa-4">
+		<MudMainContent Class="mt-16 ma-2 pa-4">
 			@Body
 		</MudMainContent>
 	</NotAuthorized>
@@ -50,8 +44,6 @@
 </div>
 
 @code {
-	private bool _drawerOpen = true;
-
 	MudTheme BenderTheme = new()
 	{
 		Typography = new()
