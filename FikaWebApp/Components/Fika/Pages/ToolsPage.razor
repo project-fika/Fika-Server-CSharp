@@ -1,9 +1,18 @@
 ﻿@page "/Fika/Manage/Tools"
 
 <MudPaper Class="pa-4">
-	<MudStack Row>
-		<FikaPrimaryButton StartIcon="@Icons.Material.Filled.AttachEmail" Text="Send Item To Everyone" OnClick="SendItemToEveryone" />
-		<FikaPrimaryButton StartIcon="@Icons.Material.Filled.List" Text="View Queued Items" OnClick="OpenQueuedItems" />
-		<FikaPrimaryButton StartIcon="@Icons.Material.Filled.Refresh" Text="Refresh Item Database" OnClick="RefreshItemDatabase" />
-	</MudStack>
+	<MudBreakpointProvider OnBreakpointChanged="OnBreakpointChanged">
+		<FikaPrimaryButton StartIcon="@Icons.Material.Filled.AttachEmail" Text="Send Item To Everyone" OnClick="SendItemToEveryone" FullWidth="@(Breakpoint == Breakpoint.Xs)"/>
+		<FikaPrimaryButton StartIcon="@Icons.Material.Filled.List" Text="View Queued Items" OnClick="OpenQueuedItems" FullWidth="@(Breakpoint == Breakpoint.Xs)"/>
+		<FikaPrimaryButton StartIcon="@Icons.Material.Filled.Refresh" Text="Refresh Item Database" OnClick="RefreshItemDatabase" FullWidth="@(Breakpoint == Breakpoint.Xs)"/>
+	</MudBreakpointProvider>
+
 </MudPaper>
+
+@code
+{
+	Breakpoint Breakpoint { get; set; }
+
+	// added this cuz it does seem like you wanna set FullWidth in code? with the FikaPrimaryButton. if not change to using css only?
+	private void OnBreakpointChanged(Breakpoint breakpoint) => Breakpoint = breakpoint;
+}
