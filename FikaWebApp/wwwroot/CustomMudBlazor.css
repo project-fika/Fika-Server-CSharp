@@ -3,9 +3,23 @@
     src: url('fonts/bender.otf') format('opentype');
 }
 
-body {
+html {
     background-image: url('/images/background.png');
     background-repeat: repeat;
     background-size: auto;
     background-position: top left;
+    background-color: rgb(45, 45, 45);
+}
+
+body {
+    background-color: transparent;
+}
+
+@media (max-width: 550px) {
+    .mud-table .mud-table-pagination .mud-table-pagination-toolbar .mud-table-pagination-actions {
+        margin-left: auto;
+        margin-right: -14px;
+        margin-inline-start: auto;
+        margin-inline-end: -14px;
+    }
 }
