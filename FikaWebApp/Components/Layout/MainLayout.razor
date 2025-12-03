@@ -9,7 +9,7 @@
 	<Authorized>
 		<MudLayout>
 			<MudAppBar Elevation="1">
-				<MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="ToggleDraw"></MudIconButton>
+				<MudStaticNavDrawerToggle DrawerId="nav-drawer" Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" />
 				<MudSpacer />
 				<MudHidden Breakpoint="Breakpoint.Xs" Invert="false">
 					<MudContainer Class="d-flex flex-column justify-end align-end">
@@ -21,7 +21,7 @@
 				</MudHidden>
 				<MudImage Src="images/fika_logo.png" Elevation="25" Height="32" Width="32" Class="ml-2" />
 			</MudAppBar>
-			<MudDrawer id="nav-drawer" @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2" Variant="DrawerVariant.Temporary">
+			<MudDrawer id="nav-drawer" ClipMode="DrawerClipMode.Always" Elevation="2" Variant="DrawerVariant.Temporary">
 				<NavMenu />
 			</MudDrawer>
 			<MudMainContent Class="mt-16 ma-2 pa-4">
@@ -36,6 +36,7 @@
 	</NotAuthorized>
 </AuthorizeView>
 
+
 <div id="blazor-error-ui" data-nosnippet>
     An unhandled error has occurred.
     <a href="." class="reload">Reload</a>
@@ -43,13 +44,6 @@
 </div>
 
 @code {
-	private bool _drawerOpen;
-
-	private void ToggleDraw()
-	{
-		_drawerOpen = !_drawerOpen;
-	}
-
 	MudTheme BenderTheme = new()
 	{
 		Typography = new()
