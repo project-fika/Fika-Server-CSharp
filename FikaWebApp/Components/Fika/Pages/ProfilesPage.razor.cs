@@ -31,7 +31,7 @@ public partial class ProfilesPage
     private readonly IList<IBrowserFile> _files = [];
     private bool _loading;
 
-    private Func<ProfileResponse, bool> _quickFilter
+    private Func<ProfileResponse, bool> QuickFilter
     {
         get
         {
@@ -58,6 +58,44 @@ public partial class ProfilesPage
     {
         _loading = true;
         _profiles.Clear();
+#if DEBUG
+        _profiles.Add(new ProfileResponse
+        {
+            Nickname = "Test1",
+            Level = Random.Shared.Next(1, 72),
+            HasFleaBan = false,
+            ProfileId = "debug"
+        });
+        _profiles.Add(new ProfileResponse
+        {
+            Nickname = "Test2",
+            Level = Random.Shared.Next(1, 72),
+            HasFleaBan = false,
+            ProfileId = "debug"
+        });
+        _profiles.Add(new ProfileResponse
+        {
+            Nickname = "Test3",
+            Level = Random.Shared.Next(1, 72),
+            HasFleaBan = false,
+            ProfileId = "debug"
+        });
+        _profiles.Add(new ProfileResponse
+        {
+            Nickname = "Test4",
+            Level = Random.Shared.Next(1, 72),
+            HasFleaBan = true,
+            ProfileId = "debug"
+        });
+        _profiles.Add(new ProfileResponse
+        {
+            Nickname = "Test5",
+            Level = Random.Shared.Next(1, 72),
+            HasFleaBan = false,
+            ProfileId = "debug"
+        });
+        await Task.Delay(TimeSpan.FromSeconds(1));
+#else
         try
         {
             var result = await HttpClient.GetFromJsonAsync<List<ProfileResponse>>("fika/api/profiles");
@@ -67,7 +105,8 @@ public partial class ProfilesPage
         {
             Logger.LogError("There was an error retrieving the profiles: {ExceptionMessage}", ex.Message);
             Snackbar.Add($"An error occured when querying: {ex.Message}", Severity.Error);
-        }
+        }        
+#endif
         _loading = false;
     }
 
@@ -77,12 +116,6 @@ public partial class ProfilesPage
         {
             var result = await HttpClient.GetStringAsync($"fika/api/rawprofile?profileId={Uri.EscapeDataString(row.ProfileId)}")
                 ?? throw new NullReferenceException("The data was empty");
-
-            /*var jsonElement = JsonSerializer.Deserialize<JsonElement>(result);
-            string formattedJson = JsonSerializer.Serialize(jsonElement, new JsonSerializerOptions
-            {
-                WriteIndented = true
-            });*/
 
             var parameters = new DialogParameters()
             {
@@ -150,7 +183,7 @@ public partial class ProfilesPage
         try
         {
             var file = files[0];
-            using (var stream = file.OpenReadStream(10 * 1024 * 1024))
+            await using (var stream = file.OpenReadStream(10 * 1024 * 1024))
             {
                 using (var fs = new StreamReader(stream))
                 {
