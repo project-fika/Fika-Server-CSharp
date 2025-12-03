@@ -14,10 +14,6 @@
 	<Authorized>
 		<MudDataGrid @ref="_dataGrid" Items="_users" SortMode="SortMode.Single" Filterable="false" RowsPerPage="10"
 		             Breakpoint="Breakpoint.None">
-			<ToolBarContent>
-				<MudText Typo="Typo.h6">All Accounts</MudText>
-				<MudSpacer/>
-			</ToolBarContent>
 			<Columns>
 				<PropertyColumn Property="x => x.UserName" Title="Username"/>
 				<TemplateColumn Title="Roles" CellClass="justify-center">
