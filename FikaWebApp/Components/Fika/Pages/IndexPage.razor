@@ -1,5 +1,7 @@
 ﻿@page "/"
 
+@implements IDisposable
+
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Identity
 @using FikaWebApp.Data
@@ -7,18 +9,33 @@
 <PageTitle>Fika Management</PageTitle>
 
 <MudPaper Class="pa-4">
-	<MudCard>
-		<MudCardHeader>
-			<MudText Typo="Typo.h4">Server Status</MudText>
-		</MudCardHeader>
-		<MudCardContent>
-			<MudStack>
-				<MudStack Row Spacing="2">
-					<MudAvatar Size="Size.Small" Class="me-2" Color="@StatusColor" />
-					<MudText>@StatusText</MudText>
+	<MudStack Row Spacing="4">
+		<MudCard>
+			<MudCardHeader>
+				<MudText Typo="Typo.h4">Server Status</MudText>
+			</MudCardHeader>
+			<MudCardContent>
+				<MudStack>
+					<MudStack Row Spacing="2">
+						<MudAvatar Size="Size.Small" Class="me-2" Color="@StatusColor" />
+						<MudText>@StatusText</MudText>
+					</MudStack>
+					<MudText Typo="Typo.subtitle1">@LastRefreshMinutes</MudText>
 				</MudStack>
-				<MudText Typo="Typo.subtitle1">@LastRefreshMinutes</MudText>
-			</MudStack>
-		</MudCardContent>
-	</MudCard>
+			</MudCardContent>
+		</MudCard>
+		<MudCard>
+			<MudCardHeader>
+				<MudText Typo="Typo.h4">WebApp Stats</MudText>
+			</MudCardHeader>
+			<MudCardContent>
+				<MudStack Row Spacing="2">
+					<MudText>@RamText</MudText>
+				</MudStack>
+				<MudStack Row Spacing="2">
+					<MudText>@CpuText</MudText>
+				</MudStack>
+			</MudCardContent>
+		</MudCard>
+	</MudStack>
 </MudPaper>

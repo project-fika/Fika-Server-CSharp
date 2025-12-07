@@ -1,4 +1,6 @@
-﻿using FikaServer.Services;
+﻿using System.Reflection;
+using FikaServer.Services;
+using FikaServer.Services.Headless;
 using SPTarkov.Reflection.Patching;
 using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Helpers;
@@ -7,7 +9,6 @@ using SPTarkov.Server.Core.Models.Eft.Common;
 using SPTarkov.Server.Core.Models.Eft.Match;
 using SPTarkov.Server.Core.Services;
 using SPTarkov.Server.Core.Utils;
-using System.Reflection;
 
 namespace FikaServer.Overrides.Services;
 
@@ -15,45 +16,60 @@ public class StartLocalRaidOverride : AbstractPatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return typeof(LocationLifecycleService).GetMethod(nameof(LocationLifecycleService.StartLocalRaid))!;
+        return typeof(LocationLifecycleService)
+            .GetMethod(nameof(LocationLifecycleService.StartLocalRaid))!;
     }
 
     [PatchPrefix]
     public static bool Prefix(MongoId sessionId, StartLocalRaidRequestData request, ref StartLocalRaidResponseData __result)
     {
         LocationBase locationLoot;
-        MatchService matchService = ServiceLocator.ServiceProvider.GetService<MatchService>() ?? throw new NullReferenceException("MatchService is null!");
-        LocationLifecycleService locationLifeCycleService = ServiceLocator.ServiceProvider.GetService<LocationLifecycleService>() ?? throw new NullReferenceException("LocationLifecycleService is null!");
+        var matchService = ServiceLocator.ServiceProvider.GetService<MatchService>()
+            ?? throw new NullReferenceException("MatchService is null!");
+        var locationLifeCycleService = ServiceLocator.ServiceProvider.GetService<LocationLifecycleService>()
+            ?? throw new NullReferenceException("LocationLifecycleService is null!");
 
-        string? matchId = matchService!.GetMatchIdByProfile(sessionId);
+        var matchId = matchService!.GetMatchIdByProfile(sessionId);
 
         if (string.IsNullOrEmpty(matchId))
         {
             // player isn't in a Fika match, generate new loot
-            locationLoot = locationLifeCycleService.GenerateLocationAndLoot(sessionId, request.Location);
+            locationLoot = locationLifeCycleService.GenerateLocationAndLoot(sessionId, request!.Location!);
         }
         else
         {
             // player is in a Fika match, use match location loot and regen if transit
-            Models.Fika.FikaMatch? match = matchService.GetMatch(matchId);
+            var match = matchService.GetMatch(matchId);
 
             if (matchId == sessionId)
             {
-                match.Raids++;
+                // force another level set due to transits
+                if (match!.IsHeadless)
+                {
+                    var headlessService = ServiceLocator.ServiceProvider.GetService<HeadlessService>()
+                        ?? throw new NullReferenceException("HeadlessService is null");
+
+                    headlessService.SetHeadlessLevel(sessionId);
+                }
+
+                match!.Raids++;
                 if (match.Raids > 1)
                 {
-                    match.LocationData = locationLifeCycleService.GenerateLocationAndLoot(sessionId, request.Location);
+                    match.LocationData = locationLifeCycleService.GenerateLocationAndLoot(sessionId, request!.Location!);
                 }
             }
 
-            locationLoot = match.LocationData;
+            locationLoot = match!.LocationData;
         }
 
-        DatabaseService databaseService = ServiceLocator.ServiceProvider.GetService<DatabaseService>() ?? throw new NullReferenceException("DatabaseService is null!");
-        ProfileHelper profileHelper = ServiceLocator.ServiceProvider.GetService<ProfileHelper>() ?? throw new NullReferenceException("ProfileHelper is null!");
-        TimeUtil timeUtil = ServiceLocator.ServiceProvider.GetService<TimeUtil>() ?? throw new NullReferenceException("TimeUtil is null!");
+        var databaseService = ServiceLocator.ServiceProvider.GetService<DatabaseService>()
+            ?? throw new NullReferenceException("DatabaseService is null!");
+        var profileHelper = ServiceLocator.ServiceProvider.GetService<ProfileHelper>()
+            ?? throw new NullReferenceException("ProfileHelper is null!");
+        var timeUtil = ServiceLocator.ServiceProvider.GetService<TimeUtil>()
+            ?? throw new NullReferenceException("TimeUtil is null!");
 
-        PmcData? playerProfile = profileHelper.GetPmcProfile(sessionId);
+        var playerProfile = profileHelper.GetPmcProfile(sessionId);
 
         StartLocalRaidResponseData result = new()
         {
@@ -61,7 +77,7 @@ public class StartLocalRaidOverride : AbstractPatch
             ServerSettings = databaseService.GetLocationServices(),
             Profile = new ProfileInsuredItems
             {
-                InsuredItems = playerProfile.InsuredItems
+                InsuredItems = playerProfile!.InsuredItems
             },
             LocationLoot = locationLoot,
             Transition = new Transition
@@ -80,7 +96,8 @@ public class StartLocalRaidOverride : AbstractPatch
         }
 
         // Get data stored at end of previous raid (if any)
-        LocationTransit? transitionData = ServiceLocator.ServiceProvider.GetService<ProfileActivityService>()!.GetProfileActivityRaidData(sessionId).LocationTransit;
+        var transitionData = ServiceLocator.ServiceProvider.GetService<ProfileActivityService>()!
+            .GetProfileActivityRaidData(sessionId).LocationTransit;
 
         if (transitionData != null)
         {
@@ -89,26 +106,34 @@ public class StartLocalRaidOverride : AbstractPatch
 
             if (result.Transition.VisitedLocations == null)
             {
-                result.Transition.VisitedLocations = [transitionData.SptLastVisitedLocation];
+                result.Transition.VisitedLocations = [transitionData!.SptLastVisitedLocation!];
             }
             else
             {
-                result.Transition.VisitedLocations.Add(transitionData.SptLastVisitedLocation);
+                result.Transition.VisitedLocations.Add(transitionData!.SptLastVisitedLocation!);
             }
 
             // Complete, clean up
-            ServiceLocator.ServiceProvider.GetService<ProfileActivityService>()!.GetProfileActivityRaidData(sessionId).LocationTransit = null;
+            ServiceLocator.ServiceProvider.GetService<ProfileActivityService>()!
+                .GetProfileActivityRaidData(sessionId).LocationTransit = null;
         }
 
         if (string.IsNullOrEmpty(matchId) || sessionId == matchId)
         {
             // Apply changes from pmcConfig to bot hostility values
-            typeof(LocationLifecycleService).GetMethod("AdjustBotHostilitySettings")?.Invoke(locationLifeCycleService, [result.LocationLoot]);
-            typeof(LocationLifecycleService).GetMethod("AdjustExtracts")?.Invoke(locationLifeCycleService, [request.PlayerSide, request.Location, result.LocationLoot]);
+            typeof(LocationLifecycleService)
+                .GetMethod("AdjustBotHostilitySettings")?
+                .Invoke(locationLifeCycleService, [result.LocationLoot]);
+            typeof(LocationLifecycleService)
+                .GetMethod("AdjustExtracts")?
+                .Invoke(locationLifeCycleService, [request.PlayerSide, request.Location, result.LocationLoot]);
 
             // Clear bot cache ready for a fresh raid
-            ServiceLocator.ServiceProvider.GetService<BotNameService>()!.ClearNameCache();
+            ServiceLocator.ServiceProvider.GetService<BotNameService>()!
+                .ClearNameCache();
         }
+
+
 
         __result = result;
 

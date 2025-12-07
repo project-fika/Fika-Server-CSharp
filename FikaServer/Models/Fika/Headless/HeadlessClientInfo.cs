@@ -35,6 +35,10 @@ public record HeadlessClientInfo
     /// Allows for checking if the requester has been notified the match has started through the requester WebSocket so he can auto-join
     /// </summary>
     public bool? HasNotifiedRequester { get; set; }
+    /// <summary>
+    /// The current level of the headless, mainly used for transits
+    /// </summary>
+    public int Level { get; set; }
 
     /// <summary>
     /// Sets the info of the client after starting a raid

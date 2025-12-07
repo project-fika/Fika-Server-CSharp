@@ -3,27 +3,70 @@
 @inject NavigationManager NavigationManager
 
 <MudNavMenu>
-    @* <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink> *@
+    <MudNavGroup Title="Fika" Icon="@Icons.Material.Filled.Storage" Expanded="true">
+        <AuthorizeView>
+            <Authorized>
+                <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
+            </Authorized>
+        </AuthorizeView>
 
-    @* <MudNavLink Href="auth" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Lock">Auth Required</MudNavLink> *@
+        <AuthorizeView Roles="Admin">
+            <Authorized>
+                <MudNavLink Href="Fika/Manage/Accounts" Icon="@Icons.Material.Filled.AdminPanelSettings">
+                    Accounts
+                </MudNavLink>
+                <MudTooltip Text="Not yet implemented">
+                    <MudNavLink Disabled="true" Href="Fika/Manage/Configuration"
+                                Icon="@Icons.Material.Filled.Settings">Configuration
+                    </MudNavLink>
+                </MudTooltip>
+            </Authorized>
+        </AuthorizeView>
+
+        <AuthorizeView Roles="Admin, Moderator">
+            <Authorized>
+                <MudNavLink Href="Fika/Manage/Profiles" Icon="@Icons.Material.Filled.Person">Profiles
+                </MudNavLink>
+                <MudNavLink Href="Fika/Manage/Tools" Icon="@Icons.Material.Filled.HomeRepairService">Tools
+                </MudNavLink>
+            </Authorized>
+        </AuthorizeView>
+
+        <AuthorizeView>
+            <Authorized>
+                <MudNavLink Href="Fika/Manage/Players" Icon="@Icons.Material.Filled.People">Players</MudNavLink>
+                <MudNavLink Href="Fika/Manage/Statistics" Icon="@Icons.Material.Filled.PieChart">Statistics
+                </MudNavLink>
+                <MudNavLink Href="Fika/Manage/Headless" Icon="@Icons.Material.Filled.PeopleAlt">Headless
+                </MudNavLink>
+                <MudNavLink Href="Fika/Manage/FileManager" Icon="@Icons.Material.Filled.FolderShared">File
+                    Manager
+                </MudNavLink>
+            </Authorized>
+        </AuthorizeView>
+    </MudNavGroup>
+</MudNavMenu>
+<MudSpacer/>
+<MudNavMenu>
     <AuthorizeView>
         <Authorized>
-			<MudNavLink Href="" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Storage">Fika</MudNavLink>
-            <MudNavLink Href="Account/Manage" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Person">@context.User.Identity?.Name</MudNavLink>
+            <MudNavLink Href="Account/Manage" Match="NavLinkMatch.Prefix"
+                        Icon="@Icons.Material.Filled.Person">@context.User.Identity?.Name</MudNavLink>
+            <MudNavLink Href="Account/Manage/ChangePassword" Icon="@Icons.Material.Filled.Lock">Password</MudNavLink>
             <form action="Account/Logout" method="post">
-                <AntiforgeryToken />
-                <input type="hidden" name="ReturnUrl" value="@currentUrl" />
+                <AntiforgeryToken/>
+                <input type="hidden" name="ReturnUrl" value="@currentUrl"/>
                 <button type="submit" class="mud-nav-link mud-ripple">
-                    <MudIcon Icon="@Icons.Material.Filled.Logout" Color="Color.Info" Class="mr-3"></MudIcon> Logout
+                    <MudIcon Icon="@Icons.Material.Filled.Logout" Color="Color.Info" Class="mr-3"></MudIcon>
+                    Logout
                 </button>
             </form>
         </Authorized>
-        <NotAuthorized>
-            <MudNavLink Href="Account/Register" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Person">Register</MudNavLink>
-            <MudNavLink Href="Account/Login" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Password">Login</MudNavLink>
-        </NotAuthorized>
     </AuthorizeView>
-	<MudNavLink Href="About" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Info">About</MudNavLink>
+    <MudNavLink Href="About" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Info">About</MudNavLink>
+    <MudNavLink Href="https://github.com/project-fika/fika-server-csharp" Icon="@Icons.Custom.Brands.GitHub"
+                Target="_blank">GitHub
+    </MudNavLink>
 </MudNavMenu>
 
 
@@ -46,5 +89,6 @@
     {
         NavigationManager.LocationChanged -= OnLocationChanged;
     }
+
 }
 

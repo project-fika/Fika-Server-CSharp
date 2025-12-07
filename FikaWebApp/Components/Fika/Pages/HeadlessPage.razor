@@ -2,22 +2,29 @@
 
 @using FikaShared
 
-
-
-<MudPaper Class="mud-width-full pa-2" MinHeight="100%" Style="position: relative;">
-	<MudLoading Loading="_loading" Darken="true" Overlap="true" Text="Waiting for server...">
-		<MudDataGrid Items="_headlessClients">
-			<Columns>
-				<PropertyColumn Property="p => p.ProfileId" />
-				<PropertyColumn Property="p => p.Nickname" />
-				<PropertyColumn Property="p => p.State" />
-				<PropertyColumn Property="p => p.Players" />
-				<TemplateColumn>
-					<CellTemplate Context="row">
-						<MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(row.Item.State is Enums.EHeadlessState.NotReady)" OnClick="@(() => RestartHeadless(row.Item))">Restart</MudButton>
-					</CellTemplate>
-				</TemplateColumn>
-			</Columns>
-		</MudDataGrid>
-	</MudLoading>
-</MudPaper>
+@if (_loading)
+{
+	<MudStack AlignItems="AlignItems.Center" Row="false" >
+		<MudProgressCircular Indeterminate="true" />
+		<MudText>Waiting for server...</MudText>
+	</MudStack>
+}
+else
+{
+	<MudDataGrid Items="_headlessClients" Breakpoint="Breakpoint.None" RowsPerPage="10" SortMode="SortMode.Single">
+		<Columns>
+			<PropertyColumn Property="p => p.ProfileId" />
+			<PropertyColumn Property="p => p.Nickname" />
+			<PropertyColumn Property="p => p.State" />
+			<PropertyColumn Property="p => p.Players" />
+			<TemplateColumn>
+				<CellTemplate Context="row">
+					<MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(row.Item.State is Enums.EHeadlessState.NotReady)" OnClick="@(() => RestartHeadless(row.Item))">Restart</MudButton>
+				</CellTemplate>
+			</TemplateColumn>
+		</Columns>
+		<PagerContent>
+			<MudDataGridPager T="OnlineHeadless"/>
+		</PagerContent>
+	</MudDataGrid>
+}

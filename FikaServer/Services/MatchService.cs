@@ -74,9 +74,14 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
     /// </summary>
     /// <param name="matchId">The match ID of the match to get</param>
     /// <returns>Returns the match object if a match is found with this match ID, returns null if not.</returns>
-    public FikaMatch? GetMatch(MongoId matchId)
+    public FikaMatch? GetMatch(MongoId? matchId)
     {
-        if (Matches.TryGetValue(matchId, out var match))
+        if (!matchId.HasValue)
+        {
+            return null;
+        }
+
+        if (Matches.TryGetValue(matchId.Value, out var match))
         {
             return match;
         }

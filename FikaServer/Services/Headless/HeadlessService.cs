@@ -84,7 +84,13 @@ public class HeadlessService(ISptLogger<HeadlessService> logger,
             new HeadlessRequesterJoinRaid(headlessClientId));
     }
 
-    public void AddPlayerToHeadlessMatch(string headlessClientId, string sessionID)
+    /// <summary>
+    /// Adds a player to the given headless client id
+    /// </summary>
+    /// <param name="headlessClientId">The id of the headless client</param>
+    /// <param name="sessionID">The id of the player</param>
+    /// <exception cref="NullReferenceException"></exception>
+    public void AddPlayerToHeadlessMatch(MongoId headlessClientId, MongoId sessionID)
     {
         if (HeadlessClients.TryGetValue(headlessClientId, out var headlessClientInfo))
         {
@@ -100,21 +106,45 @@ public class HeadlessService(ISptLogger<HeadlessService> logger,
                 // Doing this everytime is unecessary if we're not setting the average level so only set it once the original requester of the headless joins.
                 if (headlessClientInfo.RequesterSessionID == sessionID)
                 {
-                    SetHeadlessLevel(headlessClientId);
+                    CalculateAndSetHeadlessLevel(headlessClientId);
                 }
             }
             else
             {
-                SetHeadlessLevel(headlessClientId);
+                CalculateAndSetHeadlessLevel(headlessClientId);
             }
         }
     }
 
-    public void SetHeadlessLevel(string headlessClientId)
+    /// <summary>
+    /// Sets the headless client to a specific level
+    /// </summary>
+    /// <remarks>Mainly used for transits</remarks>
+    /// <param name="headlessClientId">The id of the client</param>
+    /// <exception cref="NullReferenceException"></exception>
+    public void SetHeadlessLevel(MongoId headlessClientId)
+    {
+        if (!HeadlessClients.TryGetValue(headlessClientId, out var clientInfo))
+        {
+            throw new NullReferenceException($"Could not find headlessClientId '{headlessClientId}'");
+        }
+
+        var headlessProfile = saveServer.GetProfile(headlessClientId)
+                ?? throw new NullReferenceException($"Could not find headlessProfile {headlessClientId}");
+
+        headlessProfile.CharacterData.PmcData.Info.Level = clientInfo.Level;
+    }
+
+    /// <summary>
+    /// Calculates the level of the headless client for the raid
+    /// </summary>
+    /// <param name="headlessClientId">The id of the client</param>
+    /// <exception cref="NullReferenceException"></exception>
+    public void CalculateAndSetHeadlessLevel(MongoId headlessClientId)
     {
         if (!HeadlessClients.TryGetValue(headlessClientId, out var headlessClientInfo))
         {
-            throw new NullReferenceException($"SetHeadlessLevel:: Could not find headlessClientId '{headlessClientId}'");
+            throw new NullReferenceException($"Could not find headlessClientId '{headlessClientId}'");
         }
 
         if (headlessClientInfo.State is not EHeadlessStatus.IN_RAID)
@@ -154,6 +184,7 @@ public class HeadlessService(ISptLogger<HeadlessService> logger,
             $"[{headlessClientId}] Settings headless level to: {baseHeadlessLevel} | Players: {countedPlayers}");
 
         headlessProfile.CharacterData.PmcData.Info.Level = baseHeadlessLevel;
+        headlessClientInfo.Level = baseHeadlessLevel;
     }
 
     /// <summary>
