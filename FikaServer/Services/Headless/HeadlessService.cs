@@ -84,7 +84,7 @@ public class HeadlessService(ISptLogger<HeadlessService> logger,
             new HeadlessRequesterJoinRaid(headlessClientId));
     }
 
-    public void AddPlayerToHeadlessMatch(string headlessClientId, string sessionID)
+    public void AddPlayerToHeadlessMatch(MongoId headlessClientId, MongoId sessionID)
     {
         if (HeadlessClients.TryGetValue(headlessClientId, out var headlessClientInfo))
         {
@@ -110,7 +110,7 @@ public class HeadlessService(ISptLogger<HeadlessService> logger,
         }
     }
 
-    public void SetHeadlessLevel(string headlessClientId)
+    public void SetHeadlessLevel(MongoId headlessClientId)
     {
         if (!HeadlessClients.TryGetValue(headlessClientId, out var headlessClientInfo))
         {
