@@ -1,3 +1,4 @@
+using System.Net;
 using FikaShared.Responses;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
@@ -87,6 +88,24 @@ public partial class StatisticsPage
             _loading = true;
             var result = await HttpClient.GetFromJsonAsync<GetStatisticsResponse>("fika/api/statistics");
             _players.AddRange(result!.Players);
+        }
+        catch (HttpRequestException httpEx)
+        {
+            if (httpEx.StatusCode is HttpStatusCode.Forbidden)
+            {
+                Snackbar.Add("Something went wrong when retrieving statistics: [403 Forbidden].\nAre you using the wrong API key?", Severity.Error);
+                Logger.LogError("Something went wrong when retrieving statistics: [403 Forbidden]. Are you using the wrong API key?");
+            }
+            else if (httpEx.StatusCode is HttpStatusCode.NotFound)
+            {
+                Snackbar.Add("Something went wrong when retrieving statistics: [404 NotFound].\nAre you missing the Fika server mod?", Severity.Error);
+                Logger.LogError("Something went wrong when retrieving statistics: [404 NotFound]. re you missing the Fika server mod?");
+            }
+            else
+            {
+                Snackbar.Add($"There was a HttpRequestException caught when when retrieving statistics:\n{httpEx.Message}", Severity.Error);
+                Logger.LogError("There was a HttpRequestException caught when when retrieving statistics: {HttpException}", httpEx.Message);
+            }
         }
         catch (Exception ex)
         {

@@ -1,4 +1,5 @@
-﻿using FikaShared.Responses;
+﻿using System.Net;
+using FikaShared.Responses;
 
 namespace FikaWebApp.Services;
 
@@ -47,6 +48,23 @@ public class ItemCacheService(ILogger<ItemCacheService> logger, HttpClient clien
                 logger.LogError("Unable to get items from server");
                 return false;
             }
+        }
+        catch (HttpRequestException httpEx)
+        {
+            if (httpEx.StatusCode is HttpStatusCode.Forbidden)
+            {
+                logger.LogError("There was an error retrieving the items from the server: 403 Forbidden. Are you using the wrong API key?");
+                return false;
+            }
+
+            if (httpEx.StatusCode is HttpStatusCode.NotFound)
+            {
+                logger.LogError("There was an error retrieving the items from the server: 404 NotFound. Are you missing the Fika server mod?");
+                return false;
+            }
+
+            logger.LogError("There was a HttpRequestException caught when retrieving the items from the server: {Exception}", httpEx.Message);
+            return false;
         }
         catch (Exception ex)
         {

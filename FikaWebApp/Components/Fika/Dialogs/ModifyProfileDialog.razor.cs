@@ -11,22 +11,25 @@ namespace FikaWebApp.Components.Fika.Dialogs;
 public partial class ModifyProfileDialog
 {
     [Inject]
-    private IDialogService DialogService { get; set; }
+    private IDialogService DialogService { get; set; } = default!;
 
     [Inject]
-    private ISnackbar Snackbar { get; set; }
+    private ISnackbar Snackbar { get; set; } = default!;
 
     [Inject]
-    private HttpClient HttpClient { get; set; }
+    private HttpClient HttpClient { get; set; } = default!;
 
     [Inject]
-    private SendTimersService SendTimersService { get; set; }
+    private SendTimersService SendTimersService { get; set; } = default!;
 
     [CascadingParameter]
-    public IMudDialogInstance MudDialog { get; set; }
+    public IMudDialogInstance MudDialog { get; set; } = default!;
 
     [Parameter]
-    public ProfileResponse Profile { get; set; }
+    public ProfileResponse Profile { get; set; } = default!;
+
+    [Inject]
+    private ILogger<ModifyProfileDialog> Logger { get; set; } = default!;
 
 
     private async Task SendItem()
@@ -72,6 +75,24 @@ public partial class ModifyProfileDialog
                         {
                             var errorMessage = await postResult.Content.ReadAsStringAsync();
                             Snackbar.Add($"There was an error sending the item: [{postResult.StatusCode}] {errorMessage}", Severity.Error);
+                        }
+                    }
+                    catch (HttpRequestException httpEx)
+                    {
+                        if (httpEx.StatusCode is HttpStatusCode.Forbidden)
+                        {
+                            Snackbar.Add("Something went wrong when sending the item: [403 Forbidden].\nAre you using the wrong API key?", Severity.Error);
+                            Logger.LogError("Something went wrong when sending the item: [403 Forbidden]. Are you using the wrong API key?");
+                        }
+                        else if (httpEx.StatusCode is HttpStatusCode.NotFound)
+                        {
+                            Snackbar.Add("Something went wrong when sending the item: [404 NotFound].\nAre you missing the Fika server mod?", Severity.Error);
+                            Logger.LogError("Something went wrong when sending the item: [404 NotFound]. Are you missing the Fika server mod?");
+                        }
+                        else
+                        {
+                            Snackbar.Add($"There was a HttpRequestException caught when when sending the item:\n{httpEx.Message}", Severity.Error);
+                            Logger.LogError("There was a HttpRequestException caught when when sending the item: {HttpException}", httpEx.Message);
                         }
                     }
                     catch (Exception ex)

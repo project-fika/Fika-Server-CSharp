@@ -1,12 +1,13 @@
+using System.Globalization;
+using System.Net;
 using FikaShared.Requests;
 using FikaShared.Responses;
 using FikaWebApp.Components.Fika.Dialogs;
 using FikaWebApp.Models;
 using FikaWebApp.Services;
 using Microsoft.AspNetCore.Components;
-using MudBlazor;
-using System.Globalization;
 using Microsoft.AspNetCore.Components.Web;
+using MudBlazor;
 
 namespace FikaWebApp.Components.Fika.Pages;
 
@@ -26,6 +27,9 @@ public partial class ToolsPage
 
     [Inject]
     private ItemCacheService ItemCacheService { get; set; } = default!;
+
+    [Inject]
+    private ILogger<ToolsPage> Logger { get; set; } = default!;
 
     private async Task SendItemToEveryone()
     {
@@ -54,6 +58,24 @@ public partial class ToolsPage
                     var serverProfiles = await HttpClient.GetFromJsonAsync<List<ProfileResponse>>("/fika/api/profiles");
                     profiles.AddRange(serverProfiles);
                 }
+                catch (HttpRequestException httpEx)
+                {
+                    if (httpEx.StatusCode is HttpStatusCode.Forbidden)
+                    {
+                        Snackbar.Add("Something went wrong when sending the item: [403 Forbidden].\nAre you using the wrong API key?", Severity.Error);
+                        Logger.LogError("Something went wrong when sending the item: [403 Forbidden]. Are you using the wrong API key?");
+                    }
+                    else if (httpEx.StatusCode is HttpStatusCode.NotFound)
+                    {
+                        Snackbar.Add("Something went wrong when sending the item: [404 NotFound].\nAre you missing the Fika server mod?", Severity.Error);
+                        Logger.LogError("Something went wrong when sending the item: [404 NotFound]. Are you missing the Fika server mod?");
+                    }
+                    else
+                    {
+                        Snackbar.Add($"There was a HttpRequestException caught when when sending the item:\n{httpEx.Message}", Severity.Error);
+                        Logger.LogError("There was a HttpRequestException caught when when sending the item: {HttpException}", httpEx.Message);
+                    }
+                }
                 catch (Exception ex)
                 {
                     Snackbar.Add($"There was an error receiving all profiles: {ex.Message}", Severity.Error);
@@ -81,6 +103,24 @@ public partial class ToolsPage
                     {
                         await HttpClient.PostAsJsonAsync("fika/api/senditemtoall", request);
                         Snackbar.Add("The item was sent to everyone.", Severity.Success);
+                    }
+                    catch (HttpRequestException httpEx)
+                    {
+                        if (httpEx.StatusCode is HttpStatusCode.Forbidden)
+                        {
+                            Snackbar.Add("Something went wrong when sending the item: [403 Forbidden].\nAre you using the wrong API key?", Severity.Error);
+                            Logger.LogError("Something went wrong when sending the item: [403 Forbidden]. Are you using the wrong API key?");
+                        }
+                        else if (httpEx.StatusCode is HttpStatusCode.NotFound)
+                        {
+                            Snackbar.Add("Something went wrong when sending the item: [404 NotFound].\nAre you missing the Fika server mod?", Severity.Error);
+                            Logger.LogError("Something went wrong when sending the item: [404 NotFound]. Are you missing the Fika server mod?");
+                        }
+                        else
+                        {
+                            Snackbar.Add($"There was a HttpRequestException caught when when sending the item:\n{httpEx.Message}", Severity.Error);
+                            Logger.LogError("There was a HttpRequestException caught when when sending the item: {HttpException}", httpEx.Message);
+                        }
                     }
                     catch (Exception ex)
                     {

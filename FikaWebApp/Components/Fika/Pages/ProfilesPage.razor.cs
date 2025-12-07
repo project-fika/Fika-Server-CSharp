@@ -1,3 +1,4 @@
+using System.Net;
 using FikaShared.Responses;
 using FikaWebApp.Components.Fika.Dialogs;
 using FikaWebApp.Data;
@@ -100,6 +101,24 @@ public partial class ProfilesPage
         {
             var result = await HttpClient.GetFromJsonAsync<List<ProfileResponse>>("fika/api/profiles");
             _profiles.AddRange(result!);
+        }
+        catch (HttpRequestException httpEx)
+        {
+            if (httpEx.StatusCode is HttpStatusCode.Forbidden)
+            {
+                Snackbar.Add("Something went wrong when retrieving profiles: [403 Forbidden].\nAre you using the wrong API key?", Severity.Error);
+                Logger.LogError("Something went wrong when retrieving profiles: [403 Forbidden]. Are you using the wrong API key?");
+            }
+            else if (httpEx.StatusCode is HttpStatusCode.NotFound)
+            {
+                Snackbar.Add("Something went wrong when retrieving profiles: [404 NotFound].\nAre you missing the Fika server mod?", Severity.Error);
+                Logger.LogError("Something went wrong when retrieving profiles: [404 NotFound]. Are you missing the Fika server mod?");
+            }
+            else
+            {
+                Snackbar.Add($"There was a HttpRequestException caught when when retrieving profiles:\n{httpEx.Message}", Severity.Error);
+                Logger.LogError("There was a HttpRequestException caught when when retrieving profiles: {HttpException}", httpEx.Message);
+            }
         }
         catch (Exception ex)
         {

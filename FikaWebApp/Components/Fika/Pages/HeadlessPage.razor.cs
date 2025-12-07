@@ -1,3 +1,4 @@
+using System.Net;
 using FikaShared;
 using FikaShared.Requests;
 #if RELEASE
@@ -15,6 +16,9 @@ public partial class HeadlessPage
 
     [Inject]
     public ISnackbar Snackbar { get; set; } = default!;
+
+    [Inject]
+    private ILogger<HeadlessPage> Logger { get; set; } = default!;
 
     private readonly List<OnlineHeadless> _headlessClients = [];
     private bool _loading;
@@ -84,6 +88,24 @@ public partial class HeadlessPage
             if (!result.IsSuccessStatusCode)
             {
                 Snackbar.Add($"There was an error returned from the server: StatusCode {result.StatusCode}", Severity.Error);
+            }
+        }
+        catch (HttpRequestException httpEx)
+        {
+            if (httpEx.StatusCode is HttpStatusCode.Forbidden)
+            {
+                Snackbar.Add("Something went wrong when sending the restart request: [403 Forbidden].\nAre you using the wrong API key?", Severity.Error);
+                Logger.LogError("Something went wrong when sending the restart request: [403 Forbidden]. Are you using the wrong API key?");
+            }
+            else if (httpEx.StatusCode is HttpStatusCode.NotFound)
+            {
+                Snackbar.Add("Something went wrong when sending the restart request: [404 NotFound].\nAre you missing the Fika server mod?", Severity.Error);
+                Logger.LogError("Something went wrong when sending the restart request: [404 NotFound]. Are you missing the Fika server mod?");
+            }
+            else
+            {
+                Snackbar.Add($"There was a HttpRequestException caught when when sending the restart request:\n{httpEx.Message}", Severity.Error);
+                Logger.LogError("There was a HttpRequestException caught when when sending the restart request: {HttpException}", httpEx.Message);
             }
         }
         catch (Exception ex)

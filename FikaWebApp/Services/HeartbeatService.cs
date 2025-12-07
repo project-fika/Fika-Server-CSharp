@@ -1,4 +1,6 @@
-﻿namespace FikaWebApp.Services;
+﻿using System.Net;
+
+namespace FikaWebApp.Services;
 
 public class HeartbeatService
 {
@@ -51,6 +53,25 @@ public class HeartbeatService
             {
                 var result = await _client.GetAsync("fika/api/heartbeat");
                 IsRunning = result.IsSuccessStatusCode;
+            }
+            catch (HttpRequestException httpEx)
+            {
+                if (httpEx.StatusCode is HttpStatusCode.Forbidden)
+                {
+                    _logger.LogError("Something went wrong when querying for heartbeat: 403 Forbidden. Are you using the wrong API key?");
+                    IsRunning = false;
+                    return;
+                }
+
+                if (httpEx.StatusCode is HttpStatusCode.NotFound)
+                {
+                    _logger.LogError("Something went wrong when querying for heartbeat: 404 NotFound. Are you missing the Fika server mod?");
+                    IsRunning = false;
+                    return;
+                }
+
+                _logger.LogError("There was a HttpRequestException caught when when querying for heartbeat: {Exception}", httpEx.Message);
+                IsRunning = false;
             }
             catch (Exception ex)
             {
