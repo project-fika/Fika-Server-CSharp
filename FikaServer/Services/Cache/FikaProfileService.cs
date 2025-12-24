@@ -15,9 +15,9 @@ public class FikaProfileService(ISptLogger<FikaProfileService> logger, SaveServe
 {
     private readonly Dictionary<string, MongoId> _profiles = [];
 
-    public Dictionary<string, MongoId> GetAllProfiles(bool forceRefresh = false)
+    public Dictionary<string, MongoId> GetAllProfiles()
     {
-        if (_profiles.Count == 0 || forceRefresh)
+        if (_profiles.Count != saveServer.GetProfiles().Count)
         {
             RefreshProfiles();
         }
@@ -84,7 +84,7 @@ public class FikaProfileService(ISptLogger<FikaProfileService> logger, SaveServe
                 continue;
             }
 
-            string nick = profile.CharacterData.PmcData.Info.Nickname;
+            string? nick = profile?.CharacterData?.PmcData?.Info?.Nickname;
             if (!string.IsNullOrEmpty(nick))
             {
                 if (!_profiles.TryAdd(nick, id))
