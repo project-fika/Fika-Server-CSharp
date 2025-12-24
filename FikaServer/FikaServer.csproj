@@ -16,10 +16,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="SPTarkov.Common" Version="4.0.0-pre.20251007.1604" />
-		<PackageReference Include="SPTarkov.DI" Version="4.0.0-pre.20251007.1604" />
-		<PackageReference Include="SPTarkov.Reflection" Version="4.0.0-pre.20251007.1604" />
-		<PackageReference Include="SPTarkov.Server.Core" Version="4.0.0-pre.20251007.1604" />
+		<PackageReference Include="SPTarkov.Common" Version="4.0.9" />
+		<PackageReference Include="SPTarkov.DI" Version="4.0.9" />
+		<PackageReference Include="SPTarkov.Reflection" Version="4.0.9" />
+		<PackageReference Include="SPTarkov.Server.Core" Version="4.0.9" />
 		<PackageReference Include="SPTarkov.Server.Web	" Version="4.0.0-pre.20251007.1604" />
 	</ItemGroup>
 
@@ -37,6 +37,11 @@
 	
   <ItemGroup>
     <ProjectReference Include="..\FikaShared\FikaShared.csproj" />
+  </ItemGroup>
+	
+	
+  <ItemGroup>
+    <PackageReference Update="SPTarkov.Server.Web" Version="4.0.9" />
   </ItemGroup>
 	
 <!--
