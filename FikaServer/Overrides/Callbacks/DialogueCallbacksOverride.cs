@@ -135,7 +135,6 @@ public class CancelFriendRequestOverride : AbstractPatch
     [PatchPrefix]
     public static bool Prefix(string url, CancelFriendRequestData request, MongoId sessionID, ref ValueTask<string> __result)
     {
-        Console.WriteLine("ASD");
         FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
             ?? throw new NullReferenceException("Could not get DialogueController");
 
