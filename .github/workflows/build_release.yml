@@ -47,7 +47,7 @@ jobs:
           cp -r output/FikaServer.dll SPT/user/mods/fika-server
           cp -r output/FikaShared.dll SPT/user/mods/fika-server
           cp -r FikaServer/Assets SPT/user/mods/fika-server/assets
-          cp LICENSE.md SPT/user/mods/fika-server
+          cp Licenses/* SPT/user/mods/fika-server
 
       - name: Zip the build and loose files
         run: zip -r "${{ inputs.release_name }}.zip" SPT/user/mods/fika-server

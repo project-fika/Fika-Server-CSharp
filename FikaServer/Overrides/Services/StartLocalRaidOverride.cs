@@ -114,24 +114,24 @@ public class StartLocalRaidOverride : AbstractPatch
                     []
                 );
 
-                foreach (var transits in location.Transits)
+                foreach (var transit in location.Transits)
                 {
-                    if (transits.Id is null)
+                    if (transit.Id is null)
                     {
                         continue;
                     }
 
                     // ActivateAfterSeconds sets the timer on the generator, events is needed because it is checked again in the client
                     // To enable certain stuff for the Khorovod event
-                    if (matchingTransitWhitelist.Contains(transits.Id.Value))
+                    if (matchingTransitWhitelist.Contains(transit.Id.Value))
                     {
-                        transits.ActivateAfterSeconds = 300;
-                        transits.Events = true;
+                        transit.ActivateAfterSeconds = 300;
+                        transit.Events = true;
                     }
                     else
                     {
                         // Disable the other transits in this event, people are only allowed to transit to certain points
-                        transits.IsActive = false;
+                        transit.IsActive = false;
                     }
                 }
             }
