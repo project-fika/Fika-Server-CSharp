@@ -1,9 +1,11 @@
-﻿using System.Net;
+﻿using System;
+using System.Collections.Generic;
+using System.Net;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace FikaServer.Networking.LiteNetLib;
+namespace Fika.Core.Networking.LiteNetLib;
 
 internal static class NativeSocket
 {
@@ -13,7 +15,7 @@ internal static class NativeSocket
 
         [DllImport(LibName, SetLastError = true)]
         public static extern int recvfrom(
-            nint socketHandle,
+            IntPtr socketHandle,
             [In, Out] byte[] pinnedBuffer,
             [In] int len,
             [In] SocketFlags socketFlags,
@@ -22,7 +24,7 @@ internal static class NativeSocket
 
         [DllImport(LibName, SetLastError = true)]
         internal static extern int sendto(
-            nint socketHandle,
+            IntPtr socketHandle,
             byte* pinnedBuffer,
             [In] int len,
             [In] SocketFlags socketFlags,
@@ -36,7 +38,7 @@ internal static class NativeSocket
 
         [DllImport(LibName, SetLastError = true)]
         public static extern int recvfrom(
-            nint socketHandle,
+            IntPtr socketHandle,
             [In, Out] byte[] pinnedBuffer,
             [In] int len,
             [In] SocketFlags socketFlags,
@@ -45,7 +47,7 @@ internal static class NativeSocket
 
         [DllImport(LibName, SetLastError = true)]
         internal static extern int sendto(
-            nint socketHandle,
+            IntPtr socketHandle,
             byte* pinnedBuffer,
             [In] int len,
             [In] SocketFlags socketFlags,
@@ -61,7 +63,7 @@ internal static class NativeSocket
     public const int AF_INET = 2;
     public const int AF_INET6 = 10;
 
-    private static readonly Dictionary<int, SocketError> NativeErrorToSocketError = new()
+    private static readonly Dictionary<int, SocketError> NativeErrorToSocketError = new Dictionary<int, SocketError>
     {
         { 13, SocketError.AccessDenied },               //EACCES
         { 98, SocketError.AddressAlreadyInUse },        //EADDRINUSE
@@ -122,29 +124,25 @@ internal static class NativeSocket
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int RecvFrom(
-        nint socketHandle,
+        IntPtr socketHandle,
         byte[] pinnedBuffer,
         int len,
         byte[] socketAddress,
-        ref int socketAddressSize)
-    {
-        return UnixMode
+        ref int socketAddressSize) =>
+        UnixMode
             ? UnixSock.recvfrom(socketHandle, pinnedBuffer, len, 0, socketAddress, ref socketAddressSize)
             : WinSock.recvfrom(socketHandle, pinnedBuffer, len, 0, socketAddress, ref socketAddressSize);
-    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static unsafe int SendTo(
-        nint socketHandle,
+        IntPtr socketHandle,
         byte* pinnedBuffer,
         int len,
         byte[] socketAddress,
-        int socketAddressSize)
-    {
-        return UnixMode
+        int socketAddressSize) =>
+        UnixMode
             ? UnixSock.sendto(socketHandle, pinnedBuffer, len, 0, socketAddress, socketAddressSize)
             : WinSock.sendto(socketHandle, pinnedBuffer, len, 0, socketAddress, socketAddressSize);
-    }
 
     public static SocketError GetSocketError()
     {
@@ -167,10 +165,8 @@ internal static class NativeSocket
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static short GetNativeAddressFamily(IPEndPoint remoteEndPoint)
-    {
-        return UnixMode
+    public static short GetNativeAddressFamily(IPEndPoint remoteEndPoint) =>
+        UnixMode
             ? (short)(remoteEndPoint.AddressFamily == AddressFamily.InterNetwork ? AF_INET : AF_INET6)
             : (short)remoteEndPoint.AddressFamily;
-    }
 }

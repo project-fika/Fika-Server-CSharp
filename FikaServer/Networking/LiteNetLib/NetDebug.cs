@@ -1,4 +1,4 @@
-﻿#nullable disable
+﻿using System;
 using System.Diagnostics;
 
 namespace Fika.Core.Networking.LiteNetLib;
@@ -40,7 +40,7 @@ public interface INetLogger
 public static class NetDebug
 {
     public static INetLogger Logger = null;
-    private static readonly object DebugLogLock = new();
+    private static readonly object DebugLogLock = new object();
     private static void WriteLogic(NetLogLevel logLevel, string str, params object[] args)
     {
         lock (DebugLogLock)

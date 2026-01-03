@@ -1,7 +1,7 @@
-﻿using Fika.Core.Networking.LiteNetLib;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
+using LiteNetLib;
 
-namespace FikaServer.Networking.LiteNetLib.Utils;
+namespace Fika.Core.Networking.LiteNetLib.Utils;
 
 public class NetPacketProcessor
 {
@@ -13,9 +13,9 @@ public class NetPacketProcessor
         // FNV-1 64 bit hash
         static HashCache()
         {
-            ulong hash = 14695981039346656037UL; //offset
-            string typeName = typeof(T).ToString();
-            for (int i = 0; i < typeName.Length; i++)
+            var hash = 14695981039346656037UL; //offset
+            var typeName = typeof(T).ToString();
+            for (var i = 0; i < typeName.Length; i++)
             {
                 hash ^= typeName[i];
                 hash *= 1099511628211UL; //prime
@@ -32,14 +32,14 @@ public class NetPacketProcessor
         // CRC-16-CCITT
         static ShortHashCache()
         {
-            string typeName = typeof(T).ToString();
+            var typeName = typeof(T).ToString();
             const ushort poly = 0x1021;
             ushort crc = 0xFFFF;
 
-            foreach (char c in typeName)
+            foreach (var c in typeName)
             {
                 crc ^= (ushort)(c << 8);
-                for (int i = 0; i < 8; i++)
+                for (var i = 0; i < 8; i++)
                 {
                     if ((crc & 0x8000) != 0)
                     {
@@ -84,7 +84,7 @@ public class NetPacketProcessor
     protected virtual SubscribeDelegate GetCallbackFromData(NetDataReader reader)
     {
         ulong hash = reader.GetUShort();
-        if (!_callbacks.TryGetValue(hash, out SubscribeDelegate action))
+        if (!_callbacks.TryGetValue(hash, out var action))
         {
             throw new ParseException($"Undefined packet in NetDataReader: {hash}");
         }
@@ -208,7 +208,7 @@ public class NetPacketProcessor
         _netSerializer.Register<T>();
         _callbacks[GetShortHash<T>()] = (reader, userData) =>
         {
-            T reference = packetConstructor();
+            var reference = packetConstructor();
             _netSerializer.Deserialize(reader, reference);
             onReceive(reference);
         };
@@ -229,7 +229,7 @@ public class NetPacketProcessor
         _netSerializer.Register<T>();
         _callbacks[GetShortHash<T>()] = (reader, userData) =>
         {
-            T reference = packetConstructor();
+            var reference = packetConstructor();
             _netSerializer.Deserialize(reader, reference);
             onReceive(reference, (TUserData)userData);
         };
@@ -283,7 +283,7 @@ public class NetPacketProcessor
     {
         _callbacks[GetShortHash<T>()] = (reader, userData) =>
         {
-            T pkt = packetConstructor();
+            var pkt = packetConstructor();
             pkt.Deserialize(reader);
             onReceive(pkt, (TUserData)userData);
         };
@@ -295,7 +295,7 @@ public class NetPacketProcessor
     {
         _callbacks[GetShortHash<T>()] = (reader, userData) =>
         {
-            T pkt = packetConstructor();
+            var pkt = packetConstructor();
             pkt.Deserialize(reader);
             onReceive(pkt);
         };

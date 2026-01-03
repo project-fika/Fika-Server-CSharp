@@ -1,8 +1,8 @@
-﻿#nullable disable
+﻿using System;
 using System.Net;
 using System.Text;
 
-namespace FikaServer.Networking.LiteNetLib.Layers;
+namespace Fika.Core.Networking.LiteNetLib.Layers;
 
 public class XorEncryptLayer : PacketLayerBase
 {

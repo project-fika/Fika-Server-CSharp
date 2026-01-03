@@ -1,17 +1,15 @@
-﻿#nullable disable
-using Fika.Core.Networking.LiteNetLib;
+﻿using System;
 using System.Net;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
-namespace FikaServer.Networking.LiteNetLib.Utils;
+namespace Fika.Core.Networking.LiteNetLib.Utils;
 
 public unsafe class NetDataReader
 {
     protected byte[] _data;
     protected int _position;
     protected int _dataSize;
-    private int _offset;
+    protected int _offset;
 
     public byte[] RawData
     {
@@ -124,7 +122,25 @@ public unsafe class NetDataReader
 
     public void Get(out IPEndPoint result)
     {
-        result = GetNetEndPoint();
+        result = GetIPEndPoint();
+    }
+
+    public IPEndPoint GetIPEndPoint()
+    {
+        IPAddress address;
+        //IPv4
+        if (GetByte() == 0)
+        {
+            address = new IPAddress(new ReadOnlySpan<byte>(_data, _position, 4));
+            _position += 4;
+        }
+        //IPv6
+        else
+        {
+            address = new IPAddress(new ReadOnlySpan<byte>(_data, _position, 16));
+            _position += 16;
+        }
+        return new IPEndPoint(address, GetUShort());
     }
 
     public void Get(out byte result)
@@ -202,16 +218,9 @@ public unsafe class NetDataReader
         result = GetGuid();
     }
 
-    public IPEndPoint GetNetEndPoint()
-    {
-        string host = GetString(1000);
-        int port = GetInt();
-        return NetUtils.MakeEndPoint(host, port);
-    }
-
     public byte GetByte()
     {
-        byte res = _data[_position];
+        var res = _data[_position];
         _position++;
         return res;
     }
@@ -223,9 +232,9 @@ public unsafe class NetDataReader
 
     public T[] GetArray<T>(ushort size)
     {
-        ushort length = BitConverter.ToUInt16(_data, _position);
+        var length = BitConverter.ToUInt16(_data, _position);
         _position += 2;
-        T[] result = new T[length];
+        var result = new T[length];
         length *= size;
         Buffer.BlockCopy(_data, _position, result, 0, length);
         _position += length;
@@ -234,10 +243,10 @@ public unsafe class NetDataReader
 
     public T[] GetArray<T>() where T : INetSerializable, new()
     {
-        ushort length = BitConverter.ToUInt16(_data, _position);
+        var length = BitConverter.ToUInt16(_data, _position);
         _position += 2;
-        T[] result = new T[length];
-        for (int i = 0; i < length; i++)
+        var result = new T[length];
+        for (var i = 0; i < length; i++)
         {
             var item = new T();
             item.Deserialize(this);
@@ -248,11 +257,14 @@ public unsafe class NetDataReader
 
     public T[] GetArray<T>(Func<T> constructor) where T : class, INetSerializable
     {
-        ushort length = BitConverter.ToUInt16(_data, _position);
+        var length = BitConverter.ToUInt16(_data, _position);
         _position += 2;
-        T[] result = new T[length];
-        for (int i = 0; i < length; i++)
+        var result = new T[length];
+        for (var i = 0; i < length; i++)
+        {
             Get(out result[i], constructor);
+        }
+
         return result;
     }
 
@@ -303,9 +315,9 @@ public unsafe class NetDataReader
 
     public string[] GetStringArray()
     {
-        ushort length = GetUShort();
-        string[] arr = new string[length];
-        for (int i = 0; i < length; i++)
+        var length = GetUShort();
+        var arr = new string[length];
+        for (var i = 0; i < length; i++)
         {
             arr[i] = GetString();
         }
@@ -318,9 +330,9 @@ public unsafe class NetDataReader
     /// </summary>
     public string[] GetStringArray(int maxStringLength)
     {
-        ushort length = GetUShort();
-        string[] arr = new string[length];
-        for (int i = 0; i < length; i++)
+        var length = GetUShort();
+        var arr = new string[length];
+        for (var i = 0; i < length; i++)
         {
             arr[i] = GetString(maxStringLength);
         }
@@ -440,16 +452,18 @@ public unsafe class NetDataReader
     /// <returns>"string.Empty" if value > "maxLength"</returns>
     public string GetString(int maxLength)
     {
-        ushort size = GetUShort();
+        var size = GetUShort();
         if (size == 0)
+        {
             return string.Empty;
+        }
 
-        int actualSize = size - 1;
+        var actualSize = size - 1;
 #if LITENETLIB_SPANS || NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1 || NETCOREAPP3_1 || NET5_0 || NETSTANDARD2_1
         ReadOnlySpan<byte> slice = _data.AsSpan(_position, actualSize);
-        string result = maxLength > 0 && NetDataWriter.UTF8Encoding.Value.GetCharCount(slice) > maxLength ?
+        var result = maxLength > 0 && NetDataWriter.UTF8Encoding.GetCharCount(slice) > maxLength ?
             string.Empty :
-            NetDataWriter.UTF8Encoding.Value.GetString(slice);
+            NetDataWriter.UTF8Encoding.GetString(slice);
 #else
         string result = maxLength > 0 && NetDataWriter.UTF8Encoding.Value.GetCharCount(_data, _position, actualSize) > maxLength ?
             string.Empty :
@@ -462,14 +476,16 @@ public unsafe class NetDataReader
 
     public string GetString()
     {
-        ushort size = GetUShort();
+        var size = GetUShort();
         if (size == 0)
+        {
             return string.Empty;
+        }
 
-        int actualSize = size - 1;
+        var actualSize = size - 1;
 #if LITENETLIB_SPANS || NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1 || NETCOREAPP3_1 || NET5_0 || NETSTANDARD2_1
         ReadOnlySpan<byte> slice = _data.AsSpan(_position, actualSize);
-        string result = NetDataWriter.UTF8Encoding.Value.GetString(slice);
+        var result = NetDataWriter.UTF8Encoding.GetString(slice);
         _position += actualSize;
 #else
         string result = NetDataWriter.UTF8Encoding.Value.GetString(_data, _position, actualSize);
@@ -480,23 +496,22 @@ public unsafe class NetDataReader
 
     public string GetLargeString()
     {
-        int size = GetInt();
+        var size = GetInt();
         if (size <= 0)
+        {
             return string.Empty;
-        string result = NetDataWriter.UTF8Encoding.Value.GetString(_data, _position, size);
+        }
+
+        var result = NetDataWriter.UTF8Encoding.GetString(_data, _position, size);
         _position += size;
         return result;
     }
 
     public Guid GetGuid()
     {
-#if LITENETLIB_SPANS || NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1 || NETCOREAPP3_1 || NET5_0 || NETSTANDARD2_1
         var result = new Guid(_data.AsSpan(_position, 16));
         _position += 16;
         return result;
-#else
-        return new Guid(GetBytesWithLength());
-#endif
     }
 
     public ArraySegment<byte> GetBytesSegment(int count)
@@ -544,7 +559,7 @@ public unsafe class NetDataReader
 
     public byte[] GetRemainingBytes()
     {
-        byte[] outgoingData = new byte[AvailableBytes];
+        var outgoingData = new byte[AvailableBytes];
         Buffer.BlockCopy(_data, _position, outgoingData, 0, AvailableBytes);
         _position = _data.Length;
         return outgoingData;
@@ -584,7 +599,7 @@ public unsafe class NetDataReader
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public T GetUnmanaged<T>() where T : unmanaged
     {
-        int size = sizeof(T);
+        var size = sizeof(T);
 #if DEBUG
         if (_position + size > _data.Length)
         {
@@ -619,10 +634,10 @@ public unsafe class NetDataReader
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public T? GetNullableUnmanaged<T>() where T : unmanaged
     {
-        bool hasValue = GetBool();
+        var hasValue = GetBool();
 
 #if DEBUG
-        int requiredSize = hasValue ? sizeof(T) : 0;
+        var requiredSize = hasValue ? sizeof(T) : 0;
         if (_position + requiredSize > _data.Length)
         {
             throw new IndexOutOfRangeException("Not enough data to read");
@@ -665,8 +680,11 @@ public unsafe class NetDataReader
     /// <returns>The enum value read from the buffer.</returns>
     public T GetEnum<T>() where T : unmanaged, Enum
     {
-        ReadOnlySpan<byte> span = GetSpan(Unsafe.SizeOf<T>());
-        return MemoryMarshal.Read<T>(span);
+        var span = GetSpan(Unsafe.SizeOf<T>());
+        fixed (byte* ptr = span)
+        {
+            return *(T*)ptr;
+        }
     }
 
     /// <summary>
@@ -754,24 +772,28 @@ public unsafe class NetDataReader
     /// </summary>
     public string PeekString(int maxLength)
     {
-        ushort size = PeekUShort();
+        var size = PeekUShort();
         if (size == 0)
+        {
             return string.Empty;
+        }
 
-        int actualSize = size - 1;
-        return maxLength > 0 && NetDataWriter.UTF8Encoding.Value.GetCharCount(_data, _position + 2, actualSize) > maxLength ?
+        var actualSize = size - 1;
+        return maxLength > 0 && NetDataWriter.UTF8Encoding.GetCharCount(_data, _position + 2, actualSize) > maxLength ?
             string.Empty :
-            NetDataWriter.UTF8Encoding.Value.GetString(_data, _position + 2, actualSize);
+            NetDataWriter.UTF8Encoding.GetString(_data, _position + 2, actualSize);
     }
 
     public string PeekString()
     {
-        ushort size = PeekUShort();
+        var size = PeekUShort();
         if (size == 0)
+        {
             return string.Empty;
+        }
 
-        int actualSize = size - 1;
-        return NetDataWriter.UTF8Encoding.Value.GetString(_data, _position + 2, actualSize);
+        var actualSize = size - 1;
+        return NetDataWriter.UTF8Encoding.GetString(_data, _position + 2, actualSize);
     }
     #endregion
 
@@ -811,7 +833,7 @@ public unsafe class NetDataReader
 
     public bool TryGetChar(out char result)
     {
-        if (!TryGetUShort(out ushort uShortValue))
+        if (!TryGetUShort(out var uShortValue))
         {
             result = '\0';
             return false;
@@ -912,7 +934,7 @@ public unsafe class NetDataReader
     {
         if (AvailableBytes >= 2)
         {
-            ushort strSize = PeekUShort();
+            var strSize = PeekUShort();
             if (AvailableBytes >= strSize + 1)
             {
                 result = GetString();
@@ -925,14 +947,14 @@ public unsafe class NetDataReader
 
     public bool TryGetStringArray(out string[] result)
     {
-        if (!TryGetUShort(out ushort strArrayLength))
+        if (!TryGetUShort(out var strArrayLength))
         {
             result = null;
             return false;
         }
 
         result = new string[strArrayLength];
-        for (int i = 0; i < strArrayLength; i++)
+        for (var i = 0; i < strArrayLength; i++)
         {
             if (!TryGetString(out result[i]))
             {
@@ -948,7 +970,7 @@ public unsafe class NetDataReader
     {
         if (AvailableBytes >= 2)
         {
-            ushort length = PeekUShort();
+            var length = PeekUShort();
             if (AvailableBytes >= 2 + length)
             {
                 result = GetBytesWithLength();
