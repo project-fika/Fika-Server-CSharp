@@ -269,5 +269,5 @@
     "F_UI_PlayerConnected": "{0} Подключился",
     "F_UI_PlayerDisconnected": "{0} Отключился",
     "F_UI_DisabledByServerHost": "Отключено хостом сервера",
-    "F_UI_ErrorRaidInit": "An error was caught during the raid initialization.\nPlease restart your client!"
+    "F_UI_ErrorRaidInit": "Возникла ошибка во время инициализации рейда.\nПожалуйста, перезапустите клиент!"
 }
