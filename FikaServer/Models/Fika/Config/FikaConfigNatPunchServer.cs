@@ -7,6 +7,9 @@ public record FikaConfigNatPunchServer
     [JsonPropertyName("enable")]
     public bool Enable { get; set; } = false;
 
+    [JsonPropertyName("ip")]
+    public string Ip { get; set; } = "";
+
     [JsonPropertyName("port")]
     public int Port { get; set; } = 6790;
 
