@@ -14,7 +14,7 @@ namespace FikaServer.OnLoad;
 
 [Injectable(TypePriority = OnLoadOrder.PostSptModLoader)]
 
-public class FikaPostLoad(ISptLogger<FikaPostLoad> logger, ConfigServer configServer, /*NatPunchServer natPunchServer,*/ ImageRouter imageRouter,
+public class FikaPostLoad(ISptLogger<FikaPostLoad> logger, ConfigServer configServer, ImageRouter imageRouter,
     HeadlessProfileService HeadlessProfileService, LocaleService localeService, PlayerRelationsService playerRelationsCacheService,
     FriendRequestsService friendRequestsService, ConfigService fikaConfig, NatPunchServer natPunchServer, WebhookService webhookService) : IOnLoad
 {
@@ -22,7 +22,7 @@ public class FikaPostLoad(ISptLogger<FikaPostLoad> logger, ConfigServer configSe
     {
         FikaConfig config = fikaConfig.Config;
 
-        if (config.NatPunchServer.Enable)
+        if (config.NatPunchServer.Enable && config.NatPunchServer.Ip == "")
         {
             natPunchServer.Start();
         }
