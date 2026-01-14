@@ -2,10 +2,10 @@
 
 namespace FikaServer.Models.Servers;
 
-public class NatPunchServerPeer(string sessionId, IPEndPoint internalAddr, IPEndPoint externalAddr)
+public class NatPunchServerPeer(Guid guid, IPEndPoint internalAddr, IPEndPoint externalAddr)
 {
-    public string SessionId { get; set; } = sessionId;
+    public Guid Guid { get; set; } = guid;
     public IPEndPoint InternalAddr { get; } = internalAddr;
     public IPEndPoint ExternalAddr { get; } = externalAddr;
-    public DateTime LastKeepAliveTime { get; set;  } = DateTime.UtcNow;
+    public DateTime LastRequestTime { get; set;  } = DateTime.Now;
 }
