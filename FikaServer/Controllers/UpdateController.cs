@@ -32,7 +32,7 @@ public class UpdateController(MatchService matchService)
     /// <param name="request"></param>
     public void HandleSetHost(FikaUpdateSetHostRequestData request)
     {
-        matchService.SetMatchHost(request.ServerId, request.Ips, request.Port, request.NatPunch, request.IsHeadless);
+        matchService.SetMatchHost(request.ServerId, request.Ips, request.Port, request.NatPunch, request.UseFikaNatPunchServer, request.IsHeadless);
     }
 
     /// <summary>

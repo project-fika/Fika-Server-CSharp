@@ -22,7 +22,7 @@ public class FikaPostLoad(ISptLogger<FikaPostLoad> logger, ConfigServer configSe
     {
         FikaConfig config = fikaConfig.Config;
 
-        if (config.NatPunchServer.Enable && config.NatPunchServer.Ip == "")
+        if (config.NatPunchServer.Enable)
         {
             natPunchServer.Start();
         }

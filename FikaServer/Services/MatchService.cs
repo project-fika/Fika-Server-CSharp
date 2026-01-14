@@ -182,6 +182,7 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
             Time = data.Time,
             RaidCode = data.RaidCode,
             NatPunch = false,
+            UseFikaNatPunchServer = false,
             IsHeadless = false,
             Raids = 0
         };
@@ -272,14 +273,16 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
     /// <param name="ips"></param>
     /// <param name="port"></param>
     /// <param name="natPunch"></param>
+    /// <param name="useFikaNatPunchServer"></param>
     /// <param name="isHeadless"></param>
-    public void SetMatchHost(MongoId matchId, string[] ips, ushort port, bool natPunch, bool isHeadless)
+    public void SetMatchHost(MongoId matchId, string[] ips, ushort port, bool natPunch, bool useFikaNatPunchServer, bool isHeadless)
     {
         if (Matches.TryGetValue(matchId, out var match))
         {
             match.Ips = ips;
             match.Port = port;
             match.NatPunch = natPunch;
+            match.UseFikaNatPunchServer = useFikaNatPunchServer;
             match.IsHeadless = isHeadless;
         }
     }
