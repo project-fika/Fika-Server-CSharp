@@ -56,6 +56,9 @@ public record FikaMatch
     [JsonPropertyName("natPunch")]
     public bool NatPunch { get; set; }
 
+    [JsonPropertyName("useFikaNatPunchServer")]
+    public bool UseFikaNatPunchServer { get; set; }
+
     [JsonPropertyName("isHeadless")]
     public bool IsHeadless { get; set; }
 

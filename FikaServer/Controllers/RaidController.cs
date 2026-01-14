@@ -116,6 +116,7 @@ public class RaidController(MatchService matchService, HeadlessHelper headlessHe
             ServerGuid = match.ServerGuid,
             Port = match.Port,
             NatPunch = match.NatPunch,
+            UseFikaNatPunchServer = match.UseFikaNatPunchServer,
             IsHeadless = match.IsHeadless,
         };
     }

@@ -244,6 +244,8 @@
     "F_BepInEx_UseUPnP_D": "Attempt to open ports using UPnP. Useful if you cannot open ports yourself but the router supports UPnP.",
     "F_BepInEx_UseNatPunch_T": "Use NAT Punching",
     "F_BepInEx_UseNatPunch_D": "Use NAT punching when hosting a raid. Only works with fullcone NAT type routers and requires NatPunchServer to be running on the SPT server. UPnP, Force IP and Force Bind IP are disabled with this mode.",
+    "F_BepInEx_UseFikaNatPunchServer_T": "Use Fika NAT Punch server",
+    "F_BepInEx_UseFikaNatPunchServer_D": "Use the public Fika NAT Punch server. Requires Use NAT Punching setting enabled.",
     "F_BepInEx_ConnectionTimeout_T": "Connection Timeout",
     "F_BepInEx_ConnectionTimeout_D": "How long it takes for a connection to be considered dropped if no packets are received.",
     "F_BepInEx_SendRate_T": "Send Rate",
