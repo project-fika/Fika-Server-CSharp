@@ -100,7 +100,7 @@ public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer>
             }
             else
             {
-                logger.Error($"Unknown server GUID ({guid}) provided by client: {remoteEndPoint}.");
+                logger.Error($"[Fika NatPunch] Unknown server GUID ({guid}) provided by client: {remoteEndPoint}.");
             }
         }
     }
@@ -171,7 +171,7 @@ public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer>
             foreach (Guid serverPeerGuidToRemove in serverPeerGuidsToRemove)
             {
                 _serverPeers.Remove(serverPeerGuidToRemove);
-                logger.Info($"Removed {serverPeerGuidToRemove} from server peers.");
+                logger.Info($"[Fika NatPunch] Removed {serverPeerGuidToRemove} from server peers.");
             }
 
             _lastCleanupPeers = currentTime;
