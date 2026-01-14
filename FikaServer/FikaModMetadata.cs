@@ -15,5 +15,5 @@ public record FikaModMetadata : AbstractModMetadata, IModWebMetadata
     public override string License { get; init; } = "CC-BY-NC-SA-4.0";
     public override string ModGuid { get; init; } = "Fika";
     public override SemanticVersioning.Version Version { get; init; } = new(2, 2, 0);
-    public override SemanticVersioning.Range SptVersion { get; init; } = new("~4.0.0");
+    public override SemanticVersioning.Range SptVersion { get; init; } = new(">=4.0.11");
 }
