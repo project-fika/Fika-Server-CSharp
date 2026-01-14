@@ -273,7 +273,7 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
     /// <param name="port"></param>
     /// <param name="natPunch"></param>
     /// <param name="isHeadless"></param>
-    public void SetMatchHost(MongoId matchId, string[] ips, int port, bool natPunch, bool isHeadless)
+    public void SetMatchHost(MongoId matchId, string[] ips, ushort port, bool natPunch, bool isHeadless)
     {
         if (Matches.TryGetValue(matchId, out var match))
         {

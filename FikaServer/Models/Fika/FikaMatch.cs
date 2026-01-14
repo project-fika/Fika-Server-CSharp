@@ -15,7 +15,7 @@ public record FikaMatch
     public Guid ServerGuid { get; set; } = default;
 
     [JsonPropertyName("port")]
-    public int Port { get; set; }
+    public ushort Port { get; set; }
 
     [JsonPropertyName("hostUsername")]
     public string HostUsername { get; set; } = string.Empty;

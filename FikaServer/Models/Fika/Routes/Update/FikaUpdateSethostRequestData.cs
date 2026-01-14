@@ -12,7 +12,7 @@ public record FikaUpdateSetHostRequestData : IRequestData
     public string[] Ips { get; set; } = [];
 
     [JsonPropertyName("port")]
-    public int Port { get; set; }
+    public ushort Port { get; set; }
 
     [JsonPropertyName("natPunch")]
     public bool NatPunch { get; set; }
