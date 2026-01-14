@@ -11,7 +11,7 @@ public record FikaRaidGethostResponse
     public Guid ServerGuid { get; set; } = default;
 
     [JsonPropertyName("port")]
-    public int Port { get; set; }
+    public ushort Port { get; set; }
 
     [JsonPropertyName("natPunch")]
     public bool NatPunch { get; set; }
