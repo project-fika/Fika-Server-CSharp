@@ -1,5 +1,6 @@
 ﻿using Fika.Core.Networking.LiteNetLib;
 using FikaServer.Models.Servers;
+using FikaServer.Models.Servers.Enums;
 using FikaServer.Services;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Utils;
@@ -11,7 +12,7 @@ namespace FikaServer.Servers;
 [Injectable(InjectionType.Singleton)]
 public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer> logger) : INatPunchListener, INetEventListener
 {
-    private readonly Dictionary<Guid, NatPunchServerPeer> _serverPeers = [];
+    private readonly Dictionary<Guid, NatPunchPeer> _serverPeers = [];
     private NetManager? _netServer;
     private CancellationTokenSource? _pollEventsRoutineCts;
     private DateTime _lastCleanupPeers = DateTime.Now;
@@ -51,7 +52,7 @@ public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer>
 
     public void PollEvents()
     {
-        _netServer?.NatPunchModule.PollEvents();
+        _netServer?.NatPunchModule?.PollEvents();
     }
 
     public void OnNatIntroductionRequest(IPEndPoint localEndPoint, IPEndPoint remoteEndPoint, string token)
@@ -64,30 +65,29 @@ public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer>
 
         Guid guid = natPunchIntroduction.Guid;
 
-        if (natPunchIntroduction.Type == "Server")
+        if (natPunchIntroduction.Type == NatPunchType.Server)
         {
             if (_serverPeers.TryGetValue(guid, out var serverPeer))
             {
-                serverPeer.LastRequestTime = DateTime.Now;
+                serverPeer.UpdateRequestInfo();
 
                 logger.Info($"[Fika NatPunch] Keep Alive {guid} ({remoteEndPoint}).");
             }
             else
             {
-                serverPeer = new(guid, localEndPoint, remoteEndPoint);
-                _serverPeers[guid] = serverPeer;
+                _serverPeers[guid] = new(guid, localEndPoint, remoteEndPoint);
 
                 logger.Info($"[Fika NatPunch] Added {guid} ({remoteEndPoint}) to server peers.");
             }
         }
 
-        if (natPunchIntroduction.Type == "Client")
+        if (natPunchIntroduction.Type == NatPunchType.Client)
         {
             if (_serverPeers.TryGetValue(guid, out var serverPeer))
             {
                 logger.Info($"[Fika NatPunch] Introducing server {guid} to client: {remoteEndPoint}.");
 
-                _netServer?.NatPunchModule.NatIntroduce(
+                _netServer?.NatPunchModule?.NatIntroduce(
                     serverPeer.InternalAddr,
                     serverPeer.ExternalAddr,
                     localEndPoint,
@@ -157,9 +157,9 @@ public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer>
 
             foreach (Guid serverPeersGuid in _serverPeers.Keys)
             {
-                NatPunchServerPeer serverPeer = _serverPeers[serverPeersGuid];
+                NatPunchPeer serverPeer = _serverPeers[serverPeersGuid];
 
-                if (currentTime - serverPeer.LastRequestTime > TimeSpan.FromSeconds(30))
+                if (!serverPeer.IsActive(TimeSpan.FromSeconds(30)))
                 {
                     serverPeerGuidsToRemove.Add(serverPeersGuid);
                 }
@@ -191,9 +191,9 @@ public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer>
         }
     }
 
-    private bool TryParseToken(string token, out NatPunchIntroduction? natPunchIntroduction)
+    private bool TryParseToken(string token, out NatPunchToken? natPunchToken)
     {
-        natPunchIntroduction = null;
+        natPunchToken = null;
 
         if (!token.Contains(':'))
         {
@@ -201,11 +201,11 @@ public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer>
         }
 
         string strGuid;
-        string type;
+        string strType;
 
         try
         {
-            type = token.Split(':')[0];
+            strType = token.Split(':')[0];
             strGuid = token.Split(':')[1];
         }
         catch
@@ -213,7 +213,12 @@ public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer>
             return false;
         }
 
-        if (type != "Server" && type != "Client")
+        if (strType != "Server" && strType != "Client")
+        {
+            return false;
+        }
+
+        if (!Enum.TryParse(strType, out NatPunchType natPunchType))
         {
             return false;
         }
@@ -223,7 +228,7 @@ public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer>
             return false;
         }
 
-        natPunchIntroduction = new(type, guid);
+        natPunchToken = new(natPunchType, guid);
 
         return true;
     }
