@@ -57,15 +57,15 @@ public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer>
 
     public void OnNatIntroductionRequest(IPEndPoint localEndPoint, IPEndPoint remoteEndPoint, string token)
     {
-        if (!TryParseToken(token, out var natPunchIntroduction) || natPunchIntroduction is null)
+        if (!TryParseToken(token, out var natPunchToken) || natPunchToken is null)
         {
             logger.Error($"[Fika NatPunch] Invalid token sent by peer: {remoteEndPoint}.");
             return;
         }
 
-        Guid guid = natPunchIntroduction.Guid;
+        Guid guid = natPunchToken.Guid;
 
-        if (natPunchIntroduction.Type == NatPunchType.Server)
+        if (natPunchToken.Type == NatPunchType.Server)
         {
             if (_serverPeers.TryGetValue(guid, out var serverPeer))
             {
@@ -81,7 +81,7 @@ public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer>
             }
         }
 
-        if (natPunchIntroduction.Type == NatPunchType.Client)
+        if (natPunchToken.Type == NatPunchType.Client)
         {
             if (_serverPeers.TryGetValue(guid, out var serverPeer))
             {
