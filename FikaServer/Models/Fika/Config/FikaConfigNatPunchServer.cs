@@ -9,7 +9,4 @@ public record FikaConfigNatPunchServer
 
     [JsonPropertyName("port")]
     public int Port { get; set; } = 6790;
-
-    [JsonPropertyName("natIntroduceAmount")]
-    public int NatIntroduceAmount { get; set; } = 1;
 }
