@@ -244,6 +244,8 @@
     "F_BepInEx_UseUPnP_D": "Попытаться открыть порты с помощью UPnP. Полезно, если вы не можете открыть порты самостоятельно, но ваш роутер поддерживает UPnP.",
     "F_BepInEx_UseNatPunch_T": "Использовать NAT Punching",
     "F_BepInEx_UseNatPunch_D": "Использовать NAT Punching при хостинге рейда. Работает только с роутерами, поддерживающими full cone NAT, и требует, чтобы на SPT сервере был запущен NatPunchServer. UPnP, Force IP и Force Bind IP отключены с этим режимом.",
+    "F_BepInEx_UseFikaNatPunchServer_T": "Use Fika NAT Punch server",
+    "F_BepInEx_UseFikaNatPunchServer_D": "Use the public Fika NAT Punch server. Requires Use NAT Punching setting enabled.",
     "F_BepInEx_ConnectionTimeout_T": "Время ожидания соединения",
     "F_BepInEx_ConnectionTimeout_D": "Определяет, через какое время соединение будет считаться разорванным, если от клиента или сервера не поступает никаких пакетов данных.",
     "F_BepInEx_SendRate_T": "Скорость отправки",
@@ -269,5 +271,6 @@
     "F_UI_PlayerConnected": "{0} Подключился",
     "F_UI_PlayerDisconnected": "{0} Отключился",
     "F_UI_DisabledByServerHost": "Отключено хостом сервера",
-    "F_UI_ErrorRaidInit": "Возникла ошибка во время инициализации рейда.\nПожалуйста, перезапустите клиент!"
+    "F_UI_ErrorRaidInit": "Возникла ошибка во время инициализации рейда.\nПожалуйста, перезапустите клиент!",
+    "F_UI_HeadlessConnected": "Headless client {0} connected"
 }

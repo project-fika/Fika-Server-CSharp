@@ -244,6 +244,8 @@
     "F_BepInEx_UseUPnP_D": "Megpróbál portokat nyitni UPnP-vel. Hasznos, ha tudod hogyan nyitsd meg őked egyedül, de a router ezt támogatja.",
     "F_BepInEx_UseNatPunch_T": "Használja a NAT átütés",
     "F_BepInEx_UseNatPunch_D": "Használjon NAT átütést raid fogadásakor. Csak teljes kúp NAT típusú routerekel működik, és megköveteli, hogy a NatPunchServer fusson az SPT kiszolgálón. Az UPnP, a Kényszeritett IP és a Kényszeritett Bind IP le van tiltva ezzel a móddal.",
+    "F_BepInEx_UseFikaNatPunchServer_T": "Use Fika NAT Punch server",
+    "F_BepInEx_UseFikaNatPunchServer_D": "Use the public Fika NAT Punch server. Requires Use NAT Punching setting enabled.",
     "F_BepInEx_ConnectionTimeout_T": "Kapcsolati időtullépés",
     "F_BepInEx_ConnectionTimeout_D": "Mennyi időbe telik, amíg a kapcsolat megszakadtnak minősül, ha nem érkezik packet.",
     "F_BepInEx_SendRate_T": "Küldési arány",
@@ -269,5 +271,6 @@
     "F_UI_PlayerConnected": "{0} csatlakozott",
     "F_UI_PlayerDisconnected": "{0} elhagyta a játékot",
     "F_UI_DisabledByServerHost": "Kikapcsolva a szerver host által",
-    "F_UI_ErrorRaidInit": "An error was caught during the raid initialization.\nPlease restart your client!"
+    "F_UI_ErrorRaidInit": "An error was caught during the raid initialization.\nPlease restart your client!",
+    "F_UI_HeadlessConnected": "Headless client {0} connected"
 }

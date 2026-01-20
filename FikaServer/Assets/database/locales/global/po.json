@@ -244,6 +244,8 @@
     "F_BepInEx_UseUPnP_D": "Tentar abrir portas usando o UPnP. Útil se você não pode abrir portas você mesmo, mas o roteador suporta o UPnP.",
     "F_BepInEx_UseNatPunch_T": "Usar Socador NAT",
     "F_BepInEx_UseNatPunch_D": "Usa Socador NAT ao hospedar uma incursão. Só funciona com roteadores de tipo NAT fullcone e requer que o NatPunchServer esteja rodando no servidor SPT. UPnP, forçar IP e forçar IP fixo estão desativados com este modo.",
+    "F_BepInEx_UseFikaNatPunchServer_T": "Use Fika NAT Punch server",
+    "F_BepInEx_UseFikaNatPunchServer_D": "Use the public Fika NAT Punch server. Requires Use NAT Punching setting enabled.",
     "F_BepInEx_ConnectionTimeout_T": "Tempo de Limite de Conexão",
     "F_BepInEx_ConnectionTimeout_D": "Quanto tempo leva para uma conexão ser considerada perdida se nenhum pacote for recebido.",
     "F_BepInEx_SendRate_T": "Taxa de Envio",
@@ -269,5 +271,6 @@
     "F_UI_PlayerConnected": "{0} se conectou",
     "F_UI_PlayerDisconnected": "{0} se desconectou",
     "F_UI_DisabledByServerHost": "Desabilitado pelo hospedeiro do servidor",
-    "F_UI_ErrorRaidInit": "Um erro ocorreu durante a inicialização da incursão.\nPor favor reinicie seu jogo!"
+    "F_UI_ErrorRaidInit": "Um erro ocorreu durante a inicialização da incursão.\nPor favor reinicie seu jogo!",
+    "F_UI_HeadlessConnected": "Headless client {0} connected"
 }

@@ -1,5 +1,4 @@
 ﻿using FikaServer.Helpers;
-using FikaServer.Models.Fika;
 using FikaServer.Models.Fika.Routes.Headless;
 using FikaServer.Models.Fika.Routes.Raid;
 using FikaServer.Models.Fika.Routes.Raid.Create;
@@ -34,7 +33,7 @@ public class RaidController(MatchService matchService, HeadlessHelper headlessHe
     /// <returns></returns>
     public async Task<FikaRaidCreateResponse> HandleRaidCreate(FikaRaidCreateRequestData request, MongoId sessionId)
     {
-        string hostUsername = request.HostUsername;
+        var hostUsername = request.HostUsername;
 
         if (headlessHelper.IsHeadlessClient(request.ServerId))
         {
@@ -47,17 +46,17 @@ public class RaidController(MatchService matchService, HeadlessHelper headlessHe
         await notificationWebSocket.BroadcastAsync(new StartRaidNotification
         {
             Nickname = hostUsername,
-            Location = request.Settings.Location,
+            Location = request.Settings!.Location!,
             IsHeadlessRaid = headlessHelper.IsHeadlessClient(request.ServerId),
             HeadlessRequesterName = requesterName,
             RaidTime = request.Time
         });
 
-        await webhookService.SendWebhookMessage($"{requesterName} has started a {request.Side} raid on {request.Settings.Location.ToLower().ToFikaLocation()}.");
+        await webhookService.SendWebhookMessage($"{requesterName} has started a {request.Side} raid on {request.Settings!.Location!.ToLower().ToFikaLocation()}.");
 
         return new FikaRaidCreateResponse
         {
-            Success = matchService.CreateMatch(request, sessionId)
+            Success = await matchService.CreateMatch(request, sessionId)
         };
     }
 
@@ -68,7 +67,7 @@ public class RaidController(MatchService matchService, HeadlessHelper headlessHe
     /// <returns>A new <see cref="FikaRaidJoinResponse"/></returns>
     public FikaRaidJoinResponse HandleRaidJoin(FikaRaidJoinRequestData request)
     {
-        FikaMatch match = matchService.GetMatch(request.ServerId)!;
+        var match = matchService.GetMatch(request.ServerId)!;
 
         return new FikaRaidJoinResponse
         {
@@ -103,7 +102,7 @@ public class RaidController(MatchService matchService, HeadlessHelper headlessHe
     /// <returns></returns>
     public FikaRaidGethostResponse? HandleRaidGetHost(FikaRaidServerIdRequestData request)
     {
-        FikaMatch? match = matchService.GetMatch(request.ServerId);
+        var match = matchService.GetMatch(request.ServerId);
 
         if (match == null)
         {
@@ -128,7 +127,7 @@ public class RaidController(MatchService matchService, HeadlessHelper headlessHe
     /// <returns></returns>
     public FikaRaidSettingsResponse? HandleRaidGetSettings(FikaRaidServerIdRequestData request)
     {
-        FikaMatch? match = matchService.GetMatch(request.ServerId);
+        var match = matchService.GetMatch(request.ServerId);
 
         if (match == null)
         {
@@ -172,7 +171,7 @@ public class RaidController(MatchService matchService, HeadlessHelper headlessHe
             };
         }
 
-        string? headlessClientId = await headlessService.StartHeadlessRaid(info.HeadlessSessionID, sessionID, info);
+        var headlessClientId = await headlessService.StartHeadlessRaid(info.HeadlessSessionID, sessionID, info);
 
         logger.Info($"Sent WS FikaHeadlessStartRaid to {headlessClientId}");
 

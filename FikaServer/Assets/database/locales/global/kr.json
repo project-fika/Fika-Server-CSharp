@@ -244,6 +244,8 @@
     "F_BepInEx_UseUPnP_D": "UPnP를 사용하여 포트 개방 시도. 직접 포트를 열지 못하는데 라우터가 UPnP를 지원하는 경우 유용함",
     "F_BepInEx_UseNatPunch_T": "NAT 펀칭 사용",
     "F_BepInEx_UseNatPunch_D": "레이드 호스팅 시에 NAT 펀칭을 사용. fullcone NAT 타입 라우터만 호환가능하며 NatPunchServer가 SPT 서버에 동작중이여야 함. 해당 기능 사용 시 UPnP, IP강제, IP강제 바인드는 모두 비활성화 됨.",
+    "F_BepInEx_UseFikaNatPunchServer_T": "Use Fika NAT Punch server",
+    "F_BepInEx_UseFikaNatPunchServer_D": "Use the public Fika NAT Punch server. Requires Use NAT Punching setting enabled.",
     "F_BepInEx_ConnectionTimeout_T": "연결 타임아웃",
     "F_BepInEx_ConnectionTimeout_D": "해당 시간동안 패킷을 받지 못하면 연결을 드랍한걸로 간주함",
     "F_BepInEx_SendRate_T": "전송률",
@@ -269,5 +271,6 @@
     "F_UI_PlayerConnected": "{0}님이 입장하셨습니다",
     "F_UI_PlayerDisconnected": "{0} has disconnected",
     "F_UI_DisabledByServerHost": "Disabled by server host",
-    "F_UI_ErrorRaidInit": "An error was caught during the raid initialization.\nPlease restart your client!"
+    "F_UI_ErrorRaidInit": "An error was caught during the raid initialization.\nPlease restart your client!",
+    "F_UI_HeadlessConnected": "Headless client {0} connected"
 }

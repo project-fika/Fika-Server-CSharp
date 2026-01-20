@@ -244,6 +244,8 @@
     "F_BepInEx_UseUPnP_D": "尝试使用 UPnP 打开端口。如果你无法自行打开端口，但路由器支持 UPnP，则此功能会很有用。",
     "F_BepInEx_UseNatPunch_T": "使用 NAT 穿透",
     "F_BepInEx_UseNatPunch_D": "在托管突袭时启用 NAT 穿透功能。仅适用于支持 Fullcone NAT 类型的路由器，并且需要 SPT 服务器上运行 NatPunchServer。启用此模式时，UPnP、强制 IP 和强制绑定 IP 功能将被禁用。",
+    "F_BepInEx_UseFikaNatPunchServer_T": "Use Fika NAT Punch server",
+    "F_BepInEx_UseFikaNatPunchServer_D": "Use the public Fika NAT Punch server. Requires Use NAT Punching setting enabled.",
     "F_BepInEx_ConnectionTimeout_T": "连接超时",
     "F_BepInEx_ConnectionTimeout_D": "如果没有收到数据包，判定连接丢失所需的时间。",
     "F_BepInEx_SendRate_T": "发送速率",
@@ -269,5 +271,6 @@
     "F_UI_PlayerConnected": "{0} 已连接",
     "F_UI_PlayerDisconnected": "{0} 已断开连接",
     "F_UI_DisabledByServerHost": "服务器已禁用",
-    "F_UI_ErrorRaidInit": "战局初始化发生错误，请重启你的客户端！"
+    "F_UI_ErrorRaidInit": "战局初始化发生错误，请重启你的客户端！",
+    "F_UI_HeadlessConnected": "Headless client {0} connected"
 }

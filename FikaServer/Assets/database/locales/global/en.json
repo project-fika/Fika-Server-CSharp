@@ -271,5 +271,6 @@
     "F_UI_PlayerConnected": "{0} has connected",
     "F_UI_PlayerDisconnected": "{0} has disconnected",
     "F_UI_DisabledByServerHost": "Disabled by server host",
-    "F_UI_ErrorRaidInit": "An error was caught during the raid initialization.\nPlease restart your client!"
+    "F_UI_ErrorRaidInit": "An error was caught during the raid initialization.\nPlease restart your client!",
+    "F_UI_HeadlessConnected": "Headless client {0} connected"
 }

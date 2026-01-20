@@ -104,7 +104,7 @@ public class HeadlessService(ISptLogger<HeadlessService> logger,
             if (!fikaConfigService.Config.Headless.SetLevelToAverageOfLobby)
             {
                 // Doing this everytime is unecessary if we're not setting the average level so only set it once the original requester of the headless joins.
-                if (headlessClientInfo.RequesterSessionID == sessionID)
+                if (headlessClientInfo!.RequesterSessionID! == sessionID)
                 {
                     CalculateAndSetHeadlessLevel(headlessClientId);
                 }
@@ -132,7 +132,7 @@ public class HeadlessService(ISptLogger<HeadlessService> logger,
         var headlessProfile = saveServer.GetProfile(headlessClientId)
                 ?? throw new NullReferenceException($"Could not find headlessProfile {headlessClientId}");
 
-        headlessProfile.CharacterData.PmcData.Info.Level = clientInfo.Level;
+        headlessProfile.CharacterData!.PmcData!.Info!.Level = clientInfo.Level;
     }
 
     /// <summary>

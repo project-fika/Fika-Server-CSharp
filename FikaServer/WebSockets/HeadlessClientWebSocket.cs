@@ -1,19 +1,21 @@
-﻿using FikaServer.Helpers;
+﻿using System.Collections.Concurrent;
+using System.Net.WebSockets;
+using System.Text;
+using FikaServer.Helpers;
 using FikaServer.Models.Fika.Headless;
+using FikaServer.Models.Fika.WebSocket.Notifications;
 using FikaServer.Services;
 using FikaServer.Services.Headless;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers.Ws;
-using System.Collections.Concurrent;
-using System.Net.WebSockets;
-using System.Text;
 
 namespace FikaServer.WebSockets;
 
 [Injectable(InjectionType.Singleton)]
 public class HeadlessClientWebSocket(HeadlessHelper headlessHelper, HeadlessService headlessService,
-    MatchService matchService, ISptLogger<HeadlessClientWebSocket> logger, WebhookService webhookService) : IWebSocketConnectionHandler
+    MatchService matchService, ISptLogger<HeadlessClientWebSocket> logger, WebhookService webhookService,
+    NotificationWebSocket notificationWebSocket) : IWebSocketConnectionHandler
 {
     private readonly ConcurrentDictionary<string, WebSocket> _headlessWebSockets = [];
 
@@ -29,7 +31,7 @@ public class HeadlessClientWebSocket(HeadlessHelper headlessHelper, HeadlessServ
 
     public async Task OnConnection(WebSocket ws, HttpContext context, string sessionIdContext)
     {
-        string authHeader = context.Request.Headers.Authorization.ToString();
+        var authHeader = context.Request.Headers.Authorization.ToString();
 
         if (string.IsNullOrEmpty(authHeader))
         {
@@ -37,10 +39,10 @@ public class HeadlessClientWebSocket(HeadlessHelper headlessHelper, HeadlessServ
             return;
         }
 
-        string base64EncodedString = authHeader.Split(' ')[1];
-        string decodedString = Encoding.UTF8.GetString(Convert.FromBase64String(base64EncodedString));
-        string[] authorization = decodedString.Split(':');
-        string userSessionID = authorization[0];
+        var base64EncodedString = authHeader.Split(' ')[1];
+        var decodedString = Encoding.UTF8.GetString(Convert.FromBase64String(base64EncodedString));
+        var authorization = decodedString.Split(':');
+        var userSessionID = authorization[0];
 
         logger.Debug($"[{GetSocketId()}] User is {userSessionID}");
 
@@ -63,7 +65,12 @@ public class HeadlessClientWebSocket(HeadlessHelper headlessHelper, HeadlessServ
         }
         else
         {
-            await webhookService.SendWebhookMessage($"Headless client {headlessHelper.GetHeadlessNickname(userSessionID)} has connected");
+            var name = headlessHelper.GetHeadlessNickname(userSessionID);
+            await webhookService.SendWebhookMessage($"Headless client {name} has connected");
+            await notificationWebSocket.BroadcastAsync(new HeadlessConnectedNotification
+            {
+                Name = name
+            });
         }
     }
 
@@ -75,7 +82,7 @@ public class HeadlessClientWebSocket(HeadlessHelper headlessHelper, HeadlessServ
 
     public Task OnClose(WebSocket ws, HttpContext context, string sessionIdContext)
     {
-        string userSessionID = _headlessWebSockets.FirstOrDefault(x => x.Value == ws).Key;
+        var userSessionID = _headlessWebSockets.FirstOrDefault(x => x.Value == ws).Key;
 
         if (!string.IsNullOrEmpty(userSessionID))
         {

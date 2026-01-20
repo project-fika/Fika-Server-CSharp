@@ -244,6 +244,8 @@
     "F_BepInEx_UseUPnP_D": "Intentar abrir puertos usando UPnP. Útil si no puede abrir sus puertos por sí mismo pero el router soporta UPnP.",
     "F_BepInEx_UseNatPunch_T": "Usar NAT Punching",
     "F_BepInEx_UseNatPunch_D": "Usar NAT Punching al ser anfitrión de una incursión. Solo funciona con routers de tipo Fullcone NAT y requiere que NatPunchServer se esté ejecutando en el servidor SPT. UPnP, Force IP y Force Bind IP son desactivados en este modo.",
+    "F_BepInEx_UseFikaNatPunchServer_T": "Use Fika NAT Punch server",
+    "F_BepInEx_UseFikaNatPunchServer_D": "Use the public Fika NAT Punch server. Requires Use NAT Punching setting enabled.",
     "F_BepInEx_ConnectionTimeout_T": "Connection Timeout",
     "F_BepInEx_ConnectionTimeout_D": "Cuánto tiempo se tarda en que una conexión se considere abandonada si no se han recibido paquetes.",
     "F_BepInEx_SendRate_T": "Tasa de Envío",
@@ -269,5 +271,6 @@
     "F_UI_PlayerConnected": "{0} se ha conectado",
     "F_UI_PlayerDisconnected": "{0} se ha desconectado",
     "F_UI_DisabledByServerHost": "Deshabilitado por el servidor",
-    "F_UI_ErrorRaidInit": "An error was caught during the raid initialization.\nPlease restart your client!"
+    "F_UI_ErrorRaidInit": "An error was caught during the raid initialization.\nPlease restart your client!",
+    "F_UI_HeadlessConnected": "Headless client {0} connected"
 }

@@ -1,4 +1,5 @@
-﻿using FikaServer.Helpers;
+﻿using System.Collections.Concurrent;
+using FikaServer.Helpers;
 using FikaServer.Models.Enums;
 using FikaServer.Models.Fika;
 using FikaServer.Models.Fika.Presence;
@@ -6,11 +7,9 @@ using FikaServer.Models.Fika.Routes.Raid.Create;
 using FikaServer.Services.Headless;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Common;
-using SPTarkov.Server.Core.Models.Eft.Common.Tables;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Services;
-using System.Collections.Concurrent;
 
 namespace FikaServer.Services;
 
@@ -155,14 +154,14 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
     /// settings. Cannot be null.</param>
     /// <param name="sessionId">The unique identifier of the session to associate with the new match.</param>
     /// <returns>true if the match was successfully created and registered; otherwise, false.</returns>
-    public bool CreateMatch(FikaRaidCreateRequestData data, MongoId sessionId)
+    public async Task<bool> CreateMatch(FikaRaidCreateRequestData data, MongoId sessionId)
     {
         if (Matches.ContainsKey(data.ServerId))
         {
-            DeleteMatch(data.ServerId);
+            await DeleteMatch(data.ServerId);
         }
 
-        var locationData = locationLifecycleService.GenerateLocationAndLoot(sessionId, data.Settings.Location);
+        var locationData = locationLifecycleService.GenerateLocationAndLoot(sessionId, data.Settings!.Location!);
 
         FikaMatch match = new()
         {

@@ -244,8 +244,8 @@
     "F_BepInEx_UseUPnP_D": "Tente d'ouvrir des ports en utilisant UPnP. Utile si vous ne pouvez pas ouvrir des ports vous-même alors que le routeur supporte UPnP.",
     "F_BepInEx_UseNatPunch_T": "Utiliser la traversée NAT",
     "F_BepInEx_UseNatPunch_D": "Utilise la traversée NAT lorsque vous hébergez un raid. Ne fonctionne qu'avec les routeurs de type NAT fullcone et nécessite que NatPunchServer soit exécuté sur le serveur SPT. UPnP, Forcer IP et Forcer la connexion IP sont désactivés avec ce mode.",
-    "F_BepInEx_UseFikaNatPunchServer_T": "Utiliser le serveur de traversée NAT publique de Fika",
-    "F_BepInEx_UseFikaNatPunchServer_D": "Utilise le serveur de traversée NAT publique de Fika. Le paramètre Utiliser la traversée NAT doit être activé.",
+    "F_BepInEx_UseFikaNatPunchServer_T": "Use Fika NAT Punch server",
+    "F_BepInEx_UseFikaNatPunchServer_D": "Use the public Fika NAT Punch server. Requires Use NAT Punching setting enabled.",
     "F_BepInEx_ConnectionTimeout_T": "Délai de connexion dépassé",
     "F_BepInEx_ConnectionTimeout_D": "Combien de temps faut-il pour qu'une connexion soit considérée comme abandonnée si aucun paquet réseau n'est reçu.",
     "F_BepInEx_SendRate_T": "Taux denvoi",
@@ -271,5 +271,6 @@
     "F_UI_PlayerConnected": "{0} s'est connecté",
     "F_UI_PlayerDisconnected": "{0} s'est déconnecté",
     "F_UI_DisabledByServerHost": "Désactivé par l'hôte du serveur",
-    "F_UI_ErrorRaidInit": "An error was caught during the raid initialization.\nPlease restart your client!"
+    "F_UI_ErrorRaidInit": "An error was caught during the raid initialization.\nPlease restart your client!",
+    "F_UI_HeadlessConnected": "Headless client {0} connected"
 }

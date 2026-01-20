@@ -244,6 +244,8 @@
     "F_BepInEx_UseUPnP_D": "UPnP kullanarak bağlantı noktalarını açmaya çalışın. Portları kendiniz açamıyorsanız ancak yönlendirici UPnP'yi destekliyorsa kullanışlıdır.",
     "F_BepInEx_UseNatPunch_T": "NAT Punching kullanın",
     "F_BepInEx_UseNatPunch_D": "Bir baskına ev sahipliği yaparken NAT Punching özelliğini kullanın. Sadece fullcone NAT tipi yönlendiricilerle çalışır ve SPT sunucusunda NatPunchServer'ın çalışıyor olmasını gerektirir. UPnP, Force IP ve Force Bind IP bu modda devre dışı bırakılır.",
+    "F_BepInEx_UseFikaNatPunchServer_T": "Use Fika NAT Punch server",
+    "F_BepInEx_UseFikaNatPunchServer_D": "Use the public Fika NAT Punch server. Requires Use NAT Punching setting enabled.",
     "F_BepInEx_ConnectionTimeout_T": "Bağlantı Zaman Aşımı",
     "F_BepInEx_ConnectionTimeout_D": "Hiçbir paket alınmadığında bir bağlantının düşmüş sayılması için ne kadar süre geçmesi gerektiği.",
     "F_BepInEx_SendRate_T": "Oran Gönder",
@@ -269,5 +271,6 @@
     "F_UI_PlayerConnected": "{0} bağlandı",
     "F_UI_PlayerDisconnected": "{0} bağlantısı kesildi",
     "F_UI_DisabledByServerHost": "Sunucu ana bilgisayarı tarafından devre dışı bırakıldı",
-    "F_UI_ErrorRaidInit": "An error was caught during the raid initialization.\nPlease restart your client!"
+    "F_UI_ErrorRaidInit": "An error was caught during the raid initialization.\nPlease restart your client!",
+    "F_UI_HeadlessConnected": "Headless client {0} connected"
 }
