@@ -28,11 +28,15 @@ public class ConnectionRequest
     {
         //old request
         if (connectRequest.ConnectionTime < InternalPacket.ConnectionTime)
+        {
             return;
+        }
 
         if (connectRequest.ConnectionTime == InternalPacket.ConnectionTime &&
             connectRequest.ConnectionNumber == InternalPacket.ConnectionNumber)
+        {
             return;
+        }
 
         InternalPacket = connectRequest;
     }
@@ -50,18 +54,25 @@ public class ConnectionRequest
     public LiteNetPeer AcceptIfKey(string key)
     {
         if (!TryActivate())
+        {
             return null;
+        }
+
         try
         {
             if (Data.GetString() == key)
+            {
                 Result = ConnectionRequestResult.Accept;
+            }
         }
         catch
         {
             NetDebug.WriteError("[AC] Invalid incoming data");
         }
         if (Result == ConnectionRequestResult.Accept)
+        {
             return _listener.OnConnectionSolved(this, null, 0, 0);
+        }
 
         Result = ConnectionRequestResult.Reject;
         _listener.OnConnectionSolved(this, null, 0, 0);
@@ -75,7 +86,10 @@ public class ConnectionRequest
     public LiteNetPeer Accept()
     {
         if (!TryActivate())
+        {
             return null;
+        }
+
         Result = ConnectionRequestResult.Accept;
         return _listener.OnConnectionSolved(this, null, 0, 0);
     }
@@ -83,7 +97,10 @@ public class ConnectionRequest
     public void Reject(byte[] rejectData, int start, int length, bool force)
     {
         if (!TryActivate())
+        {
             return;
+        }
+
         Result = force ? ConnectionRequestResult.RejectForce : ConnectionRequestResult.Reject;
         _listener.OnConnectionSolved(this, rejectData, start, length);
     }

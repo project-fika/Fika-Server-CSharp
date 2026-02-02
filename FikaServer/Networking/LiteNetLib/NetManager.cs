@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
 using System.Net;
 using Fika.Core.Networking.LiteNetLib.Layers;
 using Fika.Core.Networking.LiteNetLib.Utils;
@@ -76,7 +74,7 @@ public class NetManager : LiteNetManager
 
             var copiedData = new byte[packet.Size];
             Buffer.BlockCopy(packet.RawData, 0, copiedData, 0, packet.Size);
-            NtpPacket ntpPacket = NtpPacket.FromServerResponse(copiedData, DateTime.UtcNow);
+            var ntpPacket = NtpPacket.FromServerResponse(copiedData, DateTime.UtcNow);
             try
             {
                 ntpPacket.ValidateReply();
