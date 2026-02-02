@@ -1,4 +1,7 @@
-﻿using FikaServer.Models.Fika.WebSocket;
+﻿using System.Collections.Concurrent;
+using System.Net.WebSockets;
+using System.Text;
+using FikaServer.Models.Fika.WebSocket;
 using FikaServer.Services;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Common;
@@ -6,9 +9,6 @@ using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Servers.Ws;
 using SPTarkov.Server.Core.Utils;
-using System.Collections.Concurrent;
-using System.Net.WebSockets;
-using System.Text;
 
 namespace FikaServer.WebSockets;
 
@@ -29,7 +29,7 @@ public class NotificationWebSocket(SaveServer saveServer, JsonUtil jsonUtil, ISp
 
     public async Task OnConnection(WebSocket ws, HttpContext context, string sessionIdContext)
     {
-        string authHeader = context.Request.Headers.Authorization.ToString();
+        var authHeader = context.Request.Headers.Authorization.ToString();
 
         if (string.IsNullOrEmpty(authHeader))
         {
@@ -37,10 +37,10 @@ public class NotificationWebSocket(SaveServer saveServer, JsonUtil jsonUtil, ISp
             return;
         }
 
-        string base64EncodedString = authHeader.Split(' ')[1];
-        string decodedString = Encoding.UTF8.GetString(Convert.FromBase64String(base64EncodedString));
-        string[] authorization = decodedString.Split(':');
-        string userSessionID = authorization[0];
+        var base64EncodedString = authHeader.Split(' ')[1];
+        var decodedString = Encoding.UTF8.GetString(Convert.FromBase64String(base64EncodedString));
+        var authorization = decodedString.Split(':');
+        var userSessionID = authorization[0];
 
         logger.Debug($"[{GetSocketId()}] User is {userSessionID}");
 
@@ -61,7 +61,7 @@ public class NotificationWebSocket(SaveServer saveServer, JsonUtil jsonUtil, ISp
 
     public Task OnClose(WebSocket ws, HttpContext context, string sessionIdContext)
     {
-        KeyValuePair<string, WebSocket> client = clientWebSockets.Where(x => x.Value == ws).FirstOrDefault();
+        var client = clientWebSockets.Where(x => x.Value == ws).FirstOrDefault();
 
         if (client.Key != null)
         {
@@ -77,7 +77,7 @@ public class NotificationWebSocket(SaveServer saveServer, JsonUtil jsonUtil, ISp
     public async Task SendAsync<T>(MongoId sessionID, T message) where T : IFikaNotification
     {
         // Client is not online or not currently connected to the websocket.
-        if (!clientWebSockets.TryGetValue(sessionID, out WebSocket ws))
+        if (!clientWebSockets.TryGetValue(sessionID, out var ws))
         {
             return;
         }
@@ -93,7 +93,7 @@ public class NotificationWebSocket(SaveServer saveServer, JsonUtil jsonUtil, ISp
 
     public async Task BroadcastAsync<T>(T message) where T : IFikaNotification
     {
-        foreach (KeyValuePair<string, WebSocket> websocket in clientWebSockets)
+        foreach (var websocket in clientWebSockets)
         {
             await SendAsync(websocket.Key, message);
         }

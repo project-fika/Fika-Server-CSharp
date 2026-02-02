@@ -1,5 +1,5 @@
-﻿using FikaServer.Models.Enums;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
+using FikaServer.Models.Enums;
 
 namespace FikaServer.Models.Fika.Headless;
 

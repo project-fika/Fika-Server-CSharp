@@ -4,7 +4,6 @@ using SPTarkov.Server.Core.Controllers;
 using SPTarkov.Server.Core.Helpers;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Common;
-using SPTarkov.Server.Core.Models.Eft.Common.Tables;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Enums;
 using SPTarkov.Server.Core.Models.Spt.Config;
@@ -35,12 +34,12 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
 
         if (HeadlessProfiles.Count < profileAmount)
         {
-            List<SptProfile> createdProfiles = await CreateHeadlessProfiles(profileAmount);
+            var createdProfiles = await CreateHeadlessProfiles(profileAmount);
             logger.Log(SPTarkov.Server.Core.Models.Spt.Logging.LogLevel.Info, $"Created {createdProfiles.Count} headless client profiles!");
         }
 
         // Stop headless from adding up to the percentage of achievements unlocked
-        foreach (SptProfile headlessProfile in HeadlessProfiles)
+        foreach (var headlessProfile in HeadlessProfiles)
         {
             _sptCoreConfig.Features.AchievementProfileIdBlacklist.Add(headlessProfile.ProfileInfo.ProfileId);
         }
@@ -53,7 +52,7 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
         List<SptProfile> createdProfiles = [];
         for (var i = 0; i < profileAmountToCreate; i++)
         {
-            SptProfile profile = await CreateHeadlessProfile();
+            var profile = await CreateHeadlessProfile();
             createdProfiles.Add(profile);
             HeadlessProfiles.Add(profile);
             GenerateLaunchScript(profile.ProfileInfo.ProfileId.Value);
@@ -109,7 +108,7 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
         var backendUrl = configService.Config.Headless.Scripts.ForceIp;
         backendUrl = string.IsNullOrEmpty(backendUrl) ? "https://127.0.0.1:6969" : backendUrl;
 
-        if (!Uri.TryCreate(backendUrl, UriKind.Absolute, out Uri uri))
+        if (!Uri.TryCreate(backendUrl, UriKind.Absolute, out var uri))
         {
             logger.Error($"Could not parse {backendUrl} as a valid URL, please delete the headless profile and try again.");
             return;
@@ -155,7 +154,7 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
     {
         await profileController.CreateProfile(profileData, profileId);
 
-        SptProfile profile = saveServer.GetProfile(profileId)
+        var profile = saveServer.GetProfile(profileId)
             ?? throw new NullReferenceException("CreateFullProfile:: Could not find profile");
 
         ClearUnecessaryHeadlessItems(profile.CharacterData.PmcData, profileId);
@@ -184,7 +183,7 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
 
     private List<string?> GetAllHeadlessItems(PmcData pmcProfile)
     {
-        List<Item> inventoryItems = pmcProfile.Inventory?.Items ?? [];
+        var inventoryItems = pmcProfile.Inventory?.Items ?? [];
         string? equipmentRootId = pmcProfile.Inventory?.Equipment;
         string? stashRootId = pmcProfile.Inventory?.Stash;
 

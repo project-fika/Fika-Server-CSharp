@@ -1,5 +1,5 @@
-﻿using SPTarkov.Server.Core.Models.Utils;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
+using SPTarkov.Server.Core.Models.Utils;
 
 namespace FikaServer.Models.Fika.SendItem.AvailableReceivers;
 

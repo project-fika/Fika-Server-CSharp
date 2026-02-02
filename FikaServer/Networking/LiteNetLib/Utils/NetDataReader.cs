@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Runtime.CompilerServices;
 
 namespace Fika.Core.Networking.LiteNetLib.Utils;

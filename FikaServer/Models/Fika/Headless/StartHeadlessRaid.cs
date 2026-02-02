@@ -1,6 +1,6 @@
-﻿using FikaServer.Models.Enums;
+﻿using System.Diagnostics.CodeAnalysis;
+using FikaServer.Models.Enums;
 using FikaServer.Models.Fika.Routes.Headless;
-using System.Diagnostics.CodeAnalysis;
 
 namespace FikaServer.Models.Fika.Headless;
 

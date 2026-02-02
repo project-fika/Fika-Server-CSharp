@@ -1,10 +1,7 @@
-﻿using FikaServer.Models.Fika;
-using FikaServer.Models.Fika.Dialog;
-using FikaServer.Models.Fika.WebSocket;
+﻿using FikaServer.Models.Fika.WebSocket;
 using FikaServer.Services.Cache;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Common;
-using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Eft.Ws;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
@@ -35,14 +32,14 @@ public class PlayerRelationsHelper(ISptLogger<PlayerRelationsHelper> logger,
     /// <exception cref="NotImplementedException"></exception>
     public void RemoveFriend(MongoId fromProfileId, MongoId toProfileId)
     {
-        FikaPlayerRelations fromRelations = playerRelationsService.GetStoredValue(fromProfileId);
+        var fromRelations = playerRelationsService.GetStoredValue(fromProfileId);
         if (fromRelations == null)
         {
             logger.Debug($"Could not find relations for {fromProfileId}");
             return;
         }
 
-        FikaPlayerRelations toRelations = playerRelationsService.GetStoredValue(toProfileId);
+        var toRelations = playerRelationsService.GetStoredValue(toProfileId);
         if (toRelations == null)
         {
             logger.Debug($"Could not find relations for target {toProfileId}");
@@ -59,7 +56,7 @@ public class PlayerRelationsHelper(ISptLogger<PlayerRelationsHelper> logger,
             logger.Warning($"{toProfileId} tried to remove {fromProfileId} from their friend list unsuccessfully");
         }
 
-        SptProfile profile = saveServer.GetProfile(fromProfileId);
+        var profile = saveServer.GetProfile(fromProfileId);
         if (profile != null && profile.ProfileInfo != null && profile.CharacterData?.PmcData?.Info != null)
         {
             webSocketHandler.SendMessage(toProfileId, new WsFriendListRemove()
@@ -95,7 +92,7 @@ public class PlayerRelationsHelper(ISptLogger<PlayerRelationsHelper> logger,
 
     public bool RemoveFriendRequest(MongoId from, MongoId to, ERemoveFriendReason reason)
     {
-        if (!friendRequestsService.HasFriendRequest(from, to, out FriendRequestListResponse? response))
+        if (!friendRequestsService.HasFriendRequest(from, to, out var response))
         {
             logger.Error($"{from} tried to remove a friend request from {to} but it doesn't exist. Reason: {reason}");
             return false;
@@ -108,7 +105,7 @@ public class PlayerRelationsHelper(ISptLogger<PlayerRelationsHelper> logger,
         {
             case ERemoveFriendReason.Accept:
                 {
-                    SptProfile profile = saveServer.GetProfile(to);
+                    var profile = saveServer.GetProfile(to);
                     webSocketHandler.SendMessage(from, new WsFriendListRemove()
                     {
                         EventIdentifier = new(),
@@ -119,7 +116,7 @@ public class PlayerRelationsHelper(ISptLogger<PlayerRelationsHelper> logger,
                 break;
             case ERemoveFriendReason.Cancel:
                 {
-                    SptProfile profile = saveServer.GetProfile(from);
+                    var profile = saveServer.GetProfile(from);
                     webSocketHandler.SendMessage(to, new WsFriendListRemove()
                     {
                         EventIdentifier = new(),
@@ -130,7 +127,7 @@ public class PlayerRelationsHelper(ISptLogger<PlayerRelationsHelper> logger,
                 break;
             case ERemoveFriendReason.Decline:
                 {
-                    SptProfile profile = saveServer.GetProfile(to);
+                    var profile = saveServer.GetProfile(to);
                     webSocketHandler.SendMessage(from, new WsFriendListRemove()
                     {
                         EventIdentifier = new(),
@@ -151,13 +148,13 @@ public class PlayerRelationsHelper(ISptLogger<PlayerRelationsHelper> logger,
     /// <param name="to"></param>
     public void AddFriend(MongoId from, MongoId to)
     {
-        FikaPlayerRelations fromRelations = playerRelationsService.GetStoredValue(from);
+        var fromRelations = playerRelationsService.GetStoredValue(from);
         if (!fromRelations.Friends.Contains(to))
         {
             fromRelations.Friends.Add(to);
         }
 
-        FikaPlayerRelations toRelations = playerRelationsService.GetStoredValue(to);
+        var toRelations = playerRelationsService.GetStoredValue(to);
         if (!toRelations.Friends.Contains(from))
         {
             toRelations.Friends.Add(from);
@@ -168,7 +165,7 @@ public class PlayerRelationsHelper(ISptLogger<PlayerRelationsHelper> logger,
 
     public void AddToIgnoreList(MongoId from, MongoId to)
     {
-        FikaPlayerRelations fromRelations = playerRelationsService.GetStoredValue(from);
+        var fromRelations = playerRelationsService.GetStoredValue(from);
         if (fromRelations.Ignore.Contains(to))
         {
             logger.Warning($"{from} already has {to} in their ignore list");
@@ -178,7 +175,7 @@ public class PlayerRelationsHelper(ISptLogger<PlayerRelationsHelper> logger,
         fromRelations.Ignore.Add(to);
         playerRelationsService.SaveProfileRelations();
 
-        SptProfile profile = saveServer.GetProfile(from);
+        var profile = saveServer.GetProfile(from);
         ArgumentNullException.ThrowIfNull(profile);
 
         webSocketHandler.SendMessage(to, new WsIgnoreListAdd()
@@ -192,7 +189,7 @@ public class PlayerRelationsHelper(ISptLogger<PlayerRelationsHelper> logger,
 
     public void RemoveFromIgnoreList(MongoId from, MongoId to)
     {
-        FikaPlayerRelations fromRelations = playerRelationsService.GetStoredValue(from);
+        var fromRelations = playerRelationsService.GetStoredValue(from);
         if (!fromRelations.Ignore.Remove(to))
         {
             logger.Warning($"{from} tried to remove {to} from their ignore list but it was unsuccesful");
@@ -201,7 +198,7 @@ public class PlayerRelationsHelper(ISptLogger<PlayerRelationsHelper> logger,
 
         playerRelationsService.SaveProfileRelations();
 
-        SptProfile profile = saveServer.GetProfile(from);
+        var profile = saveServer.GetProfile(from);
         ArgumentNullException.ThrowIfNull(profile);
 
         webSocketHandler.SendMessage(to, new WsIgnoreListAdd()

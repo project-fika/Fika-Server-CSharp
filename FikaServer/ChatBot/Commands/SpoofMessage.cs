@@ -1,4 +1,5 @@
-﻿using FikaServer.Services;
+﻿using System.Text.RegularExpressions;
+using FikaServer.Services;
 using FikaServer.Services.Cache;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Common;
@@ -7,7 +8,6 @@ using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Enums;
 using SPTarkov.Server.Core.Services;
 using SPTarkov.Server.Core.Utils;
-using System.Text.RegularExpressions;
 
 namespace FikaServer.ChatBot.Commands;
 
@@ -37,7 +37,7 @@ public partial class SpoofMessage(ConfigService configService, MailSendService m
     public ValueTask<string> PerformAction(UserDialogInfo commandHandler, MongoId sessionId, SendMessageRequest request)
     {
         ValueTask<string> value = new(request.DialogId);
-        bool isAdmin = configService.Config.Server.AdminIds.Contains(sessionId);
+        var isAdmin = configService.Config.Server.AdminIds.Contains(sessionId);
         if (!isAdmin)
         {
             mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
@@ -45,8 +45,8 @@ public partial class SpoofMessage(ConfigService configService, MailSendService m
             return value;
         }
 
-        string text = request.Text;
-        Match match = SpoofMessageCommandRegex().Match(text);
+        var text = request.Text;
+        var match = SpoofMessageCommandRegex().Match(text);
         if (!match.Success)
         {
             mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
@@ -54,21 +54,21 @@ public partial class SpoofMessage(ConfigService configService, MailSendService m
             return value;
         }
 
-        string nickname = match.Groups[1].Value;
-        string user = match.Groups[2].Value;
-        string message = match.Groups[3].Value;
+        var nickname = match.Groups[1].Value;
+        var user = match.Groups[2].Value;
+        var message = match.Groups[3].Value;
 
         mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
             $"'{nickname}' been sent the spoofed message:\n{message}");
 
-        MemberCategory memberCategory = MemberCategory.Default;
+        var memberCategory = MemberCategory.Default;
         Array values = Enum.GetValues<MemberCategory>();
         if (values.Length > 0)
         {
             memberCategory = (MemberCategory)values?.GetValue(Random.Shared.Next(values.Length));
         }
 
-        SptProfile? profile = fikaProfileService.GetProfileByNickname(nickname);
+        var profile = fikaProfileService.GetProfileByNickname(nickname);
         mailSendService.SendUserMessageToPlayer(profile.ProfileInfo.ProfileId.GetValueOrDefault(), new()
         {
             Aid = hashUtil.GenerateAccountId(),

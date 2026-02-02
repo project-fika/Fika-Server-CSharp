@@ -1,12 +1,12 @@
-﻿using FikaServer.Models.Fika.Config;
+﻿using System.Reflection;
+using System.Security.Cryptography;
+using FikaServer.Models.Fika.Config;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Helpers;
 using SPTarkov.Server.Core.Models.Spt.Config;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Utils;
-using System.Reflection;
-using System.Security.Cryptography;
 
 namespace FikaServer.Services;
 
@@ -42,7 +42,7 @@ public class ConfigService(ISptLogger<ConfigService> logger, ConfigServer config
             Directory.CreateDirectory(_configFolderPath);
         }
 
-        string configPath = Path.Combine(_configFolderPath, "fika.jsonc");
+        var configPath = Path.Combine(_configFolderPath, "fika.jsonc");
 
         Config = await jsonUtil.DeserializeFromFileAsync<FikaConfig>(configPath) ?? new();
 
@@ -65,7 +65,7 @@ public class ConfigService(ISptLogger<ConfigService> logger, ConfigServer config
 
     private static Task<string> GenerateAPIKey(int size = 32)
     {
-        byte[] keyBytes = RandomNumberGenerator.GetBytes(size);
+        var keyBytes = RandomNumberGenerator.GetBytes(size);
         return Task.FromResult(Convert.ToBase64String(keyBytes)
                      .Replace("+", "")
                      .Replace("/", "")
@@ -81,8 +81,8 @@ public class ConfigService(ISptLogger<ConfigService> logger, ConfigServer config
     {
         logger.Info("[Fika Server] Overriding SPT configuration");
 
-        CoreConfig coreConfig = configServer.GetConfig<CoreConfig>();
-        HttpConfig httpConfig = configServer.GetConfig<HttpConfig>();
+        var coreConfig = configServer.GetConfig<CoreConfig>();
+        var httpConfig = configServer.GetConfig<HttpConfig>();
 
         if (config.DisableSPTChatBots)
         {

@@ -30,7 +30,7 @@ public class AdminSettings(ConfigService configService, NotificationWebSocket no
 
     public async ValueTask<string> PerformAction(UserDialogInfo commandHandler, MongoId sessionId, SendMessageRequest request)
     {
-        bool isAdmin = configService.Config.Server.AdminIds.Contains(sessionId);
+        var isAdmin = configService.Config.Server.AdminIds.Contains(sessionId);
         await notificationWebSocket.SendAsync(sessionId, new OpenAdminMenuNotification(isAdmin));
 
         mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,

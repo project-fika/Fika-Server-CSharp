@@ -19,8 +19,8 @@ public class UploadProfilesController(JsonUtil jsonUtil,
         {
             using (StreamReader sr = new(Request.Body))
             {
-                string rawData = await sr.ReadToEndAsync();
-                SptProfile? profile = jsonUtil.Deserialize<SptProfile>(rawData);
+                var rawData = await sr.ReadToEndAsync();
+                var profile = jsonUtil.Deserialize<SptProfile>(rawData);
 
                 if (profile != null)
                 {

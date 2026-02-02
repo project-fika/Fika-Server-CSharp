@@ -1,4 +1,4 @@
-﻿using FikaServer.Models.Fika.Config;
+﻿using System.Reflection;
 using FikaServer.Services;
 using SPTarkov.Reflection.Patching;
 using SPTarkov.Server.Core.Controllers;
@@ -7,7 +7,6 @@ using SPTarkov.Server.Core.Helpers;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Launcher;
 using SPTarkov.Server.Core.Models.Eft.Profile;
-using System.Reflection;
 
 namespace FikaServer.Overrides.Services;
 
@@ -21,7 +20,7 @@ public class GetMiniProfilesOverride : AbstractPatch
     [PatchPrefix]
     public static bool Prefix(ref List<MiniProfile> __result)
     {
-        FikaConfig fikaConfig = ServiceLocator.ServiceProvider.GetService<ConfigService>()?.Config ?? throw new NullReferenceException("FikaConfig is null!");
+        var fikaConfig = ServiceLocator.ServiceProvider.GetService<ConfigService>()?.Config ?? throw new NullReferenceException("FikaConfig is null!");
 
         if (!fikaConfig.Server.LauncherListAllProfiles)
         {
@@ -45,14 +44,14 @@ public class GetFriendsOverride : AbstractPatch
     [PatchPrefix]
     public static bool Prefix(SearchProfilesRequestData request, MongoId sessionID, ref List<SearchFriendResponse> __result)
     {
-        string searchNickname = request.Nickname.ToLower();
+        var searchNickname = request.Nickname.ToLower();
 
-        ProfileHelper profileHelper = ServiceLocator.ServiceProvider.GetService<ProfileHelper>() ?? throw new NullReferenceException("ProfileHelper is null!");
+        var profileHelper = ServiceLocator.ServiceProvider.GetService<ProfileHelper>() ?? throw new NullReferenceException("ProfileHelper is null!");
 
-        Dictionary<MongoId, SptProfile> profiles = profileHelper.GetProfiles();
+        var profiles = profileHelper.GetProfiles();
         List<SearchFriendResponse> friends = [];
 
-        foreach (SptProfile profile in profiles.Values)
+        foreach (var profile in profiles.Values)
         {
             if (profile.IsHeadlessProfile())
             {

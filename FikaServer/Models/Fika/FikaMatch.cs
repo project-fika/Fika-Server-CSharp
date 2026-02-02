@@ -1,8 +1,8 @@
-﻿using FikaServer.Models.Enums;
+﻿using System.Text.Json.Serialization;
+using FikaServer.Models.Enums;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Common;
 using SPTarkov.Server.Core.Models.Eft.Match;
-using System.Text.Json.Serialization;
 
 namespace FikaServer.Models.Fika;
 

@@ -1,11 +1,10 @@
-﻿using FikaServer.Models.Fika;
+﻿using System.Reflection;
 using FikaServer.Services;
 using SPTarkov.Reflection.Patching;
 using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Match;
 using SPTarkov.Server.Core.Services;
-using System.Reflection;
 using InsuranceService = FikaServer.Services.InsuranceService;
 
 namespace FikaServer.Overrides.Services;
@@ -20,8 +19,8 @@ public class EndLocalRaidOverride : AbstractPatch
     [PatchPrefix]
     public static bool Prefix(MongoId sessionId, EndLocalRaidRequestData request)
     {
-        MatchService matchService = ServiceLocator.ServiceProvider.GetService<MatchService>() ?? throw new NullReferenceException("MatchService is null!");
-        InsuranceService insuranceService = ServiceLocator.ServiceProvider.GetService<InsuranceService>() ?? throw new NullReferenceException("InsuranceService is null!");
+        var matchService = ServiceLocator.ServiceProvider.GetService<MatchService>() ?? throw new NullReferenceException("MatchService is null!");
+        var insuranceService = ServiceLocator.ServiceProvider.GetService<InsuranceService>() ?? throw new NullReferenceException("InsuranceService is null!");
 
         // Get match id from player session id
         string? matchId = matchService.GetMatchIdByPlayer(sessionId);
@@ -32,7 +31,7 @@ public class EndLocalRaidOverride : AbstractPatch
         }
 
         // Find player that exited the raid
-        FikaPlayer? player = matchService.GetPlayerInMatch(matchId, sessionId);
+        var player = matchService.GetPlayerInMatch(matchId, sessionId);
 
         if (player != null)
         {

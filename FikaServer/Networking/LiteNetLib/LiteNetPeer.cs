@@ -1,11 +1,8 @@
 ﻿#if DEBUG
 #define STATS_ENABLED
 #endif
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
-using System.Threading;
 using Fika.Core.Networking.LiteNetLib.Utils;
 
 namespace Fika.Core.Networking.LiteNetLib;

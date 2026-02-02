@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
@@ -87,8 +85,8 @@ public static class NetUtils
     /// <param name="addrType">type of address (IPv4, IPv6 or both)</param>
     public static void GetLocalIpList(IList<string> targetList, LocalAddrType addrType)
     {
-        bool ipv4 = (addrType & LocalAddrType.IPv4) == LocalAddrType.IPv4;
-        bool ipv6 = (addrType & LocalAddrType.IPv6) == LocalAddrType.IPv6;
+        var ipv4 = (addrType & LocalAddrType.IPv4) == LocalAddrType.IPv4;
+        var ipv6 = (addrType & LocalAddrType.IPv6) == LocalAddrType.IPv6;
         try
         {
             // Sort networks interfaces so it prefer Wifi over Cellular networks

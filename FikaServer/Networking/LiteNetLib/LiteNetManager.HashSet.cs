@@ -1,6 +1,4 @@
-﻿using System;
-using System.Net;
-using System.Threading;
+﻿using System.Net;
 
 namespace Fika.Core.Networking.LiteNetLib;
 
@@ -253,7 +251,7 @@ public partial class LiteNetManager
         {
 #if NET8_0_OR_GREATER
             //can be NetPeer or IPEndPoint
-            int hashCode = (UseNativeSockets ? endPoint.GetHashCode() : endPoint.Serialize().GetHashCode()) & Lower31BitMask;
+            var hashCode = (UseNativeSockets ? endPoint.GetHashCode() : endPoint.Serialize().GetHashCode()) & Lower31BitMask;
 #else
             var hashCode = endPoint.GetHashCode() & Lower31BitMask;
 #endif

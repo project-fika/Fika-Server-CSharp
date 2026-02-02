@@ -1,4 +1,5 @@
-﻿using FikaServer.Models.Fika.WebSocket.Notifications;
+﻿using System.Text.RegularExpressions;
+using FikaServer.Models.Fika.WebSocket.Notifications;
 using FikaServer.Services;
 using FikaServer.Services.Cache;
 using SPTarkov.DI.Annotations;
@@ -9,7 +10,6 @@ using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Eft.Ws;
 using SPTarkov.Server.Core.Servers.Ws;
 using SPTarkov.Server.Core.Services;
-using System.Text.RegularExpressions;
 
 namespace FikaServer.ChatBot.Commands;
 
@@ -39,8 +39,8 @@ public partial class SendMessage(ConfigService configService, MailSendService ma
 
     public ValueTask<string> PerformAction(UserDialogInfo commandHandler, MongoId sessionId, SendMessageRequest request)
     {
-        string value = request.DialogId;
-        bool isAdmin = configService.Config.Server.AdminIds.Contains(sessionId);
+        var value = request.DialogId;
+        var isAdmin = configService.Config.Server.AdminIds.Contains(sessionId);
         if (!isAdmin)
         {
             mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
@@ -49,8 +49,8 @@ public partial class SendMessage(ConfigService configService, MailSendService ma
         }
 
 
-        string text = request.Text;
-        Match match = SendMessageCommandRegex().Match(text);
+        var text = request.Text;
+        var match = SendMessageCommandRegex().Match(text);
         if (!match.Success)
         {
             mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
@@ -58,8 +58,8 @@ public partial class SendMessage(ConfigService configService, MailSendService ma
             return new(value);
         }
 
-        string nickname = match.Groups[1].Value;
-        string message = match.Groups[2].Value;
+        var nickname = match.Groups[1].Value;
+        var message = match.Groups[2].Value;
 
         if (nickname == "all")
         {
@@ -77,7 +77,7 @@ public partial class SendMessage(ConfigService configService, MailSendService ma
         mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
             $"'{nickname}' has been sent the message:\n{message}");
 
-        SptProfile? profile = fikaProfileService.GetProfileByNickname(nickname);
+        var profile = fikaProfileService.GetProfileByNickname(nickname);
         sendHelper.SendMessage(profile.ProfileInfo.ProfileId.GetValueOrDefault(), new SendMessageNotification(message)
         {
             EventType = NotificationEventType.tournamentWarning,

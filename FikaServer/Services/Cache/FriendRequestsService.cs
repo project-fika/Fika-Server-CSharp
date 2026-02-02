@@ -36,7 +36,7 @@ public class FriendRequestsService(
             Directory.CreateDirectory(_friendRequestsFullPath);
         }
 
-        string file = $"{_friendRequestsFullPath}/friendRequests.json";
+        var file = $"{_friendRequestsFullPath}/friendRequests.json";
         if (!File.Exists(file))
         {
             await SaveFriendRequests();
@@ -45,7 +45,7 @@ public class FriendRequestsService(
         {
             try
             {
-                string data = File.ReadAllText(file);
+                var data = File.ReadAllText(file);
                 _friendRequests = await jsonUtil.DeserializeFromFileAsync<List<FriendRequestListResponse>>(file);
             }
             catch (Exception ex)

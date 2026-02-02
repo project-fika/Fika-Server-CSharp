@@ -27,9 +27,9 @@ public class FikaProfileService(ISptLogger<FikaProfileService> logger, SaveServe
 
     public MongoId? GetProfileIdByNickname(string nickname)
     {
-        Dictionary<string, MongoId> profiles = GetAllProfiles();
+        var profiles = GetAllProfiles();
 
-        if (profiles.TryGetValue(nickname, out MongoId foundId))
+        if (profiles.TryGetValue(nickname, out var foundId))
         {
             return foundId;
         }
@@ -47,11 +47,11 @@ public class FikaProfileService(ISptLogger<FikaProfileService> logger, SaveServe
 
     public SptProfile? GetProfileByNickname(string nickname)
     {
-        Dictionary<string, MongoId> profiles = GetAllProfiles();
+        var profiles = GetAllProfiles();
 
-        if (profiles.TryGetValue(nickname, out MongoId foundId))
+        if (profiles.TryGetValue(nickname, out var foundId))
         {
-            SptProfile profile = saveServer.GetProfile(foundId);
+            var profile = saveServer.GetProfile(foundId);
             if (profile != null)
             {
                 return profile;
@@ -62,7 +62,7 @@ public class FikaProfileService(ISptLogger<FikaProfileService> logger, SaveServe
             RefreshProfiles();
             if (profiles.TryGetValue(nickname, out foundId))
             {
-                SptProfile profile = saveServer.GetProfile(foundId);
+                var profile = saveServer.GetProfile(foundId);
                 if (profile != null)
                 {
                     return profile;
@@ -76,15 +76,15 @@ public class FikaProfileService(ISptLogger<FikaProfileService> logger, SaveServe
     private void RefreshProfiles()
     {
         _profiles.Clear();
-        Dictionary<MongoId, SptProfile> profiles = saveServer.GetProfiles();
-        foreach ((MongoId id, SptProfile profile) in profiles)
+        var profiles = saveServer.GetProfiles();
+        foreach ((var id, var profile) in profiles)
         {
             if (!profile.HasProfileData())
             {
                 continue;
             }
 
-            string? nick = profile?.CharacterData?.PmcData?.Info?.Nickname;
+            var nick = profile?.CharacterData?.PmcData?.Info?.Nickname;
             if (!string.IsNullOrEmpty(nick))
             {
                 if (!_profiles.TryAdd(nick, id))

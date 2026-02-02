@@ -1,4 +1,5 @@
-﻿using FikaServer.Models.Fika.WebSocket.Notifications;
+﻿using System.Text.RegularExpressions;
+using FikaServer.Models.Fika.WebSocket.Notifications;
 using FikaServer.Services;
 using FikaServer.Services.Cache;
 using SPTarkov.DI.Annotations;
@@ -10,7 +11,6 @@ using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Eft.Ws;
 using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Services;
-using System.Text.RegularExpressions;
 
 namespace FikaServer.ChatBot.Commands;
 
@@ -39,8 +39,8 @@ public partial class RemoveFleaBan(ConfigService configService, MailSendService 
 
     public async ValueTask<string> PerformAction(UserDialogInfo commandHandler, MongoId sessionId, SendMessageRequest request)
     {
-        string value = request.DialogId;
-        bool isAdmin = configService.Config.Server.AdminIds.Contains(sessionId);
+        var value = request.DialogId;
+        var isAdmin = configService.Config.Server.AdminIds.Contains(sessionId);
         if (!isAdmin)
         {
             mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
@@ -48,7 +48,7 @@ public partial class RemoveFleaBan(ConfigService configService, MailSendService 
             return value;
         }
 
-        string text = request.Text;
+        var text = request.Text;
         if (!RemoveFleaBanCommandRegex().IsMatch(text))
         {
             mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
@@ -56,9 +56,9 @@ public partial class RemoveFleaBan(ConfigService configService, MailSendService 
             return value;
         }
 
-        string[] split = text.Split(' ');
-        string nickname = split[2];
-        SptProfile? profile = fikaProfileService.GetProfileByNickname(nickname);
+        var split = text.Split(' ');
+        var nickname = split[2];
+        var profile = fikaProfileService.GetProfileByNickname(nickname);
         if (!profile.HasProfileData())
         {
             mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
@@ -66,7 +66,7 @@ public partial class RemoveFleaBan(ConfigService configService, MailSendService 
             return value;
         }
 
-        IEnumerable<Ban>? bans = profile.CharacterData.PmcData.Info.Bans;
+        var bans = profile.CharacterData.PmcData.Info.Bans;
         if (bans == null || !bans.Any(b => b.BanType == BanType.RagFair))
         {
             mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,

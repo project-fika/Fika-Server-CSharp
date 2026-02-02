@@ -1,6 +1,4 @@
-﻿using FikaServer.Models.Enums;
-using FikaServer.Models.Fika.Dialog;
-using FikaServer.Models.Fika.Presence;
+﻿using FikaServer.Models.Fika.Dialog;
 using SPTarkov.Server.Core.Models.Eft.Common;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Enums;

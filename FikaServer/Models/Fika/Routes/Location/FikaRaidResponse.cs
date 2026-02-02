@@ -1,6 +1,6 @@
-﻿using FikaServer.Models.Enums;
+﻿using System.Text.Json.Serialization;
+using FikaServer.Models.Enums;
 using SPTarkov.Server.Core.Models.Common;
-using System.Text.Json.Serialization;
 
 namespace FikaServer.Models.Fika.Routes.Location;
 

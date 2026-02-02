@@ -1,6 +1,6 @@
-﻿using FikaServer.Models.Fika.Headless;
+﻿using System.Text.Json.Serialization;
+using FikaServer.Models.Fika.Headless;
 using SPTarkov.Server.Core.Models.Common;
-using System.Text.Json.Serialization;
 
 namespace FikaServer.Models.Fika.Routes.Headless;
 

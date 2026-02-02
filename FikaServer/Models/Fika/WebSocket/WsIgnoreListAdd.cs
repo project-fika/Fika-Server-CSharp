@@ -1,7 +1,7 @@
-﻿using FikaServer.Models.Fika.Dialog;
+﻿using System.Text.Json.Serialization;
+using FikaServer.Models.Fika.Dialog;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Ws;
-using System.Text.Json.Serialization;
 
 namespace FikaServer.Models.Fika.WebSocket;
 

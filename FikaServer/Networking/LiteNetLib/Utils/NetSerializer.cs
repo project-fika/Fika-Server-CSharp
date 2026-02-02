@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -626,7 +624,7 @@ public class NetSerializer
 #if NET5_0_OR_GREATER
     [DynamicallyAccessedMembers(Trimming.SerializerMemberTypes)]
 #endif
-        T>()
+    T>()
     {
         if (ClassInfo<T>.Instance != null)
         {

@@ -1,5 +1,4 @@
-﻿using FikaServer.Models.Fika.Config;
-using FikaServer.Models.Fika.Routes.Admin;
+﻿using FikaServer.Models.Fika.Routes.Admin;
 using FikaServer.Services;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Common;
@@ -33,7 +32,7 @@ public class AdminController(ConfigService configService, ISptLogger<AdminContro
             return new(false);
         }
 
-        FikaConfigClient client = configService.Config.Client;
+        var client = configService.Config.Client;
 
         client.FriendlyFire = adminSetSettingsRequest.FriendlyFire;
         client.AllowFreeCam = adminSetSettingsRequest.FreeCam;

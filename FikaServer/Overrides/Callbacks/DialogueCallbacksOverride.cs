@@ -1,4 +1,5 @@
-﻿using FikaServer.Controllers;
+﻿using System.Reflection;
+using FikaServer.Controllers;
 using SPTarkov.Reflection.Patching;
 using SPTarkov.Server.Core.Callbacks;
 using SPTarkov.Server.Core.DI;
@@ -6,7 +7,6 @@ using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Common;
 using SPTarkov.Server.Core.Models.Eft.Common.Request;
 using SPTarkov.Server.Core.Models.Eft.Dialog;
-using System.Reflection;
 
 namespace FikaServer.Overrides.Callbacks;
 
@@ -21,7 +21,7 @@ public class ListInboxOverride : AbstractPatch
     [PatchPrefix]
     public static bool Prefix(string url, EmptyRequestData _, MongoId sessionID, ref ValueTask<string> __result)
     {
-        FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
+        var dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
             ?? throw new NullReferenceException("Could not get DialogueController");
 
         __result = dialogueController.ListInbox(sessionID);
@@ -40,7 +40,7 @@ public class ListOutboxOverride : AbstractPatch
     [PatchPrefix]
     public static bool Prefix(string url, EmptyRequestData _, MongoId sessionID, ref ValueTask<string> __result)
     {
-        FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
+        var dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
             ?? throw new NullReferenceException("Could not get DialogueController");
 
         __result = dialogueController.ListOutBox(sessionID);
@@ -59,7 +59,7 @@ public class SendFriendRequestOverride : AbstractPatch
     [PatchPrefix]
     public static bool Prefix(string url, FriendRequestData request, MongoId sessionID, ref ValueTask<string> __result)
     {
-        FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
+        var dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
             ?? throw new NullReferenceException("Could not get DialogueController");
 
         __result = dialogueController.SendFriendRequest(sessionID, request.To.Value);
@@ -78,7 +78,7 @@ public class AcceptAllFriendRequestsOverride : AbstractPatch
     [PatchPrefix]
     public static bool Prefix(string url, EmptyRequestData _, MongoId sessionID, ref ValueTask<string> __result)
     {
-        FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
+        var dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
             ?? throw new NullReferenceException("Could not get DialogueController");
 
         __result = dialogueController.AcceptAllFriendRequests(sessionID);
@@ -97,7 +97,7 @@ public class AcceptFriendRequestOverride : AbstractPatch
     [PatchPrefix]
     public static bool Prefix(AcceptFriendRequestData request, MongoId sessionID, ref ValueTask<string> __result)
     {
-        FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
+        var dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
             ?? throw new NullReferenceException("Could not get DialogueController");
 
         __result = dialogueController.AcceptFriendRequest(sessionID, request);
@@ -116,7 +116,7 @@ public class DeclineFriendRequestOverride : AbstractPatch
     [PatchPrefix]
     public static bool Prefix(string url, DeclineFriendRequestData request, MongoId sessionID, ref ValueTask<string> __result)
     {
-        FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
+        var dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
             ?? throw new NullReferenceException("Could not get DialogueController");
 
         __result = dialogueController.DeclineFriendRequest(request.ProfileId, sessionID);
@@ -135,7 +135,7 @@ public class CancelFriendRequestOverride : AbstractPatch
     [PatchPrefix]
     public static bool Prefix(string url, CancelFriendRequestData request, MongoId sessionID, ref ValueTask<string> __result)
     {
-        FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
+        var dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
             ?? throw new NullReferenceException("Could not get DialogueController");
 
         __result = dialogueController.CancelFriendRequest(sessionID, request.ProfileId);
@@ -154,7 +154,7 @@ public class DeleteFriendOverride : AbstractPatch
     [PatchPrefix]
     public static bool Prefix(string url, DeleteFriendRequest request, MongoId sessionID, ref ValueTask<string> __result)
     {
-        FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
+        var dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
             ?? throw new NullReferenceException("Could not get DialogueController");
 
         __result = dialogueController.DeleteFriend(sessionID, request.FriendId);
@@ -173,7 +173,7 @@ public class IgnoreFriendOverride : AbstractPatch
     [PatchPrefix]
     public static bool Prefix(UIDRequestData request, MongoId sessionID, ref ValueTask<string> __result)
     {
-        FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
+        var dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
             ?? throw new NullReferenceException("Could not get DialogueController");
 
         __result = dialogueController.IgnoreFriend(sessionID, request.Uid);
@@ -192,7 +192,7 @@ public class UnIgnoreFriendOverride : AbstractPatch
     [PatchPrefix]
     public static bool Prefix(UIDRequestData request, MongoId sessionID, ref ValueTask<string> __result)
     {
-        FikaDialogueController dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
+        var dialogueController = ServiceLocator.ServiceProvider.GetService<FikaDialogueController>()
             ?? throw new NullReferenceException("Could not get DialogueController");
 
         __result = dialogueController.UnIgnoreFriend(sessionID, request.Uid);

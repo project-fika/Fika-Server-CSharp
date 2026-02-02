@@ -1,12 +1,12 @@
-﻿using FikaServer.Models.Fika.Headless;
+﻿using System.Collections.Concurrent;
+using System.Net.WebSockets;
+using System.Text;
+using FikaServer.Models.Fika.Headless;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Servers.Ws;
 using SPTarkov.Server.Core.Utils;
-using System.Collections.Concurrent;
-using System.Net.WebSockets;
-using System.Text;
 
 namespace FikaServer.WebSockets;
 
@@ -27,7 +27,7 @@ public class HeadlessRequesterWebSocket(SaveServer saveServer, JsonUtil jsonUtil
 
     public async Task OnConnection(WebSocket ws, HttpContext context, string sessionIdContext)
     {
-        string authHeader = context.Request.Headers.Authorization.ToString();
+        var authHeader = context.Request.Headers.Authorization.ToString();
 
         if (string.IsNullOrEmpty(authHeader))
         {
@@ -35,10 +35,10 @@ public class HeadlessRequesterWebSocket(SaveServer saveServer, JsonUtil jsonUtil
             return;
         }
 
-        string base64EncodedString = authHeader.Split(' ')[1];
-        string decodedString = Encoding.UTF8.GetString(Convert.FromBase64String(base64EncodedString));
-        string[] authorization = decodedString.Split(':');
-        string userSessionID = authorization[0];
+        var base64EncodedString = authHeader.Split(' ')[1];
+        var decodedString = Encoding.UTF8.GetString(Convert.FromBase64String(base64EncodedString));
+        var authorization = decodedString.Split(':');
+        var userSessionID = authorization[0];
 
         logger.Debug($"[{GetSocketId()}] User is {userSessionID}");
 
@@ -59,7 +59,7 @@ public class HeadlessRequesterWebSocket(SaveServer saveServer, JsonUtil jsonUtil
 
     public Task OnClose(WebSocket ws, HttpContext context, string sessionIdContext)
     {
-        string userSessionID = requesterWebSockets.FirstOrDefault(x => x.Value == ws).Key;
+        var userSessionID = requesterWebSockets.FirstOrDefault(x => x.Value == ws).Key;
 
         if (!string.IsNullOrEmpty(userSessionID))
         {
@@ -74,7 +74,7 @@ public class HeadlessRequesterWebSocket(SaveServer saveServer, JsonUtil jsonUtil
     public async Task SendAsync<T>(string sessionID, T message) where T : IHeadlessWSMessage
     {
         // Client is not online or not currently connected to the websocket.
-        if (!requesterWebSockets.TryGetValue(sessionID, out WebSocket ws))
+        if (!requesterWebSockets.TryGetValue(sessionID, out var ws))
         {
             logger.Warning($"[{GetSocketId()}] Requester ({sessionID}) is not connected yet?");
             return;

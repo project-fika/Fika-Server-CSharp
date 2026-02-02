@@ -24,7 +24,7 @@ public class RequireApiKeyAttribute : Attribute, IAsyncAuthorizationFilter
             return;
         }
 
-        string? token = authHeader.Count > 0 ? authHeader[0] : null;
+        var token = authHeader.Count > 0 ? authHeader[0] : null;
 
         if (string.IsNullOrEmpty(token) ||
             !token.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
