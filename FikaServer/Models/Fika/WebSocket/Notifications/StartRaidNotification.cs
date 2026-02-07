@@ -1,5 +1,5 @@
-﻿using FikaServer.Models.Enums;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
+using FikaServer.Models.Enums;
 
 namespace FikaServer.Models.Fika.WebSocket.Notifications;
 

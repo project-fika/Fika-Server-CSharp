@@ -1,6 +1,6 @@
-﻿using SPTarkov.Server.Core.Models.Eft.Profile;
+﻿using System.Text.Json.Serialization;
+using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Utils;
-using System.Text.Json.Serialization;
 
 namespace FikaServer.Models.Fika.Routes.Client;
 

@@ -38,8 +38,8 @@ public class FleaBanController(SaveServer saveServer, TimeUtil timeUtil, Notific
             return NotFound("Profile not found.");
         }
 
-        int days = request.AmountOfDays == 0 ? 9999 : request.AmountOfDays;
-        long banTime = timeUtil.GetTimeStampFromNowDays(days);
+        var days = request.AmountOfDays == 0 ? 9999 : request.AmountOfDays;
+        var banTime = timeUtil.GetTimeStampFromNowDays(days);
 
         profile.CharacterData.PmcData.Info.Bans = (profile.CharacterData.PmcData.Info.Bans ?? [])
         .Append(new Ban()

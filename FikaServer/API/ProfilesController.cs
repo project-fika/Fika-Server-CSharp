@@ -2,7 +2,6 @@
 using FikaShared.Responses;
 using Microsoft.AspNetCore.Mvc;
 using SPTarkov.Server.Core.Models.Eft.Common.Tables;
-using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Servers;
 
 namespace FikaServer.API;
@@ -16,7 +15,7 @@ public class ProfilesController(SaveServer saveServer) : ControllerBase
     {
         var profiles = saveServer.GetProfiles().Values;
         List<ProfileResponse> profilesResponse = [];
-        foreach (SptProfile profile in profiles)
+        foreach (var profile in profiles)
         {
             profilesResponse.Add(new()
             {

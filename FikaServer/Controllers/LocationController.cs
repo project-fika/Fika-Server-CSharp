@@ -1,5 +1,4 @@
 ﻿using FikaServer.Helpers;
-using FikaServer.Models.Fika;
 using FikaServer.Models.Fika.Routes.Location;
 using FikaServer.Services;
 using SPTarkov.DI.Annotations;
@@ -21,16 +20,16 @@ public class LocationController(MatchService matchService, HeadlessHelper headle
     {
         List<FikaRaidResponse> matches = [];
 
-        foreach ((MongoId serverId, FikaMatch match) in matchService.Matches)
+        foreach ((var serverId, var match) in matchService.Matches)
         {
             Dictionary<MongoId, bool> players = [];
 
-            foreach ((MongoId playerId, FikaPlayer player) in match.Players)
+            foreach ((var playerId, var player) in match.Players)
             {
                 players[playerId] = player.IsDead;
             }
 
-            string hostUsername = match.HostUsername;
+            var hostUsername = match.HostUsername;
             if (match.IsHeadless)
             {
                 hostUsername = headlessHelper.GetHeadlessNickname(serverId);

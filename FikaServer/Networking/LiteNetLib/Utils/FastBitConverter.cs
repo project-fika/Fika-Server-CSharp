@@ -1,6 +1,4 @@
-﻿using System;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.CompilerServices;
 
 namespace Fika.Core.Networking.LiteNetLib.Utils;
 
@@ -42,7 +40,10 @@ public static class FastBitConverter
     public static void GetBytes<T>(byte[] bytes, int startIndex, T value) where T : unmanaged
     {
         if (bytes.Length < startIndex + Unsafe.SizeOf<T>())
+        {
             ThrowIndexOutOfRangeException();
+        }
+
         Unsafe.As<byte, T>(ref bytes[startIndex]) = value;
     }
 #endif
@@ -124,14 +125,14 @@ public static class FastBitConverter
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void GetBytes(byte[] bytes, int startIndex, double value)
     {
-        ConverterHelperDouble ch = new ConverterHelperDouble { Adouble = value };
+        var ch = new ConverterHelperDouble { Adouble = value };
         WriteLittleEndian(bytes, startIndex, ch.Along);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void GetBytes(byte[] bytes, int startIndex, float value)
     {
-        ConverterHelperFloat ch = new ConverterHelperFloat { Afloat = value };
+        var ch = new ConverterHelperFloat { Afloat = value };
         WriteLittleEndian(bytes, startIndex, ch.Aint);
     }
 

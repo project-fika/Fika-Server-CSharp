@@ -1,11 +1,10 @@
-﻿using FikaServer.Models.Fika;
+﻿using System.Collections.Concurrent;
+using FikaServer.Models.Fika;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Helpers;
 using SPTarkov.Server.Core.Models.Common;
-using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Utils;
-using System.Collections.Concurrent;
 
 namespace FikaServer.Services.Cache;
 
@@ -38,7 +37,7 @@ public class PlayerRelationsService(ProfileHelper profileHelper, ConfigService F
             Directory.CreateDirectory(_playerRelationsFullPath);
         }
 
-        string file = $"{_playerRelationsFullPath}/playerRelations.json";
+        var file = $"{_playerRelationsFullPath}/playerRelations.json";
         if (!File.Exists(file))
         {
             await SaveProfileRelationsAsync();
@@ -51,12 +50,12 @@ public class PlayerRelationsService(ProfileHelper profileHelper, ConfigService F
 
     public async Task OnPostLoad()
     {
-        Dictionary<MongoId, SptProfile> profiles = profileHelper.GetProfiles();
-        bool shouldSave = false;
+        var profiles = profileHelper.GetProfiles();
+        var shouldSave = false;
 
-        foreach (MongoId profileId in profiles.Keys)
+        foreach (var profileId in profiles.Keys)
         {
-            if (!_playerRelations.TryGetValue(profileId, out FikaPlayerRelations? value))
+            if (!_playerRelations.TryGetValue(profileId, out var value))
             {
                 value = new FikaPlayerRelations();
                 if (!_playerRelations.TryAdd(profileId, value))
@@ -69,9 +68,9 @@ public class PlayerRelationsService(ProfileHelper profileHelper, ConfigService F
                 continue;
             }
 
-            List<string> Friends = value.Friends;
+            var Friends = value.Friends;
 
-            foreach (string friend in Friends.ToList())
+            foreach (var friend in Friends.ToList())
             {
                 if (!profiles.ContainsKey(friend))
                 {
@@ -80,9 +79,9 @@ public class PlayerRelationsService(ProfileHelper profileHelper, ConfigService F
                 }
             }
 
-            List<string> Ignored = value.Ignore;
+            var Ignored = value.Ignore;
 
-            foreach (string ignore in Ignored.ToList())
+            foreach (var ignore in Ignored.ToList())
             {
                 Ignored.Remove(ignore);
                 shouldSave = true;

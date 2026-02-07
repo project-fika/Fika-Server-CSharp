@@ -1,6 +1,6 @@
-﻿using SPTarkov.Server.Core.Models.Eft.Common.Tables;
+﻿using System.Text.Json.Serialization;
+using SPTarkov.Server.Core.Models.Eft.Common.Tables;
 using SPTarkov.Server.Core.Models.Eft.Ws;
-using System.Text.Json.Serialization;
 
 namespace FikaServer.Models.Fika.WebSocket.Notifications;
 

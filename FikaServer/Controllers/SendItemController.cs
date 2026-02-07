@@ -5,11 +5,8 @@ using FikaServer.WebSockets;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Extensions;
 using SPTarkov.Server.Core.Helpers;
-using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Common;
-using SPTarkov.Server.Core.Models.Eft.Common.Tables;
 using SPTarkov.Server.Core.Models.Eft.ItemEvent;
-using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Routers;
 using SPTarkov.Server.Core.Servers;
@@ -25,14 +22,14 @@ public class SendItemController(ISptLogger<SendItemController> logger, EventOutp
 {
     public async ValueTask<ItemEventRouterResponse> SendItem(PmcData pmcData, SendItemRequestData body, string sessionId)
     {
-        ItemEventRouterResponse output = eventOutputHolder.GetOutput(sessionId);
+        var output = eventOutputHolder.GetOutput(sessionId);
 
         if (body is null || body.ID is null || body.Target is null)
         {
             return httpResponseUtil.AppendErrorToOutput(output, "Missing data in body");
         }
 
-        SptProfile senderProfile = saveServer.GetProfile(sessionId);
+        var senderProfile = saveServer.GetProfile(sessionId);
 
         if (!saveServer.ProfileExists(body.Target))
         {
@@ -41,8 +38,8 @@ public class SendItemController(ISptLogger<SendItemController> logger, EventOutp
 
         logger.Info($"{body.ID} is going to sessionID: {body.Target}");
 
-        List<Item> senderItems = senderProfile.CharacterData?.PmcData?.Inventory?.Items ?? [];
-        List<Item> itemsToSend = senderItems.GetItemWithChildren(body.ID);
+        var senderItems = senderProfile.CharacterData?.PmcData?.Inventory?.Items ?? [];
+        var itemsToSend = senderItems.GetItemWithChildren(body.ID);
 
         if (itemsToSend.Count == 0)
         {
@@ -51,7 +48,7 @@ public class SendItemController(ISptLogger<SendItemController> logger, EventOutp
 
         if (fikaConfigService.Config.Server.SentItemsLoseFIR)
         {
-            foreach (Item item in itemsToSend)
+            foreach (var item in itemsToSend)
             {
                 item.Upd ??= new();
                 item.Upd.SpawnedInSession = false;
@@ -82,11 +79,11 @@ public class SendItemController(ISptLogger<SendItemController> logger, EventOutp
             return result;
         }
 
-        SptProfile sender = saveServer.GetProfile(sessionID);
+        var sender = saveServer.GetProfile(sessionID);
 
-        foreach (KeyValuePair<MongoId, SptProfile> profileKvP in saveServer.GetProfiles())
+        foreach (var profileKvP in saveServer.GetProfiles())
         {
-            SptProfile profile = profileKvP.Value;
+            var profile = profileKvP.Value;
 
             // Skip freshly created profiles as they would cause an error
             if (profile.CharacterData?.PmcData?.Info is null)
@@ -100,7 +97,7 @@ public class SendItemController(ISptLogger<SendItemController> logger, EventOutp
                 continue;
             }
 
-            string Nickname = profile.CharacterData.PmcData?.Info?.Nickname;
+            var Nickname = profile.CharacterData.PmcData?.Info?.Nickname;
 
             // Skip if the same user already exists in the results
             if (result.ContainsKey(Nickname))

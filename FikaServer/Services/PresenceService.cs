@@ -1,12 +1,11 @@
-﻿using FikaServer.Models.Enums;
+﻿using System.Collections.Concurrent;
+using FikaServer.Models.Enums;
 using FikaServer.Models.Fika.Presence;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Common;
-using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Utils;
-using System.Collections.Concurrent;
 
 namespace FikaServer.Services;
 
@@ -25,7 +24,7 @@ public class PresenceService(SaveServer saveServer, TimeUtil timeUtil, ISptLogge
 
     public FikaPlayerPresence? GetPlayerPresence(MongoId profileId)
     {
-        if (_onlinePlayers.TryGetValue(profileId, out FikaPlayerPresence? playerPresence))
+        if (_onlinePlayers.TryGetValue(profileId, out var playerPresence))
         {
             return playerPresence;
         }
@@ -35,7 +34,7 @@ public class PresenceService(SaveServer saveServer, TimeUtil timeUtil, ISptLogge
 
     public void AddPlayerPresence(MongoId sessionID)
     {
-        SptProfile profile = saveServer.GetProfile(sessionID);
+        var profile = saveServer.GetProfile(sessionID);
 
         if (profile == null)
         {
@@ -57,12 +56,12 @@ public class PresenceService(SaveServer saveServer, TimeUtil timeUtil, ISptLogge
 
     public void UpdatePlayerPresence(MongoId sessionID, FikaSetPresence NewPresence)
     {
-        if (!_onlinePlayers.TryGetValue(sessionID, out FikaPlayerPresence currentPresence))
+        if (!_onlinePlayers.TryGetValue(sessionID, out var currentPresence))
         {
             return;
         }
 
-        SptProfile profile = saveServer.GetProfile(sessionID);
+        var profile = saveServer.GetProfile(sessionID);
 
         _onlinePlayers.TryUpdate(sessionID, new FikaPlayerPresence
         {

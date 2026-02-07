@@ -1,6 +1,5 @@
-﻿using FikaServer.Models.Fika.Config;
+﻿using System.Text.Json.Serialization;
 using FikaServer.Services;
-using System.Text.Json.Serialization;
 
 namespace FikaServer.Models.Fika.Routes.Admin;
 
@@ -8,7 +7,7 @@ public record AdminGetSettingsResponse
 {
     public AdminGetSettingsResponse(ConfigService service)
     {
-        FikaConfigClient client = service.Config.Client;
+        var client = service.Config.Client;
         FriendlyFire = client.FriendlyFire;
         FreeCam = client.AllowFreeCam;
         SpectateFreeCam = client.AllowSpectateFreeCam;

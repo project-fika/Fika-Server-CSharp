@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading;
-
-namespace Fika.Core.Networking.LiteNetLib;
+﻿namespace Fika.Core.Networking.LiteNetLib;
 
 internal abstract class BaseChannel
 {
@@ -26,14 +23,18 @@ internal abstract class BaseChannel
     protected void AddToPeerChannelSendQueue()
     {
         if (Interlocked.CompareExchange(ref _isAddedToPeerChannelSendQueue, 1, 0) == 0)
+        {
             Peer.AddToReliableChannelSendQueue(this);
+        }
     }
 
     public bool SendAndCheckQueue()
     {
-        bool hasPacketsToSend = SendNextPackets();
+        var hasPacketsToSend = SendNextPackets();
         if (!hasPacketsToSend)
+        {
             Interlocked.Exchange(ref _isAddedToPeerChannelSendQueue, 0);
+        }
 
         return hasPacketsToSend;
     }

@@ -1,11 +1,11 @@
-﻿using Fika.Core.Networking.LiteNetLib;
+﻿using System.Net;
+using System.Net.Sockets;
+using Fika.Core.Networking.LiteNetLib;
 using FikaServer.Models.Servers;
 using FikaServer.Models.Servers.Enums;
 using FikaServer.Services;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Utils;
-using System.Net;
-using System.Net.Sockets;
 
 namespace FikaServer.Servers;
 
@@ -57,13 +57,13 @@ public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer>
 
     public void OnNatIntroductionRequest(IPEndPoint localEndPoint, IPEndPoint remoteEndPoint, string token)
     {
-        if (!TryParseToken(token, out var natPunchToken) || natPunchToken is null)
+        if (!TryParseToken(token, out var natPunchToken) || natPunchToken is null)
         {
             logger.Error($"[Fika NatPunch] Invalid token sent by peer: {remoteEndPoint}.");
             return;
         }
 
-        Guid guid = natPunchToken.Guid;
+        var guid = natPunchToken.Guid;
 
         if (natPunchToken.Type == NatPunchType.Server)
         {
@@ -149,15 +149,15 @@ public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer>
 
     private void CleanupPeers()
     {
-        DateTime currentTime = DateTime.Now;
+        var currentTime = DateTime.Now;
 
         if (currentTime - _lastCleanupPeers > TimeSpan.FromSeconds(3))
         {
             List<Guid> serverPeerGuidsToRemove = [];
 
-            foreach (Guid serverPeersGuid in _serverPeers.Keys)
+            foreach (var serverPeersGuid in _serverPeers.Keys)
             {
-                NatPunchPeer serverPeer = _serverPeers[serverPeersGuid];
+                var serverPeer = _serverPeers[serverPeersGuid];
 
                 if (!serverPeer.IsActive(TimeSpan.FromSeconds(30)))
                 {
@@ -165,7 +165,7 @@ public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer>
                 }
             }
 
-            foreach (Guid serverPeerGuidToRemove in serverPeerGuidsToRemove)
+            foreach (var serverPeerGuidToRemove in serverPeerGuidsToRemove)
             {
                 _serverPeers.Remove(serverPeerGuidToRemove);
                 logger.Info($"[Fika NatPunch] Removed {serverPeerGuidToRemove} from server peers.");

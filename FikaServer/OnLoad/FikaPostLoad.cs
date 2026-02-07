@@ -1,5 +1,4 @@
-﻿using FikaServer.Models.Fika.Config;
-using FikaServer.Servers;
+﻿using FikaServer.Servers;
 using FikaServer.Services;
 using FikaServer.Services.Cache;
 using FikaServer.Services.Headless;
@@ -20,7 +19,7 @@ public class FikaPostLoad(ISptLogger<FikaPostLoad> logger, ConfigServer configSe
 {
     public async Task OnLoad()
     {
-        FikaConfig config = fikaConfig.Config;
+        var config = fikaConfig.Config;
 
         if (config.NatPunchServer.Enable)
         {
@@ -44,15 +43,15 @@ public class FikaPostLoad(ISptLogger<FikaPostLoad> logger, ConfigServer configSe
 
         if (config.Background.Enable)
         {
-            string imagePath = "assets/images/launcher/bg.png";
+            var imagePath = "assets/images/launcher/bg.png";
             imageRouter.AddRoute("/files/launcher/bg", Path.Join(fikaConfig.ModPath, imagePath));
         }
     }
 
     private void BlacklistSpecialProfiles()
     {
-        CoreConfig coreConfig = configServer.GetConfig<CoreConfig>();
-        HashSet<string> profileBlacklist = coreConfig.Features.CreateNewProfileTypesBlacklist;
+        var coreConfig = configServer.GetConfig<CoreConfig>();
+        var profileBlacklist = coreConfig.Features.CreateNewProfileTypesBlacklist;
 
         if (!fikaConfig.Config.Server.ShowDevProfile)
         {
@@ -61,7 +60,7 @@ public class FikaPostLoad(ISptLogger<FikaPostLoad> logger, ConfigServer configSe
 
         if (!fikaConfig.Config.Server.ShowNonStandardProfile)
         {
-            foreach (string profile in (string[])["Tournament", "SPT Easy start", "SPT Zero to hero"])
+            foreach (var profile in (string[])["Tournament", "SPT Easy start", "SPT Zero to hero"])
             {
                 profileBlacklist.Add(profile);
             }

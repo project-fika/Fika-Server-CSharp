@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using Fika.Core.Networking.LiteNetLib.Utils;
 
 namespace Fika.Core.Networking.LiteNetLib.Layers;
@@ -21,7 +20,7 @@ public sealed class Crc32cLayer : PacketLayerBase
             return;
         }
 
-        int checksumPoint = length - CRC32C.ChecksumSize;
+        var checksumPoint = length - CRC32C.ChecksumSize;
         if (CRC32C.Compute(data, 0, checksumPoint) != BitConverter.ToUInt32(data, checksumPoint))
         {
             NetDebug.Write("[NM] DataReceived checksum: bad!");

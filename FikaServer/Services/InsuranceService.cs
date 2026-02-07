@@ -1,4 +1,5 @@
-﻿using FikaServer.Models.Fika.Insurance;
+﻿using System.Collections.Concurrent;
+using FikaServer.Models.Fika.Insurance;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Helpers;
 using SPTarkov.Server.Core.Models.Common;
@@ -7,7 +8,6 @@ using SPTarkov.Server.Core.Models.Eft.Match;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
-using System.Collections.Concurrent;
 
 namespace FikaServer.Services;
 
@@ -23,7 +23,7 @@ public class InsuranceService(SaveServer saveServer, ItemHelper itemHelper, ISpt
     /// <returns></returns>
     public string GetMatchId(string sessionID)
     {
-        foreach ((string matchId, List<FikaInsurancePlayer> players) in _matchInsuranceInfo)
+        foreach ((var matchId, var players) in _matchInsuranceInfo)
         {
             if (players.Any(player => player.SessionID == sessionID))
             {
@@ -42,7 +42,7 @@ public class InsuranceService(SaveServer saveServer, ItemHelper itemHelper, ISpt
     /// <param name="sessionID">The profile id to add</param>
     public void AddPlayerToMatchId(string matchId, string sessionID)
     {
-        if (!_matchInsuranceInfo.TryGetValue(matchId, out List<FikaInsurancePlayer>? players))
+        if (!_matchInsuranceInfo.TryGetValue(matchId, out var players))
         {
             players = [];
 
@@ -74,13 +74,13 @@ public class InsuranceService(SaveServer saveServer, ItemHelper itemHelper, ISpt
     /// <param name="endLocalRaidRequest">The request data</param>
     public void OnEndLocalRaidRequest(string sessionID, string matchId, EndLocalRaidRequestData endLocalRaidRequest)
     {
-        if (!_matchInsuranceInfo.TryGetValue(matchId, out List<FikaInsurancePlayer>? players))
+        if (!_matchInsuranceInfo.TryGetValue(matchId, out var players))
         {
             logger.Error("[Fika Insurance] onEndLocalRaidRequest: matchId not found!");
             return;
         }
 
-        foreach (FikaInsurancePlayer player in players)
+        foreach (var player in players)
         {
             if (player.SessionID == sessionID)
             {
@@ -104,12 +104,12 @@ public class InsuranceService(SaveServer saveServer, ItemHelper itemHelper, ISpt
     /// <param name="matchId">The id of the match</param>
     public void OnMatchEnd(string matchId)
     {
-        if (!_matchInsuranceInfo.TryGetValue(matchId, out List<FikaInsurancePlayer>? players))
+        if (!_matchInsuranceInfo.TryGetValue(matchId, out var players))
         {
             return;
         }
 
-        foreach (FikaInsurancePlayer player in players)
+        foreach (var player in players)
         {
             // This player either crashed or the raid ended prematurely, eitherway we skip him.
             if (!player.EndedRaid)
@@ -117,7 +117,7 @@ public class InsuranceService(SaveServer saveServer, ItemHelper itemHelper, ISpt
                 continue;
             }
 
-            foreach (FikaInsurancePlayer nextPlayer in players)
+            foreach (var nextPlayer in players)
             {
                 // Don't need to check the player we have in the base loop
                 if (player.SessionID == nextPlayer.SessionID)
@@ -132,7 +132,7 @@ public class InsuranceService(SaveServer saveServer, ItemHelper itemHelper, ISpt
                 }
 
                 // Find overlap between players other than the initial player we're looping over, if it contains the lost item id of the initial player we add it to foundItems
-                List<MongoId> overlap = nextPlayer.Inventory
+                var overlap = nextPlayer.Inventory
                     .Where(player.LostItems.Contains)
                     .ToList() ?? [];
 
@@ -158,13 +158,13 @@ public class InsuranceService(SaveServer saveServer, ItemHelper itemHelper, ISpt
     /// <exception cref="NullReferenceException"></exception>
     private void RemoveItemsFromInsurance(string sessionID, List<MongoId> ids)
     {
-        SptProfile profile = saveServer.GetProfile(sessionID)
+        var profile = saveServer.GetProfile(sessionID)
             ?? throw new NullReferenceException("[Fika Insurance] Profile was null");
 
         List<Item> toRemove = [];
-        for (int i = 0; i < profile.InsuranceList?.Count; i++)
+        for (var i = 0; i < profile.InsuranceList?.Count; i++)
         {
-            Insurance insurance = profile.InsuranceList[i];
+            var insurance = profile.InsuranceList[i];
             if (insurance.Items == null)
             {
                 continue;
@@ -172,7 +172,7 @@ public class InsuranceService(SaveServer saveServer, ItemHelper itemHelper, ISpt
 
             foreach (string? itemId in ids)
             {
-                Item? item = insurance.Items
+                var item = insurance.Items
                     .FirstOrDefault(x => x.Id == itemId);
 
                 if (item is null)
@@ -184,10 +184,10 @@ public class InsuranceService(SaveServer saveServer, ItemHelper itemHelper, ISpt
                 if (itemHelper.IsOfBaseclasses(item.Template, [BaseClasses.ARMOR, BaseClasses.HEADWEAR]))
                 {
                     logger.Debug($"[Fika Insurance] {itemId} is armor or helmet");
-                    IEnumerable<Item> children = insurance.Items
+                    var children = insurance.Items
                         .Where(x => x.ParentId == itemId && itemHelper.IsOfBaseclass(x.Template, BaseClasses.BUILT_IN_INSERTS));
 
-                    foreach (Item? childItem in children)
+                    foreach (var childItem in children)
                     {
                         // Soft inserts are not insured
                         if (!ids.Contains(childItem.Id))
@@ -198,7 +198,7 @@ public class InsuranceService(SaveServer saveServer, ItemHelper itemHelper, ISpt
                 }
 
                 // Remove children of the item
-                foreach (Item itemToRemove in toRemove)
+                foreach (var itemToRemove in toRemove)
                 {
                     if (!insurance.Items.Remove(itemToRemove))
                     {

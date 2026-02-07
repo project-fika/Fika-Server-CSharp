@@ -2,6 +2,7 @@
 using System.Net.WebSockets;
 using System.Text;
 using FikaServer.Helpers;
+using FikaServer.Models.Enums;
 using FikaServer.Models.Fika.Headless;
 using FikaServer.Models.Fika.WebSocket.Notifications;
 using FikaServer.Services;
@@ -35,7 +36,7 @@ public class HeadlessClientWebSocket(HeadlessHelper headlessHelper, HeadlessServ
 
         if (string.IsNullOrEmpty(authHeader))
         {
-            await ws.CloseAsync(WebSocketCloseStatus.InvalidPayloadData, "", CancellationToken.None);
+            await ws.CloseAsync(WebSocketCloseStatus.InvalidPayloadData, string.Empty, CancellationToken.None);
             return;
         }
 
@@ -59,18 +60,44 @@ public class HeadlessClientWebSocket(HeadlessHelper headlessHelper, HeadlessServ
             await matchService.DeleteMatch(userSessionID);
         }
 
-        if (!headlessService.HeadlessClients.TryAdd(userSessionID, new HeadlessClientInfo(ws, Models.Enums.EHeadlessStatus.READY)))
+        WebSocket? oldSocket = null;
+        var isNewClient = false;
+
+        headlessService.HeadlessClients.AddOrUpdate(userSessionID,
+        _ =>
         {
-            logger.Error($"failed to add headless {userSessionID} to the headless clients list");
-        }
-        else
+            isNewClient = true;
+            return new HeadlessClientInfo(ws, EHeadlessStatus.READY);
+        },
+        (_, existing) =>
         {
-            var name = headlessHelper.GetHeadlessNickname(userSessionID);
-            await webhookService.SendWebhookMessage($"Headless client {name} has connected");
-            await notificationWebSocket.BroadcastAsync(new HeadlessConnectedNotification
+            oldSocket = existing.WebSocket;
+            return new HeadlessClientInfo(ws, EHeadlessStatus.READY);
+        });
+
+        if (oldSocket != null)
+        {
+            try
             {
-                Name = name
-            });
+                await oldSocket.CloseAsync(WebSocketCloseStatus.PolicyViolation,
+                    "Replaced by new connection", CancellationToken.None);
+            }
+            catch (Exception ex)
+            {
+                logger.Error($"{ex.Message}", ex);
+            }
+        }
+
+        var name = headlessHelper.GetHeadlessNickname(userSessionID);
+
+        await webhookService.SendWebhookMessage($"Headless client {name} has connected");
+        await notificationWebSocket.BroadcastAsync(new HeadlessConnectedNotification
+        {
+            Name = name
+        });
+        if (!isNewClient)
+        {
+            logger.Info($"Headless client {name} reconnected and replaced existing session");
         }
     }
 

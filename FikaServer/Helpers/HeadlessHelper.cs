@@ -1,5 +1,5 @@
-﻿using FikaServer.Models.Enums;
-using FikaServer.Models.Fika.Config;
+﻿using System.Collections.Concurrent;
+using FikaServer.Models.Enums;
 using FikaServer.Models.Fika.Headless;
 using FikaServer.Services;
 using FikaServer.Services.Headless;
@@ -7,7 +7,6 @@ using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
-using System.Collections.Concurrent;
 
 namespace FikaServer.Helpers;
 
@@ -45,7 +44,7 @@ public class HeadlessHelper(ConfigService fikaConfig, SaveServer saveServer, Hea
     /// <returns>Returns true if it's available, returns false if it isn't available.</returns>
     public bool IsHeadlessClientAvailable(MongoId headlessSessionID)
     {
-        if (headlessService.HeadlessClients.TryGetValue(headlessSessionID, out HeadlessClientInfo? headlessClientInfo))
+        if (headlessService.HeadlessClients.TryGetValue(headlessSessionID, out var headlessClientInfo))
         {
             return headlessClientInfo.State is EHeadlessStatus.READY;
         }
@@ -60,14 +59,14 @@ public class HeadlessHelper(ConfigService fikaConfig, SaveServer saveServer, Hea
     /// <returns>The nickname if the headless has been requested by a user, returns null if not.</returns>
     public string? GetRequesterUsername(MongoId headlessSessionID)
     {
-        if (headlessService.HeadlessClients.TryGetValue(headlessSessionID, out HeadlessClientInfo? headlessClientInfo))
+        if (headlessService.HeadlessClients.TryGetValue(headlessSessionID, out var headlessClientInfo))
         {
             if (string.IsNullOrEmpty(headlessClientInfo.RequesterSessionID))
             {
                 return null;
             }
 
-            string? nickname = saveServer.GetProfile(headlessClientInfo.RequesterSessionID).CharacterData?.PmcData?.Info?.Nickname;
+            var nickname = saveServer.GetProfile(headlessClientInfo.RequesterSessionID).CharacterData?.PmcData?.Info?.Nickname;
             if (string.IsNullOrEmpty(nickname))
             {
                 return null;
@@ -86,13 +85,13 @@ public class HeadlessHelper(ConfigService fikaConfig, SaveServer saveServer, Hea
     /// <returns>the alias, or nickname or the headless client.</returns>
     public string GetHeadlessNickname(MongoId headlessSessionID)
     {
-        FikaConfig config = fikaConfig.Config;
-        if (config.Headless.Profiles.Aliases.TryGetValue(headlessSessionID, out string? alias))
+        var config = fikaConfig.Config;
+        if (config.Headless.Profiles.Aliases.TryGetValue(headlessSessionID, out var alias))
         {
             return alias;
         }
 
-        string? nickname = saveServer.GetProfile(headlessSessionID).CharacterData?.PmcData?.Info?.Nickname;
+        var nickname = saveServer.GetProfile(headlessSessionID).CharacterData?.PmcData?.Info?.Nickname;
         if (string.IsNullOrEmpty(nickname))
         {
             return "ERROR";
@@ -112,7 +111,7 @@ public class HeadlessHelper(ConfigService fikaConfig, SaveServer saveServer, Hea
             .Select(x => x.Key)];
 
         List<HeadlessAvailableClients> result = [];
-        foreach (string sessionId in availableClients)
+        foreach (var sessionId in availableClients)
         {
             result.Add(new(sessionId, GetHeadlessNickname(sessionId)));
         }

@@ -1,4 +1,5 @@
-﻿using FikaServer.Services;
+﻿using System.Text.RegularExpressions;
+using FikaServer.Services;
 using FikaServer.Services.Cache;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Helpers;
@@ -8,7 +9,6 @@ using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Eft.Ws;
 using SPTarkov.Server.Core.Servers.Ws;
 using SPTarkov.Server.Core.Services;
-using System.Text.RegularExpressions;
 
 namespace FikaServer.ChatBot.Commands;
 
@@ -38,8 +38,8 @@ public partial class ForceLogout(ConfigService configService, MailSendService ma
 
     public ValueTask<string> PerformAction(UserDialogInfo commandHandler, MongoId sessionId, SendMessageRequest request)
     {
-        string value = request.DialogId;
-        bool isAdmin = configService.Config.Server.AdminIds.Contains(sessionId);
+        var value = request.DialogId;
+        var isAdmin = configService.Config.Server.AdminIds.Contains(sessionId);
         if (!isAdmin)
         {
             mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
@@ -47,7 +47,7 @@ public partial class ForceLogout(ConfigService configService, MailSendService ma
             return new(value);
         }
 
-        string text = request.Text;
+        var text = request.Text;
         if (!ForceLogoutCommandRegex().IsMatch(text))
         {
             mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
@@ -55,8 +55,8 @@ public partial class ForceLogout(ConfigService configService, MailSendService ma
             return new(value);
         }
 
-        string[] split = text.Split(' ');
-        string nickname = split[2];
+        var split = text.Split(' ');
+        var nickname = split[2];
 
         if (nickname == "all")
         {
@@ -74,7 +74,7 @@ public partial class ForceLogout(ConfigService configService, MailSendService ma
         mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
             $"'{nickname}' has been forced to log out.");
 
-        SptProfile? profile = fikaProfileService.GetProfileByNickname(nickname)
+        var profile = fikaProfileService.GetProfileByNickname(nickname)
             ?? throw new NullReferenceException($"Could not find profile {nickname}");
         sendHelper.SendMessage(profile.ProfileInfo.ProfileId.GetValueOrDefault(), new WsNotificationEvent()
         {

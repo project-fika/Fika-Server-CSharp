@@ -45,6 +45,9 @@ public record FikaConfigClient
 
     [JsonPropertyName("allowNamePlates")]
     public bool AllowNamePlates { get; set; } = true;
+
+    [JsonPropertyName("randomLabyrinthSpawns")]
+    public bool RandomLabyrinthSpawns { get; set; }
 }
 
 public record FikaConfigClientMods

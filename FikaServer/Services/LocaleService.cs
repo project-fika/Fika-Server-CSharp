@@ -1,7 +1,7 @@
-﻿using SPTarkov.DI.Annotations;
+﻿using System.Text.Json;
+using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Utils;
-using System.Text.Json;
 
 namespace FikaServer.Services;
 
@@ -51,14 +51,14 @@ public class LocaleService(FileUtil fileUtil, ConfigService fikaConfig, Database
 
     private async Task<Dictionary<string, Dictionary<string, string>>> RecursiveLoadFiles(string path)
     {
-        List<string> files = fileUtil.GetFiles(path);
+        var files = fileUtil.GetFiles(path);
         Dictionary<string, Dictionary<string, string>> locales = [];
 
-        foreach (string file in files)
+        foreach (var file in files)
         {
             await using (FileStream fs = new(file, FileMode.Open, FileAccess.Read))
             {
-                Dictionary<string, string>? localeFile = await JsonSerializer.DeserializeAsync<Dictionary<string, string>>(fs);
+                var localeFile = await JsonSerializer.DeserializeAsync<Dictionary<string, string>>(fs);
 
                 locales.Add(Path.GetFileNameWithoutExtension(file), localeFile);
             }

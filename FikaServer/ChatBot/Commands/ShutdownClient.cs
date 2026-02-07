@@ -1,4 +1,7 @@
-﻿using FikaServer.Models.Fika.Headless;
+﻿using System.Net.WebSockets;
+using System.Text;
+using System.Text.RegularExpressions;
+using FikaServer.Models.Fika.Headless;
 using FikaServer.Models.Fika.WebSocket.Notifications;
 using FikaServer.Services;
 using FikaServer.Services.Cache;
@@ -10,9 +13,6 @@ using SPTarkov.Server.Core.Models.Eft.Dialog;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Services;
 using SPTarkov.Server.Core.Utils;
-using System.Net.WebSockets;
-using System.Text;
-using System.Text.RegularExpressions;
 
 namespace FikaServer.ChatBot.Commands;
 
@@ -42,8 +42,8 @@ public partial class ShutdownClient(ConfigService configService, MailSendService
 
     public async ValueTask<string> PerformAction(UserDialogInfo commandHandler, MongoId sessionId, SendMessageRequest request)
     {
-        string value = request.DialogId;
-        bool isAdmin = configService.Config.Server.AdminIds.Contains(sessionId);
+        var value = request.DialogId;
+        var isAdmin = configService.Config.Server.AdminIds.Contains(sessionId);
         if (!isAdmin)
         {
             mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
@@ -51,7 +51,7 @@ public partial class ShutdownClient(ConfigService configService, MailSendService
             return value;
         }
 
-        string text = request.Text;
+        var text = request.Text;
         if (!ShutdownClientCommandRegex().IsMatch(text))
         {
             mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
@@ -59,11 +59,11 @@ public partial class ShutdownClient(ConfigService configService, MailSendService
             return value;
         }
 
-        string[] split = text.Split(' ');
-        string nickname = split[2];
-        SptProfile? profile = fikaProfileService.GetProfileByNickname(nickname);
+        var split = text.Split(' ');
+        var nickname = split[2];
+        var profile = fikaProfileService.GetProfileByNickname(nickname);
 
-        if (headlessService.HeadlessClients.TryGetValue(profile.ProfileInfo.ProfileId.GetValueOrDefault(), out HeadlessClientInfo? client))
+        if (headlessService.HeadlessClients.TryGetValue(profile.ProfileInfo.ProfileId.GetValueOrDefault(), out var client))
         {
             if (client.WebSocket == null || client.WebSocket.State is WebSocketState.Closed)
             {
@@ -73,7 +73,7 @@ public partial class ShutdownClient(ConfigService configService, MailSendService
                 return value;
             }
 
-            string? data = jsonUtil.Serialize(new HeadlessShutdownClient())
+            var data = jsonUtil.Serialize(new HeadlessShutdownClient())
                 ?? throw new NullReferenceException("ShutdownClient::Data was null after serializing");
             await client.WebSocket.SendAsync(Encoding.UTF8.GetBytes(data),
             WebSocketMessageType.Text, true, CancellationToken.None);

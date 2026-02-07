@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.Primitives;
+﻿using System.Reflection;
+using Microsoft.Extensions.Primitives;
 using SPTarkov.Reflection.Patching;
 using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Helpers;
 using SPTarkov.Server.Core.Routers;
-using System.Reflection;
 
 namespace FikaServer.Overrides.Routers;
 
@@ -21,14 +21,14 @@ public class GetResponseOverride : AbstractPatch
     [PatchPostfix]
     public async static ValueTask<string?> Postfix(ValueTask<string?> __result, HttpRequest req)
     {
-        HttpServerHelper httpServerHelper = ServiceLocator.ServiceProvider.GetService<HttpServerHelper>() ?? throw new NullReferenceException("HttpServerHelper is null!");
+        var httpServerHelper = ServiceLocator.ServiceProvider.GetService<HttpServerHelper>() ?? throw new NullReferenceException("HttpServerHelper is null!");
 
-        string? response = await __result;
+        var response = await __result;
 
         if (!StringValues.IsNullOrEmpty(req.Headers.Host))
         {
-            string originalHost = httpServerHelper.BuildUrl();
-            string requestHost = req.Headers.Host.ToString();
+            var originalHost = httpServerHelper.BuildUrl();
+            var requestHost = req.Headers.Host.ToString();
 
             response = response?.Replace(originalHost, requestHost);
         }

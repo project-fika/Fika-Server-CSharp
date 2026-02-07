@@ -50,7 +50,7 @@ public class FikaPreLoad(ISptLogger<FikaPreLoad> logger, ClientService clientSer
 
         try
         {
-            foreach (AbstractPatch patch in _abstractPatches)
+            foreach (var patch in _abstractPatches)
             {
                 logger.Debug($"[Fika Server] Loading patch: {patch.GetType().Name}");
                 patch.Enable();

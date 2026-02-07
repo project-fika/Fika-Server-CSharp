@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Net;
-using System.Net.Sockets;
 using System.Net.NetworkInformation;
+using System.Net.Sockets;
 
 namespace Fika.Core.Networking.LiteNetLib;
 
@@ -30,26 +28,35 @@ public static class NetUtils
 
     public static IPAddress ResolveAddress(string hostStr)
     {
-        if(hostStr == "localhost")
+        if (hostStr == "localhost")
+        {
             return IPAddress.Loopback;
+        }
 
         if (!IPAddress.TryParse(hostStr, out var ipAddress))
         {
             if (LiteNetManager.IPv6Support)
+            {
                 ipAddress = ResolveAddress(hostStr, AddressFamily.InterNetworkV6);
+            }
+
             if (ipAddress == null)
+            {
                 ipAddress = ResolveAddress(hostStr, AddressFamily.InterNetwork);
+            }
         }
         if (ipAddress == null)
+        {
             throw new ArgumentException("Invalid address: " + hostStr);
+        }
 
         return ipAddress;
     }
 
     public static IPAddress ResolveAddress(string hostStr, AddressFamily addressFamily)
     {
-        IPAddress[] addresses = Dns.GetHostEntry(hostStr).AddressList;
-        foreach (IPAddress ip in addresses)
+        var addresses = Dns.GetHostEntry(hostStr).AddressList;
+        foreach (var ip in addresses)
         {
             if (ip.AddressFamily == addressFamily)
             {
@@ -66,7 +73,7 @@ public static class NetUtils
     /// <returns>List with all local ip addresses</returns>
     public static List<string> GetLocalIpList(LocalAddrType addrType)
     {
-        List<string> targetList = new List<string>();
+        var targetList = new List<string>();
         GetLocalIpList(targetList, addrType);
         return targetList;
     }
@@ -78,8 +85,8 @@ public static class NetUtils
     /// <param name="addrType">type of address (IPv4, IPv6 or both)</param>
     public static void GetLocalIpList(IList<string> targetList, LocalAddrType addrType)
     {
-        bool ipv4 = (addrType & LocalAddrType.IPv4) == LocalAddrType.IPv4;
-        bool ipv6 = (addrType & LocalAddrType.IPv6) == LocalAddrType.IPv6;
+        var ipv4 = (addrType & LocalAddrType.IPv4) == LocalAddrType.IPv4;
+        var ipv6 = (addrType & LocalAddrType.IPv6) == LocalAddrType.IPv6;
         try
         {
             // Sort networks interfaces so it prefer Wifi over Cellular networks
@@ -87,39 +94,47 @@ public static class NetUtils
             var networks = NetworkInterface.GetAllNetworkInterfaces();
             Array.Sort(networks, NetworkSorter);
 
-            foreach (NetworkInterface ni in networks)
+            foreach (var ni in networks)
             {
                 //Skip loopback and disabled network interfaces
                 if (ni.NetworkInterfaceType == NetworkInterfaceType.Loopback ||
                     ni.OperationalStatus != OperationalStatus.Up)
+                {
                     continue;
+                }
 
                 var ipProps = ni.GetIPProperties();
 
                 //Skip address without gateway
                 if (ipProps.GatewayAddresses.Count == 0)
+                {
                     continue;
+                }
 
-                foreach (UnicastIPAddressInformation ip in ipProps.UnicastAddresses)
+                foreach (var ip in ipProps.UnicastAddresses)
                 {
                     var address = ip.Address;
                     if ((ipv4 && address.AddressFamily == AddressFamily.InterNetwork) ||
                         (ipv6 && address.AddressFamily == AddressFamily.InterNetworkV6))
+                    {
                         targetList.Add(address.ToString());
+                    }
                 }
             }
 
-	            //Fallback mode (unity android)
-	            if (targetList.Count == 0)
-	            {
-	                IPAddress[] addresses = Dns.GetHostEntry(Dns.GetHostName()).AddressList;
-	                foreach (IPAddress ip in addresses)
-	                {
-	                    if((ipv4 && ip.AddressFamily == AddressFamily.InterNetwork) ||
-	                       (ipv6 && ip.AddressFamily == AddressFamily.InterNetworkV6))
-	                        targetList.Add(ip.ToString());
-	                }
-	            }
+            //Fallback mode (unity android)
+            if (targetList.Count == 0)
+            {
+                var addresses = Dns.GetHostEntry(Dns.GetHostName()).AddressList;
+                foreach (var ip in addresses)
+                {
+                    if ((ipv4 && ip.AddressFamily == AddressFamily.InterNetwork) ||
+                       (ipv6 && ip.AddressFamily == AddressFamily.InterNetworkV6))
+                    {
+                        targetList.Add(ip.ToString());
+                    }
+                }
+            }
         }
         catch
         {
@@ -128,10 +143,15 @@ public static class NetUtils
 
         if (targetList.Count == 0)
         {
-            if(ipv4)
+            if (ipv4)
+            {
                 targetList.Add("127.0.0.1");
-            if(ipv6)
+            }
+
+            if (ipv6)
+            {
                 targetList.Add("::1");
+            }
         }
     }
 
@@ -156,12 +176,12 @@ public static class NetUtils
     // ===========================================
     internal static void PrintInterfaceInfos()
     {
-        NetDebug.WriteForce(NetLogLevel.Info, $"IPv6Support: { LiteNetManager.IPv6Support}");
+        NetDebug.WriteForce(NetLogLevel.Info, $"IPv6Support: {LiteNetManager.IPv6Support}");
         try
         {
-            foreach (NetworkInterface ni in NetworkInterface.GetAllNetworkInterfaces())
+            foreach (var ni in NetworkInterface.GetAllNetworkInterfaces())
             {
-                foreach (UnicastIPAddressInformation ip in ni.GetIPProperties().UnicastAddresses)
+                foreach (var ip in ni.GetIPProperties().UnicastAddresses)
                 {
                     if (ip.Address.AddressFamily == AddressFamily.InterNetwork ||
                         ip.Address.AddressFamily == AddressFamily.InterNetworkV6)
@@ -207,8 +227,8 @@ internal class NetworkSorter : IComparer<NetworkInterface>
                           b.NetworkInterfaceType == NetworkInterfaceType.Wwanpp ||
                           b.NetworkInterfaceType == NetworkInterfaceType.Wwanpp2;
 
-        var isWifiA     = a.NetworkInterfaceType == NetworkInterfaceType.Wireless80211;
-        var isWifiB     = b.NetworkInterfaceType == NetworkInterfaceType.Wireless80211;
+        var isWifiA = a.NetworkInterfaceType == NetworkInterfaceType.Wireless80211;
+        var isWifiB = b.NetworkInterfaceType == NetworkInterfaceType.Wireless80211;
 
         var isEthernetA = a.NetworkInterfaceType == NetworkInterfaceType.Ethernet ||
                           a.NetworkInterfaceType == NetworkInterfaceType.Ethernet3Megabit ||
@@ -222,8 +242,8 @@ internal class NetworkSorter : IComparer<NetworkInterface>
                           b.NetworkInterfaceType == NetworkInterfaceType.FastEthernetFx ||
                           b.NetworkInterfaceType == NetworkInterfaceType.FastEthernetT;
 
-        var isOtherA    = !isCellularA && !isWifiA && !isEthernetA;
-        var isOtherB    = !isCellularB && !isWifiB && !isEthernetB;
+        var isOtherA = !isCellularA && !isWifiA && !isEthernetA;
+        var isOtherB = !isCellularB && !isWifiB && !isEthernetB;
 
         var priorityA = isEthernetA ? 3 : isWifiA ? 2 : isOtherA ? 1 : 0;
         var priorityB = isEthernetB ? 3 : isWifiB ? 2 : isOtherB ? 1 : 0;

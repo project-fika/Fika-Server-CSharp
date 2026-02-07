@@ -13,7 +13,7 @@ public class FikaChatBotCommands(IEnumerable<IFikaCommand> fikaCommands) : IChat
 
     public string GetCommandHelp(string command)
     {
-        return _fikaCommands.TryGetValue(command, out IFikaCommand? value) ? value.CommandHelp : string.Empty;
+        return _fikaCommands.TryGetValue(command, out var value) ? value.CommandHelp : string.Empty;
     }
 
     public string CommandPrefix

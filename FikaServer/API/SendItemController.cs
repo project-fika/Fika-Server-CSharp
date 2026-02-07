@@ -1,4 +1,5 @@
-﻿using FikaServer.Models;
+﻿using System.Collections.Frozen;
+using FikaServer.Models;
 using FikaShared.Requests;
 using Microsoft.AspNetCore.Mvc;
 using SPTarkov.Server.Core.Extensions;
@@ -7,7 +8,6 @@ using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Common.Tables;
 using SPTarkov.Server.Core.Services;
 using SPTarkov.Server.Core.Utils.Cloners;
-using System.Collections.Frozen;
 
 namespace FikaServer.API;
 
@@ -29,8 +29,8 @@ public class SendItemController(MailSendService mailSendService, ItemHelper item
     {
         MongoId profileId = new(request.ProfileId);
         MongoId itemTpl = new(request.ItemTemplate);
-        int quantity = request.Amount;
-        string message = request.Message;
+        var quantity = request.Amount;
+        var message = request.Message;
 
         var checkedItem = itemHelper.GetItem(itemTpl);
         if (!checkedItem.Key)
