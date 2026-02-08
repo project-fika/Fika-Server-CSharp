@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using FikaServer.Models.Enums;
+using SPTarkov.Server.Core.Models.Common;
 
 namespace FikaServer.Models.Fika.Headless;
 
@@ -26,7 +27,7 @@ public record HeadlessClientInfo
     /// <summary>
     /// The players that are playing on this headless client, only set if the state is IN_RAID
     /// </summary>
-    public List<string>? Players { get; set; }
+    public List<MongoId> Players { get; set; } = [];
     /// <summary>
     /// SessionID of the person who has requested the headless client, it will only ever be set if the status is IN_RAID
     /// </summary>
@@ -46,7 +47,6 @@ public record HeadlessClientInfo
     /// <param name="requestId">The id who requested the raid</param>
     public void StartRaid(string requestId)
     {
-        Players = [];
         RequesterSessionID = requestId;
         HasNotifiedRequester = false;
     }
@@ -57,7 +57,7 @@ public record HeadlessClientInfo
     public void Reset()
     {
         State = EHeadlessStatus.READY;
-        Players = null;
+        Players.Clear();
         RequesterSessionID = null;
         HasNotifiedRequester = null;
     }

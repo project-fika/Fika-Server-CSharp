@@ -22,12 +22,13 @@ public class HeadlessController(HeadlessService headlessService, HeadlessHelper 
         foreach ((var profileId, var headlessClient) in headlessClients)
         {
             var state = headlessClient.WebSocket.State is WebSocketState.Open ? EHeadlessState.Ready : EHeadlessState.NotReady;
-            clients.Add(new()
+            clients.Add(new OnlineHeadless
             {
                 ProfileId = profileId,
                 Nickname = headlessHelper.GetHeadlessNickname(profileId),
                 State = state,
-                Players = (headlessClient.Players?.Count) ?? 0
+                Players = headlessClient.Players.Count,
+                ProfileIds = headlessClient.Players!.ConvertAll(x => x.ToString())
             });
         }
 

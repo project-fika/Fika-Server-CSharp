@@ -99,7 +99,7 @@ public class HeadlessService(ISptLogger<HeadlessService> logger,
                 throw new NullReferenceException($"AddPlayerToHeadlessMatch:: HeadlessClientInfo was null on {headlessClientId}");
             }
 
-            headlessClientInfo.Players?.Add(sessionID);
+            headlessClientInfo.Players.Add(sessionID);
 
             if (!fikaConfigService.Config.Headless.SetLevelToAverageOfLobby)
             {

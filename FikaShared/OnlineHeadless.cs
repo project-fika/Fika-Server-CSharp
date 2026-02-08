@@ -16,4 +16,7 @@ public record OnlineHeadless
 
     [JsonPropertyName("players")]
     public required int Players { get; set; }
+
+    [JsonPropertyName("profileIds")]
+    public required List<string> ProfileIds { get; set; }
 }
