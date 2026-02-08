@@ -183,7 +183,8 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
             NatPunch = false,
             UseFikaNatPunchServer = false,
             IsHeadless = false,
-            Raids = 0
+            Raids = 0,
+            CustomRaidSettings = data.CustomRaidSettings
         };
 
         if (!Matches.TryAdd(data.ServerId, match))

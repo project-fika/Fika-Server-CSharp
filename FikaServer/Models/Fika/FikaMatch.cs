@@ -1,5 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 using FikaServer.Models.Enums;
+using FikaServer.Models.Fika.Routes.Client;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Common;
 using SPTarkov.Server.Core.Models.Eft.Match;
@@ -64,4 +65,7 @@ public record FikaMatch
 
     [JsonPropertyName("raids")]
     public int Raids { get; set; }
+
+    [JsonPropertyName("customRaidSettings")]
+    public FikaCustomRaidSettings? CustomRaidSettings { get; set; }
 }

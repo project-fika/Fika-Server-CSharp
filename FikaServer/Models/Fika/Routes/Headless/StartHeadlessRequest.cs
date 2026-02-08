@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using FikaServer.Models.Fika.Routes.Client;
 using SPTarkov.Server.Core.Models.Eft.Match;
 using SPTarkov.Server.Core.Models.Enums;
 using SPTarkov.Server.Core.Models.Utils;
@@ -34,8 +35,8 @@ public record StartHeadlessRequest : IRequestData
     [JsonPropertyName("side")]
     public SideType Side { get; set; }
 
-    [JsonPropertyName("customWeather")]
-    public bool CustomWeather { get; set; }
+    [JsonPropertyName("customRaidSettings")]
+    public FikaCustomRaidSettings? CustomRaidSettings { get; set; }
 
     [JsonPropertyName("useEvent")]
     public bool UseEvent { get; set; }

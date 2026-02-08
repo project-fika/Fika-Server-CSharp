@@ -1,5 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 using FikaServer.Models.Enums;
+using FikaServer.Models.Fika.Routes.Client;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Match;
 using SPTarkov.Server.Core.Models.Utils;
@@ -40,4 +41,7 @@ public record FikaRaidCreateRequestData : IRequestData
 
     [JsonPropertyName("isSpectator")]
     public bool IsSpectator { get; set; }
+
+    [JsonPropertyName("customRaidSettings")]
+    public FikaCustomRaidSettings? CustomRaidSettings { get; set; }
 }

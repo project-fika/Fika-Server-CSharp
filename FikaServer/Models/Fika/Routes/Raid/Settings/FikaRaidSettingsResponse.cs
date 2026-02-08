@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using FikaServer.Models.Fika.Routes.Client;
 using SPTarkov.Server.Core.Models.Enums;
 using SPTarkov.Server.Core.Models.Enums.RaidSettings.TimeAndWeather;
 
@@ -11,6 +12,9 @@ public record FikaRaidSettingsResponse
 
     [JsonPropertyName("metabolismDisabled")]
     public bool MetabolismDisabled { get; set; }
+
+    [JsonPropertyName("customRaidSettings")]
+    public FikaCustomRaidSettings? CustomRaidSettings { get; set; }
 
     [JsonPropertyName("playersSpawnPlace")]
     public PlayersSpawnPlace PlayersSpawnPlace { get; set; }

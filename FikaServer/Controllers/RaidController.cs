@@ -139,6 +139,7 @@ public class RaidController(MatchService matchService, HeadlessHelper headlessHe
         {
             Received = true,
             MetabolismDisabled = match.RaidConfig!.MetabolismDisabled!.Value,
+            CustomRaidSettings = match.CustomRaidSettings,
             PlayersSpawnPlace = match.RaidConfig!.PlayersSpawnPlace!.Value,
             HourOfDay = match.RaidConfig!.TimeAndWeatherSettings!.HourOfDay!.Value,
             TimeFlowType = match.RaidConfig!.TimeAndWeatherSettings!.TimeFlowType!.Value
