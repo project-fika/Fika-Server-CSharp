@@ -1,4 +1,5 @@
 ﻿using FikaServer.Models;
+using FikaServer.Models.Fika.API;
 using FikaServer.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,7 +13,7 @@ public class GetRaidsController(MatchService matchService) : ControllerBase
     [HttpGet]
     public IActionResult HandleRequest()
     {
-        return Ok(matchService.Matches);
+        return Ok(matchService.Matches.Values
+            .Select(match => new FikaMatchResponse(match)));
     }
 }
-

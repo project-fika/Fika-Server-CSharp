@@ -13,7 +13,7 @@ public record FikaMatch
     public string[] Ips { get; set; } = [];
 
     [JsonPropertyName("serverGuid")]
-    public Guid ServerGuid { get; set; } = default;
+    public Guid ServerGuid { get; set; }
 
     [JsonPropertyName("port")]
     public ushort Port { get; set; }

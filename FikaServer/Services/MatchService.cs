@@ -18,7 +18,8 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
     SaveServer saveServer, ConfigService fikaConfig, HeadlessHelper headlessHelper, HeadlessService headlessService,
     InsuranceService insuranceService, PresenceService presenceService, WebhookService webhookService)
 {
-    public readonly ConcurrentDictionary<MongoId, FikaMatch> Matches = [];
+    public ConcurrentDictionary<MongoId, FikaMatch> Matches { get; set; } = [];
+
     protected readonly ConcurrentDictionary<MongoId, Timer> _timeoutIntervals = [];
 
     /// <summary>
