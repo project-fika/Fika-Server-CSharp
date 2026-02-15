@@ -48,6 +48,9 @@ public record FikaConfigClient
 
     [JsonPropertyName("randomLabyrinthSpawns")]
     public bool RandomLabyrinthSpawns { get; set; }
+
+    [JsonPropertyName("pmcFoundInRaid")]
+    public bool PMCFoundInRaid { get; set; }
 }
 
 public record FikaConfigClientMods
