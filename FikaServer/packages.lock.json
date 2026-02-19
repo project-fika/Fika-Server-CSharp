@@ -10,18 +10,18 @@
       },
       "SPTarkov.Common": {
         "type": "Direct",
-        "requested": "[4.0.9, )",
-        "resolved": "4.0.9",
-        "contentHash": "e8YAGGnkdNT54CXkmn63//MN2Ns138E46AtMDKpeRE/Q//8JWeiFHNcpCY+rSF7eIKbKFXNRAzvA9CiHrIWxag==",
+        "requested": "[4.0.12, )",
+        "resolved": "4.0.12",
+        "contentHash": "BJMVsFnKHWxLOvFLIEEKTaOM9+D9yoxi1kEpwkWZd8nSi8kNEvTmJ+7yLwhHG3vLXPmw+8q2R9nXWuM2Afk1ug==",
         "dependencies": {
           "SemanticVersioning": "3.0.0"
         }
       },
       "SPTarkov.DI": {
         "type": "Direct",
-        "requested": "[4.0.9, )",
-        "resolved": "4.0.9",
-        "contentHash": "MNMqGfnWXS/DzO8MDg2bc1+7tD6f2dpfaHIXWcvKrh/5DIXeb5OFWwlx/IGh16fuSk6OPUfGohlehDFYcNN5CA==",
+        "requested": "[4.0.12, )",
+        "resolved": "4.0.12",
+        "contentHash": "U6Kq0F7mJ+bK+i/BBTrDMkQYmCRxwsQYwU+833IjxomhVH89GNhlHxnHWwnv3dmDNJB6rH5OZpywEE4rtydH6A==",
         "dependencies": {
           "JetBrains.Annotations": "2025.2.2",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "9.0.9"
@@ -29,35 +29,35 @@
       },
       "SPTarkov.Reflection": {
         "type": "Direct",
-        "requested": "[4.0.9, )",
-        "resolved": "4.0.9",
-        "contentHash": "grWPc8lzia+HUZB23qVXNEkPsfyvr4YBu2+ZqsbA0Tt0sVLvmew0AIIkoqHoT+DyrD8H0lcUdTpGYdfZ+VhxXA==",
+        "requested": "[4.0.12, )",
+        "resolved": "4.0.12",
+        "contentHash": "P0wDeHKx8APFESUmnZdkZZ6cbY06CKpUvHtGxXDTUjpwc/AfMOHdtac7qMuujm9JWGy51TxwPfRjVsUwE1ZEuQ==",
         "dependencies": {
           "HarmonyX": "2.15.0",
           "JetBrains.Annotations": "2025.2.2",
-          "SPTarkov.DI": "4.0.9"
+          "SPTarkov.DI": "4.0.12"
         }
       },
       "SPTarkov.Server.Core": {
         "type": "Direct",
-        "requested": "[4.0.9, )",
-        "resolved": "4.0.9",
-        "contentHash": "MW6RlHBf7VVwI3qVxagvFxVPlA0zyy4DZqJ0Nkr09rocnmsCybsjfoAszXVlEvczsAXjRHPi2LnfANnAYXyo3w==",
+        "requested": "[4.0.12, )",
+        "resolved": "4.0.12",
+        "contentHash": "Gsx6MtljcAKEB/kKmOs0lq9KOapy7CtNtfxijXzP/Xmlifb8ByfnnzjL7R4z1/bGFu503BCHQTRaEWnpIf2BhA==",
         "dependencies": {
           "FastCloner": "3.3.16",
-          "SPTarkov.Common": "4.0.9",
-          "SPTarkov.DI": "4.0.9",
+          "SPTarkov.Common": "4.0.12",
+          "SPTarkov.DI": "4.0.12",
           "System.IO.Hashing": "9.0.9"
         }
       },
       "SPTarkov.Server.Web": {
         "type": "Direct",
-        "requested": "[4.0.9, )",
-        "resolved": "4.0.9",
-        "contentHash": "wxni3xpXdwoWZ5MKZtx8D2++GWHpB8JtcgaHsa9P4NR/bXPXQJZwIHCnHWcPc6Ev0rDdCh+gfAZRUH4AgszJCA==",
+        "requested": "[4.0.12, )",
+        "resolved": "4.0.12",
+        "contentHash": "OHT++ZhCFMAXXtsW3Md9poyTOdGEWUoTQOyVjxj5kNQtQlPEzxJUnc6R/VYq3VKriMghnu7ReSJZzxHd/W9+mg==",
         "dependencies": {
           "MudBlazor": "8.13.0",
-          "SPTarkov.Server.Core": "4.0.9"
+          "SPTarkov.Server.Core": "4.0.12"
         }
       },
       "FastCloner": {
