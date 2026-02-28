@@ -51,6 +51,9 @@ public record FikaConfigClient
 
     [JsonPropertyName("pmcFoundInRaid")]
     public bool PMCFoundInRaid { get; set; }
+
+    [JsonPropertyName("allowSpectateBots")]
+    public bool AllowSpectateBots { get; set; }
 }
 
 public record FikaConfigClientMods
