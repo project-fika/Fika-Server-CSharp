@@ -20,7 +20,7 @@
 		<PackageReference Include="SPTarkov.DI" Version="4.0.13" />
 		<PackageReference Include="SPTarkov.Reflection" Version="4.0.13" />
 		<PackageReference Include="SPTarkov.Server.Core" Version="4.0.13" />
-		<PackageReference Include="SPTarkov.Server.Web	" Version="4.0.0-pre.20251007.1604" />
+		<PackageReference Include="SPTarkov.Server.Web" Version="4.0.13" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -38,30 +38,4 @@
   <ItemGroup>
     <ProjectReference Include="..\FikaShared\FikaShared.csproj" />
   </ItemGroup>
-	
-	
-  <ItemGroup>
-    <PackageReference Update="SPTarkov.Server.Web" Version="4.0.13" />
-  </ItemGroup>
-	
-<!--
-  <ItemGroup>
-    <Reference Include="SPTarkov.Common">
-      <HintPath>tref\SPTarkov.Common.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="SPTarkov.DI">
-      <HintPath>tref\SPTarkov.DI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="SPTarkov.Reflection">
-      <HintPath>tref\SPTarkov.Reflection.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="SPTarkov.Server.Core">
-      <HintPath>tref\SPTarkov.Server.Core.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-  </ItemGroup>
-  -->
 </Project>
