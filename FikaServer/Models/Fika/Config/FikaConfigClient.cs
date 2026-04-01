@@ -54,6 +54,12 @@ public record FikaConfigClient
 
     [JsonPropertyName("allowSpectateBots")]
     public bool AllowSpectateBots { get; set; }
+
+    [JsonPropertyName("instantLoad")]
+    public bool InstantLoad { get; set; }
+
+    [JsonPropertyName("fastLoad")]
+    public bool FastLoad { get; set; }
 }
 
 public record FikaConfigClientMods
