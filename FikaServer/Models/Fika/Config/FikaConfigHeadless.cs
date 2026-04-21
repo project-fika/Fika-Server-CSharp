@@ -14,13 +14,13 @@ public record FikaConfigHeadless
     public bool SetLevelToAverageOfLobby { get; set; } = true;
 
     [JsonPropertyName("restartAfterAmountOfRaids")]
-    public int RestartAfterAmountOfRaids { get; set; } = 0;
+    public int RestartAfterAmountOfRaids { get; set; } = 1;
 }
 
 public record FikaConfigHeadlessProfiles
 {
     [JsonPropertyName("amount")]
-    public int Amount { get; set; } = 0;
+    public int Amount { get; set; }
 
     [JsonPropertyName("aliases")]
     public Dictionary<string, string> Aliases { get; set; } = [];
