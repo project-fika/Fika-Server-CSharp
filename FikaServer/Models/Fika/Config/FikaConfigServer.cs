@@ -45,7 +45,7 @@ public record FikaSPTServerConfig
     public FikaSPTHttpServerConfig Http { get; set; } = new();
 
     [JsonPropertyName("disableSPTChatBots")]
-    public bool DisableSPTChatBots { get; set; } = true;
+    public bool DisableSPTChatBots { get; set; }
 }
 
 public record FikaSPTHttpServerConfig
