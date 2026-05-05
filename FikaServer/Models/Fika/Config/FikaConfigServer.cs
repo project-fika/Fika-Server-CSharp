@@ -32,6 +32,9 @@ public record FikaConfigServer
     [JsonPropertyName("showNonStandardProfile")]
     public bool ShowNonStandardProfile { get; set; } = true;
 
+    [JsonPropertyName("logClientModsInConsole")]
+    public bool LogClientModsInConsole { get; set;  } = false;
+
     [JsonPropertyName("adminIds")]
     public List<MongoId> AdminIds { get; set; } = [];
 

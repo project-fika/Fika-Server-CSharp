@@ -1,11 +1,11 @@
-﻿using System.Text.Json;
-using System.Text.Json.Nodes;
-using FikaServer.Models.Fika.Config;
+﻿using FikaServer.Models.Fika.Config;
 using FikaServer.Models.Fika.Routes.Client;
 using FikaServer.Models.Fika.Routes.Client.Check;
 using FikaServer.Services;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Common;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace FikaServer.Controllers;
 
@@ -22,7 +22,7 @@ public class ClientController(ClientService fikaClientService)
         // Here be dragons, this is technically not in the client config, or well it was.. But it was decided it was better for this configuration
         // To be together with 'sentItemsLoseFIR' so users could find both options easier.
         // Keep this here as this is really only supposed to be a 'client' config and it's really only used on the client.
-        var config = JsonSerializer.Serialize(clientConfig);
+        string config = JsonSerializer.Serialize(clientConfig);
         JsonNode configObject = JsonNode.Parse(config)!.AsObject();
         configObject["allowItemSending"] = fikaClientService.GetIsItemSendingAllowed();
 
@@ -40,9 +40,9 @@ public class ClientController(ClientService fikaClientService)
     /// <summary>
     /// Handle /fika/client/check/mods
     /// </summary>
-    public FikaCheckModResponse HandleCheckMods(FikaCheckModRequestData request)
+    public FikaCheckModResponse HandleCheckMods(FikaCheckModRequestData request, MongoId sessionId)
     {
-        return fikaClientService.GetCheckModsResponse(request);
+        return fikaClientService.GetCheckModsResponse(request, sessionId);
     }
 
     /// <summary>
