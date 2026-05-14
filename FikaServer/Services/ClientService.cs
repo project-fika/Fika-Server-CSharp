@@ -65,7 +65,7 @@ public class ClientService(ISptLogger<ClientService> logger, SaveServer saveServ
         };
     }
 
-    public FikaCheckModResponse GetCheckModsResponse(FikaCheckModRequestData request)
+    public FikaCheckModResponse GetCheckModsResponse(FikaCheckModRequestData request, MongoId sessionId)
     {
         FikaCheckModResponse mismatchedMods = new()
         {
@@ -73,6 +73,13 @@ public class ClientService(ISptLogger<ClientService> logger, SaveServer saveServ
             MissingRequired = [],
             HashMismatch = []
         };
+
+        if (fikaConfig.Config.Server.LogClientModsInConsole)
+        {
+            var username = saveServer.GetProfile(sessionId).ProfileInfo?.Username;
+
+            logger.Info($"{username} ({sessionId}) connected with {request.Count} client mods: {string.Join(", ", request.Keys)}");
+        }
 
         // if no configuration was made, allow all mods
         if (!_hasRequiredOrOptionalMods)

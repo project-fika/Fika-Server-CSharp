@@ -32,7 +32,7 @@ public class ClientCallbacks(HttpResponseUtil httpResponseUtil, ClientController
     /// </summary>
     public ValueTask<string> HandleCheckMods(string url, FikaCheckModRequestData info, MongoId sessionID)
     {
-        return new ValueTask<string>(httpResponseUtil.NoBody(fikaClientController.HandleCheckMods(info)));
+        return new ValueTask<string>(httpResponseUtil.NoBody(fikaClientController.HandleCheckMods(info, sessionID)));
     }
 
     /// <summary>
