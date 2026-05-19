@@ -82,6 +82,15 @@ public sealed record FikaReviveConfig
     [JsonPropertyName("headshotKills")]
     public bool HeadshotKills { get; set; }
 
+    [JsonPropertyName("grenadesKills")]
+    public bool GrenadesKills { get; set; }
+
     [JsonPropertyName("maxRevives")]
     public int MaxRevives { get; set; }
+
+    [JsonPropertyName("bleedoutTime")]
+    public float BleedoutTime { get; set; } = 60f;
+
+    [JsonPropertyName("reviveTime")]
+    public float ReviveTime { get; set; } = 5f;
 }
