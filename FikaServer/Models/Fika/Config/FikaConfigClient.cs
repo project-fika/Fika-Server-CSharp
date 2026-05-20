@@ -85,6 +85,9 @@ public sealed record FikaReviveConfig
     [JsonPropertyName("grenadesKills")]
     public bool GrenadesKills { get; set; }
 
+    [JsonPropertyName("allowLooting")]
+    public bool AllowLooting { get; set; }
+
     [JsonPropertyName("maxRevives")]
     public int MaxRevives { get; set; }
 
