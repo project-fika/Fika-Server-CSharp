@@ -14,14 +14,14 @@ namespace FikaServer.Services;
 [Injectable(InjectionType.Singleton)]
 public class InsuranceService(SaveServer saveServer, ItemHelper itemHelper, ISptLogger<InsuranceService> logger)
 {
-    private readonly ConcurrentDictionary<string, List<FikaInsurancePlayer>> _matchInsuranceInfo = [];
+    private readonly ConcurrentDictionary<MongoId, List<FikaInsurancePlayer>> _matchInsuranceInfo = [];
 
     /// <summary>
     /// Gets the match the player is part of
     /// </summary>
     /// <param name="sessionID">The profile id to search for</param>
     /// <returns></returns>
-    public string GetMatchId(string sessionID)
+    public string GetMatchId(MongoId sessionID)
     {
         foreach ((var matchId, var players) in _matchInsuranceInfo)
         {
@@ -40,7 +40,7 @@ public class InsuranceService(SaveServer saveServer, ItemHelper itemHelper, ISpt
     /// </summary>
     /// <param name="matchId">The id of the match</param>
     /// <param name="sessionID">The profile id to add</param>
-    public void AddPlayerToMatchId(string matchId, string sessionID)
+    public void AddPlayerToMatchId(MongoId matchId, MongoId sessionID)
     {
         if (!_matchInsuranceInfo.TryGetValue(matchId, out var players))
         {
@@ -72,7 +72,7 @@ public class InsuranceService(SaveServer saveServer, ItemHelper itemHelper, ISpt
     /// <param name="sessionID">The profile id that requested the end</param>
     /// <param name="matchId">The id of the match</param>
     /// <param name="endLocalRaidRequest">The request data</param>
-    public void OnEndLocalRaidRequest(string sessionID, string matchId, EndLocalRaidRequestData endLocalRaidRequest)
+    public void OnEndLocalRaidRequest(MongoId sessionID, MongoId matchId, EndLocalRaidRequestData endLocalRaidRequest)
     {
         if (!_matchInsuranceInfo.TryGetValue(matchId, out var players))
         {
@@ -102,7 +102,7 @@ public class InsuranceService(SaveServer saveServer, ItemHelper itemHelper, ISpt
     /// Executed when a match ends
     /// </summary>
     /// <param name="matchId">The id of the match</param>
-    public void OnMatchEnd(string matchId)
+    public void OnMatchEnd(MongoId matchId)
     {
         if (!_matchInsuranceInfo.TryGetValue(matchId, out var players))
         {
@@ -111,7 +111,7 @@ public class InsuranceService(SaveServer saveServer, ItemHelper itemHelper, ISpt
 
         foreach (var player in players)
         {
-            // This player either crashed or the raid ended prematurely, eitherway we skip him.
+            // This player either crashed or the raid ended prematurely, either way we skip him.
             if (!player.EndedRaid)
             {
                 continue;
@@ -156,7 +156,7 @@ public class InsuranceService(SaveServer saveServer, ItemHelper itemHelper, ISpt
     /// <param name="sessionID">The profile to remove from</param>
     /// <param name="ids">The item ids to search for and remove</param>
     /// <exception cref="NullReferenceException"></exception>
-    private void RemoveItemsFromInsurance(string sessionID, List<MongoId> ids)
+    private void RemoveItemsFromInsurance(MongoId sessionID, List<MongoId> ids)
     {
         var profile = saveServer.GetProfile(sessionID)
             ?? throw new NullReferenceException("[Fika Insurance] Profile was null");
@@ -170,9 +170,9 @@ public class InsuranceService(SaveServer saveServer, ItemHelper itemHelper, ISpt
                 continue;
             }
 
-            foreach (string? itemId in ids)
+            foreach (var itemId in ids)
             {
-                var item = insurance.Items
+                var item = insurance.Items!
                     .FirstOrDefault(x => x.Id == itemId);
 
                 if (item is null)
@@ -184,8 +184,8 @@ public class InsuranceService(SaveServer saveServer, ItemHelper itemHelper, ISpt
                 if (itemHelper.IsOfBaseclasses(item.Template, [BaseClasses.ARMOR, BaseClasses.HEADWEAR]))
                 {
                     logger.Debug($"[Fika Insurance] {itemId} is armor or helmet");
-                    var children = insurance.Items
-                        .Where(x => x.ParentId == itemId && itemHelper.IsOfBaseclass(x.Template, BaseClasses.BUILT_IN_INSERTS));
+                    var children = insurance.Items!
+                        .Where(x => x.ParentId! == itemId && itemHelper.IsOfBaseclass(x.Template, BaseClasses.BUILT_IN_INSERTS));
 
                     foreach (var childItem in children)
                     {
@@ -200,7 +200,7 @@ public class InsuranceService(SaveServer saveServer, ItemHelper itemHelper, ISpt
                 // Remove children of the item
                 foreach (var itemToRemove in toRemove)
                 {
-                    if (!insurance.Items.Remove(itemToRemove))
+                    if (!insurance.Items!.Remove(itemToRemove))
                     {
                         logger.Debug($"[Fika Insurance] Unable to remove the item {itemToRemove.Id}");
                     }
