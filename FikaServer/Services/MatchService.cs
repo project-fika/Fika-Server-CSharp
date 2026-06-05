@@ -308,9 +308,9 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
     /// <summary>
     /// Adds a player to a match
     /// </summary>
-    /// <param name="matchId"></param>
-    /// <param name="playerId"></param>
-    /// <param name="data"></param>
+    /// <param name="matchId">The match id</param>
+    /// <param name="playerId">The player id to add to the match</param>
+    /// <param name="data">Data for the player</param>
     public void AddPlayerToMatch(MongoId matchId, MongoId playerId, FikaPlayer data)
     {
         if (Matches.TryGetValue(matchId, out var match))
@@ -348,8 +348,8 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
     /// <summary>
     /// Sets a player to dead
     /// </summary>
-    /// <param name="matchId"></param>
-    /// <param name="playerId"></param>
+    /// <param name="matchId">The match id</param>
+    /// <param name="playerId">The player id to set as dead</param>
     public void SetPlayerDead(MongoId matchId, MongoId playerId)
     {
         if (Matches.TryGetValue(matchId, out var match))
@@ -366,9 +366,9 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
     /// <summary>
     /// Sets the groupId for a player
     /// </summary>
-    /// <param name="matchId"></param>
-    /// <param name="playerId"></param>
-    /// <param name="groupId"></param>
+    /// <param name="matchId">The match id</param>
+    /// <param name="playerId">The player id</param>
+    /// <param name="groupId">The group to add <paramref name="playerId"/> to</param>
     public void SetPlayerGroup(MongoId matchId, MongoId playerId, string groupId)
     {
         if (Matches.TryGetValue(matchId, out var match))
@@ -385,8 +385,8 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
     /// <summary>
     /// Removes a player from a match
     /// </summary>
-    /// <param name="matchId"></param>
-    /// <param name="playerId"></param>
+    /// <param name="matchId">The match to remove the player from</param>
+    /// <param name="playerId">The player id to remove</param>
     public void RemovePlayerFromMatch(MongoId matchId, MongoId playerId)
     {
         if (Matches.TryGetValue(matchId, out var match))

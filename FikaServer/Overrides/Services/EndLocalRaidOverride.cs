@@ -13,7 +13,8 @@ public class EndLocalRaidOverride : AbstractPatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return typeof(LocationLifecycleService).GetMethod(nameof(LocationLifecycleService.EndLocalRaid))!;
+        return typeof(LocationLifecycleService)
+            .GetMethod(nameof(LocationLifecycleService.EndLocalRaid))!;
     }
 
     [PatchPrefix]
