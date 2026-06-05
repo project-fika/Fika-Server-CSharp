@@ -1,7 +1,7 @@
 ﻿using FikaServer.Controllers;
 using FikaServer.Models.Fika.SendItem;
 using SPTarkov.DI.Annotations;
-using SPTarkov.Server.Core.Models.Eft.Common;
+using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.ItemEvent;
 using SPTarkov.Server.Core.Utils;
 
@@ -10,9 +10,9 @@ namespace FikaServer.Callbacks;
 [Injectable]
 public class SendItemCallbacks(HttpResponseUtil httpResponseUtil, SendItemController sendItemController)
 {
-    public async ValueTask<ItemEventRouterResponse> HandleSendItem(PmcData pmcData, SendItemRequestData body, string sessionID)
+    public async ValueTask<ItemEventRouterResponse> HandleSendItem(SendItemRequestData body, MongoId sessionID)
     {
-        return await sendItemController.SendItem(pmcData, body, sessionID);
+        return await sendItemController.SendItem(body, sessionID);
     }
 
     /// <summary>

@@ -3,17 +3,23 @@ using FikaServer.Models.Enums;
 
 namespace FikaServer.Models.Fika.WebSocket.Notifications;
 
-public record ReceivedSentItemNotification : IFikaNotification
+public sealed record ReceivedSentItemNotification : IFikaNotification
 {
     [JsonPropertyName("type")]
     public EFikaNotification Type { get; set; } = EFikaNotification.SentItem;
 
     [JsonPropertyName("nickname")]
-    public string Nickname { get; set; } = string.Empty;
+    public required string Nickname { get; set; }
 
     [JsonPropertyName("targetId")]
-    public string TargetId { get; set; } = string.Empty;
+    public required string TargetId { get; set; }
 
     [JsonPropertyName("itemName")]
-    public string ItemName { get; set; } = string.Empty;
+    public required string ItemName { get; set; }
+
+    [JsonPropertyName("stackCount")]
+    public required double StackCount { get; set; }
+
+    [JsonPropertyName("multiple")]
+    public required bool Multiple { get; set; }
 }

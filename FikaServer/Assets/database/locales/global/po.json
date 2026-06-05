@@ -101,6 +101,8 @@
     "F_UI_InitWeather": "Gerando clima...",
     "F_Notification_RaidStarted": "{0} iniciou uma incursão em {1}",
     "F_Notification_ItemReceived": "Você recebeu um {0} de {1}",
+    "F_Notification_ItemStackReceived": "You received a stack of {0} {1} from {2}",
+    "F_Notification_MultipleItemReceived": "You received items from {0}",
     "F_Notification_RaidSettingsDisabled": "A edição das Configurações de Incursão está desativada pelo anfitrião do servidor",
     "F_UI_ExtractMessage": "Pressione {0} para extrair",
     "F_UI_DownloadProfile": "BAIXAR PERFIL",

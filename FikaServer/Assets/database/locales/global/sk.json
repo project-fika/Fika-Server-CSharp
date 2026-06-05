@@ -101,6 +101,8 @@
     "F_UI_InitWeather": "Generujem počasie...",
     "F_Notification_RaidStarted": "{0} spustil raid na {1}",
     "F_Notification_ItemReceived": "Dostal si {0} od {1}",
+    "F_Notification_ItemStackReceived": "You received a stack of {0} {1} from {2}",
+    "F_Notification_MultipleItemReceived": "You received items from {0}",
     "F_Notification_RaidSettingsDisabled": "Úprava nastavení Raidu je vypnutá hosťom serveru",
     "F_UI_ExtractMessage": "Stlač {0} pre extrakt",
     "F_UI_DownloadProfile": "STIAHNUŤ PROFIL",

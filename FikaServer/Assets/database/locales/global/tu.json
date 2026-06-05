@@ -101,6 +101,8 @@
     "F_UI_InitWeather": "Hava durumu oluşturuluyor...",
     "F_Notification_RaidStarted": "{0}, {1}'e bir baskın başlattı",
     "F_Notification_ItemReceived": "{1}'den bir {0} aldınız",
+    "F_Notification_ItemStackReceived": "You received a stack of {0} {1} from {2}",
+    "F_Notification_MultipleItemReceived": "You received items from {0}",
     "F_Notification_RaidSettingsDisabled": "Baskın Ayarlarının düzenlenmesi sunucu ana bilgisayarı tarafından devre dışı bırakılır",
     "F_UI_ExtractMessage": "Çıkarmak için {0} tuşuna basın",
     "F_UI_DownloadProfile": "PROFİLİ İNDİR",

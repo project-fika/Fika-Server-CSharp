@@ -101,6 +101,8 @@
     "F_UI_InitWeather": "날씨 생성 중...",
     "F_Notification_RaidStarted": "{0} 가 {1} 에서 레이드를 시작하였습니다",
     "F_Notification_ItemReceived": "{1} 에게서 {0} 를 받았습니다",
+    "F_Notification_ItemStackReceived": "You received a stack of {0} {1} from {2}",
+    "F_Notification_MultipleItemReceived": "You received items from {0}",
     "F_Notification_RaidSettingsDisabled": "레이드 설정 편집이 서버 호스트에 의해서 비활성화 되어있습니다.",
     "F_UI_ExtractMessage": "{0} 을 눌러 탈출을 완료하세요",
     "F_UI_DownloadProfile": "프로필 다운로드",

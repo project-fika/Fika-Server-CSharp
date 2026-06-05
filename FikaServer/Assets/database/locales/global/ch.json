@@ -101,6 +101,8 @@
     "F_UI_InitWeather": "正在生成天气...",
     "F_Notification_RaidStarted": "{0} 开始了 {1} 行动",
     "F_Notification_ItemReceived": "你收到了来自玩家 {1} 发送的 {0}",
+    "F_Notification_ItemStackReceived": "You received a stack of {0} {1} from {2}",
+    "F_Notification_MultipleItemReceived": "You received items from {0}",
     "F_Notification_RaidSettingsDisabled": "服务器主机禁用了战局设置",
     "F_UI_ExtractMessage": "按 {0} 撤离",
     "F_UI_DownloadProfile": "下载档案",

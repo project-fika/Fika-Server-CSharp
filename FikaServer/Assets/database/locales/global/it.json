@@ -101,6 +101,8 @@
     "F_UI_InitWeather": "Generazione meteo...",
     "F_Notification_RaidStarted": "{0} ha avviato un raid su {1}",
     "F_Notification_ItemReceived": "Hai ricevuto {0} da {1}",
+    "F_Notification_ItemStackReceived": "You received a stack of {0} {1} from {2}",
+    "F_Notification_MultipleItemReceived": "You received items from {0}",
     "F_Notification_RaidSettingsDisabled": "La modifica di RaidSettings è stata disabilitata dall' host del server",
     "F_UI_ExtractMessage": "Premi {0} per estrarre",
     "F_UI_DownloadProfile": "SCARICA PROFILO",

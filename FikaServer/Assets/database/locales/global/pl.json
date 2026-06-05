@@ -101,6 +101,8 @@
     "F_UI_InitWeather": "Generowanie pogody...",
     "F_Notification_RaidStarted": "{0} Rozpoczął raid na {1}",
     "F_Notification_ItemReceived": "Otrzymałeś {0} od {1}",
+    "F_Notification_ItemStackReceived": "You received a stack of {0} {1} from {2}",
+    "F_Notification_MultipleItemReceived": "You received items from {0}",
     "F_Notification_RaidSettingsDisabled": "Edytowanie ustawień raidu jest wyłączone przez hosta serwera",
     "F_UI_ExtractMessage": "Wciśnij {0} aby wyjść",
     "F_UI_DownloadProfile": "POBIERZ PROFIL",

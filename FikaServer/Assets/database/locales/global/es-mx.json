@@ -101,6 +101,8 @@
     "F_UI_InitWeather": "Generando clima...",
     "F_Notification_RaidStarted": "{0} comenzó una raid en {1}",
     "F_Notification_ItemReceived": "Recibiste un {0} de {1}",
+    "F_Notification_ItemStackReceived": "You received a stack of {0} {1} from {2}",
+    "F_Notification_MultipleItemReceived": "You received items from {0}",
     "F_Notification_RaidSettingsDisabled": "La edición de RaidSettings ha sido desactivada por el anfitrión del servidor",
     "F_UI_ExtractMessage": "Presiona {0} para extraer",
     "F_UI_DownloadProfile": "DOWNLOAD PROFILE",

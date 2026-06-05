@@ -17,7 +17,7 @@ public class SendItemEventRouter(SendItemCallbacks sendItemCallbacks) : ItemEven
     {
         return url switch
         {
-            FikaItemEventRouter.SENDTOPLAYER => await sendItemCallbacks.HandleSendItem(pmcData, body as SendItemRequestData, sessionID),
+            FikaItemEventRouter.SENDTOPLAYER => await sendItemCallbacks.HandleSendItem(body as SendItemRequestData, sessionID),
             _ => throw new Exception($"SendItemEventRouter being used when it cant handle route {url}")
         };
     }

@@ -101,6 +101,8 @@
     "F_UI_InitWeather": "Генерируем погоду...",
     "F_Notification_RaidStarted": "{0} запустил рейд на {1}",
     "F_Notification_ItemReceived": "Вы получили {0} от {1}",
+    "F_Notification_ItemStackReceived": "You received a stack of {0} {1} from {2}",
+    "F_Notification_MultipleItemReceived": "You received items from {0}",
     "F_Notification_RaidSettingsDisabled": "Редактирование настроек рейда отключено хостом сервера",
     "F_UI_ExtractMessage": "Нажмите {0} для выхода",
     "F_UI_DownloadProfile": "СКАЧАТЬ ПРОФИЛЬ",

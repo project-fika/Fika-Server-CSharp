@@ -101,6 +101,8 @@
     "F_UI_InitWeather": "天気を生成中…",
     "F_Notification_RaidStarted": "{0} started a raid on {1}",
     "F_Notification_ItemReceived": "You received a {0} from {1}",
+    "F_Notification_ItemStackReceived": "You received a stack of {0} {1} from {2}",
+    "F_Notification_MultipleItemReceived": "You received items from {0}",
     "F_Notification_RaidSettingsDisabled": "サーバのホストによりレイド設定の編集は無効になっています",
     "F_UI_ExtractMessage": "Press {0} to extract",
     "F_UI_DownloadProfile": "DOWNLOAD PROFILE",
