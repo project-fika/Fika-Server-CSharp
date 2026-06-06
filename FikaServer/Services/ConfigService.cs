@@ -51,6 +51,8 @@ public class ConfigService(ISptLogger<ConfigService> logger, ConfigServer config
             Config.Server.ApiKey = await GenerateAPIKey();
         }
 
+        EnforceReviveValues();
+
         // No need to do any fancyness around sorting properties and writing them if they weren't set before here
         // We store default values in the config models, and if one is missing this will write it to the file in the correct place
         await SaveConfig();
@@ -61,6 +63,16 @@ public class ConfigService(ISptLogger<ConfigService> logger, ConfigServer config
 #endif
 
         ApplySPTConfig(Config.Server.SPT);
+    }
+
+    private void EnforceReviveValues()
+    {
+        if (Math.Abs(Config.Client.ReviveConfig.BleedoutTime) >= float.Epsilon)
+        {
+            Config.Client.ReviveConfig.BleedoutTime = Math.Clamp(Config.Client.ReviveConfig.BleedoutTime, 10f, 600f);
+        }
+        Config.Client.ReviveConfig.MaxRevives = Math.Clamp(Config.Client.ReviveConfig.MaxRevives, 0, 10);
+        Config.Client.ReviveConfig.ReviveTime = Math.Clamp(Config.Client.ReviveConfig.ReviveTime, 3f, 30f);
     }
 
     private static Task<string> GenerateAPIKey(int size = 32)

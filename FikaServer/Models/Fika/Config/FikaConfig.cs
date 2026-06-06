@@ -18,6 +18,4 @@ public record FikaConfig
 
     [JsonPropertyName("background")]
     public FikaConfigBackground Background { get; set; } = new();
-
-
 }

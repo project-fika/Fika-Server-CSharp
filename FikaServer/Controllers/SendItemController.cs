@@ -5,7 +5,7 @@ using FikaServer.WebSockets;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Extensions;
 using SPTarkov.Server.Core.Helpers;
-using SPTarkov.Server.Core.Models.Eft.Common;
+using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.ItemEvent;
 using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Routers;
@@ -17,14 +17,14 @@ namespace FikaServer.Controllers;
 
 [Injectable]
 public class SendItemController(ISptLogger<SendItemController> logger, EventOutputHolder eventOutputHolder,
-    MailSendService mailSendService, InventoryHelper inventoryHelper, SaveServer saveServer, ItemHelper itemHelper,
-    HttpResponseUtil httpResponseUtil, ConfigService fikaConfigService, NotificationWebSocket notificationWebSocket)
+    MailSendService mailSendService, InventoryHelper inventoryHelper, SaveServer saveServer, HttpResponseUtil httpResponseUtil,
+    ConfigService fikaConfigService, NotificationWebSocket notificationWebSocket)
 {
-    public async ValueTask<ItemEventRouterResponse> SendItem(PmcData pmcData, SendItemRequestData body, string sessionId)
+    public async ValueTask<ItemEventRouterResponse> SendItem(SendItemRequestData body, MongoId sessionId)
     {
         var output = eventOutputHolder.GetOutput(sessionId);
 
-        if (body is null || body.ID is null || body.Target is null)
+        if (body is null || body.ItemIds is null || body.Target is null)
         {
             return httpResponseUtil.AppendErrorToOutput(output, "Missing data in body");
         }
@@ -36,10 +36,13 @@ public class SendItemController(ISptLogger<SendItemController> logger, EventOutp
             return httpResponseUtil.AppendErrorToOutput(output, "Target profile not found");
         }
 
-        logger.Info($"{body.ID} is going to sessionID: {body.Target}");
+        logger.Info($"{body.ItemIds.Length} items are going to sessionID: {body.Target}");
 
         var senderItems = senderProfile.CharacterData?.PmcData?.Inventory?.Items ?? [];
-        var itemsToSend = senderItems.GetItemWithChildren(body.ID);
+        var itemsToSend = body.ItemIds
+            .SelectMany(id => senderItems.GetItemWithChildren(id))
+            .Distinct()
+            .ToList();
 
         if (itemsToSend.Count == 0)
         {
@@ -57,14 +60,23 @@ public class SendItemController(ISptLogger<SendItemController> logger, EventOutp
 
         mailSendService.SendSystemMessageToPlayer(body.Target,
             $"You have received a gift from {senderProfile?.CharacterData?.PmcData?.Info?.Nickname ?? "Unknown"}",
-            itemsToSend, fikaConfigService.Config.Server.ItemSendingStorageTime * 86400); // days * seconds per day
-        inventoryHelper.RemoveItem(senderProfile.CharacterData.PmcData, body.ID, sessionId, output);
+            itemsToSend, fikaConfigService.Config.Server.ItemSendingStorageTime * 86_400); // days * seconds per day
+        foreach (var itemId in body.ItemIds)
+        {
+            inventoryHelper.RemoveItem(senderProfile!.CharacterData!.PmcData!, itemId, sessionId, output);
+        }
+
+        var stackCount = itemsToSend.Count > 1
+            ? 1d
+            : itemsToSend[0].Upd?.StackObjectsCount.GetValueOrDefault() ?? 1d;
 
         await notificationWebSocket.SendAsync(body.Target, new ReceivedSentItemNotification
         {
             Nickname = senderProfile?.CharacterData?.PmcData?.Info?.Nickname ?? "Unknown",
             TargetId = body.Target,
-            ItemName = $"{itemsToSend[0].Template} ShortName"
+            ItemName = $"{itemsToSend[0].Template} ShortName",
+            StackCount = stackCount,
+            Multiple = itemsToSend.Count > 1
         });
 
         return output;

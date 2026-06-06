@@ -2,7 +2,7 @@
 
 namespace FikaServer.Models.Fika.Config;
 
-public record FikaConfigClient
+public sealed record FikaConfigClient
 {
     [JsonPropertyName("useBtr")]
     public bool UseBtr { get; set; } = true;
@@ -60,13 +60,40 @@ public record FikaConfigClient
 
     [JsonPropertyName("fastLoad")]
     public bool FastLoad { get; set; }
+
+    [JsonPropertyName("reviveConfig")]
+    public FikaReviveConfig ReviveConfig { get; set; } = new();
 }
 
-public record FikaConfigClientMods
+public sealed record FikaConfigClientMods
 {
     [JsonPropertyName("required")]
     public List<string> Required { get; set; } = [];
 
     [JsonPropertyName("optional")]
     public List<string> Optional { get; set; } = [];
+}
+
+public sealed record FikaReviveConfig
+{
+    [JsonPropertyName("enabled")]
+    public bool Enabled { get; set; }
+
+    [JsonPropertyName("headshotKills")]
+    public bool HeadshotKills { get; set; }
+
+    [JsonPropertyName("grenadesKills")]
+    public bool GrenadesKills { get; set; }
+
+    [JsonPropertyName("allowLooting")]
+    public bool AllowLooting { get; set; }
+
+    [JsonPropertyName("maxRevives")]
+    public int MaxRevives { get; set; }
+
+    [JsonPropertyName("bleedoutTime")]
+    public float BleedoutTime { get; set; } = 60f;
+
+    [JsonPropertyName("reviveTime")]
+    public float ReviveTime { get; set; } = 5f;
 }

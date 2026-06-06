@@ -13,7 +13,8 @@ public class EndLocalRaidOverride : AbstractPatch
 {
     protected override MethodBase GetTargetMethod()
     {
-        return typeof(LocationLifecycleService).GetMethod(nameof(LocationLifecycleService.EndLocalRaid))!;
+        return typeof(LocationLifecycleService)
+            .GetMethod(nameof(LocationLifecycleService.EndLocalRaid))!;
     }
 
     [PatchPrefix]
@@ -23,7 +24,7 @@ public class EndLocalRaidOverride : AbstractPatch
         var insuranceService = ServiceLocator.ServiceProvider.GetService<InsuranceService>() ?? throw new NullReferenceException("InsuranceService is null!");
 
         // Get match id from player session id
-        string? matchId = matchService.GetMatchIdByPlayer(sessionId);
+        var matchId = matchService.GetMatchIdByPlayer(sessionId);
         if (matchId == null)
         {
             // Could not find matchId, run original
@@ -31,7 +32,7 @@ public class EndLocalRaidOverride : AbstractPatch
         }
 
         // Find player that exited the raid
-        var player = matchService.GetPlayerInMatch(matchId, sessionId);
+        var player = matchService.GetPlayerInMatch(matchId.Value, sessionId);
 
         if (player != null)
         {

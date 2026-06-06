@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using FikaServer.Models.Fika.Insurance;
 using SPTarkov.DI.Annotations;
+using SPTarkov.Server.Core.Extensions;
 using SPTarkov.Server.Core.Helpers;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Common.Tables;
@@ -14,14 +15,14 @@ namespace FikaServer.Services;
 [Injectable(InjectionType.Singleton)]
 public class InsuranceService(SaveServer saveServer, ItemHelper itemHelper, ISptLogger<InsuranceService> logger)
 {
-    private readonly ConcurrentDictionary<string, List<FikaInsurancePlayer>> _matchInsuranceInfo = [];
+    private readonly ConcurrentDictionary<MongoId, List<FikaInsurancePlayer>> _matchInsuranceInfo = [];
 
     /// <summary>
     /// Gets the match the player is part of
     /// </summary>
     /// <param name="sessionID">The profile id to search for</param>
-    /// <returns></returns>
-    public string GetMatchId(string sessionID)
+    /// <returns>The match id or <see langword="null"/> if not found</returns>
+    public MongoId? GetMatchId(MongoId sessionID)
     {
         foreach ((var matchId, var players) in _matchInsuranceInfo)
         {
@@ -31,8 +32,7 @@ public class InsuranceService(SaveServer saveServer, ItemHelper itemHelper, ISpt
             }
         }
 
-        //Todo: Nullable? Check?
-        return string.Empty;
+        return null;
     }
 
     /// <summary>
@@ -40,26 +40,39 @@ public class InsuranceService(SaveServer saveServer, ItemHelper itemHelper, ISpt
     /// </summary>
     /// <param name="matchId">The id of the match</param>
     /// <param name="sessionID">The profile id to add</param>
-    public void AddPlayerToMatchId(string matchId, string sessionID)
+    public void AddPlayerToMatchId(MongoId matchId, MongoId sessionID)
     {
         if (!_matchInsuranceInfo.TryGetValue(matchId, out var players))
         {
             players = [];
-
             _matchInsuranceInfo.TryAdd(matchId, players);
         }
+
+        var profile = saveServer.GetProfile(sessionID)
+            ?? throw new NullReferenceException("[Fika Insurance] Profile was null");
+
+        var pmcData = profile.CharacterData?.PmcData;
+        var equipmentId = pmcData!.Inventory?.Equipment!;
+        var equipment = pmcData!.Inventory!.Items!
+            .Where(i => i.ParentId! == equipmentId || pmcData.DoesItemHaveRootId(i, equipmentId.Value))
+            .Select(i => i.Id)
+            .ToArray();
+        var insuredItems = pmcData.InsuredItems!
+            .Where(i => i.ItemId.HasValue && equipment.Contains(i.ItemId.Value))
+            .Select(i => i.ItemId!.Value)
+            .ToArray();
+
+        logger.Debug($"[Fika Insurance] {sessionID} brought {insuredItems.Length} items into the raid");
 
         FikaInsurancePlayer player = new()
         {
             SessionID = sessionID,
             EndedRaid = false,
-            LostItems = [],
-            FoundItems = [],
-            Inventory = [],
+            InsuredItemsBroughtToRaid = insuredItems
         };
 
         _matchInsuranceInfo.AddOrUpdate(matchId, [player],
-           (key, existingPlayers) =>
+           (_, existingPlayers) =>
            {
                existingPlayers.Add(player);
                return existingPlayers;
@@ -72,9 +85,15 @@ public class InsuranceService(SaveServer saveServer, ItemHelper itemHelper, ISpt
     /// <param name="sessionID">The profile id that requested the end</param>
     /// <param name="matchId">The id of the match</param>
     /// <param name="endLocalRaidRequest">The request data</param>
-    public void OnEndLocalRaidRequest(string sessionID, string matchId, EndLocalRaidRequestData endLocalRaidRequest)
+    public void OnEndLocalRaidRequest(MongoId sessionID, MongoId? matchId, EndLocalRaidRequestData endLocalRaidRequest)
     {
-        if (!_matchInsuranceInfo.TryGetValue(matchId, out var players))
+        if (!matchId.HasValue)
+        {
+            logger.Error($"{sessionID} ended their raid but the match could not be found");
+            return;
+        }
+
+        if (!_matchInsuranceInfo.TryGetValue(matchId.Value, out var players))
         {
             logger.Error("[Fika Insurance] onEndLocalRaidRequest: matchId not found!");
             return;
@@ -82,19 +101,18 @@ public class InsuranceService(SaveServer saveServer, ItemHelper itemHelper, ISpt
 
         foreach (var player in players)
         {
-            if (player.SessionID == sessionID)
+            if (player.SessionID != sessionID)
             {
                 continue;
             }
 
             // Map both the lost items and the current inventory
-            player.LostItems = endLocalRaidRequest.LostInsuredItems?
-                .Select((i) => i.Id)
-                .ToList() ?? [];
-            player.Inventory = endLocalRaidRequest.Results?.Profile?.Inventory?.Items?
+            player.InventoryAfterRaid = endLocalRaidRequest.Results?.Profile?.Inventory?.Items?
                 .Select(i => i.Id)
-                .ToList() ?? [];
+                .ToArray();
             player.EndedRaid = true;
+
+            logger.Debug($"[Fika Insurance] {sessionID} brought {player.InventoryAfterRaid?.Length} items out from the raid");
         }
     }
 
@@ -102,48 +120,41 @@ public class InsuranceService(SaveServer saveServer, ItemHelper itemHelper, ISpt
     /// Executed when a match ends
     /// </summary>
     /// <param name="matchId">The id of the match</param>
-    public void OnMatchEnd(string matchId)
+    public void OnMatchEnd(MongoId matchId)
     {
         if (!_matchInsuranceInfo.TryGetValue(matchId, out var players))
         {
+            logger.Error($"[Fika Insurance] Could not find match with ID {matchId}");
             return;
         }
 
+        logger.Debug($"[Fika Insurance] Iterating over {players.Count} players");
         foreach (var player in players)
         {
-            // This player either crashed or the raid ended prematurely, eitherway we skip him.
+            // This player either crashed or the raid ended prematurely, either way we skip him.
             if (!player.EndedRaid)
             {
                 continue;
             }
 
-            foreach (var nextPlayer in players)
+            if (player.InsuredItemsBroughtToRaid == null)
             {
-                // Don't need to check the player we have in the base loop
-                if (player.SessionID == nextPlayer.SessionID)
-                {
-                    continue;
-                }
-
-                // This player either crashed or the raid ended prematurely, eitherway we skip him.
-                if (!nextPlayer.EndedRaid)
-                {
-                    continue;
-                }
-
-                // Find overlap between players other than the initial player we're looping over, if it contains the lost item id of the initial player we add it to foundItems
-                var overlap = nextPlayer.Inventory
-                    .Where(player.LostItems.Contains)
-                    .ToList() ?? [];
-
-                // Add said overlap to player's found items
-                player.FoundItems.AddRange(overlap);
+                continue;
             }
 
-            if (player.FoundItems.Count > 0)
+            var allPostRaidInventories = players
+                .Where(p => p.EndedRaid && p.InventoryAfterRaid != null)
+                .SelectMany(p => p.InventoryAfterRaid!)
+                .ToArray();
+
+            var lootedItemsForThisPlayer = player.InsuredItemsBroughtToRaid
+                .Where(allPostRaidInventories.Contains)
+                .ToArray();
+
+            if (lootedItemsForThisPlayer?.Length > 0)
             {
-                logger.Debug($"{player.SessionID} will lose ${player.FoundItems.Count}/${player.LostItems.Count} items in insurance`");
-                RemoveItemsFromInsurance(player.SessionID, player.FoundItems);
+                logger.Debug($"{player.SessionID} will lose {lootedItemsForThisPlayer?.Length} items in insurance");
+                RemoveItemsFromInsurance(player.SessionID, lootedItemsForThisPlayer!);
             }
         }
 
@@ -156,7 +167,7 @@ public class InsuranceService(SaveServer saveServer, ItemHelper itemHelper, ISpt
     /// <param name="sessionID">The profile to remove from</param>
     /// <param name="ids">The item ids to search for and remove</param>
     /// <exception cref="NullReferenceException"></exception>
-    private void RemoveItemsFromInsurance(string sessionID, List<MongoId> ids)
+    private void RemoveItemsFromInsurance(MongoId sessionID, MongoId[] ids)
     {
         var profile = saveServer.GetProfile(sessionID)
             ?? throw new NullReferenceException("[Fika Insurance] Profile was null");
@@ -170,9 +181,9 @@ public class InsuranceService(SaveServer saveServer, ItemHelper itemHelper, ISpt
                 continue;
             }
 
-            foreach (string? itemId in ids)
+            foreach (var itemId in ids)
             {
-                var item = insurance.Items
+                var item = insurance.Items!
                     .FirstOrDefault(x => x.Id == itemId);
 
                 if (item is null)
@@ -184,8 +195,8 @@ public class InsuranceService(SaveServer saveServer, ItemHelper itemHelper, ISpt
                 if (itemHelper.IsOfBaseclasses(item.Template, [BaseClasses.ARMOR, BaseClasses.HEADWEAR]))
                 {
                     logger.Debug($"[Fika Insurance] {itemId} is armor or helmet");
-                    var children = insurance.Items
-                        .Where(x => x.ParentId == itemId && itemHelper.IsOfBaseclass(x.Template, BaseClasses.BUILT_IN_INSERTS));
+                    var children = insurance.Items!
+                        .Where(x => x.ParentId! == itemId && itemHelper.IsOfBaseclass(x.Template, BaseClasses.BUILT_IN_INSERTS));
 
                     foreach (var childItem in children)
                     {
@@ -200,7 +211,7 @@ public class InsuranceService(SaveServer saveServer, ItemHelper itemHelper, ISpt
                 // Remove children of the item
                 foreach (var itemToRemove in toRemove)
                 {
-                    if (!insurance.Items.Remove(itemToRemove))
+                    if (!insurance.Items!.Remove(itemToRemove))
                     {
                         logger.Debug($"[Fika Insurance] Unable to remove the item {itemToRemove.Id}");
                     }
