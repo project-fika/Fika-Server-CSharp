@@ -346,8 +346,6 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
                 MatchId = matchId
             }
         });
-
-        logger.Warning($"Adding player to {matchId}");
     }
 
     /// <summary>
