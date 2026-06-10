@@ -129,32 +129,30 @@ public class InsuranceService(SaveServer saveServer, ItemHelper itemHelper, ISpt
         }
 
         logger.Debug($"[Fika Insurance] Iterating over {players.Count} players");
+
+        var postRaidInventoryMap = players
+            .Where(p => p.EndedRaid && p.InventoryAfterRaid != null)
+            .ToDictionary(p => p.SessionID, p => p.InventoryAfterRaid!);
+
         foreach (var player in players)
         {
-            // This player either crashed or the raid ended prematurely, either way we skip him.
-            if (!player.EndedRaid)
+            if (!player.EndedRaid || player.InsuredItemsBroughtToRaid == null)
             {
                 continue;
             }
 
-            if (player.InsuredItemsBroughtToRaid == null)
-            {
-                continue;
-            }
-
-            var allPostRaidInventories = players
-                .Where(p => p.EndedRaid && p.InventoryAfterRaid != null)
-                .SelectMany(p => p.InventoryAfterRaid!)
-                .ToArray();
+            var otherPlayersPostRaidInventories = new HashSet<MongoId>(postRaidInventoryMap
+                .Where(kvp => kvp.Key != player.SessionID)
+                .SelectMany(kvp => kvp.Value));
 
             var lootedItemsForThisPlayer = player.InsuredItemsBroughtToRaid
-                .Where(allPostRaidInventories.Contains)
+                .Where(otherPlayersPostRaidInventories.Contains)
                 .ToArray();
 
-            if (lootedItemsForThisPlayer?.Length > 0)
+            if (lootedItemsForThisPlayer.Length > 0)
             {
-                logger.Debug($"{player.SessionID} will lose {lootedItemsForThisPlayer?.Length} items in insurance");
-                RemoveItemsFromInsurance(player.SessionID, lootedItemsForThisPlayer!);
+                logger.Debug($"{player.SessionID} will lose {lootedItemsForThisPlayer.Length} items in insurance");
+                RemoveItemsFromInsurance(player.SessionID, lootedItemsForThisPlayer);
             }
         }
 
