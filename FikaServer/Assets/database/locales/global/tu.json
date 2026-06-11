@@ -99,6 +99,7 @@
     "F_UI_FikaAlwaysCoop": "Co-op Fika'da her zaman etkindir",
     "F_UI_UpnpFailed": "UPnP eşlemesi başarısız oldu. Seçilen bağlantı noktasının zaten açık olmadığından emin olun!\nVPN kullanıyorsanız UPnP'yi devre dışı bırakın.",
     "F_UI_InitWeather": "Hava durumu oluşturuluyor...",
+    "F_UI_ScavNotReady": "Your scav is not ready for another {0} minutes.",
     "F_Notification_RaidStarted": "{0}, {1}'e bir baskın başlattı",
     "F_Notification_ItemReceived": "{1}'den bir {0} aldınız",
     "F_Notification_ItemStackReceived": "You received a stack of {0} {1} from {2}",

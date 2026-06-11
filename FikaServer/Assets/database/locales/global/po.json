@@ -99,6 +99,7 @@
     "F_UI_FikaAlwaysCoop": "O co-op está sempre ativado no Fika",
     "F_UI_UpnpFailed": "O mapeamento UPnP falhou. Assegure-se de que a porta escolhida não está aberta!\\nDesative UPnP se estiver usando uma VPN.",
     "F_UI_InitWeather": "Gerando clima...",
+    "F_UI_ScavNotReady": "Your scav is not ready for another {0} minutes.",
     "F_Notification_RaidStarted": "{0} iniciou uma incursão em {1}",
     "F_Notification_ItemReceived": "Você recebeu um {0} de {1}",
     "F_Notification_ItemStackReceived": "You received a stack of {0} {1} from {2}",

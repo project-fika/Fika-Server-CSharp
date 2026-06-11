@@ -99,6 +99,7 @@
     "F_UI_FikaAlwaysCoop": "Кооператив всегда включен в Fika",
     "F_UI_UpnpFailed": "Ошибка сопоставления UPnP. Убедитесь, что выбранный порт уже не открыт!\\nОтключите UPnP, если вы используете VPN.",
     "F_UI_InitWeather": "Генерируем погоду...",
+    "F_UI_ScavNotReady": "Your scav is not ready for another {0} minutes.",
     "F_Notification_RaidStarted": "{0} запустил рейд на {1}",
     "F_Notification_ItemReceived": "Вы получили {0} от {1}",
     "F_Notification_ItemStackReceived": "You received a stack of {0} {1} from {2}",
