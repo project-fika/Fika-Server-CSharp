@@ -3,7 +3,7 @@ using FikaServer.Models.Enums;
 
 namespace FikaServer.Models.Fika.Presence;
 
-public record FikaPlayerPresence
+public sealed record FikaPlayerPresence
 {
     [JsonPropertyName("nickname")]
     public string Nickname { get; set; } = string.Empty;

@@ -255,6 +255,7 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
         if (Matches.TryGetValue(matchId, out var match))
         {
             match.Status = status;
+            presenceService.UpdateMatchStatus(matchId, status);
 
             if (status == EFikaMatchStatus.COMPLETE && match.IsHeadless)
             {
@@ -341,6 +342,8 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
                 Location = match.LocationData.Id,
                 Side = match.Side,
                 Time = match.Time,
+                Started = match.Status != EFikaMatchStatus.COMPLETE,
+                MatchId = matchId
             }
         });
     }
