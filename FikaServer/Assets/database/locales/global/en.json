@@ -21,6 +21,7 @@
     "F_Client_PeerConnected": "Peer connected to server on port {0}",
     "F_Client_PeerDisconnected": "Peer disconnected {0}, info: {1}",
     "F_Client_ConnectingToSession": "Connecting to session...",
+    "F_Client_MissingKeyForLocation": "Missing key '{0}' for location",
     "F_Client_ItemIsBlacklisted": "{0} is blacklisted from being sent",
     "F_Client_ItemsContainsBlacklisted": "{0} contains {1} which is blacklisted from being sent",
     "F_Client_SavedProfile": "Saved profile {0} to {1}",

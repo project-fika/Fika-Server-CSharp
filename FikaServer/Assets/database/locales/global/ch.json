@@ -21,6 +21,7 @@
     "F_Client_PeerConnected": "连接到端口 {0} 上的服务器",
     "F_Client_PeerDisconnected": "用户断开连接 {0}，信息: {1}",
     "F_Client_ConnectingToSession": "正在连接...",
+    "F_Client_MissingKeyForLocation": "Missing key '{0}' for location",
     "F_Client_ItemIsBlacklisted": "要发送物品:{0} 在黑名单中",
     "F_Client_ItemsContainsBlacklisted": "{0} 包含被在发送黑名单的 {1}",
     "F_Client_SavedProfile": "个人资料 {0} 已保存到 {1}",

@@ -21,6 +21,7 @@
     "F_Client_PeerConnected": "O persoana s-a conectat la server folosind port-ul {0}",
     "F_Client_PeerDisconnected": "Peer deconectat {0}, informații: {1}",
     "F_Client_ConnectingToSession": "Se conectează la sesiune...",
+    "F_Client_MissingKeyForLocation": "Missing key '{0}' for location",
     "F_Client_ItemIsBlacklisted": "{0} este pe lista neagră, nu poate fi trimis",
     "F_Client_ItemsContainsBlacklisted": "{0} conține {1} care nu poate fi trimis din cauză că este pe lista neagră",
     "F_Client_SavedProfile": "Profilul {0} salvat în {1}",

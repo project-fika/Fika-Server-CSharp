@@ -21,6 +21,7 @@
     "F_Client_PeerConnected": "{0} 포트로 클라이언트가 접속하였습니다",
     "F_Client_PeerDisconnected": "클라이언트가 접속을 해제하였습니다 {0}, info: {1}",
     "F_Client_ConnectingToSession": "세션 참가중....",
+    "F_Client_MissingKeyForLocation": "Missing key '{0}' for location",
     "F_Client_ItemIsBlacklisted": "{0}은 전송아이템 블랙리스트 되어있습니다",
     "F_Client_ItemsContainsBlacklisted": "{0}에 블랙리스트 아이템인 {1}이 들어있어 보낼 수 없습니다",
     "F_Client_SavedProfile": "프로필 {0}을 {1}에 저장하였습니다",

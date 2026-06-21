@@ -21,6 +21,7 @@
     "F_Client_PeerConnected": "Joueur connecté sur le port {0}",
     "F_Client_PeerDisconnected": "{0} s'est déconnecté. Info : {1}",
     "F_Client_ConnectingToSession": "Connexion à la session...",
+    "F_Client_MissingKeyForLocation": "Missing key '{0}' for location",
     "F_Client_ItemIsBlacklisted": "{0} ne peut pas être envoyé",
     "F_Client_ItemsContainsBlacklisted": "{0} contient {1} qui ne peut pas être envoyé",
     "F_Client_SavedProfile": "Profil {0} sauvegardé vers {1}",

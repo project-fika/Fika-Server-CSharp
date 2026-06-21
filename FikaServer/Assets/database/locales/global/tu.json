@@ -21,6 +21,7 @@
     "F_Client_PeerConnected": "Eş {0} numaralı bağlantı noktasından sunucuya bağlandı",
     "F_Client_PeerDisconnected": "Eşin bağlantısı kesildi {0}, bilgi: {1}",
     "F_Client_ConnectingToSession": "Oturuma bağlanılıyor...",
+    "F_Client_MissingKeyForLocation": "Missing key '{0}' for location",
     "F_Client_ItemIsBlacklisted": "{0} gönderilmek üzere kara listeye alındı",
     "F_Client_ItemsContainsBlacklisted": "{0} gönderilmek üzere kara listeye alınmış {1} içerir",
     "F_Client_SavedProfile": "Profil {0}'dan {1}'e kaydedildi",

@@ -21,6 +21,7 @@
     "F_Client_PeerConnected": "Uczestnik połączony z serwerem przez port {0}",
     "F_Client_PeerDisconnected": "Uczestnik rozłączył się {0}, informacja: {1}",
     "F_Client_ConnectingToSession": "Łączenie z sesją...",
+    "F_Client_MissingKeyForLocation": "Missing key '{0}' for location",
     "F_Client_ItemIsBlacklisted": "Przedmiot {0} znajduje się na czarnej liście i nie można go wysłać",
     "F_Client_ItemsContainsBlacklisted": "{0} zawiera {1}, który jest na czarnej liście wysyłania",
     "F_Client_SavedProfile": "Zapisano profil {0} do {1}",

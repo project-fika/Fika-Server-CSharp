@@ -21,6 +21,7 @@
     "F_Client_PeerConnected": "Клиент подключен к серверу с портом {0}",
     "F_Client_PeerDisconnected": "Клиент отключен {0}, причина: {1}",
     "F_Client_ConnectingToSession": "Подключение к сессии...",
+    "F_Client_MissingKeyForLocation": "Missing key '{0}' for location",
     "F_Client_ItemIsBlacklisted": "{0} не будет отправлен, так как находится в черном списке",
     "F_Client_ItemsContainsBlacklisted": "{0} содержит {1} который находится в черном списке",
     "F_Client_SavedProfile": "Профиль перезаписан с {0} в {1}",

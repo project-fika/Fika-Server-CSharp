@@ -21,6 +21,7 @@
     "F_Client_PeerConnected": "Spieler hat die Verbindung mit dem Server über den Port {0} hergestellt",
     "F_Client_PeerDisconnected": "{0} hat die Verbindung getrennt, Info: {1}",
     "F_Client_ConnectingToSession": "Verbinde mit Sitzung...",
+    "F_Client_MissingKeyForLocation": "Missing key '{0}' for location",
     "F_Client_ItemIsBlacklisted": "{0} darf nicht versendet werden",
     "F_Client_ItemsContainsBlacklisted": "{0} enthält {1}, was nicht gesendet werden darf",
     "F_Client_SavedProfile": "Profil {0} wurde gespeichert in {1}",

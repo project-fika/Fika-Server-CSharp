@@ -21,6 +21,7 @@
     "F_Client_PeerConnected": "Klient připojen k serveru na portu {0}",
     "F_Client_PeerDisconnected": "Klient odpojen {0}, info: {1}",
     "F_Client_ConnectingToSession": "Připojování k relaci...",
+    "F_Client_MissingKeyForLocation": "Missing key '{0}' for location",
     "F_Client_ItemIsBlacklisted": "{0} je zakázáno odesílat",
     "F_Client_ItemsContainsBlacklisted": "{0} obsahuje {1}, což je zakázáno odesílat",
     "F_Client_SavedProfile": "Profil {0} uložen do {1}",

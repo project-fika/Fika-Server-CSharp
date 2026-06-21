@@ -21,6 +21,7 @@
     "F_Client_PeerConnected": "ピアがポート {0} でサーバーに接続しました",
     "F_Client_PeerDisconnected": "ピアが {0} で切断しました、情報: {1}",
     "F_Client_ConnectingToSession": "セッションに接続中…",
+    "F_Client_MissingKeyForLocation": "Missing key '{0}' for location",
     "F_Client_ItemIsBlacklisted": "{0} は送信がブラックリストに登録されています",
     "F_Client_ItemsContainsBlacklisted": "{0} には {1} が含まれており、送信がブラックリストに登録されています",
     "F_Client_SavedProfile": "プロファイル {0} を {1} に保存しました",

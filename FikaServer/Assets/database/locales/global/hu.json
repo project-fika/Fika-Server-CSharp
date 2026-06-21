@@ -21,6 +21,7 @@
     "F_Client_PeerConnected": "Peer csatlakozik a szerverhez az {0} porton",
     "F_Client_PeerDisconnected": "Társ kapcsolat megszakítva: {0}, információ: {1}",
     "F_Client_ConnectingToSession": "Csatlakozás a játékhoz...",
+    "F_Client_MissingKeyForLocation": "Missing key '{0}' for location",
     "F_Client_ItemIsBlacklisted": "{0} a tiltólistán van a küldéstől",
     "F_Client_ItemsContainsBlacklisted": "A {0} tartalmazza a {1} elemet, amely tiltólistán van az elküldéstől",
     "F_Client_SavedProfile": "A(z) {0} profil mentve ide: {1}",
