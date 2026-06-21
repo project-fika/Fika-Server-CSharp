@@ -100,6 +100,7 @@
     "F_UI_FikaAlwaysCoop": "Co-op je vždy zapnutý vo Fike",
     "F_UI_UpnpFailed": "UPnP mapovanie zlyhalo. Uistite sa že vybraný port nie je otvorený!\nVypnite UPnP ak používate VPN.",
     "F_UI_InitWeather": "Generujem počasie...",
+    "F_UI_ScavNotReady": "Your scav is not ready for another {0} minutes.",
     "F_Notification_RaidStarted": "{0} spustil raid na {1}",
     "F_Notification_ItemReceived": "Dostal si {0} od {1}",
     "F_Notification_ItemStackReceived": "You received a stack of {0} {1} from {2}",

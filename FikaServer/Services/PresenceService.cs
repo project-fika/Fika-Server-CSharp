@@ -77,4 +77,15 @@ public class PresenceService(SaveServer saveServer, TimeUtil timeUtil, ISptLogge
     {
         _onlinePlayers.TryRemove(sessionID, out _);
     }
+
+    public void UpdateMatchStatus(MongoId matchId, EFikaMatchStatus status)
+    {
+        var matchPlayers = AllPlayersPresence
+            .Where(mp => mp.RaidInformation?.MatchId == matchId);
+
+        foreach (var matchPlayer in matchPlayers)
+        {
+            matchPlayer.RaidInformation!.Started = status != EFikaMatchStatus.COMPLETE;
+        }
+    }
 }
