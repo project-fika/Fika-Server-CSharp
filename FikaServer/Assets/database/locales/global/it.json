@@ -128,6 +128,8 @@
     "F_BepInEx_AutoExtract_D": "Estrai automaticamente dopo il countdown dell' estrazione come host, questo funzionerà solamente se non ci sono client connessi.",
     "F_BepInEx_ShowExtractMessage_T": "Mostra messaggio di estrazione",
     "F_BepInEx_ShowExtractMessage_D": "Indica se mostrare o meno il messaggio di estrazione dopo essere morti/estratti.",
+	"F_BepInEx_ShowPlayersList_T": "",
+    "F_BepInEx_ShowPlayersList_D": "",
     "F_BepInEx_ExtractKey_T": "Tasto per l'estrazione",
     "F_BepInEx_ExtractKey_D": "Il tasto usato per l'estrazione da un raid.",
     "F_BepInEx_EnableChat_T": "Abilita la chat",

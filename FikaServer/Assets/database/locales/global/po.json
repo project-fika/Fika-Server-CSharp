@@ -128,6 +128,8 @@
     "F_BepInEx_AutoExtract_D": "Extrai automaticamente após a contagem de extração. Como um host, isso só funcionará se não houver clientes conectados.",
     "F_BepInEx_ShowExtractMessage_T": "Mostrar Mensagem de Extração",
     "F_BepInEx_ShowExtractMessage_D": "Mostrar a mensagem de extração depois de morrer/extrair.",
+	"F_BepInEx_ShowPlayersList_T": "",
+    "F_BepInEx_ShowPlayersList_D": "",
     "F_BepInEx_ExtractKey_T": "Tecla de Extração",
     "F_BepInEx_ExtractKey_D": "A tecla usada para extrair da Raid.",
     "F_BepInEx_EnableChat_T": "Habilitar Chat",

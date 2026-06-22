@@ -128,6 +128,8 @@
     "F_BepInEx_AutoExtract_D": "Automatikusan elhagyja a pályát, miután a visszaszámlálás lejárt. Hostként ez csak akkor működik ha már nincs más a menetben.",
     "F_BepInEx_ShowExtractMessage_T": "Extract üzenet mutatása",
     "F_BepInEx_ShowExtractMessage_D": "Megmutatja amikor kiextractolsz vagy meghalsz.",
+	"F_BepInEx_ShowPlayersList_T": "",
+    "F_BepInEx_ShowPlayersList_D": "",
     "F_BepInEx_ExtractKey_T": "Extract gomb",
     "F_BepInEx_ExtractKey_D": "A gomb amit meg kell nyomnod, hogy elhagyd a menetet.",
     "F_BepInEx_EnableChat_T": "Csevegés engedélyezése",

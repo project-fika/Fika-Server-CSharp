@@ -128,6 +128,8 @@
     "F_BepInEx_AutoExtract_D": "Extraer automáticamente después de la cuenta regresiva de la extracción. Como anfitrión, esto solo funcionará si no hay clientes conectados.",
     "F_BepInEx_ShowExtractMessage_T": "Mostrar Mensaje de Extracción",
     "F_BepInEx_ShowExtractMessage_D": "Si se debe mostrar el mensaje de extracción después de morir/extraer.",
+	"F_BepInEx_ShowPlayersList_T": "",
+    "F_BepInEx_ShowPlayersList_D": "",
     "F_BepInEx_ExtractKey_T": "Tecla para Extraer",
     "F_BepInEx_ExtractKey_D": "La tecla utilizada para extraer de la incursión.",
     "F_BepInEx_EnableChat_T": "Habilitar Chat",

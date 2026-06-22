@@ -128,6 +128,8 @@
     "F_BepInEx_AutoExtract_D": "在撤离倒数结束后自动撤离。如果你是主机，这将仅仅在没有客户端连接时有效。",
     "F_BepInEx_ShowExtractMessage_T": "显示撤离消息",
     "F_BepInEx_ShowExtractMessage_D": "是否在死亡/撤离后显示提示消息",
+	"F_BepInEx_ShowPlayersList_T": "",
+    "F_BepInEx_ShowPlayersList_D": "",
     "F_BepInEx_ExtractKey_T": "撤离键",
     "F_BepInEx_ExtractKey_D": "用于撤离的按键",
     "F_BepInEx_EnableChat_T": "启用聊天",
