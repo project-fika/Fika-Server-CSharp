@@ -128,6 +128,8 @@
     "F_BepInEx_AutoExtract_D": "Automatically extracts after the extraction countdown. As a host, this will only work if there are no clients connected.",
     "F_BepInEx_ShowExtractMessage_T": "Show Extract Message",
     "F_BepInEx_ShowExtractMessage_D": "Whether to show the extract message after dying/extracting.",
+	"F_BepInEx_ShowPlayersList_T": "Show Players List",
+    "F_BepInEx_ShowPlayersList_D": "Whether to show a list of players or bots after dying/extracting.",
     "F_BepInEx_ExtractKey_T": "Extract Key",
     "F_BepInEx_ExtractKey_D": "The key used to extract from the raid.",
     "F_BepInEx_EnableChat_T": "Enable Chat",

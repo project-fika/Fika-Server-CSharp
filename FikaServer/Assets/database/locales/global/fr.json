@@ -128,6 +128,8 @@
     "F_BepInEx_AutoExtract_D": "Extraction automatique après le compte à rebours d'extraction. En tant qu'hôte, cela ne fonctionnera que s'il n'y a pas de clients connectés.",
     "F_BepInEx_ShowExtractMessage_T": "Afficher le message d'extraction",
     "F_BepInEx_ShowExtractMessage_D": "Afficher/Masquer le message d'extraction après la mort ou l'extraction.",
+	"F_BepInEx_ShowPlayersList_T": "Show Players List",
+    "F_BepInEx_ShowPlayersList_D": "Whether to show a list of players or bots after dying/extracting.",
     "F_BepInEx_ExtractKey_T": "Touche pour l'extraction",
     "F_BepInEx_ExtractKey_D": "La touche utilisée pour extraire du raid.",
     "F_BepInEx_EnableChat_T": "Activer le chat",

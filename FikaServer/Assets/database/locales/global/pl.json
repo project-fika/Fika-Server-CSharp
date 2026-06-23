@@ -128,6 +128,8 @@
     "F_BepInEx_AutoExtract_D": "Automatycznie wychodzi z raidu po odliczaniu wyjścia. Jako host, będzie działać tylko, gdy nie ma żadnych połączonych klientów.",
     "F_BepInEx_ShowExtractMessage_T": "Pokazuj Wiadomość Wyjścia",
     "F_BepInEx_ShowExtractMessage_D": "Czy pokazywać wiadomość wyjścia po śmierci/wyjściu.",
+	"F_BepInEx_ShowPlayersList_T": "Show Players List",
+    "F_BepInEx_ShowPlayersList_D": "Whether to show a list of players or bots after dying/extracting.",
     "F_BepInEx_ExtractKey_T": "Klawisz Wyjścia",
     "F_BepInEx_ExtractKey_D": "Klawisz używany do wyjścia z raidu.",
     "F_BepInEx_EnableChat_T": "Włącz Czat",

@@ -128,6 +128,8 @@
     "F_BepInEx_AutoExtract_D": "Exfill geri sayımından sonra otomatik olarak çıkarır. Bir ana bilgisayar olarak, bu yalnızca bağlı hiçbir istemci yoksa çalışacaktır.",
     "F_BepInEx_ShowExtractMessage_T": "Ayıklama Mesajını Göster",
     "F_BepInEx_ShowExtractMessage_D": "Boyama/özütleme işleminden sonra özüt mesajının gösterilip gösterilmeyeceği.",
+	"F_BepInEx_ShowPlayersList_T": "Show Players List",
+    "F_BepInEx_ShowPlayersList_D": "Whether to show a list of players or bots after dying/extracting.",
     "F_BepInEx_ExtractKey_T": "Exfill tuşu",
     "F_BepInEx_ExtractKey_D": "Baskından çıkarmak için kullanılan tuş.",
     "F_BepInEx_EnableChat_T": "Sohbeti Etkinleştir",
