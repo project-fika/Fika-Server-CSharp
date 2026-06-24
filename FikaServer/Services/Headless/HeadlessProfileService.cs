@@ -92,7 +92,7 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
     private void GenerateLaunchScript(MongoId profileId)
     {
         var modPath = configService.ModPath;
-        var scriptsPath = Path.Combine(modPath, "assets/scripts/");
+        var scriptsPath = Path.Combine(modPath, "assets", "scripts");
         var newFolderPath = Path.Combine(scriptsPath, profileId);
 
         try
