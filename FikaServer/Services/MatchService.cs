@@ -33,15 +33,12 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
             RemoveTimeoutInterval(matchId);
         }
 
-        Timer timer = new(_ =>
+        Timer timer = new(async _ =>
         {
             var match = GetMatch(matchId);
-            if (match != null)
+            if (match != null && match.Timeout++ >= fikaConfig.Config.Server.SessionTimeout)
             {
-                if (match.Timeout++ >= fikaConfig.Config.Server.SessionTimeout)
-                {
-                    EndMatch(matchId, EFikaMatchEndSessionMessage.PingTimeout);
-                }
+                await EndMatch(matchId, EFikaMatchEndSessionMessage.PingTimeout);
             }
 
         }, null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
