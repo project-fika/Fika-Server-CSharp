@@ -130,9 +130,19 @@ public class InsuranceService(SaveServer saveServer, ItemHelper itemHelper, ISpt
 
         logger.Debug($"[Fika Insurance] Iterating over {players.Count} players");
 
-        var postRaidInventoryMap = players
-            .Where(p => p.EndedRaid && p.InventoryAfterRaid != null)
-            .ToDictionary(p => p.SessionID, p => p.InventoryAfterRaid!);
+        var postRaidInventoryMap = new Dictionary<MongoId, MongoId[]>();
+        foreach (var player in players)
+        {
+            if (!player.EndedRaid || player.InventoryAfterRaid == null)
+            {
+                continue;
+            }
+
+            if (!postRaidInventoryMap.TryAdd(player.SessionID, player.InventoryAfterRaid!))
+            {
+                logger.Error($"OnMatchEnd: Duplicate SessionID detected: {player.SessionID}.");
+            }
+        }
 
         foreach (var player in players)
         {
