@@ -3,8 +3,10 @@ using SPTarkov.Server.Web;
 
 namespace FikaServer;
 
-public record FikaModMetadata : AbstractModMetadata, IModWebMetadata
+public sealed record FikaModMetadata : AbstractModMetadata, IModWebMetadata
 {
+    public const string FikaVersion = "2.3.6";
+
     public override string Name { get; init; } = "server";
     public override string Author { get; init; } = "Fika";
     public override List<string>? Contributors { get; init; } = [];
@@ -14,6 +16,6 @@ public record FikaModMetadata : AbstractModMetadata, IModWebMetadata
     public override bool? IsBundleMod { get; init; } = false;
     public override string License { get; init; } = "CC-BY-NC-SA-4.0";
     public override string ModGuid { get; init; } = "Fika";
-    public override SemanticVersioning.Version Version { get; init; } = new(2, 3, 5);
+    public override SemanticVersioning.Version Version { get; init; } = new(FikaVersion);
     public override SemanticVersioning.Range SptVersion { get; init; } = new(">=4.0.13");
 }
