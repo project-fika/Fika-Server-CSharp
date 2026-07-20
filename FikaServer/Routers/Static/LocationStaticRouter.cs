@@ -14,7 +14,8 @@ public class LocationStaticRouter(LocationCallbacks locationCallbacks, JsonUtil 
                 url,
                 info,
                 sessionId,
-                output
+                output,
+                cancellationToken
             ) => await locationCallbacks.HandleGetRaids(url, info, sessionId)
             )
     ])

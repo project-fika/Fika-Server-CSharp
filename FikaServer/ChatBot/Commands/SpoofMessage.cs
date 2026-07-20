@@ -1,18 +1,18 @@
-﻿using System.Text.RegularExpressions;
-using FikaServer.Services;
+﻿using FikaServer.Models.Fika.Config;
 using FikaServer.Services.Cache;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Dialog;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Enums;
-using SPTarkov.Server.Core.Services;
+using SPTarkov.Server.Core.Services.Commerce;
 using SPTarkov.Server.Core.Utils;
+using System.Text.RegularExpressions;
 
 namespace FikaServer.ChatBot.Commands;
 
 [Injectable]
-public partial class SpoofMessage(ConfigService configService, MailSendService mailSendService,
+public partial class SpoofMessage(FikaServerConfig fikaServerConfig, MailSendService mailSendService,
     HashUtil hashUtil, FikaProfileService fikaProfileService) : IFikaCommand
 {
     [GeneratedRegex("^fika spoofmessage (\\S+) \"([^\"]+)\" (.+)$")]
@@ -37,7 +37,7 @@ public partial class SpoofMessage(ConfigService configService, MailSendService m
     public ValueTask<string> PerformAction(UserDialogInfo commandHandler, MongoId sessionId, SendMessageRequest request)
     {
         ValueTask<string> value = new(request.DialogId);
-        var isAdmin = configService.Config.Server.AdminIds.Contains(sessionId);
+        var isAdmin = fikaServerConfig.Server.AdminIds.Contains(sessionId);
         if (!isAdmin)
         {
             mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,

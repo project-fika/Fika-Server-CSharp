@@ -1,16 +1,16 @@
 ﻿using FikaServer.Models.Fika.Config;
 using FikaServer.Models.Fika.Routes.Client;
 using FikaServer.Models.Fika.Routes.Client.Check;
+using SPTarkov.Common.Models.Logging;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Common;
-using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
 
 namespace FikaServer.Services;
 
 [Injectable(InjectionType.Singleton)]
 public class ClientService(ISptLogger<ClientService> logger, SaveServer saveServer,
-    ClientModHashesService fikaClientModHashesService, ConfigService fikaConfig)
+    ClientModHashesService fikaClientModHashesService, FikaServerConfig fikaServerConfig)
 {
     private readonly List<string> _requiredMods = ["com.fika.core", "com.SPT.custom", "com.SPT.singleplayer", "com.SPT.core", "com.SPT.debugging"];
     private readonly List<string> _allowedMods = ["com.bepis.bepinex.configurationmanager", "com.fika.headless"];
@@ -18,10 +18,8 @@ public class ClientService(ISptLogger<ClientService> logger, SaveServer saveServ
 
     public void OnPreLoad()
     {
-        var config = fikaConfig.Config;
-
-        var sanitizedRequiredMods = FilterEmptyMods(config.Client.Mods.Required);
-        var sanitizedOptionalMods = FilterEmptyMods(config.Client.Mods.Optional);
+        var sanitizedRequiredMods = FilterEmptyMods(fikaServerConfig.Client.Mods.Required);
+        var sanitizedOptionalMods = FilterEmptyMods(fikaServerConfig.Client.Mods.Optional);
 
         if (sanitizedRequiredMods.Count > 0 || sanitizedOptionalMods.Count > 0)
         {
@@ -44,24 +42,24 @@ public class ClientService(ISptLogger<ClientService> logger, SaveServer saveServ
 
     public FikaConfigClient GetClientConfig()
     {
-        return fikaConfig.Config.Client;
+        return fikaServerConfig.Client;
     }
 
     public bool GetIsItemSendingAllowed()
     {
-        return fikaConfig.Config.Server.AllowItemSending;
+        return fikaServerConfig.Server.AllowItemSending;
     }
 
     public FikaConfigNatPunchServer GetNatPunchServerConfig()
     {
-        return fikaConfig.Config.NatPunchServer;
+        return fikaServerConfig.NatPunchServer;
     }
 
     public VersionCheckResponse GetVersion()
     {
         return new VersionCheckResponse
         {
-            Version = fikaConfig.Version
+            Version = FikaModMetadata.FikaVersion
         };
     }
 
@@ -74,7 +72,7 @@ public class ClientService(ISptLogger<ClientService> logger, SaveServer saveServ
             HashMismatch = []
         };
 
-        if (fikaConfig.Config.Server.LogClientModsInConsole)
+        if (fikaServerConfig.Server.LogClientModsInConsole)
         {
             var username = saveServer.GetProfile(sessionId).ProfileInfo?.Username;
 

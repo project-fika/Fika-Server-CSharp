@@ -15,7 +15,8 @@ public class PresenceStaticRouter(PresenceCallbacks fikaPresenceCallbacks, JsonU
                 url,
                 info,
                 sessionId,
-                output
+                output,
+                cancellationToken
             ) => await fikaPresenceCallbacks.HandleGetPresence(url, info, sessionId)),
         new RouteAction<FikaSetPresence>(
             "/fika/presence/set",
@@ -23,7 +24,8 @@ public class PresenceStaticRouter(PresenceCallbacks fikaPresenceCallbacks, JsonU
                 url,
                 info,
                 sessionId,
-                output
+                output,
+                cancellationToken
             ) => await fikaPresenceCallbacks.HandleSetPresence(url, info, sessionId)
             ),
         new RouteAction<FikaSetPresence>(
@@ -32,7 +34,8 @@ public class PresenceStaticRouter(PresenceCallbacks fikaPresenceCallbacks, JsonU
                 url,
                 info,
                 sessionId,
-                output
+                output,
+                cancellationToken
             ) => await fikaPresenceCallbacks.HandleSetGetPresence(url, info, sessionId)
             ),
     ])

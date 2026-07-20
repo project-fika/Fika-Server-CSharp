@@ -3,7 +3,7 @@ using FikaServer.Models.Fika.WebSocket.Notifications;
 using FikaShared.Requests;
 using Microsoft.AspNetCore.Mvc;
 using SPTarkov.Server.Core.Extensions;
-using SPTarkov.Server.Core.Helpers;
+using SPTarkov.Server.Core.Helpers.Server;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Common.Tables;
 using SPTarkov.Server.Core.Models.Eft.Ws;
@@ -50,7 +50,7 @@ public class FleaBanController(SaveServer saveServer, TimeUtil timeUtil, Notific
 
         await saveServer.SaveProfileAsync(profileId);
 
-        sendHelper.SendMessage(profileId, new AddBanNotification
+        await sendHelper.SendMessageAsync(profileId, new AddBanNotification
         {
             EventType = NotificationEventType.InGameBan,
             EventIdentifier = new(),
@@ -92,7 +92,7 @@ public class FleaBanController(SaveServer saveServer, TimeUtil timeUtil, Notific
 
         await saveServer.SaveProfileAsync(profileId);
 
-        sendHelper.SendMessage(profileId, new RemoveBanNotification
+        await sendHelper.SendMessageAsync(profileId, new RemoveBanNotification
         {
             EventType = NotificationEventType.InGameUnBan,
             EventIdentifier = new(),

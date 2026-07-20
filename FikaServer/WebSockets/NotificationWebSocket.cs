@@ -1,19 +1,18 @@
-﻿using System.Collections.Concurrent;
-using System.Net.WebSockets;
-using System.Text;
-using FikaServer.Models.Fika.WebSocket;
+﻿using FikaServer.Models.Fika.WebSocket;
 using FikaServer.Services;
+using SPTarkov.Common.Models.Logging;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Common;
-using SPTarkov.Server.Core.Models.Utils;
-using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Servers.Ws;
 using SPTarkov.Server.Core.Utils;
+using System.Collections.Concurrent;
+using System.Net.WebSockets;
+using System.Text;
 
 namespace FikaServer.WebSockets;
 
 [Injectable(InjectionType.Singleton)]
-public class NotificationWebSocket(SaveServer saveServer, JsonUtil jsonUtil, ISptLogger<NotificationWebSocket> logger, PresenceService fikaPresenceService) : IWebSocketConnectionHandler
+public class NotificationWebSocket(JsonUtil jsonUtil, ISptLogger<NotificationWebSocket> logger, PresenceService fikaPresenceService) : IWebSocketConnectionHandler
 {
     private ConcurrentDictionary<string, WebSocket> clientWebSockets = [];
 
@@ -27,7 +26,7 @@ public class NotificationWebSocket(SaveServer saveServer, JsonUtil jsonUtil, ISp
         return "Fika Notification Manager";
     }
 
-    public async Task OnConnection(WebSocket ws, HttpContext context, string sessionIdContext)
+    public async Task OnConnectionAsync(WebSocket ws, HttpContext context, string sessionIdContext)
     {
         var authHeader = context.Request.Headers.Authorization.ToString();
 
@@ -53,13 +52,13 @@ public class NotificationWebSocket(SaveServer saveServer, JsonUtil jsonUtil, ISp
         fikaPresenceService.AddPlayerPresence(userSessionID);
     }
 
-    public Task OnMessage(byte[] rawData, WebSocketMessageType messageType, WebSocket ws, HttpContext context)
+    public Task OnMessageAsync(byte[] rawData, WebSocketMessageType messageType, WebSocket ws, HttpContext context)
     {
         // Do nothing
         return Task.CompletedTask;
     }
 
-    public Task OnClose(WebSocket ws, HttpContext context, string sessionIdContext)
+    public Task OnCloseAsync(WebSocket ws, HttpContext context, string sessionIdContext)
     {
         var client = clientWebSockets.Where(x => x.Value == ws).FirstOrDefault();
 

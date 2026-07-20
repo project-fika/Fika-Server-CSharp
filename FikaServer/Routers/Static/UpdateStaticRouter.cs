@@ -15,7 +15,8 @@ public class UpdateStaticRouter(UpdateCallbacks fikaUpdateCallbacks, JsonUtil js
                 url,
                 info,
                 sessionId,
-                output
+                output,
+                cancellationToken
             ) => await fikaUpdateCallbacks.HandlePing(url, info, sessionId)
             ),
         new RouteAction<FikaUpdatePlayerSpawnRequestData>(
@@ -24,7 +25,8 @@ public class UpdateStaticRouter(UpdateCallbacks fikaUpdateCallbacks, JsonUtil js
                 url,
                 info,
                 sessionId,
-                output
+                output,
+                cancellationToken
             ) => await fikaUpdateCallbacks.HandlePlayerSpawn(url, info, sessionId)
             ),
          new RouteAction<FikaUpdateSetHostRequestData>(
@@ -33,7 +35,8 @@ public class UpdateStaticRouter(UpdateCallbacks fikaUpdateCallbacks, JsonUtil js
                 url,
                 info,
                 sessionId,
-                output
+                output,
+                cancellationToken
             ) => await fikaUpdateCallbacks.HandleSetHost(url, info, sessionId)
             ),
         new RouteAction<FikaUpdateSetStatusRequestData>(
@@ -42,7 +45,8 @@ public class UpdateStaticRouter(UpdateCallbacks fikaUpdateCallbacks, JsonUtil js
                 url,
                 info,
                 sessionId,
-                output
+                output,
+                cancellationToken
             ) => await fikaUpdateCallbacks.HandleSetStatus(url, info, sessionId)
             ),
         new RouteAction<FikaUpdateRaidAddPlayerData>(
@@ -51,7 +55,8 @@ public class UpdateStaticRouter(UpdateCallbacks fikaUpdateCallbacks, JsonUtil js
                 url,
                 info,
                 sessionId,
-                output
+                output,
+                cancellationToken
             ) => await fikaUpdateCallbacks.HandleRaidAddPlayer(url, info, sessionId)
             ),
         new RouteAction<FikaUpdateRaidAddPlayerData>(
@@ -60,7 +65,8 @@ public class UpdateStaticRouter(UpdateCallbacks fikaUpdateCallbacks, JsonUtil js
                 url,
                 info,
                 sessionId,
-                output
+                output,
+                cancellationToken
             ) => await fikaUpdateCallbacks.HandlePlayerDied(url, info, sessionId)
             ),
     ])

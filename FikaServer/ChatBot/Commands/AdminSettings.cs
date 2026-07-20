@@ -1,16 +1,16 @@
-﻿using FikaServer.Models.Fika.WebSocket.Notifications;
-using FikaServer.Services;
+﻿using FikaServer.Models.Fika.Config;
+using FikaServer.Models.Fika.WebSocket.Notifications;
 using FikaServer.WebSockets;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Dialog;
 using SPTarkov.Server.Core.Models.Eft.Profile;
-using SPTarkov.Server.Core.Services;
+using SPTarkov.Server.Core.Services.Commerce;
 
 namespace FikaServer.ChatBot.Commands;
 
 [Injectable]
-public class AdminSettings(ConfigService configService, NotificationWebSocket notificationWebSocket, MailSendService mailSendService) : IFikaCommand
+public class AdminSettings(FikaServerConfig fikaServerConfig, NotificationWebSocket notificationWebSocket, MailSendService mailSendService) : IFikaCommand
 {
     public string Command
     {
@@ -30,7 +30,7 @@ public class AdminSettings(ConfigService configService, NotificationWebSocket no
 
     public async ValueTask<string> PerformAction(UserDialogInfo commandHandler, MongoId sessionId, SendMessageRequest request)
     {
-        var isAdmin = configService.Config.Server.AdminIds.Contains(sessionId);
+        var isAdmin = fikaServerConfig.Server.AdminIds.Contains(sessionId);
         await notificationWebSocket.SendAsync(sessionId, new OpenAdminMenuNotification(isAdmin));
 
         mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,

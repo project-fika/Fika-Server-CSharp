@@ -1,21 +1,22 @@
-﻿using System.Collections.Concurrent;
-using FikaServer.Helpers;
+﻿using FikaServer.Helpers;
 using FikaServer.Models.Enums;
 using FikaServer.Models.Fika;
+using FikaServer.Models.Fika.Config;
 using FikaServer.Models.Fika.Presence;
 using FikaServer.Models.Fika.Routes.Raid.Create;
 using FikaServer.Services.Headless;
+using SPTarkov.Common.Models.Logging;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Common;
-using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
-using SPTarkov.Server.Core.Services;
+using SPTarkov.Server.Core.Services.InRaid;
+using System.Collections.Concurrent;
 
 namespace FikaServer.Services;
 
 [Injectable(InjectionType.Singleton)]
 public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleService locationLifecycleService,
-    SaveServer saveServer, ConfigService fikaConfig, HeadlessHelper headlessHelper, HeadlessService headlessService,
+    SaveServer saveServer, FikaServerConfig fikaServerConfig, HeadlessHelper headlessHelper, HeadlessService headlessService,
     InsuranceService insuranceService, PresenceService presenceService, WebhookService webhookService)
 {
     public ConcurrentDictionary<MongoId, FikaMatch> Matches { get; set; } = [];
@@ -36,7 +37,7 @@ public class MatchService(ISptLogger<MatchService> logger, LocationLifecycleServ
         Timer timer = new(async _ =>
         {
             var match = GetMatch(matchId);
-            if (match != null && match.Timeout++ >= fikaConfig.Config.Server.SessionTimeout)
+            if (match != null && match.Timeout++ >= fikaServerConfig.Server.SessionTimeout)
             {
                 await EndMatch(matchId, EFikaMatchEndSessionMessage.PingTimeout);
             }

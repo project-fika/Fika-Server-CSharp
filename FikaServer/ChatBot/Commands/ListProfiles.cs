@@ -1,16 +1,16 @@
-﻿using System.Text;
-using FikaServer.Services;
+﻿using FikaServer.Models.Fika.Config;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Dialog;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Servers;
-using SPTarkov.Server.Core.Services;
+using SPTarkov.Server.Core.Services.Commerce;
+using System.Text;
 
 namespace FikaServer.ChatBot.Commands;
 
 [Injectable]
-public class ListProfiles(ConfigService configService,
+public class ListProfiles(FikaServerConfig fikaServerConfig,
     SaveServer saveServer,
     MailSendService mailSendService) : IFikaCommand
 {
@@ -32,7 +32,7 @@ public class ListProfiles(ConfigService configService,
 
     public async ValueTask<string> PerformAction(UserDialogInfo commandHandler, MongoId sessionId, SendMessageRequest request)
     {
-        var isAdmin = configService.Config.Server.AdminIds.Contains(sessionId);
+        var isAdmin = fikaServerConfig.Server.AdminIds.Contains(sessionId);
         if (!isAdmin)
         {
             mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,

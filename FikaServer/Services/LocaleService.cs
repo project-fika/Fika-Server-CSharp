@@ -1,14 +1,15 @@
-﻿using System.Text.Json;
+﻿using FikaServer.Models.Fika.Config;
 using SPTarkov.DI.Annotations;
-using SPTarkov.Server.Core.Servers;
+using SPTarkov.Server.Core.Models.Spt.Tables;
 using SPTarkov.Server.Core.Utils;
+using System.Text.Json;
 
 namespace FikaServer.Services;
 
 [Injectable(InjectionType.Singleton)]
-public class LocaleService(FileUtil fileUtil, ConfigService fikaConfig, DatabaseServer databaseServer)
+public class LocaleService(FileUtil fileUtil, FikaPaths fikaPaths, LocaleTable localeTable)
 {
-    private readonly string _globalLocaleDir = Path.Join(fikaConfig.ModPath, "assets", "database", "locales", "global");
+    private readonly string _globalLocaleDir = fikaPaths.GlobalLocalesPath;
     //private readonly string serverLocaleDir = Path.Join(fikaConfig.GetModPath(), "assets", "database", "locales", "server");
 
     Dictionary<string, Dictionary<string, string>> _globalLocales = [];
@@ -23,7 +24,7 @@ public class LocaleService(FileUtil fileUtil, ConfigService fikaConfig, Database
     {
         _globalLocales = await RecursiveLoadFiles(_globalLocaleDir);
 
-        foreach ((var locale, var lazyLoadedValue) in databaseServer.GetTables().Locales.Global)
+        foreach ((var locale, var lazyLoadedValue) in localeTable.Global)
         {
             lazyLoadedValue.AddTransformer(localeData =>
             {

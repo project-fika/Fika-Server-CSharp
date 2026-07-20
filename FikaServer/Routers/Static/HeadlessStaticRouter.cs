@@ -14,7 +14,8 @@ public class HeadlessStaticRouter(HeadlessCallbacks fikaHeadlessCallbacks, JsonU
                 url,
                 info,
                 sessionId,
-                output
+                output,
+                cancellationToken
             ) => await fikaHeadlessCallbacks.HandleGetHeadlesses(url, info, sessionId)
             ),
         new RouteAction<EmptyRequestData>(
@@ -23,7 +24,8 @@ public class HeadlessStaticRouter(HeadlessCallbacks fikaHeadlessCallbacks, JsonU
                 url,
                 info,
                 sessionId,
-                output
+                output,
+                cancellationToken
             ) => await fikaHeadlessCallbacks.HandleAvailableHeadlesses(url, info, sessionId)
             ),
          new RouteAction<EmptyRequestData>(
@@ -32,7 +34,8 @@ public class HeadlessStaticRouter(HeadlessCallbacks fikaHeadlessCallbacks, JsonU
                 url,
                 info,
                 sessionId,
-                output
+                output,
+                cancellationToken
             ) => await fikaHeadlessCallbacks.HandleRestartAfterRaidAmount(url, info, sessionId)
             ),
     ])

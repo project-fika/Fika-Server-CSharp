@@ -1,15 +1,15 @@
-﻿using System.Collections.Concurrent;
-using System.Net.WebSockets;
-using System.Text;
-using FikaServer.Helpers;
+﻿using FikaServer.Helpers;
 using FikaServer.Models.Enums;
 using FikaServer.Models.Fika.Headless;
 using FikaServer.Models.Fika.WebSocket.Notifications;
 using FikaServer.Services;
 using FikaServer.Services.Headless;
+using SPTarkov.Common.Models.Logging;
 using SPTarkov.DI.Annotations;
-using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers.Ws;
+using System.Collections.Concurrent;
+using System.Net.WebSockets;
+using System.Text;
 
 namespace FikaServer.WebSockets;
 
@@ -30,7 +30,7 @@ public class HeadlessClientWebSocket(HeadlessHelper headlessHelper, HeadlessServ
         return "Fika Headless Client";
     }
 
-    public async Task OnConnection(WebSocket ws, HttpContext context, string sessionIdContext)
+    public async Task OnConnectionAsync(WebSocket ws, HttpContext context, string sessionIdContext)
     {
         var authHeader = context.Request.Headers.Authorization.ToString();
 
@@ -101,13 +101,13 @@ public class HeadlessClientWebSocket(HeadlessHelper headlessHelper, HeadlessServ
         }
     }
 
-    public Task OnMessage(byte[] rawData, WebSocketMessageType messageType, WebSocket ws, HttpContext context)
+    public Task OnMessageAsync(byte[] rawData, WebSocketMessageType messageType, WebSocket ws, HttpContext context)
     {
         // Do nothing
         return Task.CompletedTask;
     }
 
-    public Task OnClose(WebSocket ws, HttpContext context, string sessionIdContext)
+    public Task OnCloseAsync(WebSocket ws, HttpContext context, string sessionIdContext)
     {
         var userSessionID = _headlessWebSockets.FirstOrDefault(x => x.Value == ws).Key;
 

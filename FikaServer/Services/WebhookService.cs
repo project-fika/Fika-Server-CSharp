@@ -1,13 +1,13 @@
 ﻿using FikaServer.Models.Fika.Config;
 using FikaServer.Models.Webhook;
+using Spectre.Console;
+using SPTarkov.Common.Models.Logging;
 using SPTarkov.DI.Annotations;
-using SPTarkov.Server.Core.Models.Logging;
-using SPTarkov.Server.Core.Models.Utils;
 
 namespace FikaServer.Services;
 
 [Injectable(InjectionType.Singleton)]
-public class WebhookService(ISptLogger<ConfigService> logger, ConfigService configService)
+public class WebhookService(ISptLogger<WebhookService> logger, FikaServerConfig fikaServerConfig)
 {
     private readonly HttpClient _httpClient = new();
     private bool _verified;
@@ -16,7 +16,7 @@ public class WebhookService(ISptLogger<ConfigService> logger, ConfigService conf
     {
         get
         {
-            return configService.Config.Server.Webhook;
+            return fikaServerConfig.Server.Webhook;
         }
     }
 
@@ -52,7 +52,7 @@ public class WebhookService(ISptLogger<ConfigService> logger, ConfigService conf
             response = await _httpClient.PostAsJsonAsync(url, message);
             response.EnsureSuccessStatusCode();
             _verified = true;
-            logger.LogWithColor("Fika webhook verified", LogTextColor.Green);
+            logger.LogWithColor("Fika webhook verified", Color.Green);
             return true;
         }
         catch (HttpRequestException ex)

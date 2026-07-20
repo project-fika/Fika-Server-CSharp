@@ -1,7 +1,7 @@
 ﻿using FikaServer.Models;
 using FikaShared.Requests;
 using Microsoft.AspNetCore.Mvc;
-using SPTarkov.Server.Core.Helpers;
+using SPTarkov.Server.Core.Helpers.Server;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Ws;
 
@@ -17,7 +17,7 @@ public class LogoutController(NotificationSendHelper sendHelper) : ControllerBas
     {
         MongoId profileId = new(request.ProfileId);
 
-        sendHelper.SendMessage(profileId, new WsNotificationEvent()
+        await sendHelper.SendMessageAsync(profileId, new WsNotificationEvent()
         {
             EventType = NotificationEventType.ForceLogout,
             EventIdentifier = new()

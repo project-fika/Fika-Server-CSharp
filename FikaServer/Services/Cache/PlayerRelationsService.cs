@@ -1,17 +1,18 @@
-﻿using System.Collections.Concurrent;
-using FikaServer.Models.Fika;
+﻿using FikaServer.Models.Fika;
+using FikaServer.Models.Fika.Config;
+using SPTarkov.Common.Models.Logging;
 using SPTarkov.DI.Annotations;
-using SPTarkov.Server.Core.Helpers;
+using SPTarkov.Server.Core.Helpers.Profile;
 using SPTarkov.Server.Core.Models.Common;
-using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Utils;
+using System.Collections.Concurrent;
 
 namespace FikaServer.Services.Cache;
 
 [Injectable(InjectionType.Singleton)]
-public class PlayerRelationsService(ProfileHelper profileHelper, ConfigService FikaConfig, JsonUtil jsonUtil, ISptLogger<PlayerRelationsService> logger)
+public class PlayerRelationsService(ProfileHelper profileHelper, FikaPaths fikaPaths, JsonUtil jsonUtil, ISptLogger<PlayerRelationsService> logger)
 {
-    private readonly string _playerRelationsFullPath = Path.Join(FikaConfig.ModPath, "database");
+    private readonly string _playerRelationsFullPath = fikaPaths.DatabasePath;
     private ConcurrentDictionary<MongoId, FikaPlayerRelations> _playerRelations = [];
 
     public List<MongoId> Keys

@@ -1,6 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using SPTarkov.Server.Core.Models.Eft.Ws;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
-using SPTarkov.Server.Core.Models.Eft.Ws;
 
 namespace FikaServer.Models.Fika.WebSocket.Notifications;
 

@@ -2,7 +2,7 @@
 using FikaServer.Models.Fika.WebSocket.Notifications;
 using FikaShared.Requests;
 using Microsoft.AspNetCore.Mvc;
-using SPTarkov.Server.Core.Helpers;
+using SPTarkov.Server.Core.Helpers.Server;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Ws;
 
@@ -14,11 +14,11 @@ namespace FikaServer.API;
 public class SendMessageController(NotificationSendHelper sendHelper) : ControllerBase
 {
     [HttpPost]
-    public IActionResult HandlePostRequest([FromBody] SendMessageRequest request)
+    public async Task<IActionResult> HandlePostRequest([FromBody] SendMessageRequest request)
     {
         MongoId profileId = new(request.ProfileId);
 
-        sendHelper.SendMessage(profileId, new SendMessageNotification(request.Message)
+        await sendHelper.SendMessageAsync(profileId, new SendMessageNotification(request.Message)
         {
             EventType = NotificationEventType.tournamentWarning,
             EventIdentifier = new()

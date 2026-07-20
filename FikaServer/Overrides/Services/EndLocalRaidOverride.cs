@@ -1,30 +1,37 @@
-﻿using System.Reflection;
 using FikaServer.Services;
+using SPTarkov.DI.Annotations;
 using SPTarkov.Reflection.Patching;
-using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Match;
-using SPTarkov.Server.Core.Services;
+using SPTarkov.Server.Core.Services.InRaid;
+using System.Reflection;
 using InsuranceService = FikaServer.Services.InsuranceService;
 
 namespace FikaServer.Overrides.Services;
 
-public class EndLocalRaidOverride : AbstractPatch
+[Injectable]
+public sealed class EndLocalRaidOverride : AbstractPatch
 {
+    private static MatchService _matchService = default!;
+    private static InsuranceService _insuranceService = default!;
+
+    public EndLocalRaidOverride(MatchService matchService, InsuranceService insuranceService)
+    {
+        _matchService = matchService;
+        _insuranceService = insuranceService;
+    }
+
     protected override MethodBase GetTargetMethod()
     {
         return typeof(LocationLifecycleService)
-            .GetMethod(nameof(LocationLifecycleService.EndLocalRaid))!;
+            .GetMethod(nameof(LocationLifecycleService.EndLocalRaidAsync))!;
     }
 
     [PatchPrefix]
     public static bool Prefix(MongoId sessionId, EndLocalRaidRequestData request)
     {
-        var matchService = ServiceLocator.ServiceProvider.GetService<MatchService>() ?? throw new NullReferenceException("MatchService is null!");
-        var insuranceService = ServiceLocator.ServiceProvider.GetService<InsuranceService>() ?? throw new NullReferenceException("InsuranceService is null!");
-
         // Get match id from player session id
-        var matchId = matchService.GetMatchIdByPlayer(sessionId);
+        var matchId = _matchService.GetMatchIdByPlayer(sessionId);
         if (matchId == null)
         {
             // Could not find matchId, run original
@@ -32,11 +39,11 @@ public class EndLocalRaidOverride : AbstractPatch
         }
 
         // Find player that exited the raid
-        var player = matchService.GetPlayerInMatch(matchId.Value, sessionId);
+        var player = _matchService.GetPlayerInMatch(matchId.Value, sessionId);
 
         if (player != null)
         {
-            insuranceService.OnEndLocalRaidRequest(sessionId, insuranceService.GetMatchId(sessionId), request);
+            _insuranceService.OnEndLocalRaidRequest(sessionId, _insuranceService.GetMatchId(sessionId), request);
 
             // If the player is not a spectator, continue running EndLocalRaid
             if (!player.IsSpectator)

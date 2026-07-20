@@ -1,6 +1,6 @@
-﻿using System.Text.Json.Serialization;
-using SPTarkov.Server.Core.Models.Common;
+﻿using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Enums;
+using System.Text.Json.Serialization;
 
 namespace FikaServer.Models.Fika.Dialog;
 

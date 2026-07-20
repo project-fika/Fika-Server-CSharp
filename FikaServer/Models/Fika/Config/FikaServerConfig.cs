@@ -2,7 +2,7 @@
 
 namespace FikaServer.Models.Fika.Config;
 
-public record FikaConfig
+public record FikaServerConfig
 {
     [JsonPropertyName("client")]
     public FikaConfigClient Client { get; set; } = new();

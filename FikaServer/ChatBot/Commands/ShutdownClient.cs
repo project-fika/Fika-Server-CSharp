@@ -1,9 +1,6 @@
-﻿using System.Net.WebSockets;
-using System.Text;
-using System.Text.RegularExpressions;
+﻿using FikaServer.Models.Fika.Config;
 using FikaServer.Models.Fika.Headless;
 using FikaServer.Models.Fika.WebSocket.Notifications;
-using FikaServer.Services;
 using FikaServer.Services.Cache;
 using FikaServer.Services.Headless;
 using FikaServer.WebSockets;
@@ -11,13 +8,16 @@ using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Dialog;
 using SPTarkov.Server.Core.Models.Eft.Profile;
-using SPTarkov.Server.Core.Services;
+using SPTarkov.Server.Core.Services.Commerce;
 using SPTarkov.Server.Core.Utils;
+using System.Net.WebSockets;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace FikaServer.ChatBot.Commands;
 
 [Injectable]
-public partial class ShutdownClient(ConfigService configService, MailSendService mailSendService,
+public partial class ShutdownClient(FikaServerConfig fikaServerConfig, MailSendService mailSendService,
     NotificationWebSocket notificationWebSocket, HeadlessService headlessService, JsonUtil jsonUtil,
     FikaProfileService fikaProfileService) : IFikaCommand
 {
@@ -43,7 +43,7 @@ public partial class ShutdownClient(ConfigService configService, MailSendService
     public async ValueTask<string> PerformAction(UserDialogInfo commandHandler, MongoId sessionId, SendMessageRequest request)
     {
         var value = request.DialogId;
-        var isAdmin = configService.Config.Server.AdminIds.Contains(sessionId);
+        var isAdmin = fikaServerConfig.Server.AdminIds.Contains(sessionId);
         if (!isAdmin)
         {
             mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,

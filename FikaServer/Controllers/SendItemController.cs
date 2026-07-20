@@ -1,16 +1,16 @@
-﻿using FikaServer.Models.Fika.SendItem;
+﻿using FikaServer.Models.Fika.Config;
+using FikaServer.Models.Fika.SendItem;
 using FikaServer.Models.Fika.WebSocket.Notifications;
-using FikaServer.Services;
 using FikaServer.WebSockets;
+using SPTarkov.Common.Models.Logging;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Extensions;
-using SPTarkov.Server.Core.Helpers;
+using SPTarkov.Server.Core.Helpers.Profile;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.ItemEvent;
-using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Routers;
 using SPTarkov.Server.Core.Servers;
-using SPTarkov.Server.Core.Services;
+using SPTarkov.Server.Core.Services.Commerce;
 using SPTarkov.Server.Core.Utils;
 
 namespace FikaServer.Controllers;
@@ -18,7 +18,7 @@ namespace FikaServer.Controllers;
 [Injectable]
 public class SendItemController(ISptLogger<SendItemController> logger, EventOutputHolder eventOutputHolder,
     MailSendService mailSendService, InventoryHelper inventoryHelper, SaveServer saveServer, HttpResponseUtil httpResponseUtil,
-    ConfigService fikaConfigService, NotificationWebSocket notificationWebSocket)
+    FikaServerConfig fikaServerConfig, NotificationWebSocket notificationWebSocket)
 {
     public async ValueTask<ItemEventRouterResponse> SendItem(SendItemRequestData body, MongoId sessionId)
     {
@@ -49,7 +49,7 @@ public class SendItemController(ISptLogger<SendItemController> logger, EventOutp
             return httpResponseUtil.AppendErrorToOutput(output, "Item not found in inventory");
         }
 
-        if (fikaConfigService.Config.Server.SentItemsLoseFIR)
+        if (fikaServerConfig.Server.SentItemsLoseFIR)
         {
             foreach (var item in itemsToSend)
             {
@@ -60,7 +60,7 @@ public class SendItemController(ISptLogger<SendItemController> logger, EventOutp
 
         mailSendService.SendSystemMessageToPlayer(body.Target,
             $"You have received a gift from {senderProfile?.CharacterData?.PmcData?.Info?.Nickname ?? "Unknown"}",
-            itemsToSend, fikaConfigService.Config.Server.ItemSendingStorageTime * 86_400); // days * seconds per day
+            itemsToSend, fikaServerConfig.Server.ItemSendingStorageTime * 86_400); // days * seconds per day
         foreach (var itemId in body.ItemIds)
         {
             inventoryHelper.RemoveItem(senderProfile!.CharacterData!.PmcData!, itemId, sessionId, output);
