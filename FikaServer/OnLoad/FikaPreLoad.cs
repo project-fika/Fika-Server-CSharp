@@ -41,8 +41,6 @@ public class FikaPreLoad(ISptLogger<FikaPreLoad> logger, IEnumerable<IRuntimePat
 
         ApplySPTConfig(fikaServerConfig.Server.SPT);
 
-        //BaseInteractionRequestDataConverter.RegisterModDataHandler(FikaItemEventRouter.SENDTOPLAYER, jsonUtil.Deserialize<SendItemRequestData>);
-
         clientService.OnPreLoad();
         await playerRelationsCacheService.OnPreLoad();
         await friendRequestsService.OnPreLoad();
