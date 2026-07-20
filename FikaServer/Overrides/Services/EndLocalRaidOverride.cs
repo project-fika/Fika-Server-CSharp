@@ -28,7 +28,7 @@ public sealed class EndLocalRaidOverride : AbstractPatch
     }
 
     [PatchPrefix]
-    public static bool Prefix(MongoId sessionId, EndLocalRaidRequestData request)
+    public static bool Prefix(MongoId sessionId, EndLocalRaidRequestData request, ref Task __result)
     {
         // Get match id from player session id
         var matchId = _matchService.GetMatchIdByPlayer(sessionId);
@@ -53,6 +53,8 @@ public sealed class EndLocalRaidOverride : AbstractPatch
         }
 
         // Stop running the method if the player is a spectator
+        __result = Task.CompletedTask;
+
         return false;
     }
 }

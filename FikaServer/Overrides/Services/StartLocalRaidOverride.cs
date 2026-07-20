@@ -55,7 +55,16 @@ public sealed class StartLocalRaidOverride : AbstractPatch
     }
 
     [PatchPrefix]
-    public static bool Prefix(MongoId sessionId, StartLocalRaidRequestData request, ref StartLocalRaidResponseData __result)
+    public static bool Prefix(MongoId sessionId, StartLocalRaidRequestData request, CancellationToken cancellationToken,
+        ref Task<StartLocalRaidResponseData> __result)
+    {
+        __result = StartLocalRaidAsync(sessionId, request, cancellationToken);
+
+        return false;
+    }
+
+    private static async Task<StartLocalRaidResponseData> StartLocalRaidAsync(MongoId sessionId, StartLocalRaidRequestData request,
+        CancellationToken cancellationToken)
     {
         LocationBase location;
 
@@ -220,8 +229,6 @@ public sealed class StartLocalRaidOverride : AbstractPatch
             .GetMethod("HandlePreRaidInventoryChecks", BindingFlags.NonPublic | BindingFlags.Instance)?
             .Invoke(_locationLifeCycleService, [request.PlayerSide, playerProfile.CharacterData.PmcData, sessionId]);
 
-        __result = result;
-
-        return false;
+        return result;
     }
 }
