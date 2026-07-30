@@ -7,7 +7,7 @@ namespace FikaServer.OnLoad;
 
 public sealed class FikaDIConstruct : IOnDIConstruct
 {
-    public static async Task OnDIConstructAsync(IServiceCollection serviceCollection)
+    public static async Task OnDIConstructAsync(IServiceCollection serviceCollection, CancellationToken cancellationToken)
     {
         FikaPaths paths = new(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!);
 

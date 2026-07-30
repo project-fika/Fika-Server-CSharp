@@ -17,11 +17,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="SPTarkov.Common" Version="4.1.0-pre.202607161908" />
-		<PackageReference Include="SPTarkov.DI" Version="4.1.0-pre.202607161908" />
-		<PackageReference Include="SPTarkov.Reflection" Version="4.1.0-pre.202607161908" />
-		<PackageReference Include="SPTarkov.Server.Core" Version="4.1.0-pre.202607161908" />
-		<PackageReference Include="SPTarkov.Server.Web" Version="4.1.0-pre.202607161908" />
+		<PackageReference Include="SPTarkov.Common" Version="4.1.0-pre.202607241343" />
+		<PackageReference Include="SPTarkov.DI" Version="4.1.0-pre.202607241343" />
+		<PackageReference Include="SPTarkov.Reflection" Version="4.1.0-pre.202607241343" />
+		<PackageReference Include="SPTarkov.Server.Core" Version="4.1.0-pre.202607241343" />
+		<PackageReference Include="SPTarkov.Server.Web" Version="4.1.0-pre.202607241343" />
 	</ItemGroup>
 
 	<ItemGroup>
