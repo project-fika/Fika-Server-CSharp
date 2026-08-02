@@ -2,21 +2,18 @@ using FikaServer.Models.Fika.Config;
 using FikaServer.Servers;
 using FikaServer.Services;
 using FikaServer.Services.Cache;
-using FikaServer.Services.Headless;
 using SPTarkov.Common.Models.Logging;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Reflection.Patching;
 using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Models.Spt.Config;
-using SPTarkov.Server.Core.Routers;
 
 namespace FikaServer.OnLoad;
 
 [Injectable(InjectionType.Singleton, TypePriority = OnLoadOrder.Preload)]
 public class FikaPreLoad(ISptLogger<FikaPreLoad> logger, IEnumerable<IRuntimePatch> patches, ClientService clientService,
     PlayerRelationsService playerRelationsCacheService, FriendRequestsService friendRequestsService,
-    HeadlessProfileService headlessProfileService, LocaleService localeService, NatPunchServer natPunchServer,
-    WebhookService webhookService, ImageRouter imageRouter, FikaPaths fikaPaths,
+    LocaleService localeService, NatPunchServer natPunchServer, WebhookService webhookService, 
     FikaServerConfig fikaServerConfig, CoreConfig coreConfig, HttpConfig httpConfig) : IOnLoad
 {
     public async Task OnLoadAsync(CancellationToken cancellationToken)
@@ -42,6 +39,7 @@ public class FikaPreLoad(ISptLogger<FikaPreLoad> logger, IEnumerable<IRuntimePat
         ApplySPTConfig(fikaServerConfig.Server.SPT);
 
         clientService.OnPreLoad();
+        await localeService.OnPreLoad();
         await playerRelationsCacheService.OnPreLoad();
         await friendRequestsService.OnPreLoad();
 
@@ -50,25 +48,11 @@ public class FikaPreLoad(ISptLogger<FikaPreLoad> logger, IEnumerable<IRuntimePat
             natPunchServer.Start();
         }
 
-        if (fikaServerConfig.Headless.Profiles.Amount > 0)
-        {
-            await headlessProfileService.OnPostLoadAsync();
-        }
-
-        await localeService.OnPostLoadAsync();
         BlacklistSpecialProfiles();
-        await playerRelationsCacheService.OnPostLoad();
-        friendRequestsService.OnPostLoad();
 
         if (fikaServerConfig.Server.Webhook.Enabled)
         {
             await webhookService.VerifyWebhook();
-        }
-
-        if (fikaServerConfig.Background.Enable)
-        {
-            var imagePath = "assets/images/launcher/bg.png";
-            imageRouter.AddRoute("/files/launcher/bg", Path.Join(fikaPaths.ModPath, imagePath));
         }
     }
 

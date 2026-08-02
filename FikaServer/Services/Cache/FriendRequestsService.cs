@@ -43,7 +43,7 @@ public class FriendRequestsService(
             try
             {
                 var data = File.ReadAllText(file);
-                _friendRequests = await jsonUtil.DeserializeFromFileAsync<List<FriendRequestListResponse>>(file);
+                _friendRequests = await jsonUtil.DeserializeFromFileAsync<List<FriendRequestListResponse>>(file) ?? throw new InvalidOperationException("Could not load friend requests!");
             }
             catch (Exception ex)
             {

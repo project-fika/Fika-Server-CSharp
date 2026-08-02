@@ -45,7 +45,8 @@ public class PlayerRelationsService(ProfileHelper profileHelper, FikaPaths fikaP
         }
         else
         {
-            _playerRelations = await jsonUtil.DeserializeFromFileAsync<ConcurrentDictionary<MongoId, FikaPlayerRelations>>(file);
+            _playerRelations = await jsonUtil.DeserializeFromFileAsync<ConcurrentDictionary<MongoId, FikaPlayerRelations>>(file) 
+                ?? throw new InvalidOperationException("Could not deserialize player relations!");
         }
     }
 

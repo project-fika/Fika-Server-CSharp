@@ -3,6 +3,7 @@ using FikaServer.Models.Fika.Config;
 using SPTarkov.Common.Models.Logging;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Controllers;
+using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Helpers.Profile;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Common;
@@ -25,7 +26,7 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
     private static readonly MongoId HEAD_USEC_4 = new("5fdb4139e4ed5b5ea251e4ed"); // _parent: 5cc085e214c02e000c6bea67
     private static readonly MongoId VOICE_USEC_4 = new("6284d6a28e4092597733b7a6"); // _parent: 5fc100cf95572123ae738483
 
-    public async Task OnPostLoadAsync()
+    public async Task OnPostLoadAsync(CancellationToken cancellationToken = default)
     {
         LoadHeadlessProfiles();
 

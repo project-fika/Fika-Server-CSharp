@@ -14,7 +14,7 @@ public class LocaleService(FileUtil fileUtil, FikaPaths fikaPaths, LocaleTable l
 
     Dictionary<string, Dictionary<string, string>> _globalLocales = [];
 
-    public async Task OnPostLoadAsync()
+    public async Task OnPreLoad()
     {
         await LoadGlobalLocales();
         LoadServerLocales();

@@ -15,7 +15,4 @@ public record FikaServerConfig
 
     [JsonPropertyName("headless")]
     public FikaConfigHeadless Headless { get; set; } = new();
-
-    [JsonPropertyName("background")]
-    public FikaConfigBackground Background { get; set; } = new();
 }
