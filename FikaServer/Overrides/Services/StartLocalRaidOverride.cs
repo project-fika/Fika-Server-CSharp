@@ -1,85 +1,111 @@
-﻿using System.Reflection;
-using FikaServer.Services;
+﻿using FikaServer.Services;
 using FikaServer.Services.Headless;
+using SPTarkov.DI.Annotations;
 using SPTarkov.Reflection.Patching;
-using SPTarkov.Server.Core.DI;
-using SPTarkov.Server.Core.Helpers;
+using SPTarkov.Server.Core.Helpers.Profile;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Common;
 using SPTarkov.Server.Core.Models.Eft.Match;
 using SPTarkov.Server.Core.Models.Enums;
 using SPTarkov.Server.Core.Models.Spt.Config;
-using SPTarkov.Server.Core.Servers;
-using SPTarkov.Server.Core.Services;
+using SPTarkov.Server.Core.Models.Spt.Tables;
+using SPTarkov.Server.Core.Services.Bot;
+using SPTarkov.Server.Core.Services.InRaid;
+using SPTarkov.Server.Core.Services.Profile;
 using SPTarkov.Server.Core.Utils;
+using System.Reflection;
 
 namespace FikaServer.Overrides.Services;
 
-public class StartLocalRaidOverride : AbstractPatch
+[Injectable]
+public sealed class StartLocalRaidOverride : AbstractPatch
 {
+    private static MatchService _matchService = default!;
+    private static LocationLifecycleService _locationLifeCycleService = default!;
+    private static HeadlessService _headlessService = default!;
+    private static GlobalTable _globalTable = default!;
+    private static TemplateTable _templateTable = default!;
+    private static SeasonalEventConfig _seasonalEventConfig = default!;
+    private static ProfileHelper _profileHelper = default!;
+    private static TimeUtil _timeUtil = default!;
+    private static ProfileActivityService _profileActivityService = default!;
+    private static BotNameService _botNameService = default!;
+
+
+    public StartLocalRaidOverride(MatchService matchService, LocationLifecycleService locationLifecycleService,
+        HeadlessService headlessService, GlobalTable globalTable, TemplateTable templateTable, SeasonalEventConfig seasonalEventConfig,
+        ProfileHelper profileHelper, TimeUtil timeUtil, ProfileActivityService profileActivityService, BotNameService botNameService)
+    {
+        _matchService = matchService;
+        _locationLifeCycleService = locationLifecycleService;
+        _headlessService = headlessService;
+        _globalTable = globalTable;
+        _templateTable = templateTable;
+        _seasonalEventConfig = seasonalEventConfig;
+        _profileHelper = profileHelper;
+        _timeUtil = timeUtil;
+        _profileActivityService = profileActivityService;
+        _botNameService = botNameService;
+    }
+
     protected override MethodBase GetTargetMethod()
     {
         return typeof(LocationLifecycleService)
-            .GetMethod(nameof(LocationLifecycleService.StartLocalRaid))!;
+            .GetMethod(nameof(LocationLifecycleService.StartLocalRaidAsync))!;
     }
 
     [PatchPrefix]
-    public static bool Prefix(MongoId sessionId, StartLocalRaidRequestData request, ref StartLocalRaidResponseData __result)
+    public static bool Prefix(MongoId sessionId, StartLocalRaidRequestData request, CancellationToken cancellationToken,
+        ref Task<StartLocalRaidResponseData> __result)
+    {
+        __result = StartLocalRaidAsync(sessionId, request, cancellationToken);
+
+        return false;
+    }
+
+    private static async Task<StartLocalRaidResponseData> StartLocalRaidAsync(MongoId sessionId, StartLocalRaidRequestData request,
+        CancellationToken cancellationToken)
     {
         LocationBase location;
-        var matchService = ServiceLocator.ServiceProvider.GetService<MatchService>()
-            ?? throw new NullReferenceException("MatchService is null!");
-        var locationLifeCycleService = ServiceLocator.ServiceProvider.GetService<LocationLifecycleService>()
-            ?? throw new NullReferenceException("LocationLifecycleService is null!");
 
-        var matchId = matchService!.GetMatchIdByProfile(sessionId);
+        var matchId = _matchService.GetMatchIdByProfile(sessionId);
 
         if (string.IsNullOrEmpty(matchId))
         {
             // player isn't in a Fika match, generate new loot
-            location = locationLifeCycleService.GenerateLocationAndLoot(sessionId, request!.Location!, request!.ShouldSkipLootGeneration ?? true);
+            location = _locationLifeCycleService.GenerateLocationAndLoot(sessionId, request!.Location!, request!.ShouldSkipLootGeneration ?? true);
         }
         else
         {
             // player is in a Fika match, use match location loot and regen if transit
-            var match = matchService.GetMatch(matchId);
+            var match = _matchService.GetMatch(matchId);
 
             if (matchId == sessionId)
             {
                 // force another level set due to transits
                 if (match!.IsHeadless)
                 {
-                    var headlessService = ServiceLocator.ServiceProvider.GetService<HeadlessService>()
-                        ?? throw new NullReferenceException("HeadlessService is null");
-
-                    headlessService.SetHeadlessLevel(sessionId);
+                    _headlessService.SetHeadlessLevel(sessionId);
                 }
 
                 match!.Raids++;
                 if (match.Raids > 1)
                 {
-                    match.LocationData = locationLifeCycleService.GenerateLocationAndLoot(sessionId, request!.Location!, request!.ShouldSkipLootGeneration ?? true);
+                    match.LocationData = _locationLifeCycleService.GenerateLocationAndLoot(sessionId, request!.Location!, request!.ShouldSkipLootGeneration ?? true);
                 }
             }
 
             location = match!.LocationData;
         }
 
-        var databaseService = ServiceLocator.ServiceProvider.GetService<DatabaseService>()
-            ?? throw new NullReferenceException("DatabaseService is null!");
-        var profileHelper = ServiceLocator.ServiceProvider.GetService<ProfileHelper>()
-            ?? throw new NullReferenceException("ProfileHelper is null!");
-        var timeUtil = ServiceLocator.ServiceProvider.GetService<TimeUtil>()
-            ?? throw new NullReferenceException("TimeUtil is null!");
-
-        var playerProfile = profileHelper.GetFullProfile(sessionId);
+        var playerProfile = _profileHelper.GetFullProfile(sessionId);
 
         var isSide = (bool)typeof(LocationLifecycleService)
             .GetMethod("IsSide", BindingFlags.NonPublic | BindingFlags.Instance)!
-            .Invoke(locationLifeCycleService, [request.PlayerSide!, "pmc"])!;
+            .Invoke(_locationLifeCycleService, [request.PlayerSide!, "pmc"])!;
         typeof(LocationLifecycleService)
             .GetMethod("ResetSkillPointsEarnedDuringRaid", BindingFlags.NonPublic | BindingFlags.Instance)!
-            .Invoke(locationLifeCycleService, [isSide
+            .Invoke(_locationLifeCycleService, [isSide
                 ? playerProfile!.CharacterData!.PmcData!.Skills!.Common
                 : playerProfile!.CharacterData!.ScavData!.Skills!.Common]);
 
@@ -98,18 +124,15 @@ public class StartLocalRaidOverride : AbstractPatch
             }
         }
 
-        var isRundansActive = databaseService.GetGlobals().Configuration.RunddansSettings.Active;
+        var isRundansActive = _globalTable.Configuration.RunddansSettings.Active;
 
         if (transitionType == TransitionType.EVENT)
         {
-            var configServer = ServiceLocator.ServiceProvider.GetService<ConfigServer>()
-                ?? throw new NullReferenceException("ConfigServer is null!");
-            var seasonalEventConfig = configServer.GetConfig<SeasonalEventConfig>();
             // Handle Runddans / Khorovod event
             if (isRundansActive && location.Transits is not null)
             {
                 // Get whitelist for maps transits, event should have 1 only
-                var matchingTransitWhitelist = seasonalEventConfig.KhorovodEventTransitWhitelist.GetValueOrDefault(
+                var matchingTransitWhitelist = _seasonalEventConfig.KhorovodEventTransitWhitelist.GetValueOrDefault(
                     location.Id.ToLowerInvariant(),
                     []
                 );
@@ -139,8 +162,8 @@ public class StartLocalRaidOverride : AbstractPatch
 
         StartLocalRaidResponseData result = new()
         {
-            ServerId = $"{request.Location}.{request.PlayerSide}.{timeUtil.GetTimeStamp()}",
-            ServerSettings = databaseService.GetLocationServices(),
+            ServerId = $"{request.Location}.{request.PlayerSide}.{_timeUtil.GetTimeStamp()}",
+            ServerSettings = _templateTable.LocationServices,
             Profile = new ProfileInsuredItems
             {
                 InsuredItems = playerProfile!.CharacterData!.PmcData!.InsuredItems
@@ -164,8 +187,7 @@ public class StartLocalRaidOverride : AbstractPatch
         }
 
         // Get data stored at end of previous raid (if any)
-        var transitionData = ServiceLocator.ServiceProvider.GetService<ProfileActivityService>()!
-            .GetProfileActivityRaidData(sessionId).LocationTransit;
+        var transitionData = _profileActivityService.GetProfileActivityRaidData(sessionId).LocationTransit;
 
         if (transitionData != null)
         {
@@ -183,8 +205,7 @@ public class StartLocalRaidOverride : AbstractPatch
             }
 
             // Complete, clean up
-            ServiceLocator.ServiceProvider.GetService<ProfileActivityService>()!
-                .GetProfileActivityRaidData(sessionId).LocationTransit = null;
+            _profileActivityService.GetProfileActivityRaidData(sessionId).LocationTransit = null;
         }
 
         if (string.IsNullOrEmpty(matchId) || sessionId == matchId.Value)
@@ -192,14 +213,13 @@ public class StartLocalRaidOverride : AbstractPatch
             // Apply changes from pmcConfig to bot hostility values
             typeof(LocationLifecycleService)
                 .GetMethod("AdjustBotHostilitySettings", BindingFlags.NonPublic | BindingFlags.Instance)?
-                .Invoke(locationLifeCycleService, [result.LocationLoot]);
+                .Invoke(_locationLifeCycleService, [result.LocationLoot]);
             typeof(LocationLifecycleService)
                 .GetMethod("AdjustExtracts", BindingFlags.NonPublic | BindingFlags.Instance)?
-                .Invoke(locationLifeCycleService, [request.PlayerSide, request.Location, result.LocationLoot]);
+                .Invoke(_locationLifeCycleService, [request.PlayerSide, request.Location, result.LocationLoot]);
 
             // Clear bot cache ready for bot generation call that occurs after this
-            ServiceLocator.ServiceProvider.GetService<BotNameService>()!
-                .ClearNameCache();
+            _botNameService.ClearNameCache();
 
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Aggressive, true, true);
         }
@@ -207,10 +227,8 @@ public class StartLocalRaidOverride : AbstractPatch
         // Handle Player Inventory Wiping checks for alt-f4 prevention
         typeof(LocationLifecycleService)
             .GetMethod("HandlePreRaidInventoryChecks", BindingFlags.NonPublic | BindingFlags.Instance)?
-            .Invoke(locationLifeCycleService, [request.PlayerSide, playerProfile.CharacterData.PmcData, sessionId]);
+            .Invoke(_locationLifeCycleService, [request.PlayerSide, playerProfile.CharacterData.PmcData, sessionId]);
 
-        __result = result;
-
-        return false;
+        return result;
     }
 }

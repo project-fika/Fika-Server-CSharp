@@ -1,18 +1,18 @@
-﻿using System.Text.Json.Serialization;
-using FikaServer.Services;
+﻿using FikaServer.Models.Fika.Config;
+using System.Text.Json.Serialization;
 
 namespace FikaServer.Models.Fika.Routes.Admin;
 
 public record AdminGetSettingsResponse
 {
-    public AdminGetSettingsResponse(ConfigService service)
+    public AdminGetSettingsResponse(FikaServerConfig config)
     {
-        var client = service.Config.Client;
+        var client = config.Client;
         FriendlyFire = client.FriendlyFire;
         FreeCam = client.AllowFreeCam;
         SpectateFreeCam = client.AllowSpectateFreeCam;
         SharedQuestProgression = client.SharedQuestProgression;
-        AverageLevel = service.Config.Headless.SetLevelToAverageOfLobby;
+        AverageLevel = config.Headless.SetLevelToAverageOfLobby;
     }
 
     [JsonPropertyName("friendlyFire")]

@@ -1,18 +1,15 @@
-﻿using FikaServer.Models.Fika.Dialog;
+﻿using FikaServer.Models.Fika.Config;
+using FikaServer.Models.Fika.Dialog;
+using SPTarkov.Common.Models.Logging;
 using SPTarkov.DI.Annotations;
-using SPTarkov.Server.Core.Helpers;
 using SPTarkov.Server.Core.Models.Common;
-using SPTarkov.Server.Core.Models.Utils;
-using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Utils;
 
 namespace FikaServer.Services.Cache;
 
 [Injectable(InjectionType.Singleton)]
 public class FriendRequestsService(
-    ProfileHelper profileHelper,
-    ConfigService FikaConfig,
-    SaveServer saveServer,
+    FikaPaths fikaPaths,
     JsonUtil jsonUtil,
     ISptLogger<PlayerRelationsService> logger)
 {
@@ -24,7 +21,7 @@ public class FriendRequestsService(
         }
     }
 
-    private readonly string _friendRequestsFullPath = Path.Join(FikaConfig.ModPath, "database");
+    private readonly string _friendRequestsFullPath = fikaPaths.DatabasePath;
     private List<FriendRequestListResponse> _friendRequests = [];
 
     private readonly Lock _listLock = new();
@@ -46,7 +43,7 @@ public class FriendRequestsService(
             try
             {
                 var data = File.ReadAllText(file);
-                _friendRequests = await jsonUtil.DeserializeFromFileAsync<List<FriendRequestListResponse>>(file);
+                _friendRequests = await jsonUtil.DeserializeFromFileAsync<List<FriendRequestListResponse>>(file) ?? throw new InvalidOperationException("Could not load friend requests!");
             }
             catch (Exception ex)
             {

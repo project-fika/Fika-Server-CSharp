@@ -1,23 +1,24 @@
-﻿using System.Collections.Concurrent;
-using System.Net.WebSockets;
-using System.Text;
-using FikaServer.Models.Enums;
+﻿using FikaServer.Models.Enums;
+using FikaServer.Models.Fika.Config;
 using FikaServer.Models.Fika.Headless;
 using FikaServer.Models.Fika.Routes.Headless;
 using FikaServer.WebSockets;
+using Spectre.Console;
+using SPTarkov.Common.Models.Logging;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Common;
-using SPTarkov.Server.Core.Models.Logging;
-using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Utils;
+using System.Collections.Concurrent;
+using System.Net.WebSockets;
+using System.Text;
 
 namespace FikaServer.Services.Headless;
 
 [Injectable(InjectionType.Singleton)]
 public class HeadlessService(ISptLogger<HeadlessService> logger,
     HeadlessRequesterWebSocket headlessRequesterWebSocket, JsonUtil jsonUtil,
-    ConfigService fikaConfigService, SaveServer saveServer)
+    FikaServerConfig fikaServerConfig, SaveServer saveServer)
 {
     public ConcurrentDictionary<MongoId, HeadlessClientInfo> HeadlessClients { get; } = [];
 
@@ -29,13 +30,13 @@ public class HeadlessService(ISptLogger<HeadlessService> logger,
     {
         if (!HeadlessClients.TryGetValue(headlessSessionID, out var headlessClientInfo))
         {
-            logger.LogWithColor($"Could not find HeadlessSessionID '{headlessSessionID}'", LogTextColor.Red);
+            logger.LogWithColor($"Could not find HeadlessSessionID '{headlessSessionID}'", Color.Red);
             return null;
         }
 
         if (headlessClientInfo.State is not EHeadlessStatus.READY)
         {
-            logger.LogWithColor($"HeadlessSessionID '{headlessSessionID}' was not ready, was {headlessClientInfo.State}", LogTextColor.Yellow);
+            logger.LogWithColor($"HeadlessSessionID '{headlessSessionID}' was not ready, was {headlessClientInfo.State}", Color.Yellow);
             return null;
         }
 
@@ -68,13 +69,13 @@ public class HeadlessService(ISptLogger<HeadlessService> logger,
     {
         if (!HeadlessClients.TryGetValue(headlessClientId, out var headlessClientInfo))
         {
-            logger.LogWithColor($"Could not find HeadlessSessionID '{headlessClientId}'", LogTextColor.Red);
+            logger.LogWithColor($"Could not find HeadlessSessionID '{headlessClientId}'", Color.Red);
             return;
         }
 
         if (headlessClientInfo.State is not EHeadlessStatus.READY)
         {
-            logger.LogWithColor($"HeadlessSessionID '{headlessClientId}' was not ready, was {headlessClientInfo.State}", LogTextColor.Yellow);
+            logger.LogWithColor($"HeadlessSessionID '{headlessClientId}' was not ready, was {headlessClientInfo.State}", Color.Yellow);
             return;
         }
 
@@ -101,7 +102,7 @@ public class HeadlessService(ISptLogger<HeadlessService> logger,
 
             headlessClientInfo.Players.Add(sessionID);
 
-            if (!fikaConfigService.Config.Headless.SetLevelToAverageOfLobby)
+            if (!fikaServerConfig.Headless.SetLevelToAverageOfLobby)
             {
                 // Doing this everytime is unecessary if we're not setting the average level so only set it once the original requester of the headless joins.
                 if (headlessClientInfo!.RequesterSessionID! == sessionID)
@@ -180,8 +181,11 @@ public class HeadlessService(ISptLogger<HeadlessService> logger,
             baseHeadlessLevel = 1;
         }
 
-        logger.Log(SPTarkov.Server.Core.Models.Spt.Logging.LogLevel.Debug,
-            $"[{headlessClientId}] Settings headless level to: {baseHeadlessLevel} | Players: {countedPlayers}");
+        if (logger.IsLogEnabled(LogLevel.Debug))
+        {
+            logger.Log(LogLevel.Debug,
+                $"[{headlessClientId}] Settings headless level to: {baseHeadlessLevel} | Players: {countedPlayers}");
+        }
 
         headlessProfile.CharacterData.PmcData.Info.Level = baseHeadlessLevel;
         headlessClientInfo.Level = baseHeadlessLevel;

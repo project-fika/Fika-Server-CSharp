@@ -19,7 +19,8 @@ public class RaidStaticRouter(RaidCallbacks fikaRaidCallbacks, JsonUtil jsonUtil
                 url,
                 info,
                 sessionId,
-                output
+                output,
+                cancellationToken
             ) => await fikaRaidCallbacks.HandleRaidCreate(url, info, sessionId)
             ),
         new RouteAction<FikaRaidJoinRequestData>(
@@ -28,7 +29,8 @@ public class RaidStaticRouter(RaidCallbacks fikaRaidCallbacks, JsonUtil jsonUtil
                 url,
                 info,
                 sessionId,
-                output
+                output,
+                cancellationToken
             ) => await fikaRaidCallbacks.HandleRaidJoin(url, info, sessionId)
             ),
          new RouteAction<FikaRaidLeaveRequestData>(
@@ -37,7 +39,8 @@ public class RaidStaticRouter(RaidCallbacks fikaRaidCallbacks, JsonUtil jsonUtil
                 url,
                 info,
                 sessionId,
-                output
+                output,
+                cancellationToken
             ) => await fikaRaidCallbacks.HandleRaidLeave(url, info, sessionId)
             ),
         new RouteAction<FikaRaidServerIdRequestData>(
@@ -46,7 +49,8 @@ public class RaidStaticRouter(RaidCallbacks fikaRaidCallbacks, JsonUtil jsonUtil
                 url,
                 info,
                 sessionId,
-                output
+                output,
+                cancellationToken
             ) => await fikaRaidCallbacks.HandleRaidGetHost(url, info, sessionId)
             ),
         new RouteAction<FikaRaidServerIdRequestData>(
@@ -55,7 +59,8 @@ public class RaidStaticRouter(RaidCallbacks fikaRaidCallbacks, JsonUtil jsonUtil
                 url,
                 info,
                 sessionId,
-                output
+                output,
+                cancellationToken
             ) => await fikaRaidCallbacks.HandleRaidGetSettings(url, info, sessionId)
             ),
         new RouteAction<StartHeadlessRequest>(
@@ -64,7 +69,8 @@ public class RaidStaticRouter(RaidCallbacks fikaRaidCallbacks, JsonUtil jsonUtil
                 url,
                 info,
                 sessionId,
-                output
+                output,
+                cancellationToken
             ) => await fikaRaidCallbacks.HandleRaidStartHeadless(url, info, sessionId)
             ),
         new RouteAction<RegisterPlayerRequestData>(
@@ -73,7 +79,8 @@ public class RaidStaticRouter(RaidCallbacks fikaRaidCallbacks, JsonUtil jsonUtil
                 url,
                 info,
                 sessionId,
-                output
+                output,
+                cancellationToken
             ) => await fikaRaidCallbacks.HandleRaidRegisterPlayer(url, info, sessionId)
             ),
     ])

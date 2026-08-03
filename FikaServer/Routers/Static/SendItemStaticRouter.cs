@@ -14,7 +14,8 @@ public class SendItemStaticRouter(SendItemCallbacks sendItemCallbacks, JsonUtil 
                 url,
                 info,
                 sessionId,
-                output
+                output,
+                cancellationToken
             ) => await sendItemCallbacks.HandleAvailableReceivers(sessionId)
             )
     ]);

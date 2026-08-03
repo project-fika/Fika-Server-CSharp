@@ -1,16 +1,16 @@
-﻿using System.Net;
-using System.Net.Sockets;
-using Fika.Core.Networking.LiteNetLib;
+﻿using Fika.Core.Networking.LiteNetLib;
+using FikaServer.Models.Fika.Config;
 using FikaServer.Models.Servers;
 using FikaServer.Models.Servers.Enums;
-using FikaServer.Services;
+using SPTarkov.Common.Models.Logging;
 using SPTarkov.DI.Annotations;
-using SPTarkov.Server.Core.Models.Utils;
+using System.Net;
+using System.Net.Sockets;
 
 namespace FikaServer.Servers;
 
 [Injectable(InjectionType.Singleton)]
-public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer> logger) : INatPunchListener, INetEventListener
+public class NatPunchServer(FikaServerConfig fikaServerConfig, ISptLogger<NatPunchServer> logger) : INatPunchListener, INetEventListener
 {
     private readonly Dictionary<Guid, NatPunchPeer> _serverPeers = [];
     private NetManager? _netServer;
@@ -30,13 +30,13 @@ public class NatPunchServer(ConfigService fikaConfig, ISptLogger<NatPunchServer>
 
         try
         {
-            _netServer.Start(fikaConfig.Config.Server.SPT.Http.Ip, "", fikaConfig.Config.NatPunchServer.Port);
+            _netServer.Start(fikaServerConfig.Server.SPT.Http.Ip, "", fikaServerConfig.NatPunchServer.Port);
             _netServer.NatPunchModule.Init(this);
 
             _pollEventsRoutineCts = new CancellationTokenSource();
             Task.Run(PollEventsRoutine, _pollEventsRoutineCts.Token);
 
-            logger.Success($"[Fika NatPunch] NatPunchServer started on {fikaConfig.Config.Server.SPT.Http.Ip}:{_netServer.LocalPort}");
+            logger.Success($"[Fika NatPunch] NatPunchServer started on {fikaServerConfig.Server.SPT.Http.Ip}:{_netServer.LocalPort}");
         }
         catch (Exception ex)
         {

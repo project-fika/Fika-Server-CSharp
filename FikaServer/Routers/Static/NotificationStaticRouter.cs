@@ -14,7 +14,8 @@ public class NotificationStaticRouter(NotificationCallbacks fikaNotificationCall
                 url,
                 info,
                 sessionId,
-                output
+                output,
+                cancellationToken
             ) => await fikaNotificationCallbacks.HandlePushNotification(url, info, sessionId)
             )
     ])

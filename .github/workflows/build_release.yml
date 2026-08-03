@@ -3,11 +3,8 @@ name: Build And Publish
 on:
   workflow_dispatch:
     inputs:
-      release_tag:
-        description: 'Release Tag (e.g., v1.0.0)'
-        required: true
-      release_name:
-        description: 'Release Title (e.g., Fika Server Release 1.0.0)'
+      release_version:
+        description: 'Release version (e.g., 1.0.0)'
         required: true
       build_type:
         type: choice
@@ -26,12 +23,12 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: '9.0.x'
+          dotnet-version: '10.0.x'
           cache: true
           cache-dependency-path: 'FikaServer/packages.lock.json'
 
@@ -43,23 +40,23 @@ jobs:
 
       - name: Copy loose files
         run: |
-          mkdir -p SPT/user/mods/fika-server
-          cp -r output/FikaServer.dll SPT/user/mods/fika-server
-          cp -r output/FikaShared.dll SPT/user/mods/fika-server
-          cp -r FikaServer/Assets SPT/user/mods/fika-server/assets
-          cp Licenses/* SPT/user/mods/fika-server
+          mkdir -p SPT_Runtime/user/mods/fika-server
+          cp -r output/FikaServer.dll SPT_Runtime/user/mods/fika-server
+          cp -r output/FikaShared.dll SPT_Runtime/user/mods/fika-server
+          cp -r FikaServer/Assets SPT_Runtime/user/mods/fika-server/assets
+          cp Licenses/* SPT_Runtime/user/mods/fika-server
 
       - name: Zip the build and loose files
-        run: zip -r "${{ inputs.release_name }}.zip" SPT/user/mods/fika-server
+        run: zip -r "Fika Server Release ${{ inputs.release_version }}.zip" SPT_Runtime/user/mods/fika-server
 
       - name: Create GitHub Release Draft
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
-          tag_name: ${{ inputs.release_tag }}
-          name: ${{ inputs.release_name }}
+          tag_name: "v${{ inputs.release_version }}"
+          name: "Fika Server Release ${{ inputs.release_version }}.zip"
           body: ${{ inputs.release_notes }}
           draft: true
           files: |
-            ${{ inputs.release_name }}.zip
+            Fika Server Release ${{ inputs.release_version }}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}

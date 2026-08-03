@@ -1,6 +1,6 @@
-﻿using System.Text.Json.Serialization;
-using FikaServer.Models.Enums;
+﻿using FikaServer.Models.Enums;
 using FikaServer.Models.Fika.Routes.Client;
+using System.Text.Json.Serialization;
 
 namespace FikaServer.Models.Fika.API;
 

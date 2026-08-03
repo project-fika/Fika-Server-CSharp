@@ -1,13 +1,15 @@
 ﻿using FikaServer.Models.Fika;
+using FikaServer.Models.Fika.Config;
+using SPTarkov.Common.Models.Logging;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Controllers;
-using SPTarkov.Server.Core.Helpers;
+using SPTarkov.Server.Core.DI;
+using SPTarkov.Server.Core.Helpers.Profile;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Common;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Enums;
 using SPTarkov.Server.Core.Models.Spt.Config;
-using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Utils;
 using Path = System.IO.Path;
@@ -15,33 +17,41 @@ using Path = System.IO.Path;
 namespace FikaServer.Services.Headless;
 
 [Injectable(InjectionType.Singleton)]
-public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, SaveServer saveServer, ConfigService configService,
-    ConfigServer configServer, HashUtil hashUtil, ProfileController profileController, InventoryHelper inventoryHelper,
+public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, SaveServer saveServer, FikaPaths fikaPaths, FikaServerConfig fikaServerConfig,
+    CoreConfig coreConfig, HashUtil hashUtil, ProfileController profileController, InventoryHelper inventoryHelper,
     JsonUtil jsonUtil)
 {
-    private readonly CoreConfig _sptCoreConfig = configServer.GetConfig<CoreConfig>();
     public List<SptProfile> HeadlessProfiles { get; set; } = [];
 
     private static readonly MongoId HEAD_USEC_4 = new("5fdb4139e4ed5b5ea251e4ed"); // _parent: 5cc085e214c02e000c6bea67
     private static readonly MongoId VOICE_USEC_4 = new("6284d6a28e4092597733b7a6"); // _parent: 5fc100cf95572123ae738483
 
-    public async Task OnPostLoadAsync()
+    public async Task OnPostLoadAsync(CancellationToken cancellationToken = default)
     {
         LoadHeadlessProfiles();
-        logger.Log(SPTarkov.Server.Core.Models.Spt.Logging.LogLevel.Info, $"Found {HeadlessProfiles.Count} headless profiles");
 
-        var profileAmount = configService.Config.Headless.Profiles.Amount;
+        if (logger.IsLogEnabled(LogLevel.Information))
+        {
+
+            logger.Log(LogLevel.Information, $"Found {HeadlessProfiles.Count} headless profiles");
+        }
+
+        var profileAmount = fikaServerConfig.Headless.Profiles.Amount;
 
         if (HeadlessProfiles.Count < profileAmount)
         {
             var createdProfiles = await CreateHeadlessProfiles(profileAmount);
-            logger.Log(SPTarkov.Server.Core.Models.Spt.Logging.LogLevel.Info, $"Created {createdProfiles.Count} headless client profiles!");
+
+            if (logger.IsLogEnabled(LogLevel.Information))
+            {
+                logger.Log(LogLevel.Information, $"Created {createdProfiles.Count} headless client profiles!");
+            }
         }
 
         // Stop headless from adding up to the percentage of achievements unlocked
         foreach (var headlessProfile in HeadlessProfiles)
         {
-            _sptCoreConfig.Features.AchievementProfileIdBlacklist.Add(headlessProfile.ProfileInfo.ProfileId);
+            coreConfig.Features.AchievementProfileIdBlacklist.Add(headlessProfile.ProfileInfo.ProfileId);
         }
     }
 
@@ -91,8 +101,7 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
 
     private void GenerateLaunchScript(MongoId profileId)
     {
-        var modPath = configService.ModPath;
-        var scriptsPath = Path.Combine(modPath, "assets", "scripts");
+        var scriptsPath = fikaPaths.ScriptsPath;
         var newFolderPath = Path.Combine(scriptsPath, profileId);
 
         try
@@ -105,7 +114,7 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
             return;
         }
 
-        var backendUrl = configService.Config.Headless.Scripts.ForceIp;
+        var backendUrl = fikaServerConfig.Headless.Scripts.ForceIp;
         backendUrl = string.IsNullOrEmpty(backendUrl) ? "https://127.0.0.1:6969" : backendUrl;
 
         if (!Uri.TryCreate(backendUrl, UriKind.Absolute, out var uri))
@@ -132,7 +141,7 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
         MongoId profileId = new();
         MongoId scavId = new();
 
-        SPTarkov.Server.Core.Models.Eft.Profile.Info newProfile = new()
+        Info newProfile = new()
         {
             ProfileId = profileId,
             ScavengerId = scavId,

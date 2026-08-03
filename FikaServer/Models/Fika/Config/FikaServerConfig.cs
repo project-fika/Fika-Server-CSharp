@@ -2,7 +2,7 @@
 
 namespace FikaServer.Models.Fika.Config;
 
-public record FikaConfig
+public record FikaServerConfig
 {
     [JsonPropertyName("client")]
     public FikaConfigClient Client { get; set; } = new();
@@ -15,7 +15,4 @@ public record FikaConfig
 
     [JsonPropertyName("headless")]
     public FikaConfigHeadless Headless { get; set; } = new();
-
-    [JsonPropertyName("background")]
-    public FikaConfigBackground Background { get; set; } = new();
 }

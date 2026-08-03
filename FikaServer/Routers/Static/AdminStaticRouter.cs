@@ -15,7 +15,8 @@ public class AdminStaticRouter(AdminCallbacks adminCallbacks, JsonUtil jsonUtil)
                 url,
                 info,
                 sessionId,
-                output
+                output,
+                cancellationToken
             ) => await adminCallbacks.HandleSetSettings(info, sessionId)
             ),
         new RouteAction<EmptyRequestData>(
@@ -24,7 +25,8 @@ public class AdminStaticRouter(AdminCallbacks adminCallbacks, JsonUtil jsonUtil)
                 url,
                 info,
                 sessionId,
-                output
+                output,
+                cancellationToken
             ) => await adminCallbacks.HandleGetSettings()
             )
     ])

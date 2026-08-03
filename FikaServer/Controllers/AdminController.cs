@@ -1,13 +1,13 @@
-﻿using FikaServer.Models.Fika.Routes.Admin;
-using FikaServer.Services;
+﻿using FikaServer.Models.Fika.Config;
+using FikaServer.Models.Fika.Routes.Admin;
+using SPTarkov.Common.Models.Logging;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Common;
-using SPTarkov.Server.Core.Models.Utils;
 
 namespace FikaServer.Controllers;
 
 [Injectable]
-public class AdminController(ConfigService configService, ISptLogger<AdminController> logger)
+public class AdminController(FikaServerConfig fikaServerConfig, FikaPaths fikaPaths, ISptLogger<AdminController> logger)
 {
     /// <summary>
     /// Handle /fika/admin/get
@@ -15,7 +15,7 @@ public class AdminController(ConfigService configService, ISptLogger<AdminContro
     /// <returns></returns>
     public AdminGetSettingsResponse HandleGetSettings()
     {
-        return new(configService);
+        return new(fikaServerConfig);
     }
 
     /// <summary>
@@ -26,22 +26,22 @@ public class AdminController(ConfigService configService, ISptLogger<AdminContro
     /// <returns></returns>
     public async ValueTask<AdminSetSettingsResponse> HandleSetSettings(AdminSetSettingsRequest adminSetSettingsRequest, MongoId sessionId)
     {
-        if (!configService.Config.Server.AdminIds.Contains(sessionId))
+        if (!fikaServerConfig.Server.AdminIds.Contains(sessionId))
         {
             logger.Warning($"{sessionId} tried updating the settings but is not an admin!");
             return new(false);
         }
 
-        var client = configService.Config.Client;
+        var client = fikaServerConfig.Client;
 
         client.FriendlyFire = adminSetSettingsRequest.FriendlyFire;
         client.AllowFreeCam = adminSetSettingsRequest.FreeCam;
         client.AllowSpectateFreeCam = adminSetSettingsRequest.SpectateFreeCam;
         client.SharedQuestProgression = adminSetSettingsRequest.SharedQuestProgression;
-        configService.Config.Headless.SetLevelToAverageOfLobby = adminSetSettingsRequest.AverageLevel;
+        fikaServerConfig.Headless.SetLevelToAverageOfLobby = adminSetSettingsRequest.AverageLevel;
 
         logger.Info($"{sessionId} has updated the server settings");
-        await configService.SaveConfig();
+        await FikaConfigFile.SaveAsync(fikaServerConfig, fikaPaths.ConfigFilePath);
         return new(true);
     }
 }

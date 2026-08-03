@@ -1,13 +1,13 @@
 ﻿using FikaServer.Helpers;
+using FikaServer.Models.Fika.Config;
 using FikaServer.Models.Fika.Headless;
 using FikaServer.Models.Fika.Routes.Headless;
-using FikaServer.Services;
 using SPTarkov.DI.Annotations;
 
 namespace FikaServer.Controllers;
 
 [Injectable]
-public class HeadlessController(HeadlessHelper headlessHelper, ConfigService fikaConfig)
+public class HeadlessController(HeadlessHelper headlessHelper, FikaServerConfig fikaServerConfig)
 {
     /// <summary>
     /// Handle /fika/headless/get
@@ -38,7 +38,7 @@ public class HeadlessController(HeadlessHelper headlessHelper, ConfigService fik
     {
         return new GetHeadlessRestartAfterAmountOfRaids
         {
-            Amount = fikaConfig.Config.Headless.RestartAfterAmountOfRaids
+            Amount = fikaServerConfig.Headless.RestartAfterAmountOfRaids
         };
     }
 }

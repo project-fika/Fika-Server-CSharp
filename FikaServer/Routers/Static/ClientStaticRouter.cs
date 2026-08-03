@@ -15,7 +15,8 @@ public class ClientStaticRouter(ClientCallbacks fikaClientCallbacks, JsonUtil js
                 url,
                 info,
                 sessionId,
-                output
+                output,
+                cancellationToken
             ) => await fikaClientCallbacks.HandleClientConfig(url, info, sessionId)),
         new RouteAction<EmptyRequestData>(
             "/fika/natpunchserver/config",
@@ -23,7 +24,8 @@ public class ClientStaticRouter(ClientCallbacks fikaClientCallbacks, JsonUtil js
                 url,
                 info,
                 sessionId,
-                output
+                output,
+                cancellationToken
             ) => await fikaClientCallbacks.HandleNatPunchConfig(url, info, sessionId)),
         new RouteAction<FikaCheckModRequestData>(
             "/fika/client/check/mods",
@@ -31,7 +33,8 @@ public class ClientStaticRouter(ClientCallbacks fikaClientCallbacks, JsonUtil js
                 url,
                 info,
                 sessionId,
-                output
+                output,
+                cancellationToken
             ) => await fikaClientCallbacks.HandleCheckMods(url, info, sessionId)),
         new RouteAction<EmptyRequestData>(
             "/fika/profile/download",
@@ -39,7 +42,8 @@ public class ClientStaticRouter(ClientCallbacks fikaClientCallbacks, JsonUtil js
                 url,
                 info,
                 sessionId,
-                output
+                output,
+                cancellationToken
             ) => await fikaClientCallbacks.HandleProfileDownload(url, info, sessionId)),
         new RouteAction<EmptyRequestData>(
             "/fika/client/check/version",
@@ -47,7 +51,8 @@ public class ClientStaticRouter(ClientCallbacks fikaClientCallbacks, JsonUtil js
                 url,
                 info,
                 sessionId,
-                output
+                output,
+                cancellationToken
             ) => await fikaClientCallbacks.HandleVersionCheck(url, info, sessionId))
     ])
 {

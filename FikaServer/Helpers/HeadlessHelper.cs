@@ -1,17 +1,17 @@
-﻿using System.Collections.Concurrent;
-using FikaServer.Models.Enums;
+﻿using FikaServer.Models.Enums;
+using FikaServer.Models.Fika.Config;
 using FikaServer.Models.Fika.Headless;
-using FikaServer.Services;
 using FikaServer.Services.Headless;
+using SPTarkov.Common.Models.Logging;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Common;
-using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
+using System.Collections.Concurrent;
 
 namespace FikaServer.Helpers;
 
 [Injectable]
-public class HeadlessHelper(ConfigService fikaConfig, SaveServer saveServer, HeadlessService headlessService,
+public class HeadlessHelper(FikaServerConfig fikaServerConfig, SaveServer saveServer, HeadlessService headlessService,
     HeadlessProfileService headlessProfileService, ISptLogger<HeadlessHelper> logger)
 {
     /// <summary>
@@ -85,8 +85,7 @@ public class HeadlessHelper(ConfigService fikaConfig, SaveServer saveServer, Hea
     /// <returns>the alias, or nickname or the headless client.</returns>
     public string GetHeadlessNickname(MongoId headlessSessionID)
     {
-        var config = fikaConfig.Config;
-        if (config.Headless.Profiles.Aliases.TryGetValue(headlessSessionID, out var alias))
+        if (fikaServerConfig.Headless.Profiles.Aliases.TryGetValue(headlessSessionID, out var alias))
         {
             return alias;
         }

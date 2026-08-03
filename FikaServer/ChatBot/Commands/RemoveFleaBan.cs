@@ -1,21 +1,21 @@
-﻿using System.Text.RegularExpressions;
+﻿using FikaServer.Models.Fika.Config;
 using FikaServer.Models.Fika.WebSocket.Notifications;
-using FikaServer.Services;
 using FikaServer.Services.Cache;
 using SPTarkov.DI.Annotations;
-using SPTarkov.Server.Core.Helpers;
+using SPTarkov.Server.Core.Helpers.Server;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Common.Tables;
 using SPTarkov.Server.Core.Models.Eft.Dialog;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Eft.Ws;
 using SPTarkov.Server.Core.Servers;
-using SPTarkov.Server.Core.Services;
+using SPTarkov.Server.Core.Services.Commerce;
+using System.Text.RegularExpressions;
 
 namespace FikaServer.ChatBot.Commands;
 
 [Injectable]
-public partial class RemoveFleaBan(ConfigService configService, MailSendService mailSendService,
+public partial class RemoveFleaBan(FikaServerConfig fikaServerConfig, MailSendService mailSendService,
     SaveServer saveServer, NotificationSendHelper sendHelper, FikaProfileService fikaProfileService) : IFikaCommand
 {
     [GeneratedRegex("^fika removefleaban (\\w+)$")]
@@ -40,7 +40,7 @@ public partial class RemoveFleaBan(ConfigService configService, MailSendService 
     public async ValueTask<string> PerformAction(UserDialogInfo commandHandler, MongoId sessionId, SendMessageRequest request)
     {
         var value = request.DialogId;
-        var isAdmin = configService.Config.Server.AdminIds.Contains(sessionId);
+        var isAdmin = fikaServerConfig.Server.AdminIds.Contains(sessionId);
         if (!isAdmin)
         {
             mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
@@ -82,7 +82,7 @@ public partial class RemoveFleaBan(ConfigService configService, MailSendService 
         mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
             $"'{nickname}' has been unbanned from the flea.");
 
-        sendHelper.SendMessage(profile.ProfileInfo.ProfileId.GetValueOrDefault(), new RemoveBanNotification()
+        await sendHelper.SendMessageAsync(profile.ProfileInfo.ProfileId.GetValueOrDefault(), new RemoveBanNotification()
         {
             EventType = NotificationEventType.InGameUnBan,
             EventIdentifier = new(),

@@ -1,19 +1,19 @@
-﻿using System.Text.RegularExpressions;
-using FikaServer.Services;
+﻿using FikaServer.Models.Fika.Config;
 using FikaServer.Services.Cache;
 using SPTarkov.DI.Annotations;
-using SPTarkov.Server.Core.Helpers;
+using SPTarkov.Server.Core.Helpers.Server;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Dialog;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Eft.Ws;
 using SPTarkov.Server.Core.Servers.Ws;
-using SPTarkov.Server.Core.Services;
+using SPTarkov.Server.Core.Services.Commerce;
+using System.Text.RegularExpressions;
 
 namespace FikaServer.ChatBot.Commands;
 
 [Injectable]
-public partial class ForceLogout(ConfigService configService, MailSendService mailSendService,
+public partial class ForceLogout(FikaServerConfig fikaServerConfig, MailSendService mailSendService,
     NotificationSendHelper sendHelper, SptWebSocketConnectionHandler websocketHandler,
     FikaProfileService fikaProfileService) : IFikaCommand
 {
@@ -36,10 +36,10 @@ public partial class ForceLogout(ConfigService configService, MailSendService ma
         }
     }
 
-    public ValueTask<string> PerformAction(UserDialogInfo commandHandler, MongoId sessionId, SendMessageRequest request)
+    public async ValueTask<string> PerformAction(UserDialogInfo commandHandler, MongoId sessionId, SendMessageRequest request)
     {
         var value = request.DialogId;
-        var isAdmin = configService.Config.Server.AdminIds.Contains(sessionId);
+        var isAdmin = fikaServerConfig.Server.AdminIds.Contains(sessionId);
         if (!isAdmin)
         {
             mailSendService.SendUserMessageToPlayer(sessionId, commandHandler,
@@ -76,7 +76,7 @@ public partial class ForceLogout(ConfigService configService, MailSendService ma
 
         var profile = fikaProfileService.GetProfileByNickname(nickname)
             ?? throw new NullReferenceException($"Could not find profile {nickname}");
-        sendHelper.SendMessage(profile.ProfileInfo.ProfileId.GetValueOrDefault(), new WsNotificationEvent()
+        await sendHelper.SendMessageAsync(profile.ProfileInfo.ProfileId.GetValueOrDefault(), new WsNotificationEvent()
         {
             EventType = NotificationEventType.ForceLogout,
             EventIdentifier = new()

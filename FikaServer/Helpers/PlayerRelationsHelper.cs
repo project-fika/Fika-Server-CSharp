@@ -1,9 +1,9 @@
 ﻿using FikaServer.Models.Fika.WebSocket;
 using FikaServer.Services.Cache;
+using SPTarkov.Common.Models.Logging;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Ws;
-using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Servers.Ws;
 
@@ -59,7 +59,7 @@ public class PlayerRelationsHelper(ISptLogger<PlayerRelationsHelper> logger,
         var profile = saveServer.GetProfile(fromProfileId);
         if (profile != null && profile.ProfileInfo != null && profile.CharacterData?.PmcData?.Info != null)
         {
-            webSocketHandler.SendMessage(toProfileId, new WsFriendListRemove()
+            webSocketHandler.SendMessageAsync(toProfileId, new WsFriendListRemove()
             {
                 EventIdentifier = new(),
                 EventType = NotificationEventType.youAreRemovedFromFriendList,
@@ -106,7 +106,7 @@ public class PlayerRelationsHelper(ISptLogger<PlayerRelationsHelper> logger,
             case ERemoveFriendReason.Accept:
                 {
                     var profile = saveServer.GetProfile(to);
-                    webSocketHandler.SendMessage(from, new WsFriendListRemove()
+                    webSocketHandler.SendMessageAsync(from, new WsFriendListRemove()
                     {
                         EventIdentifier = new(),
                         EventType = NotificationEventType.friendListRequestAccept,
@@ -117,7 +117,7 @@ public class PlayerRelationsHelper(ISptLogger<PlayerRelationsHelper> logger,
             case ERemoveFriendReason.Cancel:
                 {
                     var profile = saveServer.GetProfile(from);
-                    webSocketHandler.SendMessage(to, new WsFriendListRemove()
+                    webSocketHandler.SendMessageAsync(to, new WsFriendListRemove()
                     {
                         EventIdentifier = new(),
                         EventType = NotificationEventType.friendListRequestCancel,
@@ -128,7 +128,7 @@ public class PlayerRelationsHelper(ISptLogger<PlayerRelationsHelper> logger,
             case ERemoveFriendReason.Decline:
                 {
                     var profile = saveServer.GetProfile(to);
-                    webSocketHandler.SendMessage(from, new WsFriendListRemove()
+                    webSocketHandler.SendMessageAsync(from, new WsFriendListRemove()
                     {
                         EventIdentifier = new(),
                         EventType = NotificationEventType.friendListRequestDecline,
@@ -178,7 +178,7 @@ public class PlayerRelationsHelper(ISptLogger<PlayerRelationsHelper> logger,
         var profile = saveServer.GetProfile(from);
         ArgumentNullException.ThrowIfNull(profile);
 
-        webSocketHandler.SendMessage(to, new WsIgnoreListAdd()
+        webSocketHandler.SendMessageAsync(to, new WsIgnoreListAdd()
         {
             EventIdentifier = new(),
             EventType = NotificationEventType.youAreAddToIgnoreList,
@@ -201,7 +201,7 @@ public class PlayerRelationsHelper(ISptLogger<PlayerRelationsHelper> logger,
         var profile = saveServer.GetProfile(from);
         ArgumentNullException.ThrowIfNull(profile);
 
-        webSocketHandler.SendMessage(to, new WsIgnoreListAdd()
+        webSocketHandler.SendMessageAsync(to, new WsIgnoreListAdd()
         {
             EventIdentifier = new(),
             EventType = NotificationEventType.youAreRemoveFromIgnoreList,

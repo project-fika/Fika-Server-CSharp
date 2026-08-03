@@ -1,17 +1,25 @@
-﻿using System.Reflection;
-using FikaServer.Services;
+using FikaServer.Models.Fika.Config;
+using SPTarkov.DI.Annotations;
 using SPTarkov.Reflection.Patching;
 using SPTarkov.Server.Core.Controllers;
-using SPTarkov.Server.Core.DI;
-using SPTarkov.Server.Core.Helpers;
+using SPTarkov.Server.Core.Helpers.Profile;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Launcher;
 using SPTarkov.Server.Core.Models.Eft.Profile;
+using System.Reflection;
 
 namespace FikaServer.Overrides.Services;
 
-public class GetMiniProfilesOverride : AbstractPatch
+[Injectable]
+public sealed class GetMiniProfilesOverride : AbstractPatch
 {
+    private static FikaServerConfig _fikaServerConfig = default!;
+
+    public GetMiniProfilesOverride(FikaServerConfig fikaServerConfig)
+    {
+        _fikaServerConfig = fikaServerConfig;
+    }
+
     protected override MethodBase GetTargetMethod()
     {
         return typeof(ProfileController).GetMethod(nameof(ProfileController.GetMiniProfiles))!;
@@ -20,9 +28,7 @@ public class GetMiniProfilesOverride : AbstractPatch
     [PatchPrefix]
     public static bool Prefix(ref List<MiniProfile> __result)
     {
-        var fikaConfig = ServiceLocator.ServiceProvider.GetService<ConfigService>()?.Config ?? throw new NullReferenceException("FikaConfig is null!");
-
-        if (!fikaConfig.Server.LauncherListAllProfiles)
+        if (!_fikaServerConfig.Server.LauncherListAllProfiles)
         {
             __result = [];
 
@@ -34,8 +40,16 @@ public class GetMiniProfilesOverride : AbstractPatch
 }
 
 
-public class GetFriendsOverride : AbstractPatch
+[Injectable]
+public sealed class GetFriendsOverride : AbstractPatch
 {
+    private static ProfileHelper _profileHelper = default!;
+
+    public GetFriendsOverride(ProfileHelper profileHelper)
+    {
+        _profileHelper = profileHelper;
+    }
+
     protected override MethodBase GetTargetMethod()
     {
         return typeof(ProfileController).GetMethod(nameof(ProfileController.SearchProfiles))!;
@@ -46,9 +60,7 @@ public class GetFriendsOverride : AbstractPatch
     {
         var searchNickname = request.Nickname.ToLower();
 
-        var profileHelper = ServiceLocator.ServiceProvider.GetService<ProfileHelper>() ?? throw new NullReferenceException("ProfileHelper is null!");
-
-        var profiles = profileHelper.GetProfiles();
+        var profiles = _profileHelper.GetProfiles();
         List<SearchFriendResponse> friends = [];
 
         foreach (var profile in profiles.Values)

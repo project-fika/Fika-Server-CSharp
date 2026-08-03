@@ -3,14 +3,15 @@ using FikaShared.Responses;
 using Microsoft.AspNetCore.Mvc;
 using SPTarkov.Server.Core.Extensions;
 using SPTarkov.Server.Core.Models.Common;
-using SPTarkov.Server.Core.Services;
+using SPTarkov.Server.Core.Models.Spt.Tables;
+using SPTarkov.Server.Core.Services.Locales;
 
 namespace FikaServer.API;
 
 [ApiController]
 [Route("fika/api/items")]
 [RequireApiKey]
-public class GetItemsController(DatabaseService databaseService, LocaleService localeService) : ControllerBase
+public class GetItemsController(TemplateTable templateTable, LocaleService localeService) : ControllerBase
 {
     private readonly static HashSet<MongoId> _ignoredItems = [
         new("5e85aac65505fa48730d8af2"),
@@ -26,13 +27,12 @@ public class GetItemsController(DatabaseService databaseService, LocaleService l
     [HttpGet]
     public IActionResult HandleRequest()
     {
-        var allItems = databaseService.GetItems();
         var locale = localeService.GetLocaleDb("en");
-        var handbookItems = databaseService.GetHandbook().Items
+        var handbookItems = templateTable.Handbook.Items
             .Where(x => x.Price != 0);
 
         var items = new Dictionary<string, ItemData>();
-        foreach ((var itemId, var item) in allItems)
+        foreach ((var itemId, var item) in templateTable.Items)
         {
             if (_ignoredItems.Contains(itemId))
             {

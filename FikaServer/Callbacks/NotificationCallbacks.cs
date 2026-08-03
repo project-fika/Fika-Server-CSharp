@@ -1,9 +1,9 @@
 ﻿using FikaServer.Models.Enums;
 using FikaServer.Models.Fika.WebSocket.Notifications;
 using FikaServer.WebSockets;
+using SPTarkov.Common.Models.Logging;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Models.Common;
-using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Utils;
 
 namespace FikaServer.Callbacks;

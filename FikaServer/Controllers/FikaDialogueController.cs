@@ -1,17 +1,17 @@
 ﻿using FikaServer.Helpers;
+using FikaServer.Models.Fika.Config;
 using FikaServer.Models.Fika.WebSocket;
-using FikaServer.Services;
 using FikaServer.Services.Cache;
+using SPTarkov.Common.Models.Logging;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.Controllers;
-using SPTarkov.Server.Core.Helpers;
 using SPTarkov.Server.Core.Helpers.Dialogue;
+using SPTarkov.Server.Core.Helpers.Profile;
 using SPTarkov.Server.Core.Models.Common;
 using SPTarkov.Server.Core.Models.Eft.Dialog;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Eft.Ws;
 using SPTarkov.Server.Core.Models.Enums;
-using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.Server.Core.Servers;
 using SPTarkov.Server.Core.Servers.Ws;
 using SPTarkov.Server.Core.Utils;
@@ -23,7 +23,7 @@ namespace FikaServer.Controllers;
 public class FikaDialogueController(ISptLogger<FikaDialogueController> logger, DialogueController dialogueController,
     ProfileHelper profileHelper, PlayerRelationsHelper playerRelationsHelper, SaveServer saveServer,
     TimeUtil timeUtil, DialogueHelper dialogueHelper, SptWebSocketConnectionHandler socketConnectionHandler,
-    FriendRequestsService friendRequestsService, HttpResponseUtil httpResponseUtil, ConfigService configService,
+    FriendRequestsService friendRequestsService, HttpResponseUtil httpResponseUtil, FikaServerConfig fikaServerConfig,
     IEnumerable<IDialogueChatBot> dialogueChatBots)
 {
     protected readonly List<IDialogueChatBot> _dialogueChatBots = [.. dialogueChatBots];
@@ -39,7 +39,7 @@ public class FikaDialogueController(ISptLogger<FikaDialogueController> logger, D
     /// <returns>A new <see cref="GetFriendListDataResponse"/></returns>
     public GetFriendListDataResponse GetFriendsList(MongoId sessionId)
     {
-        if (!_filtered && configService.Config.Server.SPT.DisableSPTChatBots)
+        if (!_filtered && fikaServerConfig.Server.SPT.DisableSPTChatBots)
         {
             for (var i = _dialogueChatBots.Count - 1; i >= 0; i--)
             {
@@ -122,7 +122,7 @@ public class FikaDialogueController(ISptLogger<FikaDialogueController> logger, D
         var fromProfile = saveServer.GetProfile(from)
             ?? throw new NullReferenceException($"{from} did not exist in the database");
 
-        socketConnectionHandler.SendMessage(to, new WsFriendListAdd()
+        socketConnectionHandler.SendMessageAsync(to, new WsFriendListAdd()
         {
             EventIdentifier = new(),
             EventType = NotificationEventType.friendListNewRequest,
@@ -271,7 +271,7 @@ public class FikaDialogueController(ISptLogger<FikaDialogueController> logger, D
         senderDialog.Messages?.Add(message);
         receiverDialog.Messages?.Add(message);
 
-        socketConnectionHandler.SendMessage(receiverProfile.ProfileInfo.ProfileId.Value, new WsChatMessageReceived()
+        socketConnectionHandler.SendMessageAsync(receiverProfile.ProfileInfo.ProfileId.Value, new WsChatMessageReceived()
         {
             EventIdentifier = new(),
             EventType = NotificationEventType.new_message,
