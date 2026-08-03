@@ -53,7 +53,7 @@ jobs:
         uses: softprops/action-gh-release@v3
         with:
           tag_name: "v${{ inputs.release_version }}"
-          name: "Fika Server Release ${{ inputs.release_version }}.zip"
+          name: "Fika Server Release ${{ inputs.release_version }}"
           body: ${{ inputs.release_notes }}
           draft: true
           files: |
