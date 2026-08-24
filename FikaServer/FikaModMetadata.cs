@@ -5,7 +5,7 @@ namespace FikaServer;
 
 public sealed record FikaModMetadata : IModMetadata, IModBlazorMetadata
 {
-    public const string FikaVersion = "2.4.0";
+    public const string FikaVersion = "2.4.1";
 
     public string Name { get; init; } = "server";
     public string Author { get; init; } = "Fika";
@@ -16,7 +16,7 @@ public sealed record FikaModMetadata : IModMetadata, IModBlazorMetadata
     public string License { get; init; } = "CC-BY-NC-SA-4.0";
     public string ModGuid { get; init; } = "Fika";
     public SemanticVersioning.Version Version { get; init; } = new(FikaVersion);
-    public SemanticVersioning.Range SptVersion { get; init; } = new(">=4.1.0");
+    public SemanticVersioning.Range SptVersion { get; init; } = new("~4.1.3");
     public bool HasPrepatcher { get; init; } = false;
     public string? WWWRootUrl { get; init; } = null;
     public string? HomePage { get; init; } = null;

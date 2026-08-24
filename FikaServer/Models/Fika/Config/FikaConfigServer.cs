@@ -20,9 +20,6 @@ public record FikaConfigServer
     [JsonPropertyName("sentItemsLoseFIR")]
     public bool SentItemsLoseFIR { get; set; } = true;
 
-    [JsonPropertyName("launcherListAllProfiles")]
-    public bool LauncherListAllProfiles { get; set; } = true;
-
     [JsonPropertyName("sessionTimeout")]
     public int SessionTimeout { get; set; } = 5;
 

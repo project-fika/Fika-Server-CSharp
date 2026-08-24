@@ -6,7 +6,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<OutputType>Library</OutputType>
-		<Version>2.0.9</Version>
+		<Version>2.4.1</Version>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<EnableDefaultContentItems>false</EnableDefaultContentItems>
 		<NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
@@ -17,11 +17,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="SPTarkov.Common" Version="4.1.1" />
-		<PackageReference Include="SPTarkov.DI" Version="4.1.1" />
-		<PackageReference Include="SPTarkov.Reflection" Version="4.1.1" />
-		<PackageReference Include="SPTarkov.Server.Core" Version="4.1.1" />
-		<PackageReference Include="SPTarkov.Server.Web" Version="4.1.1" />
+		<PackageReference Include="SPTushonka.Common" Version="4.1.3" />
+		<PackageReference Include="SPTushonka.DI" Version="4.1.3" />
+		<PackageReference Include="SPTushonka.Reflection" Version="4.1.3" />
+		<PackageReference Include="SPTushonka.Server.Core" Version="4.1.3" />
+		<PackageReference Include="SPTushonka.Server.Web" Version="4.1.3" />
 	</ItemGroup>
 
 	<ItemGroup>
