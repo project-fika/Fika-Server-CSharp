@@ -1,3 +1,4 @@
+using FikaServer.Helpers;
 using FikaServer.Models.Fika.Config;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Reflection.Patching;
@@ -14,10 +15,12 @@ namespace FikaServer.Overrides.Services;
 public sealed class GetMiniProfilesOverride : AbstractPatch
 {
     private static FikaServerConfig _fikaServerConfig = default!;
+    private static HeadlessHelper _headlessHelper = default!;
 
-    public GetMiniProfilesOverride(FikaServerConfig fikaServerConfig)
+    public GetMiniProfilesOverride(FikaServerConfig fikaServerConfig, HeadlessHelper headlessHelper)
     {
         _fikaServerConfig = fikaServerConfig;
+        _headlessHelper = headlessHelper;
     }
 
     protected override MethodBase GetTargetMethod()
@@ -36,6 +39,12 @@ public sealed class GetMiniProfilesOverride : AbstractPatch
         }
 
         return true;
+    }
+
+    [PatchPostfix]
+    public static void Postfix(ref List<MiniProfile> __result)
+    {
+        __result.RemoveAll(x => _headlessHelper.IsHeadlessClient(x.ProfileId));
     }
 }
 
