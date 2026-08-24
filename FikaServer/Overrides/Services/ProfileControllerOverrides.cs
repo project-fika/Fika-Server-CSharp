@@ -14,31 +14,16 @@ namespace FikaServer.Overrides.Services;
 [Injectable]
 public sealed class GetMiniProfilesOverride : AbstractPatch
 {
-    private static FikaServerConfig _fikaServerConfig = default!;
     private static HeadlessHelper _headlessHelper = default!;
 
-    public GetMiniProfilesOverride(FikaServerConfig fikaServerConfig, HeadlessHelper headlessHelper)
+    public GetMiniProfilesOverride(HeadlessHelper headlessHelper)
     {
-        _fikaServerConfig = fikaServerConfig;
         _headlessHelper = headlessHelper;
     }
 
     protected override MethodBase GetTargetMethod()
     {
         return typeof(ProfileController).GetMethod(nameof(ProfileController.GetMiniProfiles))!;
-    }
-
-    [PatchPrefix]
-    public static bool Prefix(ref List<MiniProfile> __result)
-    {
-        if (!_fikaServerConfig.Server.LauncherListAllProfiles)
-        {
-            __result = [];
-
-            return false;
-        }
-
-        return true;
     }
 
     [PatchPostfix]
