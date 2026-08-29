@@ -6,8 +6,8 @@ import { AxiosError } from 'axios';
 import { api } from '../api/axiosClient';
 
 export const EHeadlessState = {
-    NotReady: 0,
-    Ready: 1,
+    Ready: 0,
+    NotReady: 1,
 } as const;
 
 export type EHeadlessState = (typeof EHeadlessState)[keyof typeof EHeadlessState];
