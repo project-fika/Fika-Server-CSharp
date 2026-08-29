@@ -1,10 +1,15 @@
 ﻿using System.Net;
 using FikaShared.Responses;
+using FikaWebApp.Models;
 
 namespace FikaWebApp.Services;
 
-public class ItemCacheService(ILogger<ItemCacheService> logger, HttpClient client)
+public sealed class ItemCacheService(ILogger<ItemCacheService> logger, HttpClient client)
 {
+    private OrderedDictionary<string, ItemData> Items { get; set; } = [];
+
+    public string[] ItemNames { get; private set; } = [];
+
     public async Task<bool> PopulateDictionary()
     {
         try
@@ -36,18 +41,15 @@ public class ItemCacheService(ILogger<ItemCacheService> logger, HttpClient clien
                     Items.Add(key, value);
                 }
 
-                ItemNames = [.. Items.Values
-                    .Select(x => x.Name)];
+                ItemNames = [.. Items.Values.Select(x => x.Name)];
 
                 logger.LogInformation("Loaded {Amount} item(s) to the database", Items.Count);
                 return true;
             }
-            else
-            {
-                Items = [];
-                logger.LogError("Unable to get items from server");
-                return false;
-            }
+
+            Items = [];
+            logger.LogError("Unable to get items from server");
+            return false;
         }
         catch (HttpRequestException httpEx)
         {
@@ -73,41 +75,26 @@ public class ItemCacheService(ILogger<ItemCacheService> logger, HttpClient clien
         }
     }
 
-    private OrderedDictionary<string, ItemData> Items { get; set; } = [];
-    
-    public string[] ItemNames { get; private set; } = [];
-
-    public ItemData IdToName(string tpl)
+    public ItemData? IdToName(string tpl)
     {
-        return Items[tpl];
+        return Items.TryGetValue(tpl, out var itemData) ? itemData : null;
     }
 
-    public string NameToId(string itemName)
+    public IEnumerable<ItemSearchResultDto> NameToIdSearch(string itemName, int limit = 25)
     {
+        if (string.IsNullOrWhiteSpace(itemName))
+        {
+            return [];
+        }
+
         return Items
-            .Where(x => x.Value.Name.Contains(itemName, StringComparison.InvariantCultureIgnoreCase))
-            .Select(x => x.Key)
-            .FirstOrDefault()!;
+            .Where(x => x.Value.Name.Contains(itemName, StringComparison.OrdinalIgnoreCase))
+            .Select(x => new ItemSearchResultDto(x.Key, x.Value.Name))
+            .Take(limit);
     }
 
-    public ItemData NameToData(string itemName)
+    public bool TryGetItem(string tpl, out ItemData? itemData)
     {
-        return Items.
-            Where(x => x.Value.Name.Contains(itemName, StringComparison.InvariantCultureIgnoreCase))
-            .Select(x => x.Value)
-            .FirstOrDefault()!;
-    }
-
-    public KeyValuePair<string, ItemData> NameToKvp(string itemName)
-    {
-        return Items
-            .FirstOrDefault(x => x.Value.Name.Contains(itemName, StringComparison.InvariantCultureIgnoreCase));
-    }
-
-    public IEnumerable<string> NameToIdSearch(string itemName)
-    {
-        return Items
-            .Where(x => x.Value.Name.Contains(itemName, StringComparison.InvariantCultureIgnoreCase))
-            .Select(x => x.Value.Name);
+        return Items.TryGetValue(tpl, out itemData);
     }
 }

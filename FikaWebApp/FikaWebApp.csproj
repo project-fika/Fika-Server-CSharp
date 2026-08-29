@@ -4,23 +4,20 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>aspnet-FikaWebApp-d8d35568-a8ac-4267-9b84-60455cbb4ea4</UserSecretsId>
+		<PublishSingleFile>true</PublishSingleFile>
+		<SelfContained>false</SelfContained>
   </PropertyGroup>
 
   <ItemGroup>
-		<PackageReference Include="Blazor-ApexCharts" Version="6.1.0" />
-		<PackageReference Include="Brism" Version="1.0.1" />
-		<PackageReference Include="CodeBeam.MudBlazor.Extensions" Version="8.3.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="10.0.9" />
-		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.9" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.9" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.9" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.9">
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.11" />
+		<PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="10.0.11" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.11" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.11" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.11" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.11">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="MudBlazor" Version="8.*" />
-		<PackageReference Include="Extensions.MudBlazor.StaticInput" Version="3.*" />
 		<PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
 		<PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
   </ItemGroup>
@@ -29,9 +26,21 @@
     <ProjectReference Include="..\FikaShared\FikaShared.csproj" />
   </ItemGroup>
 
-	<Target Name="PostPublishArchive" AfterTargets="Publish">
-		<Delete Files="$(PublishDir)/fikawebapp.tar.gz" />
-		<Exec Command="tar -czf $(PublishDir)/fikawebapp.tar.gz -C $(PublishDir) *" />
+	<!-- Executes during 'dotnet publish' stage only -->
+	<Target Name="PublishFrontend" AfterTargets="ComputeFilesToPublish">
+		<!-- 1. Ensure node_modules exist -->
+		<Exec Command="npm install" WorkingDirectory="../frontend" Condition="!Exists('../frontend/node_modules')" />
+
+		<!-- 2. Build React/Mantine static bundle -->
+		<Exec Command="npm run build" WorkingDirectory="../frontend" />
+
+		<!-- 3. Copy compiled build assets directly to publish directory (wwwroot) -->
+		<!-- Adjust '../frontend/dist' to '../frontend/build' if using Create React App instead of Vite -->
+		<ItemGroup>
+			<FrontendDistFiles Include="../frontend/dist\**\*.*" />
+		</ItemGroup>
+
+		<Copy SourceFiles="@(FrontendDistFiles)" DestinationFolder="$(PublishDir)wwwroot\%(RecursiveDir)" />
 	</Target>
 
 </Project>

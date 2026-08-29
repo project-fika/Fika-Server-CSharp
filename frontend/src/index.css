@@ -1,0 +1,77 @@
+@import "@mantine/core/styles.css";
+@import "@mantine/notifications/styles.css";
+@import "@mantine/charts/styles.css";
+@import "@mantine/code-highlight/styles.css";
+@import "@mantine/dates/styles.css";
+
+@font-face {
+    font-family: 'bender';
+    src: url('/fonts/bender.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+:root {
+    --mantine-font-family: 'bender', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+html,
+body,
+#root {
+    background-color: var(--mantine-color-fikaDark-3);
+    background-image: url('/images/background.png');
+    width: 100%;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    font-family: 'bender', sans-serif;
+    color: #c7c5b3;
+}
+
+.mantine-AppShell-header {
+    background-color: var(--mantine-color-fikaDark-1);
+}
+
+.mantine-AppShell-navbar {
+    background-color: var(--mantine-color-fikaDark-2);
+    background-image: none;
+}
+
+@media (max-width: 550px) {
+    .mantine-Table-pagination {
+        margin-left: auto;
+        margin-right: -14px;
+    }
+}
+
+.mantine-AppShell-main a,
+.mantine-AppShell-main .mantine-Anchor {
+    color: #9a8866;
+    text-decoration: underline;
+}
+
+.mantine-AppShell-main a:hover,
+.mantine-AppShell-main .mantine-Anchor:hover {
+    color: #9a8866;
+}
+
+.mantine-AppShell-navbar .mantine-NavLink-root[data-active="true"] {
+    background-color: #3d3d3d;
+    color: #9a8866;
+}
+
+.mantine-AppShell-navbar .mantine-NavLink-root[data-active="true"]:hover {
+    background-color: #484848;
+}
+
+.mantine-Button-root:not([data-variant]) {
+    color: #f5efe6;
+    font-weight: 400;
+}
+
+.mantine-Badge-root:not([data-variant]) {
+    color: #f5efe6;
+    font-weight: 400;
+}

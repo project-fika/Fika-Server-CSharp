@@ -1,19 +1,15 @@
-﻿using ApexCharts;
-using Brism;
-using FikaWebApp.Components;
-using FikaWebApp.Components.Account;
+﻿using System.Net.Http.Headers;
+using System.Text;
 using FikaWebApp.Data;
 using FikaWebApp.Services;
-using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using MudBlazor.Services;
-using MudExtensions.Services;
+using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Serilog.Events;
-using System.Net.Http.Headers;
 
 namespace FikaWebApp;
 
@@ -33,82 +29,48 @@ public static class Program
 
         builder.Host.UseSerilog();
 
-        // Add MudBlazor services
-        builder.Services.AddMudServices();
-        builder.Services.AddMudExtensions();
-
-        // Add Brism
-        builder.Services.AddBrism();
-
-        // Add services to the container.
-        builder.Services.AddRazorComponents()
-            .AddInteractiveServerComponents();
-
-        // Add Controllers
+        // Add REST Controllers
         builder.Services.AddControllers();
 
-        builder.WebHost.UseStaticWebAssets();
-
-        builder.Services.AddCascadingAuthenticationState();
-        builder.Services.AddScoped<IdentityUserAccessor>();
-        builder.Services.AddScoped<IdentityRedirectManager>();
-        builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
-
-        builder.Services.AddApexCharts(e =>
+#if DEBUG
+        // Configure CORS for local Vite React development
+        builder.Services.AddCors(options =>
         {
-            e.GlobalOptions = new ApexChartBaseOptions
+            options.AddPolicy("AllowViteFrontend", policy =>
             {
-                Theme = new Theme
-                {
-                    Palette = PaletteType.Palette1,
-                    Mode = Mode.Dark
-                },
-                Chart = new Chart
-                {
-                    Background = "transparent",
-                    FontFamily = "bender"
-                },
-                Yaxis =
-                [
-                    new YAxis
-                    {
-                        DecimalsInFloat = 0,
-                        ForceNiceScale = true,
-                        Labels = new YAxisLabels
-                        {
-                            Style = new AxisLabelStyle
-                            {
-                                FontFamily = "bender"
-                            },
-                            Formatter = "function(val) { return Math.round(val).toLocaleString(); }"
-                        }
-                    }
-                ],
-                DataLabels = new DataLabels
-                {
-                    Enabled = true,
-                    Style = new DataLabelsStyle
-                    {
-                        FontFamily = "bender"
-                    }
-                },
-                Tooltip = new Tooltip
-                {
-                    Style = new TooltipStyle
-                    {
-                        FontFamily = "bender"
-                    },
-                    Y = new TooltipY
-                    {
-                        Formatter = "function (val) { " +
-                        "   return val === null || val === undefined ? val : Math.round(val).toLocaleString();" +
-                        "}"
-                    }
-                },
-                Legend = new Legend
-                {
-                    FontFamily = "bender"
-                }
+                policy.WithOrigins("http://localhost:5173")
+                      .AllowAnyHeader()
+                      .AllowAnyMethod()
+                      .AllowCredentials();
+            });
+        });
+#endif
+
+        // Configure JWT Secret Key
+        var jwtSecretKey = builder.Configuration["Jwt:SecretKey"];
+        if (string.IsNullOrWhiteSpace(jwtSecretKey))
+        {
+            throw new InvalidOperationException("Jwt:SecretKey is missing from configuration!");
+        }
+
+        builder.Services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            options.RequireHttpsMetadata = false; // Set to true in production
+            options.SaveToken = true;
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecretKey)),
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ClockSkew = TimeSpan.Zero,
+                RoleClaimType = System.Security.Claims.ClaimTypes.Role
             };
         });
 
@@ -136,34 +98,32 @@ public static class Program
         .AddEntityFrameworkStores<ApplicationDbContext>()
         .AddDefaultTokenProviders();
 
+        // Configure Application Cookie for API-based authentication
         builder.Services.ConfigureApplicationCookie(options =>
         {
             options.ExpireTimeSpan = TimeSpan.FromDays(1);
             options.SlidingExpiration = false;
+
+            options.Events.OnRedirectToLogin = context =>
+            {
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                return Task.CompletedTask;
+            };
+
+            options.Events.OnRedirectToAccessDenied = context =>
+            {
+                context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                return Task.CompletedTask;
+            };
+
+            options.Cookie.SameSite = SameSiteMode.Lax;
+            options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
         });
 
-        builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
-
-#if DEBUG
+        // Bind WebAppConfig options section dynamically for both local runs & Docker
         builder.Services.Configure<WebAppConfig>(builder.Configuration.GetSection("FikaConfig"));
-
         builder.Services.AddSingleton(resolver =>
             resolver.GetRequiredService<IOptions<WebAppConfig>>().Value);
-#else
-        var apiKey = Environment.GetEnvironmentVariable("API_KEY")
-            ?? throw new Exception("Missing API_KEY");
-        var baseUrl = Environment.GetEnvironmentVariable("BASE_URL")
-            ?? throw new Exception("Missing BASE_URL");
-
-        var fikaConfig = new WebAppConfig()
-        {
-            APIKey = apiKey,
-            BaseUrl = new Uri(baseUrl),
-            HeartbeatInterval = 5
-        };
-
-        builder.Services.AddSingleton(fikaConfig);
-#endif
 
         builder.Services.AddHttpClient(Options.DefaultName, SetupHttpClient)
             .ConfigurePrimaryHttpMessageHandler(() =>
@@ -183,7 +143,6 @@ public static class Program
 
         var app = builder.Build();
 
-        // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
             app.UseMigrationsEndPoint();
@@ -194,17 +153,18 @@ public static class Program
             app.UseHsts();
         }
 
-        //app.UseHttpsRedirection();
+        app.UseDefaultFiles();
+        app.UseStaticFiles();
 
-        app.UseAntiforgery();
+        app.UseRouting();
+
+        app.UseCors("AllowViteFrontend");
+
+        app.UseAuthentication();
+        app.UseAuthorization();
+
         app.MapControllers();
-
-        app.MapStaticAssets();
-        app.MapRazorComponents<App>()
-            .AddInteractiveServerRenderMode();
-
-        // Add additional endpoints required by the Identity /Account Razor components.
-        app.MapAdditionalIdentityEndpoints();
+        app.MapFallbackToFile("index.html");
 
         using (var scope = app.Services.CreateScope())
         {
@@ -287,7 +247,7 @@ public static class Program
     {
         var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-        await dbContext.Database.MigrateAsync(); // ensure DB and tables exist
+        await dbContext.Database.MigrateAsync();
         await dbContext.Database.EnsureCreatedAsync();
 
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
