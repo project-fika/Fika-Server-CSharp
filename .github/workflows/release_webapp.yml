@@ -38,7 +38,8 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
+          target: final
           push: true
           tags: ghcr.io/${{ steps.string.outputs.owner }}/fika-webapp:${{ github.event.inputs.version }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=registry,ref=ghcr.io/${{ steps.string.outputs.owner }}/fika-webapp:latest
+          cache-to: type=inline
