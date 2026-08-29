@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Headers;
+using System.Security.Cryptography;
 using System.Text;
 using FikaWebApp.Data;
 using FikaWebApp.Services;
@@ -28,6 +29,32 @@ public static class Program
             .CreateLogger();
 
         builder.Host.UseSerilog();
+
+        var jwtSecret = builder.Configuration["Jwt:SecretKey"];
+
+        if (string.IsNullOrWhiteSpace(jwtSecret))
+        {
+            var dataDirectory = Path.Combine(AppContext.BaseDirectory, "Data");
+            var secretKeyPath = Path.Combine(dataDirectory, "jwt-secret.txt");
+
+            Directory.CreateDirectory(dataDirectory);
+
+            if (File.Exists(secretKeyPath))
+            {
+                jwtSecret = File.ReadAllText(secretKeyPath)
+                    .Trim();
+            }
+            else
+            {
+                var randomBytes = RandomNumberGenerator.GetBytes(32);
+                jwtSecret = Convert.ToBase64String(randomBytes);
+
+                File.WriteAllText(secretKeyPath, jwtSecret);
+                Console.WriteLine($"[Security] Generated new persistent JWT secret at: {secretKeyPath}");
+            }
+
+            builder.Configuration["Jwt:SecretKey"] = jwtSecret;
+        }
 
         // Add REST Controllers
         builder.Services.AddControllers();
