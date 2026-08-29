@@ -16,20 +16,23 @@ RUN npm run build
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build-backend
 WORKDIR /src
 
-# Copy project files for dependency restoration
+# Set environment flag to disable MSBuild npm target
+ENV BuildingInsideDocker=true
+
+# Restore NuGet dependencies
 COPY FikaShared/FikaShared.csproj ./FikaShared/
 COPY FikaWebApp/FikaWebApp.csproj ./FikaWebApp/
 RUN dotnet restore "FikaWebApp/FikaWebApp.csproj"
 
-# Copy source code for both dependent projects
+# Copy source code
 COPY FikaShared/ ./FikaShared/
 COPY FikaWebApp/ ./FikaWebApp/
 
-# Copy React static dist files directly into wwwroot before publishing
-COPY --from=build-frontend /app/frontend/dist ./FikaWebApp/wwwroot
-
 WORKDIR /src/FikaWebApp
-RUN dotnet publish "FikaWebApp.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "FikaWebApp.csproj" -c Release -o /app/publish -p:UseAppHost=true
+
+# Copy React static build output directly into the published wwwroot directory
+COPY --from=build-frontend /app/frontend/dist /app/publish/wwwroot
 
 # -------------------------------------------------------------
 # Stage 3: Final Production Runtime Environment (.NET 10.0)

@@ -24,20 +24,12 @@
     <ProjectReference Include="..\FikaShared\FikaShared.csproj" />
   </ItemGroup>
 
-	<!-- Executes during 'dotnet publish' stage only -->
-	<Target Name="PublishFrontend" AfterTargets="ComputeFilesToPublish">
-		<!-- 1. Ensure node_modules exist -->
+	<Target Name="PublishFrontend" AfterTargets="ComputeFilesToPublish" Condition="Exists('../frontend') AND '$(BuildingInsideDocker)' != 'true'">
 		<Exec Command="npm install" WorkingDirectory="../frontend" Condition="!Exists('../frontend/node_modules')" />
-
-		<!-- 2. Build React/Mantine static bundle -->
 		<Exec Command="npm run build" WorkingDirectory="../frontend" />
-
-		<!-- 3. Copy compiled build assets directly to publish directory (wwwroot) -->
-		<!-- Adjust '../frontend/dist' to '../frontend/build' if using Create React App instead of Vite -->
 		<ItemGroup>
 			<FrontendDistFiles Include="../frontend/dist\**\*.*" />
 		</ItemGroup>
-
 		<Copy SourceFiles="@(FrontendDistFiles)" DestinationFolder="$(PublishDir)wwwroot\%(RecursiveDir)" />
 	</Target>
 
