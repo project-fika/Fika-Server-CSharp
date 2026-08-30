@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Headers;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using FikaWebApp.Data;
@@ -19,16 +20,31 @@ public static class Program
     public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-        var silenceLogs = args.Contains("--quiet-logs");
+
+        var fikaConfigSection = builder.Configuration.GetSection("FikaConfig");
+        builder.Services.Configure<WebAppConfig>(fikaConfigSection);
+        var config = fikaConfigSection.Get<WebAppConfig>()
+            ?? throw new Exception("Missing WebApp variables in configuration.");
+
+        if (args.Contains("--quiet-logs"))
+        {
+            config.QuietLogs = true;
+        }
 
         Log.Logger = new LoggerConfiguration()
-            .MinimumLevel.Override("Microsoft", silenceLogs ? LogEventLevel.Warning : LogEventLevel.Information)
+            .MinimumLevel.Override("Microsoft", config.QuietLogs ? LogEventLevel.Warning : LogEventLevel.Information)
             .WriteTo.Console()
             .WriteTo.File($"{WebAppConfig.LogsPath}/log-.log", rollingInterval: RollingInterval.Day, retainedFileCountLimit: 7)
             .Enrich.FromLogContext()
             .CreateLogger();
 
         builder.Host.UseSerilog();
+        var logger = Log.ForContext(typeof(Program));
+
+        if (config.QuietLogs)
+        {
+            logger.Information("Using QuietLogs");
+        }
 
         var jwtSecret = builder.Configuration["Jwt:SecretKey"];
 
@@ -50,7 +66,7 @@ public static class Program
                 jwtSecret = Convert.ToBase64String(randomBytes);
 
                 File.WriteAllText(secretKeyPath, jwtSecret);
-                Console.WriteLine($"[Security] Generated new persistent JWT secret at: {secretKeyPath}");
+                logger.Information($"[Security] Generated new persistent JWT secret at: {secretKeyPath}");
             }
 
             builder.Configuration["Jwt:SecretKey"] = jwtSecret;
@@ -88,7 +104,11 @@ public static class Program
         })
         .AddJwtBearer(options =>
         {
-            options.RequireHttpsMetadata = false; // Set to true in production
+#if DEBUG
+            options.RequireHttpsMetadata = false;
+#else
+            options.RequireHttpsMetadata = true;
+#endif
             options.SaveToken = true;
             options.TokenValidationParameters = new TokenValidationParameters
             {
@@ -96,8 +116,8 @@ public static class Program
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecretKey)),
                 ValidateIssuer = false,
                 ValidateAudience = false,
-                ClockSkew = TimeSpan.Zero,
-                RoleClaimType = System.Security.Claims.ClaimTypes.Role
+                ClockSkew = TimeSpan.FromMinutes(5),
+                RoleClaimType = ClaimTypes.Role
             };
         });
 
@@ -193,7 +213,7 @@ public static class Program
         app.MapControllers();
         app.MapFallbackToFile("index.html");
 
-        using (var scope = app.Services.CreateScope())
+        await using (var scope = app.Services.CreateAsyncScope())
         {
             await InitializeDatabase(scope);
         }
@@ -203,28 +223,26 @@ public static class Program
 
         if (args.Contains("--reset-admin"))
         {
-            await ResetAdminPassword(app);
+            logger.Warning("Resetting admin password!");
+            await ResetAdminPassword(app, logger);
         }
 
         await app.RunAsync();
     }
 
-    private static async Task ResetAdminPassword(WebApplication app)
+    private static async Task ResetAdminPassword(WebApplication app, Serilog.ILogger logger)
     {
         using var scope = app.Services.CreateScope();
 
-        var logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>()
-                                          .CreateLogger("AdminReset");
-
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-        logger.LogInformation("Starting admin password reset...");
+        logger.Information("Starting admin password reset...");
 
         var admin = await userManager.FindByNameAsync("admin");
 
         if (admin == null)
         {
-            logger.LogWarning("Admin user not found!");
+            logger.Warning("Admin user not found!");
             return;
         }
 
@@ -235,17 +253,17 @@ public static class Program
 
         if (!result.Succeeded)
         {
-            logger.LogError("Admin password reset failed!");
+            logger.Error("Admin password reset failed!");
 
             foreach (var err in result.Errors)
             {
-                logger.LogError("ResetAdminPassword::{Error}", err.Description);
+                logger.Error("ResetAdminPassword::{Error}", err.Description);
             }
 
             return;
         }
 
-        logger.LogInformation("Admin password reset successful. New password: {Password}", newPassword);
+        logger.Information("Admin password reset successful. New password: {Password}", newPassword);
     }
 
     private static Task CheckForDataFolder()
