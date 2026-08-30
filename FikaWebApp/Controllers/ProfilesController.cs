@@ -3,6 +3,7 @@ using System.Text;
 using FikaShared.Requests;
 using FikaShared.Responses;
 using FikaWebApp.Models;
+using FikaWebApp.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +14,7 @@ namespace FikaWebApp.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 public sealed class ProfilesController(
+    DataCacheService dataCacheService,
     IHttpClientFactory httpClientFactory,
     ILogger<ProfilesController> logger) : ControllerBase
 {
@@ -174,6 +176,57 @@ public sealed class ProfilesController(
         {
             logger.LogError(ex, "Error sending item.");
             return StatusCode(StatusCodes.Status500InternalServerError, new ApiResponseDto($"There was an error sending the item: {ex.Message}"));
+        }
+    }
+
+    [HttpGet("quests")]
+    public async Task<ActionResult<List<QuestData>>> GetQuests([FromQuery] string? profileId)
+    {
+        if (string.IsNullOrWhiteSpace(profileId))
+        {
+            return BadRequest(new ApiResponseDto("No ProfileId provided"));
+        }
+
+        try
+        {
+            var client = httpClientFactory.CreateClient();
+            var ids = await client.GetFromJsonAsync<List<string>>($"fika/api/profile/quests?profileId={Uri.EscapeDataString(profileId)}");
+            if (ids == null)
+            {
+                return Ok(new List<QuestData>());
+            }
+
+            var response = new List<QuestData>(ids.Count);
+            foreach (var id in ids)
+            {
+                if (dataCacheService.TryGetQuest(id, out var questData) && questData != null)
+                {
+                    response.Add(questData);
+                }
+            }
+
+            return Ok(response);
+        }
+        catch (HttpRequestException httpEx)
+        {
+            if (httpEx.StatusCode == HttpStatusCode.Forbidden)
+            {
+                logger.LogError("Error retrieving profiles: [403 Forbidden]. Missing or invalid API key.");
+                return StatusCode(StatusCodes.Status403Forbidden, new ApiResponseDto("Something went wrong when retrieving profiles: [403 Forbidden].\nAre you using the wrong API key?"));
+            }
+            if (httpEx.StatusCode == HttpStatusCode.NotFound)
+            {
+                logger.LogError("Error retrieving profiles: [404 NotFound]. Missing Fika server mod.");
+                return StatusCode(StatusCodes.Status404NotFound, new ApiResponseDto("Something went wrong when retrieving profiles: [404 NotFound].\nAre you missing the Fika server mod?"));
+            }
+
+            logger.LogError(httpEx, "HttpRequestException caught when retrieving profiles.");
+            return StatusCode(StatusCodes.Status500InternalServerError, new ApiResponseDto($"HttpRequestException: {httpEx.Message}"));
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error retrieving profiles.");
+            return StatusCode(StatusCodes.Status500InternalServerError, new ApiResponseDto($"An error occurred: {ex.Message}"));
         }
     }
 }

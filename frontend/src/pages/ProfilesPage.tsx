@@ -1,7 +1,7 @@
 import { CodeHighlight } from '@mantine/code-highlight';
 import { Box, Button, Card, Checkbox, FileButton, Flex, Group, Loader, LoadingOverlay, Modal, Paper, ScrollArea, SegmentedControl, Stack, Table, Text, TextInput, Title, Tooltip } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconCode, IconEdit, IconEye, IconListTree, IconSearch, IconUpload } from '@tabler/icons-react';
+import { IconChecklist, IconCode, IconEdit, IconEye, IconListTree, IconSearch, IconUpload } from '@tabler/icons-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { useMemo, useState } from 'react';
@@ -9,6 +9,7 @@ import JsonView from 'react18-json-view';
 import 'react18-json-view/src/style.css';
 import { api } from '../api/axiosClient';
 import { ModifyProfileModal } from '../components/ModifyProfileModal';
+import { ProfileQuestsModal } from '../components/ProfileQuestsModal';
 import type { ProfileResponse } from '../types/profiles';
 
 export function ProfilesPage() {
@@ -16,6 +17,7 @@ export function ProfilesPage() {
     const [searchString, setSearchString] = useState('');
 
     const [selectedModifyProfile, setSelectedModifyProfile] = useState<ProfileResponse | null>(null);
+    const [selectedQuestProfile, setSelectedQuestProfile] = useState<ProfileResponse | null>(null);
     const [viewJsonData, setViewJsonData] = useState<{ title: string; rawJson: string; parsedJson: object } | null>(null);
     const [isViewingProfile, setIsViewingProfile] = useState(false);
     const [viewingProfileTitle, setViewingProfileTitle] = useState('');
@@ -57,7 +59,6 @@ export function ProfilesPage() {
         try {
             const res = await api.get<string | object>(`/profiles/raw?profileId=${encodeURIComponent(profile.profileId)}`);
 
-            // Offload parsing to next frame so the Modal open animation and loader mount instantly
             requestAnimationFrame(() => {
                 let rawJson = '';
                 let parsedJson: object = {};
@@ -157,6 +158,9 @@ export function ProfilesPage() {
                                     </Table.Td>
                                     <Table.Td style={{ textAlign: 'right' }}>
                                         <Group gap="xs" justify="flex-end">
+                                            <Button size="xs" leftSection={<IconChecklist size={14} />} onClick={() => setSelectedQuestProfile(row)}>
+                                                Quests
+                                            </Button>
                                             <Button size="xs" leftSection={<IconEdit size={14} />} onClick={() => setSelectedModifyProfile(row)}>
                                                 Modify
                                             </Button>
@@ -197,6 +201,9 @@ export function ProfilesPage() {
                             </Group>
 
                             <Group grow gap="xs">
+                                <Button size="xs" variant="light" leftSection={<IconChecklist size={14} />} onClick={() => setSelectedQuestProfile(row)}>
+                                    Quests
+                                </Button>
                                 <Button size="xs" leftSection={<IconEdit size={14} />} onClick={() => setSelectedModifyProfile(row)}>
                                     Modify
                                 </Button>
@@ -210,6 +217,8 @@ export function ProfilesPage() {
             </Box>
 
             <ModifyProfileModal profile={selectedModifyProfile} onClose={() => setSelectedModifyProfile(null)} />
+
+            <ProfileQuestsModal profile={selectedQuestProfile} onClose={() => setSelectedQuestProfile(null)} />
 
             <Modal
                 opened={isViewingProfile || !!viewJsonData}
