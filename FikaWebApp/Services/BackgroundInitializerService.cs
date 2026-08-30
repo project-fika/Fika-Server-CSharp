@@ -1,7 +1,7 @@
 ﻿
 namespace FikaWebApp.Services;
 
-public class BackgroundInitializerService(HeartbeatService heartbeatService, ItemCacheService itemCacheService, SendTimersService sendTimersService) : BackgroundService
+public class BackgroundInitializerService(HeartbeatService heartbeatService, DataCacheService itemCacheService, SendTimersService sendTimersService) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {

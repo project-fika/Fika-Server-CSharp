@@ -4,20 +4,7 @@ import { IconRotateClockwise } from '@tabler/icons-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { api } from '../api/axiosClient';
-
-export const EHeadlessState = {
-    Ready: 0,
-    NotReady: 1,
-} as const;
-
-export type EHeadlessState = (typeof EHeadlessState)[keyof typeof EHeadlessState];
-
-export interface OnlineHeadless {
-    profileId: string;
-    nickname: string;
-    state: EHeadlessState;
-    players: number;
-}
+import { EHeadlessState, type OnlineHeadless } from '../types/headless';
 
 export function HeadlessPage() {
     const queryClient = useQueryClient();

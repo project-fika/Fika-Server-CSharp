@@ -2,19 +2,7 @@ import { PieChart, type PieChartCell } from '@mantine/charts';
 import { Center, Loader, Paper, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../api/axiosClient';
-
-export interface StatisticsPlayer {
-    nickname: string;
-    kills: number;
-    deaths: number;
-    ammoUsed: number;
-    bodyDamage: number;
-    armorDamage: number;
-    headshots: number;
-    bossKills: number;
-}
-
-const COLOR_PALETTE = ['blue.6', 'green.6', 'yellow.6', 'orange.6', 'red.6', 'grape.6', 'violet.6'];
+import { COLOR_PALETTE, type StatisticsPlayer } from '../types/statistics';
 
 interface StatPieChartProps {
     title: string;

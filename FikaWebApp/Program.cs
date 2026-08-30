@@ -180,7 +180,7 @@ public static class Program
                 });
 
         builder.Services.AddSingleton<SendTimersService>();
-        builder.Services.AddSingleton<ItemCacheService>();
+        builder.Services.AddSingleton<DataCacheService>();
         builder.Services.AddSingleton<HeartbeatService>();
         builder.Services.AddHostedService<BackgroundInitializerService>();
 

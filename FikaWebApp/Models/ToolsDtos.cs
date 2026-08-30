@@ -44,4 +44,4 @@ public sealed record ResolvedItemDto(
     int MaxItems
 );
 
-public sealed record ItemSearchResultDto(string TemplateId, string Name);
+public sealed record DataSearchResultDto(string TemplateId, string Name);

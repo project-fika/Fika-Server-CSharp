@@ -2,29 +2,7 @@ import { jwtDecode } from 'jwt-decode';
 import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { authEvents } from '../api/authEvents';
-
-interface JwtPayload {
-    sub?: string;
-    'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'?: string;
-    'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'?: string | string[];
-    role?: string | string[];
-    exp?: number;
-}
-
-interface User {
-    id: string;
-    username: string;
-    roles: string[];
-}
-
-interface AuthContextType {
-    token: string | null;
-    user: User | null;
-    isAuthenticated: boolean;
-    login: (token: string, username: string) => void;
-    logout: () => void;
-    hasRole: (...roles: string[]) => boolean;
-}
+import type { AuthContextType, JwtPayload, User } from '../types/auth';
 
 const AuthContext = createContext<AuthContextType | null>(null);
 

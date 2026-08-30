@@ -1,17 +1,21 @@
 import { Button, Card, Group, SimpleGrid, Stack, Text, ThemeIcon, Title } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
-import { IconListDetails, IconMailForward, IconRefresh, IconTools } from '@tabler/icons-react';
+import { IconListDetails, IconMailForward, IconRefresh, IconSearch, IconTools } from '@tabler/icons-react';
 import { useMutation } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { useState } from 'react';
 import { api } from '../api/axiosClient';
+import { QuestSearchModal } from '../components/QuestSearchModal';
 import { QueuedItemsModal } from '../components/QueuedItemsModal';
-import { SendItemModal, type SendItemModel } from '../components/SendItemModal';
-import type { ProfileResponse } from './ProfilesPage';
+import { SendItemModal } from '../components/SendItemModal';
+import type { SendItemModel } from '../types/items';
+import type { ProfileResponse } from '../types/profiles';
 
 export function ToolsPage() {
     const [sendModalOpened, setSendModalOpened] = useState(false);
     const [queuedModalOpened, setQueuedModalOpened] = useState(false);
+    const [questModalOpened, { open: openQuestModal, close: closeQuestModal }] = useDisclosure(false);
 
     const refreshDbMutation = useMutation({
         mutationFn: () => api.post('/tools/items/refresh'),
@@ -64,12 +68,7 @@ export function ToolsPage() {
             }
         },
         onError: (err: unknown) => {
-            const message =
-                err instanceof AxiosError
-                    ? err.response?.data?.message || err.message
-                    : err instanceof Error
-                      ? err.message
-                      : 'Error sending item to everyone';
+            const message = err instanceof AxiosError ? err.response?.data?.message || err.message : err instanceof Error ? err.message : 'Error sending item to everyone';
             notifications.show({
                 color: 'red',
                 message,
@@ -128,27 +127,35 @@ export function ToolsPage() {
                                 Database Sync
                             </Text>
                             <Text size="sm" c="dimmed">
-                                Force-refresh the local item templates and server definitions cache.
+                                Force-refresh the local item and quests templates.
                             </Text>
                         </div>
-                        <Button
-                            fullWidth
-                            leftSection={<IconRefresh size={16} />}
-                            loading={refreshDbMutation.isPending}
-                            onClick={() => refreshDbMutation.mutate()}
-                        >
+                        <Button fullWidth leftSection={<IconRefresh size={16} />} loading={refreshDbMutation.isPending} onClick={() => refreshDbMutation.mutate()}>
                             Refresh Database
+                        </Button>
+                    </Stack>
+                </Card>
+
+                <Card withBorder padding="lg" radius="md">
+                    <Stack justify="space-between" h="100%" gap="md">
+                        <div>
+                            <Text fw={600} size="lg" mb={4}>
+                                Quest Lookup
+                            </Text>
+                            <Text size="sm" c="dimmed">
+                                Search for quests in the database and view their objectives.
+                            </Text>
+                        </div>
+                        <Button fullWidth leftSection={<IconSearch size={16} />} onClick={openQuestModal}>
+                            Search Quests
                         </Button>
                     </Stack>
                 </Card>
             </SimpleGrid>
 
-            <SendItemModal
-                opened={sendModalOpened}
-                onClose={() => setSendModalOpened(false)}
-                loading={sendToAllMutation.isPending}
-                onConfirm={(model) => sendToAllMutation.mutate(model)}
-            />
+            <SendItemModal opened={sendModalOpened} onClose={() => setSendModalOpened(false)} loading={sendToAllMutation.isPending} onConfirm={(model) => sendToAllMutation.mutate(model)} />
+
+            <QuestSearchModal opened={questModalOpened} onClose={closeQuestModal} />
 
             <QueuedItemsModal opened={queuedModalOpened} onClose={() => setQueuedModalOpened(false)} />
         </Stack>

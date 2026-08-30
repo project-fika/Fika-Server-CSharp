@@ -6,7 +6,8 @@ import { AxiosError } from 'axios';
 import { useState } from 'react';
 import { api } from '../api/axiosClient';
 import type { ProfileResponse } from '../pages/ProfilesPage';
-import { SendItemModal, type SendItemModel } from './SendItemModal';
+import type { SendItemModel } from '../types/items';
+import { SendItemModal } from './SendItemModal';
 
 interface ModifyProfileModalProps {
     profile: ProfileResponse | null;

@@ -28,8 +28,8 @@ public class SendItemController(MailSendService mailSendService, ItemHelper item
     [HttpPost]
     public IActionResult HandlePostRequest([FromBody] SendItemRequest request)
     {
-        MongoId profileId = new(request.ProfileId);
-        MongoId itemTpl = new(request.ItemTemplate);
+        var profileId = new MongoId(request.ProfileId);
+        var itemTpl = new MongoId(request.ItemTemplate);
         var quantity = request.Amount;
         var message = request.Message;
 
@@ -105,7 +105,7 @@ public class SendItemController(MailSendService mailSendService, ItemHelper item
             // Flag the items as FiR
             itemHelper.SetFoundInRaid(itemsToSend);
         }
-        mailSendService.SendSystemMessageToPlayer(profileId, message, itemsToSend, request.ExpirationDays * 86400); // days * seconds per day
+        mailSendService.SendSystemMessageToPlayer(profileId, message, itemsToSend, request.ExpirationDays * 86_400); // days * seconds per day
 
         return Ok();
     }

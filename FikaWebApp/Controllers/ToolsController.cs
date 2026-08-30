@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using FikaShared.Requests;
+using FikaShared.Responses;
 using FikaWebApp.Models;
 using FikaWebApp.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -13,7 +14,7 @@ namespace FikaWebApp.Controllers;
 [Route("api/[controller]")]
 public sealed class ToolsController(
     IHttpClientFactory httpClientFactory,
-    ItemCacheService itemCacheService,
+    DataCacheService itemCacheService,
     SendTimersService sendTimersService,
     ILogger<ToolsController> logger) : ControllerBase
 {
@@ -55,9 +56,9 @@ public sealed class ToolsController(
     }
 
     [HttpGet("items/search")]
-    public ActionResult<IEnumerable<ItemSearchResultDto>> SearchItems([FromQuery] string? query)
+    public ActionResult<IEnumerable<DataSearchResultDto>> SearchItems([FromQuery] string? query)
     {
-        var results = itemCacheService.NameToIdSearch(query ?? string.Empty, 25);
+        var results = itemCacheService.SearchItems(query ?? string.Empty, 25);
         return Ok(results);
     }
 
@@ -79,12 +80,30 @@ public sealed class ToolsController(
         return Ok(response);
     }
 
+    [HttpGet("quests/search")]
+    public ActionResult<IEnumerable<DataSearchResultDto>> SearchQuests([FromQuery] string? query)
+    {
+        var results = itemCacheService.SearchQuests(query ?? string.Empty, 25);
+        return Ok(results);
+    }
+
+    [HttpGet("quests/resolve/{questId}")]
+    public ActionResult<QuestData> ResolveQuest(string questId)
+    {
+        if (!itemCacheService.TryGetQuest(questId, out var data) || data == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(data);
+    }
+
     [HttpPost("items/refresh")]
     public async Task<ActionResult<MessageResponseDto>> RefreshItemCache()
     {
         var success = await itemCacheService.PopulateDictionary();
         return success
-            ? Ok(new MessageResponseDto("Items successfully refreshed"))
+            ? Ok(new MessageResponseDto("Items and quests successfully refreshed"))
             : StatusCode(StatusCodes.Status500InternalServerError, new MessageResponseDto("There was an error refreshing the database"));
     }
 

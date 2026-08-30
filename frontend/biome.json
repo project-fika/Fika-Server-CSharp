@@ -4,7 +4,7 @@
         "enabled": true,
         "indentStyle": "space",
         "indentWidth": 4,
-        "lineWidth": 150
+        "lineWidth": 250
     },
     "assist": {
         "enabled": true,

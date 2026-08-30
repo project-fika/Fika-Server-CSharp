@@ -4,33 +4,7 @@ import { IconTrash } from '@tabler/icons-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { api } from '../api/axiosClient';
-
-interface SingleTimerDto {
-    ticks: number;
-    profileId: string;
-    itemTemplate: string;
-    itemName: string;
-    amount: number;
-    message: string;
-    foundInRaid: boolean;
-    sendDate: string;
-}
-
-interface AllTimerDto {
-    ticks: number;
-    itemTemplate: string;
-    itemName: string;
-    amount: number;
-    message: string;
-    foundInRaid: boolean;
-    profileIds: string[];
-    sendDate: string;
-}
-
-interface QueuedItemsResponse {
-    singleTimers: SingleTimerDto[];
-    allTimers: AllTimerDto[];
-}
+import type { QueuedItemsResponse } from '../types/queuedItems';
 
 interface QueuedItemsModalProps {
     opened: boolean;

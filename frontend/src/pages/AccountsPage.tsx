@@ -25,19 +25,7 @@ import { AxiosError } from 'axios';
 import { useState } from 'react';
 import { api } from '../api/axiosClient';
 import { useAuth } from '../context/AuthContext';
-
-interface UserDto {
-    id: string;
-    userName: string;
-    roles: string[];
-    lockoutEnd: string | null;
-}
-
-interface CreateUserPayload {
-    username: string;
-    password: string;
-    roles: string[];
-}
+import type { CreateUserPayload, UserDto } from '../types/accounts';
 
 const AVAILABLE_ROLES = ['Admin', 'Moderator'];
 

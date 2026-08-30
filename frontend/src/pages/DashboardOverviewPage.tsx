@@ -1,14 +1,7 @@
 import { ColorSwatch, Group, Paper, SimpleGrid, Skeleton, Stack, Text, Title } from '@mantine/core';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../api/axiosClient';
-
-export interface DashboardMetricsDto {
-    isRunning: boolean;
-    statusText: string;
-    lastRefreshMinutes: string;
-    cpuUsageText: string;
-    ramUsageText: string;
-}
+import type { DashboardMetricsDto } from '../types/metrics';
 
 export function DashboardOverviewPage() {
     // Poll backend stats every 2 seconds automatically

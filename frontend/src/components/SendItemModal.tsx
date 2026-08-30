@@ -23,29 +23,11 @@ import { AxiosError } from 'axios';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 import { api } from '../api/axiosClient';
+import type { ItemSearchResultDto, ResolvedItemDto, SendItemModel } from '../types/items';
 
-export interface SendItemModel {
-    itemName: string;
-    templateId: string;
-    amount: number;
-    message: string;
-    expirationDays: number;
-    foundInRaid: boolean;
-    useDate: boolean;
-    date: Date | null;
-}
+const getIconUrl = (templateId?: string) => (templateId ? `https://assets.tarkov.dev/${templateId}-icon.webp` : '/images/missing_item.png');
 
-interface ItemSearchResultDto {
-    templateId: string;
-    name: string;
-}
-
-interface ResolvedItemDto {
-    templateId: string;
-    name: string;
-    description: string;
-    maxItems: number;
-}
+const getWikiUrl = (templateId?: string) => (templateId ? `https://tarkov.dev/item/${templateId}` : undefined);
 
 interface SendItemModalProps {
     opened: boolean;
@@ -53,10 +35,6 @@ interface SendItemModalProps {
     onConfirm: (model: SendItemModel) => void;
     loading?: boolean;
 }
-
-const getIconUrl = (templateId?: string) => (templateId ? `https://assets.tarkov.dev/${templateId}-icon.webp` : '/images/missing_item.png');
-
-const getWikiUrl = (templateId?: string) => (templateId ? `https://tarkov.dev/item/${templateId}` : undefined);
 
 export function SendItemModal({ opened, onClose, onConfirm, loading }: SendItemModalProps) {
     const [itemName, setItemName] = useState('');

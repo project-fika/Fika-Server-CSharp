@@ -17,14 +17,7 @@ import { AxiosError } from 'axios';
 import { useState } from 'react';
 import { api } from '../api/axiosClient';
 import { useAuth } from '../context/AuthContext';
-
-export interface FileTreeNode {
-    value: string;
-    text: string;
-    isDirectory: boolean;
-    endText?: string;
-    children?: FileTreeNode[];
-}
+import type { FileTreeNode } from '../types/files';
 
 function getFileIcon(fileName: string, isDirectory: boolean) {
     if (isDirectory) return <IconFolder size={18} color="var(--mantine-color-yellow-5)" />;
