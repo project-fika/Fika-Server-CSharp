@@ -27,6 +27,9 @@ import { FileManagerPage } from './pages/FileManagerPage';
 import { ToolsPage } from './pages/ToolsPage';
 import { fikaTheme } from './theme/theme';
 
+import 'react18-json-view/src/style.css';
+import 'react18-json-view/src/dark.css';
+
 hljs.registerLanguage('json', jsonLang);
 const highlightJsAdapter = createHighlightJsAdapter(hljs);
 

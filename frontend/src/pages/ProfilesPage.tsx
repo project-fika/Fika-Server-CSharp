@@ -5,11 +5,13 @@ import {
     Card,
     Checkbox,
     FileButton,
+    Flex,
     Group,
     Loader,
     Modal,
     Paper,
     ScrollArea,
+    SegmentedControl,
     Stack,
     Table,
     Text,
@@ -18,10 +20,12 @@ import {
     Tooltip,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconEdit, IconEye, IconSearch, IconUpload } from '@tabler/icons-react';
+import { IconCode, IconEdit, IconEye, IconListTree, IconSearch, IconUpload } from '@tabler/icons-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { useMemo, useState } from 'react';
+import JsonView from 'react18-json-view';
+import 'react18-json-view/src/style.css';
 import { api } from '../api/axiosClient';
 import { ModifyProfileModal } from '../components/ModifyProfileModal';
 
@@ -37,7 +41,8 @@ export function ProfilesPage() {
     const [searchString, setSearchString] = useState('');
 
     const [selectedModifyProfile, setSelectedModifyProfile] = useState<ProfileResponse | null>(null);
-    const [viewJsonData, setViewJsonData] = useState<{ title: string; json: string } | null>(null);
+    const [viewJsonData, setViewJsonData] = useState<{ title: string; rawJson: string; parsedJson: object } | null>(null);
+    const [viewMode, setViewMode] = useState<'tree' | 'raw'>('tree');
     const [pendingUploadFile, setPendingUploadFile] = useState<File | null>(null);
 
     const { data: profiles = [], isLoading } = useQuery<ProfileResponse[]>({
@@ -73,22 +78,28 @@ export function ProfilesPage() {
 
     const handleViewProfile = async (profile: ProfileResponse) => {
         try {
-            const res = await api.get<string>(`/profiles/raw?profileId=${encodeURIComponent(profile.profileId)}`);
+            const res = await api.get<string | object>(`/profiles/raw?profileId=${encodeURIComponent(profile.profileId)}`);
 
-            let formattedJson = '';
+            let rawJson = '';
+            let parsedJson: object = {};
+
             if (typeof res.data === 'string') {
+                rawJson = res.data;
                 try {
-                    formattedJson = JSON.stringify(JSON.parse(res.data), null, 2);
+                    parsedJson = JSON.parse(res.data);
+                    rawJson = JSON.stringify(parsedJson, null, 2);
                 } catch {
-                    formattedJson = res.data;
+                    parsedJson = { raw: res.data };
                 }
             } else {
-                formattedJson = JSON.stringify(res.data, null, 2);
+                parsedJson = res.data;
+                rawJson = JSON.stringify(res.data, null, 2);
             }
 
             setViewJsonData({
                 title: `Viewing ${profile.nickname}`,
-                json: formattedJson,
+                rawJson,
+                parsedJson,
             });
         } catch (err: unknown) {
             const message = err instanceof AxiosError ? err.response?.data?.message || 'Failed to load profile data' : 'Failed to load profile data';
@@ -218,9 +229,62 @@ export function ProfilesPage() {
 
             <ModifyProfileModal profile={selectedModifyProfile} onClose={() => setSelectedModifyProfile(null)} />
 
-            <Modal opened={!!viewJsonData} onClose={() => setViewJsonData(null)} title={viewJsonData?.title} size="xl" centered>
-                <ScrollArea h={500}>
-                    <CodeHighlight code={viewJsonData?.json || ''} language="json" withCopyButton />
+            <Modal
+                opened={!!viewJsonData}
+                onClose={() => setViewJsonData(null)}
+                title={
+                    <Group justify="space-between" align="center" style={{ width: '100%', paddingRight: 16 }} wrap="nowrap">
+                        <Text fw={600} truncate>
+                            {viewJsonData?.title}
+                        </Text>
+                        <SegmentedControl
+                            size="xs"
+                            value={viewMode}
+                            onChange={(val) => setViewMode(val as 'tree' | 'raw')}
+                            style={{ flexShrink: 0 }}
+                            data={[
+                                {
+                                    value: 'tree',
+                                    label: (
+                                        <Flex align="center" gap={6} style={{ whiteSpace: 'nowrap' }}>
+                                            <IconListTree size={14} />
+                                            <Text size="xs">Tree</Text>
+                                        </Flex>
+                                    ),
+                                },
+                                {
+                                    value: 'raw',
+                                    label: (
+                                        <Flex align="center" gap={6} style={{ whiteSpace: 'nowrap' }}>
+                                            <IconCode size={14} />
+                                            <Text size="xs">Raw</Text>
+                                        </Flex>
+                                    ),
+                                },
+                            ]}
+                        />
+                    </Group>
+                }
+                size="60%"
+                centered
+            >
+                <ScrollArea h="calc(80vh - 100px)" mt="md" type="auto">
+                    {viewMode === 'tree' ? (
+                        <Paper
+                            p="sm"
+                            radius="sm"
+                            withBorder
+                            style={{
+                                backgroundColor: '#1e1e1e',
+                                borderColor: 'var(--mantine-color-dark-4)',
+                                minHeight: '100%',
+                            }}
+                        >
+                            <JsonView src={viewJsonData?.parsedJson || {}} collapsed={1} dark displaySize displayArrayIndex theme="vscode" />
+                        </Paper>
+                    ) : (
+                        <CodeHighlight code={viewJsonData?.rawJson || ''} language="json" withCopyButton />
+                    )}
                 </ScrollArea>
             </Modal>
 
