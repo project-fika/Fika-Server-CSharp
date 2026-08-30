@@ -1,7 +1,25 @@
-import { Anchor, Autocomplete, Box, Button, Checkbox, Group, Image, Loader, Modal, NumberInput, Stack, Text, Textarea, Tooltip } from '@mantine/core';
+import {
+    ActionIcon,
+    Anchor,
+    Autocomplete,
+    Box,
+    Button,
+    Checkbox,
+    Group,
+    Image,
+    Loader,
+    Modal,
+    NumberInput,
+    Stack,
+    Text,
+    Textarea,
+    Tooltip,
+} from '@mantine/core';
 import { DateTimePicker } from '@mantine/dates';
 import { useDebouncedCallback } from '@mantine/hooks';
+import { notifications } from '@mantine/notifications';
 import { IconCheck, IconInfoCircle, IconX } from '@tabler/icons-react';
+import { AxiosError } from 'axios';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 import { api } from '../api/axiosClient';
@@ -63,8 +81,13 @@ export function SendItemModal({ opened, onClose, onConfirm, loading }: SendItemM
         try {
             const res = await api.get<ItemSearchResultDto[]>(`/tools/items/search?query=${encodeURIComponent(val)}`);
             setSearchResults(res.data);
-        } catch {
+        } catch (err: unknown) {
             setSearchResults([]);
+            const message = err instanceof AxiosError ? err.response?.data?.message || 'Failed to search for items' : 'Failed to search for items';
+            notifications.show({
+                color: 'red',
+                message,
+            });
         } finally {
             setIsSearching(false);
         }
@@ -90,9 +113,22 @@ export function SendItemModal({ opened, onClose, onConfirm, loading }: SendItemM
         try {
             const res = await api.get<ResolvedItemDto>(`/tools/items/resolve/${encodeURIComponent(match.templateId)}`);
             setResolvedItem(res.data);
-        } catch {
+        } catch (err: unknown) {
             setResolvedItem(null);
+            const message =
+                err instanceof AxiosError ? err.response?.data?.message || 'Failed to resolve item details' : 'Failed to resolve item details';
+            notifications.show({
+                color: 'red',
+                message,
+            });
         }
+    };
+
+    const handleClearItem = () => {
+        setItemName('');
+        setResolvedItem(null);
+        setSearchResults([]);
+        setIsSearching(false);
     };
 
     const maxItems = resolvedItem?.maxItems || 10;
@@ -144,7 +180,13 @@ export function SendItemModal({ opened, onClose, onConfirm, loading }: SendItemM
                         rightSectionWidth={36}
                         rightSection={
                             <Box style={{ width: 16, height: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                {isSearching ? <Loader size={16} /> : null}
+                                {isSearching ? (
+                                    <Loader size={16} />
+                                ) : itemName ? (
+                                    <ActionIcon variant="subtle" color="gray" size="sm" onClick={handleClearItem}>
+                                        <IconX size={14} />
+                                    </ActionIcon>
+                                ) : null}
                             </Box>
                         }
                     />
