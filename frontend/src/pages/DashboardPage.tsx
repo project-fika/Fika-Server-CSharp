@@ -2,6 +2,7 @@ import { AppShell, Burger, Group, Image, Stack, Text, Title } from '@mantine/cor
 import { useDisclosure } from '@mantine/hooks';
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
+import { AnimatedPageLayout } from '../components/AnimatedPageLayout';
 import { SideNav } from '../components/SideNav';
 
 export function DashboardPage() {
@@ -47,8 +48,8 @@ export function DashboardPage() {
                 <SideNav collapsed={isCollapsed} onToggleCollapse={() => setIsCollapsed((prev) => !prev)} onLinkClick={close} />
             </AppShell.Navbar>
 
-            <AppShell.Main>
-                <Outlet />
+            <AppShell.Main style={{ overflowX: 'hidden' }}>
+                <AnimatedPageLayout />
             </AppShell.Main>
         </AppShell>
     );
