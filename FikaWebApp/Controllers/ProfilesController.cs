@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Text;
+using FikaShared.Enums;
 using FikaShared.Requests;
 using FikaShared.Responses;
 using FikaWebApp.Models;
@@ -180,7 +181,7 @@ public sealed class ProfilesController(
     }
 
     [HttpGet("quests")]
-    public async Task<ActionResult<List<QuestData>>> GetQuests([FromQuery] string? profileId)
+    public async Task<ActionResult<List<ActiveQuestData>>> GetQuests([FromQuery] string? profileId)
     {
         if (string.IsNullOrWhiteSpace(profileId))
         {
@@ -190,18 +191,54 @@ public sealed class ProfilesController(
         try
         {
             var client = httpClientFactory.CreateClient();
-            var ids = await client.GetFromJsonAsync<List<string>>($"fika/api/profile/quests?profileId={Uri.EscapeDataString(profileId)}");
-            if (ids == null)
+            var activeQuests = await client.GetFromJsonAsync<List<ActiveQuestData>>($"fika/api/profile/quests?profileId={Uri.EscapeDataString(profileId)}");
+            if (activeQuests == null)
             {
                 return Ok(new List<QuestData>());
             }
 
-            var response = new List<QuestData>(ids.Count);
-            foreach (var id in ids)
+            var response = new List<DetailedQuestData>(activeQuests.Count);
+            foreach (var activeQuestData in activeQuests)
             {
-                if (dataCacheService.TryGetQuest(id, out var questData) && questData != null)
+                if (dataCacheService.TryGetQuest(activeQuestData.Id, out var questData) && questData != null)
                 {
-                    response.Add(questData);
+                    var detailedObjectives = new List<DetailedQuestObjective>();
+
+                    foreach (var ac in activeQuestData.Objectives)
+                    {
+                        var objective = questData.Objectives.FirstOrDefault(o => o.Id == ac.Id);
+                        if (objective == null)
+                        {
+                            continue;
+                        }
+
+                        detailedObjectives.Add(new DetailedQuestObjective(
+                            objective.Description,
+                            ac.Progress,
+                            ac.Target,
+                            ac.State
+                        ));
+                    }
+
+                    if (detailedObjectives.Count == 0)
+                    {
+                        foreach (var obj in questData.Objectives)
+                        {
+                            detailedObjectives.Add(new DetailedQuestObjective(
+                                obj.Description,
+                                0,
+                                0,
+                                EQuestState.Started
+                            ));
+                        }
+                    }
+
+                    response.Add(new DetailedQuestData(
+                        questData.Name,
+                        questData.Description,
+                        activeQuestData.Completed,
+                        detailedObjectives
+                    ));
                 }
             }
 

@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using FikaShared;
+using FikaShared.Enums;
 using FikaShared.Requests;
 using FikaShared.Responses;
 using FikaWebApp.Models;
@@ -27,7 +28,7 @@ public sealed class HeadlessController(
             {
                 ProfileId = "TEST",
                 Nickname = "TEST",
-                State = Enums.EHeadlessState.Ready,
+                State = EHeadlessState.Ready,
                 Players = Random.Shared.Next(0, 5),
                 ProfileIds = []
             },
@@ -35,7 +36,7 @@ public sealed class HeadlessController(
             {
                 ProfileId = "TEST2",
                 Nickname = "TEST2",
-                State = Enums.EHeadlessState.NotReady,
+                State = EHeadlessState.NotReady,
                 Players = Random.Shared.Next(0, 5),
                 ProfileIds = []
             },
@@ -43,7 +44,7 @@ public sealed class HeadlessController(
             {
                 ProfileId = "TEST3",
                 Nickname = "TEST3",
-                State = Enums.EHeadlessState.NotReady,
+                State = EHeadlessState.NotReady,
                 Players = Random.Shared.Next(0, 5),
                 ProfileIds = []
             },
@@ -51,7 +52,7 @@ public sealed class HeadlessController(
             {
                 ProfileId = "TEST4",
                 Nickname = "TEST4",
-                State = Enums.EHeadlessState.Ready,
+                State = EHeadlessState.Ready,
                 Players = Random.Shared.Next(0, 5),
                 ProfileIds = []
             }

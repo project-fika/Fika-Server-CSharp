@@ -1,12 +1,13 @@
 import { Button, Divider, Group, Modal, NumberInput, Stack, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconCheck, IconCircleMinus, IconCirclePlus, IconMailForward } from '@tabler/icons-react';
+import { IconCheck, IconChecklist, IconCircleMinus, IconCirclePlus, IconMailForward } from '@tabler/icons-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { useState } from 'react';
 import { api } from '../api/axiosClient';
-import type { ProfileResponse } from '../pages/ProfilesPage';
 import type { SendItemModel } from '../types/items';
+import type { ProfileResponse } from '../types/profiles';
+import { ProfileDetailedQuestsModal } from './ProfileDetailedQuestsModal';
 import { SendItemModal } from './SendItemModal';
 
 interface ModifyProfileModalProps {
@@ -22,6 +23,7 @@ export function ModifyProfileModal({ profile, onClose }: ModifyProfileModalProps
     const [amountOfDays, setAmountOfDays] = useState<number>(7);
     const [showUnbanConfirm, setShowUnbanConfirm] = useState(false);
     const [showSendItemModal, setShowSendItemModal] = useState(false);
+    const [showQuestsModal, setShowQuestsModal] = useState(false);
 
     const addBanMutation = useMutation({
         mutationFn: (days: number) =>
@@ -103,12 +105,7 @@ export function ModifyProfileModal({ profile, onClose }: ModifyProfileModalProps
             }
         },
         onError: (err: unknown) => {
-            const message =
-                err instanceof AxiosError
-                    ? err.response?.data?.message || err.message
-                    : err instanceof Error
-                      ? err.message
-                      : 'Error sending item to user';
+            const message = err instanceof AxiosError ? err.response?.data?.message || err.message : err instanceof Error ? err.message : 'Error sending item to user';
             notifications.show({
                 color: 'red',
                 message,
@@ -138,15 +135,16 @@ export function ModifyProfileModal({ profile, onClose }: ModifyProfileModalProps
                         Send Item
                     </Button>
 
+                    <Button fullWidth leftSection={<IconChecklist size={16} />} onClick={() => setShowQuestsModal(true)}>
+                        View Quests
+                    </Button>
+
                     <Divider />
 
                     <Group justify="center" gap="sm">
                         <Button variant="default" leftSection={<IconCheck size={16} />} onClick={onClose}>
                             Ok
                         </Button>
-                        {/* <Button variant="default" leftSection={<IconX size={16} />} onClick={onClose}>
-                            Cancel
-                        </Button> */}
                     </Group>
                 </Stack>
             </Modal>
@@ -154,14 +152,7 @@ export function ModifyProfileModal({ profile, onClose }: ModifyProfileModalProps
             {/* Confirm Add Flea Ban Modal */}
             <Modal opened={showBanConfirm} onClose={() => setShowBanConfirm(false)} title="Confirm Flea Ban" centered>
                 <Stack gap="sm">
-                    <NumberInput
-                        label="Amount of Days"
-                        description="0 means 9999 days"
-                        min={0}
-                        max={9999}
-                        value={amountOfDays}
-                        onChange={(val) => setAmountOfDays(Number(val) || 0)}
-                    />
+                    <NumberInput label="Amount of Days" description="0 means 9999 days" min={0} max={9999} value={amountOfDays} onChange={(val) => setAmountOfDays(Number(val) || 0)} />
                     <Group justify="flex-end" mt="md">
                         <Button variant="default" onClick={() => setShowBanConfirm(false)}>
                             Cancel
@@ -189,12 +180,10 @@ export function ModifyProfileModal({ profile, onClose }: ModifyProfileModalProps
             </Modal>
 
             {/* Send Item Modal for Individual Player */}
-            <SendItemModal
-                opened={showSendItemModal}
-                onClose={() => setShowSendItemModal(false)}
-                loading={sendItemMutation.isPending}
-                onConfirm={(model) => sendItemMutation.mutate(model)}
-            />
+            <SendItemModal opened={showSendItemModal} onClose={() => setShowSendItemModal(false)} loading={sendItemMutation.isPending} onConfirm={(model) => sendItemMutation.mutate(model)} />
+
+            {/* Detailed Quests Sub Modal */}
+            <ProfileDetailedQuestsModal profile={profile} opened={showQuestsModal} onClose={() => setShowQuestsModal(false)} />
         </>
     );
 }

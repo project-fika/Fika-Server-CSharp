@@ -158,9 +158,9 @@ export function ProfilesPage() {
                                     </Table.Td>
                                     <Table.Td style={{ textAlign: 'right' }}>
                                         <Group gap="xs" justify="flex-end">
-                                            <Button size="xs" leftSection={<IconChecklist size={14} />} onClick={() => setSelectedQuestProfile(row)}>
+                                            {/* <Button size="xs" leftSection={<IconChecklist size={14} />} onClick={() => setSelectedQuestProfile(row)}>
                                                 Quests
-                                            </Button>
+                                            </Button> */}
                                             <Button size="xs" leftSection={<IconEdit size={14} />} onClick={() => setSelectedModifyProfile(row)}>
                                                 Modify
                                             </Button>

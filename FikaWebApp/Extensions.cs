@@ -1,4 +1,4 @@
-﻿using static FikaShared.Enums;
+﻿using FikaShared.Enums;
 
 namespace FikaWebApp;
 

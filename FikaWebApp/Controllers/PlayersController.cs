@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using FikaShared;
+using FikaShared.Enums;
 using FikaShared.Requests;
 using FikaShared.Responses;
 using FikaWebApp.Models;
@@ -25,13 +26,13 @@ public sealed class PlayersController(
         await Task.Delay(TimeSpan.FromSeconds(1));
         List<OnlinePlayer> mockPlayers =
         [
-            new() { Level = Random.Shared.Next(1, 69), Location = Enums.EFikaLocation.Labyrinth, Nickname = "John", ProfileId = "test1" },
-            new() { Level = Random.Shared.Next(1, 69), Location = Enums.EFikaLocation.Customs, Nickname = "West", ProfileId = "test2" },
-            new() { Level = Random.Shared.Next(1, 69), Location = Enums.EFikaLocation.Streets, Nickname = "Bjorn", ProfileId = "test3" },
-            new() { Level = Random.Shared.Next(1, 69), Location = Enums.EFikaLocation.Hideout, Nickname = "Roland", ProfileId = "test4" },
-            new() { Level = Random.Shared.Next(1, 69), Location = Enums.EFikaLocation.None, Nickname = "TarkovMan1337", ProfileId = "test5" },
-            new() { Level = Random.Shared.Next(1, 69), Location = Enums.EFikaLocation.Woods, Nickname = "Janky", ProfileId = "test6" },
-            new() { Level = Random.Shared.Next(1, 69), Location = Enums.EFikaLocation.GroundZero, Nickname = "guidot", ProfileId = "test7" }
+            new() { Level = Random.Shared.Next(1, 69), Location = EFikaLocation.Labyrinth, Nickname = "John", ProfileId = "test1" },
+            new() { Level = Random.Shared.Next(1, 69), Location = EFikaLocation.Customs, Nickname = "West", ProfileId = "test2" },
+            new() { Level = Random.Shared.Next(1, 69), Location = EFikaLocation.Streets, Nickname = "Bjorn", ProfileId = "test3" },
+            new() { Level = Random.Shared.Next(1, 69), Location = EFikaLocation.Hideout, Nickname = "Roland", ProfileId = "test4" },
+            new() { Level = Random.Shared.Next(1, 69), Location = EFikaLocation.None, Nickname = "TarkovMan1337", ProfileId = "test5" },
+            new() { Level = Random.Shared.Next(1, 69), Location = EFikaLocation.Woods, Nickname = "Janky", ProfileId = "test6" },
+            new() { Level = Random.Shared.Next(1, 69), Location = EFikaLocation.GroundZero, Nickname = "guidot", ProfileId = "test7" }
         ];
         return Ok(mockPlayers);
 #else

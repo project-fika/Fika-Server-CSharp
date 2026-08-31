@@ -5,7 +5,7 @@ using FikaShared;
 using FikaShared.Responses;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.WebSockets;
-using static FikaShared.Enums;
+using FikaShared.Enums;
 
 namespace FikaServer.API;
 

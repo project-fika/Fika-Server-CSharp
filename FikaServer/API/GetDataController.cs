@@ -92,17 +92,17 @@ public sealed class GetDataController(TemplateTable templateTable, LocaleService
                         continue;
                     }
 
-                    string description;
-                    if (condition.Value != null && condition.Value > 1d)
+                    objectives.Add(new QuestObjective(condition.Id, conditionDescription));
+                }
+
+                foreach (var condition in quest.Conditions.Fail!)
+                {
+                    if (!locale.TryGetValue(condition.Id, out var conditionDescription))
                     {
-                        description = $"{conditionDescription} 0/{condition.Value}";
-                    }
-                    else
-                    {
-                        description = conditionDescription;
+                        continue;
                     }
 
-                    objectives.Add(new QuestObjective(description));
+                    objectives.Add(new QuestObjective(condition.Id, conditionDescription));
                 }
             }
 
