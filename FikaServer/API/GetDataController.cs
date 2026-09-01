@@ -129,6 +129,11 @@ public sealed class GetDataController(TemplateTable templateTable, LocaleService
                             {
                                 foreach (var item in successReward.Items)
                                 {
+                                    if (item.ParentId != null)
+                                    {
+                                        continue;
+                                    }
+
                                     itemRewards.Add(new ItemReward
                                     {
                                         ItemId = item.Template,
