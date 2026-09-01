@@ -3,6 +3,7 @@ using FikaShared.Responses;
 using Microsoft.AspNetCore.Mvc;
 using SPTarkov.Server.Core.Extensions;
 using SPTarkov.Server.Core.Models.Common;
+using SPTarkov.Server.Core.Models.Enums;
 using SPTarkov.Server.Core.Models.Spt.Tables;
 using SPTarkov.Server.Core.Services.Locales;
 
@@ -106,11 +107,59 @@ public sealed class GetDataController(TemplateTable templateTable, LocaleService
                 }
             }
 
+            var itemRewards = new List<ItemReward>();
+            var traderRewards = new List<TraderReward>();
+            var experienceRewards = new List<ExperienceReward>();
+
+            if (quest.Rewards != null && quest.Rewards.TryGetValue("Success", out var successRewards))
+            {
+                foreach (var successReward in successRewards)
+                {
+                    switch (successReward.Type)
+                    {
+                        case RewardType.Experience:
+                            experienceRewards.Add(new ExperienceReward
+                            {
+                                Amount = successReward.Value
+                            });
+                            break;
+
+                        case RewardType.Item:
+                            if (successReward.Items != null)
+                            {
+                                foreach (var item in successReward.Items)
+                                {
+                                    itemRewards.Add(new ItemReward
+                                    {
+                                        ItemId = item.Template,
+                                        Amount = item?.Upd?.StackObjectsCount
+                                    });
+                                }
+                            }
+                            break;
+
+                        case RewardType.TraderStanding:
+                            if (successReward.Target != null)
+                            {
+                                traderRewards.Add(new TraderReward
+                                {
+                                    TraderId = successReward.Target,
+                                    Amount = successReward.Value
+                                });
+                            }
+                            break;
+                    }
+                }
+            }
+
             quests.Add(questId, new QuestData
             {
                 Name = questName,
                 Description = questDescription,
-                Objectives = objectives
+                Objectives = objectives,
+                ItemRewards = itemRewards.Count > 0 ? itemRewards : null,
+                TraderRewards = traderRewards.Count > 0 ? traderRewards : null,
+                ExperienceRewards = experienceRewards.Count > 0 ? experienceRewards : null
             });
         }
 

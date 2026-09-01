@@ -1,16 +1,35 @@
-import { Accordion, ActionIcon, Autocomplete, Box, Button, Group, Loader, Modal, Paper, ScrollArea, Stack, Text, Title } from '@mantine/core';
+import { Accordion, ActionIcon, Anchor, Autocomplete, Badge, Box, Button, Card, Group, Image, Loader, Modal, Paper, ScrollArea, SimpleGrid, Stack, Text, Title, Tooltip } from '@mantine/core';
 import { useDebouncedCallback } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
-import { IconListCheck, IconSearch, IconX } from '@tabler/icons-react';
+import { IconGift, IconListCheck, IconSearch, IconStar, IconUserCheck, IconX } from '@tabler/icons-react';
 import { AxiosError } from 'axios';
 import { useState } from 'react';
 import { api } from '../api/axiosClient';
 import type { QuestData, QuestSearchResultDto } from '../types/quests';
+import { Traders } from '../types/traders';
 
 interface QuestSearchModalProps {
     opened: boolean;
     onClose: () => void;
 }
+
+const traderNameMap: Record<string, string> = {
+    [Traders.PRAPOR]: 'Prapor',
+    [Traders.THERAPIST]: 'Therapist',
+    [Traders.FENCE]: 'Fence',
+    [Traders.SKIER]: 'Skier',
+    [Traders.PEACEKEEPER]: 'Peacekeeper',
+    [Traders.MECHANIC]: 'Mechanic',
+    [Traders.RAGMAN]: 'Ragman',
+    [Traders.JAEGER]: 'Jaeger',
+    [Traders.LIGHTHOUSEKEEPER]: 'Lightkeeper',
+    [Traders.BTR]: 'BTR',
+    [Traders.REF]: 'Ref',
+};
+
+const getIconUrl = (templateId?: string) => (templateId ? `https://assets.tarkov.dev/${templateId}-icon.webp` : '/images/missing_item.png');
+
+const getWikiUrl = (templateId?: string) => (templateId ? `https://tarkov.dev/item/${templateId}` : undefined);
 
 export function QuestSearchModal({ opened, onClose }: QuestSearchModalProps) {
     const [searchQuery, setSearchQuery] = useState('');
@@ -71,8 +90,7 @@ export function QuestSearchModal({ opened, onClose }: QuestSearchModalProps) {
             setResolvedQuest(res.data);
         } catch (err: unknown) {
             setResolvedQuest(null);
-            const message =
-                err instanceof AxiosError ? err.response?.data?.message || 'Failed to load quest details' : 'Failed to load quest details';
+            const message = err instanceof AxiosError ? err.response?.data?.message || 'Failed to load quest details' : 'Failed to load quest details';
             notifications.show({
                 color: 'red',
                 message,
@@ -95,6 +113,8 @@ export function QuestSearchModal({ opened, onClose }: QuestSearchModalProps) {
     };
 
     const hasObjectives = resolvedQuest?.objectives && resolvedQuest.objectives.length > 0;
+    const totalExp = resolvedQuest?.experienceRewards?.reduce((sum, item) => sum + (item.amount || 0), 0) || 0;
+    const hasRewards = totalExp > 0 || (resolvedQuest?.traderRewards && resolvedQuest.traderRewards.length > 0) || (resolvedQuest?.itemRewards && resolvedQuest.itemRewards.length > 0);
 
     return (
         <Modal opened={opened} onClose={handleCloseModal} title="Search Quests" size="lg" centered radius="md">
@@ -150,20 +170,106 @@ export function QuestSearchModal({ opened, onClose }: QuestSearchModalProps) {
                                             </Text>
                                         </Accordion.Control>
                                         <Accordion.Panel>
-                                            <ScrollArea.Autosize mah={250} type="auto">
+                                            <ScrollArea.Autosize mah={200} type="auto">
                                                 <Stack gap="xs">
                                                     {resolvedQuest.objectives.map((obj) => (
-                                                        <Paper
-                                                            key={`${resolvedQuest.name}-${obj.description}`}
-                                                            p="xs"
-                                                            withBorder
-                                                            style={{ backgroundColor: 'var(--mantine-color-dark-6)' }}
-                                                        >
+                                                        <Paper key={`${resolvedQuest.name}-${obj.description}`} p="xs" withBorder style={{ backgroundColor: 'var(--mantine-color-dark-6)' }}>
                                                             <Text size="sm">• {obj.description}</Text>
                                                         </Paper>
                                                     ))}
                                                 </Stack>
                                             </ScrollArea.Autosize>
+                                        </Accordion.Panel>
+                                    </Accordion.Item>
+                                </Accordion>
+                            )}
+
+                            {hasRewards && (
+                                <Accordion variant="separated" radius="sm" defaultValue="rewards">
+                                    <Accordion.Item value="rewards">
+                                        <Accordion.Control icon={<IconGift size={18} />}>
+                                            <Text size="sm" fw={600}>
+                                                Rewards
+                                            </Text>
+                                        </Accordion.Control>
+                                        <Accordion.Panel>
+                                            <Stack gap="sm">
+                                                {/* EXP & Trader Standing Badges */}
+                                                <Group gap="xs">
+                                                    {totalExp > 0 && (
+                                                        <Badge color="blue" variant="light" leftSection={<IconStar size={12} />}>
+                                                            +{totalExp.toLocaleString()} EXP
+                                                        </Badge>
+                                                    )}
+
+                                                    {resolvedQuest.traderRewards?.map((trader) => {
+                                                        const name = traderNameMap[trader.traderId] || 'Trader';
+                                                        const amt = trader.amount ?? 0;
+                                                        const formattedAmt = amt > 0 ? `+${amt}` : `${amt}`;
+                                                        return (
+                                                            <Badge key={`${trader.traderId}-${amt}`} color="green" variant="light" leftSection={<IconUserCheck size={12} />}>
+                                                                {name}: {formattedAmt}
+                                                            </Badge>
+                                                        );
+                                                    })}
+                                                </Group>
+
+                                                {/* Items Grid */}
+                                                {resolvedQuest.itemRewards && resolvedQuest.itemRewards.length > 0 && (
+                                                    <ScrollArea.Autosize mah={250} type="auto">
+                                                        <SimpleGrid cols={{ base: 3, sm: 4, md: 5 }} spacing="xs">
+                                                            {resolvedQuest.itemRewards.map((item) => {
+                                                                const iconUrl = getIconUrl(item.itemId);
+                                                                const wikiUrl = getWikiUrl(item.itemId);
+                                                                const formattedAmount = item.amount ? `x${item.amount.toLocaleString()}` : '';
+                                                                const itemKey = `${item.itemId}-${item.amount ?? 1}`;
+
+                                                                const content = (
+                                                                    <Card
+                                                                        key={itemKey}
+                                                                        withBorder
+                                                                        p={4}
+                                                                        radius="sm"
+                                                                        style={{
+                                                                            position: 'relative',
+                                                                            backgroundColor: 'var(--mantine-color-dark-8)',
+                                                                            aspectRatio: '1',
+                                                                        }}
+                                                                    >
+                                                                        <Image src={iconUrl} fallbackSrc="/images/missing_item.png" alt={item.itemId} fit="contain" h="100%" w="100%" />
+                                                                        {formattedAmount && (
+                                                                            <Text
+                                                                                size="xs"
+                                                                                fw={700}
+                                                                                style={{
+                                                                                    position: 'absolute',
+                                                                                    bottom: 2,
+                                                                                    right: 4,
+                                                                                    color: '#fff',
+                                                                                    textShadow: '0 1px 3px rgba(0,0,0,0.9), 0 0 2px rgba(0,0,0,1)',
+                                                                                    pointerEvents: 'none',
+                                                                                }}
+                                                                            >
+                                                                                {formattedAmount}
+                                                                            </Text>
+                                                                        )}
+                                                                    </Card>
+                                                                );
+
+                                                                return wikiUrl ? (
+                                                                    <Tooltip key={itemKey} label="View on tarkov.dev" openDelay={200}>
+                                                                        <Anchor href={wikiUrl} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+                                                                            {content}
+                                                                        </Anchor>
+                                                                    </Tooltip>
+                                                                ) : (
+                                                                    content
+                                                                );
+                                                            })}
+                                                        </SimpleGrid>
+                                                    </ScrollArea.Autosize>
+                                                )}
+                                            </Stack>
                                         </Accordion.Panel>
                                     </Accordion.Item>
                                 </Accordion>

@@ -6,6 +6,9 @@ export interface QuestData {
     name: string;
     description: string;
     objectives: QuestObjective[];
+    itemRewards?: ItemReward[] | null;
+    traderRewards?: TraderReward[] | null;
+    experienceRewards?: ExperienceReward[] | null;
 }
 
 export interface QuestSearchResultDto {
@@ -48,4 +51,18 @@ export interface QuestData {
 export interface QuestSearchResultDto {
     templateId: string;
     name: string;
+}
+
+export interface ItemReward {
+    amount?: number | null;
+    itemId: string;
+}
+
+export interface TraderReward {
+    amount?: number | null;
+    traderId: string;
+}
+
+export interface ExperienceReward {
+    amount?: number | null;
 }

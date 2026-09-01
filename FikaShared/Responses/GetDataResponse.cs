@@ -35,6 +35,39 @@ public sealed record QuestData
 
     [JsonPropertyName("objectives")]
     public required List<QuestObjective> Objectives { get; set; }
+
+    [JsonPropertyName("itemRewards")]
+    public required List<ItemReward>? ItemRewards { get; set; }
+
+    [JsonPropertyName("traderRewards")]
+    public required List<TraderReward>? TraderRewards { get; set; }
+
+    [JsonPropertyName("experienceRewards")]
+    public required List<ExperienceReward>? ExperienceRewards { get; set; }
+}
+
+public sealed record ItemReward
+{
+    [JsonPropertyName("amount")]
+    public required double? Amount { get; set; }
+
+    [JsonPropertyName("itemId")]
+    public required string ItemId { get; set; }
+}
+
+public sealed record TraderReward
+{
+    [JsonPropertyName("amount")]
+    public required double? Amount { get; set; }
+
+    [JsonPropertyName("traderId")]
+    public required string TraderId { get; set; }
+}
+
+public sealed record ExperienceReward
+{
+    [JsonPropertyName("amount")]
+    public required double? Amount { get; set; }
 }
 
 public sealed record ActiveQuestData(
