@@ -1,20 +1,4 @@
-import {
-    ActionIcon,
-    Anchor,
-    Autocomplete,
-    Box,
-    Button,
-    Checkbox,
-    Group,
-    Image,
-    Loader,
-    Modal,
-    NumberInput,
-    Stack,
-    Text,
-    Textarea,
-    Tooltip,
-} from '@mantine/core';
+import { ActionIcon, Anchor, Autocomplete, Box, Button, Checkbox, Group, Image, Loader, Modal, NumberInput, Stack, Text, Textarea, Tooltip } from '@mantine/core';
 import { DateTimePicker } from '@mantine/dates';
 import { useDebouncedCallback } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
@@ -93,8 +77,7 @@ export function SendItemModal({ opened, onClose, onConfirm, loading }: SendItemM
             setResolvedItem(res.data);
         } catch (err: unknown) {
             setResolvedItem(null);
-            const message =
-                err instanceof AxiosError ? err.response?.data?.message || 'Failed to resolve item details' : 'Failed to resolve item details';
+            const message = err instanceof AxiosError ? err.response?.data?.message || 'Failed to resolve item details' : 'Failed to resolve item details';
             notifications.show({
                 color: 'red',
                 message,
@@ -170,16 +153,18 @@ export function SendItemModal({ opened, onClose, onConfirm, loading }: SendItemM
                     />
 
                     <Tooltip
+                        multiline
+                        w={300}
+                        position="top"
+                        withArrow
                         label={
-                            <Group gap="xs">
-                                <IconInfoCircle size={14} />
-                                <Text size="xs" style={{ maxWidth: 300, wordWrap: 'break-word' }}>
+                            <Group gap="xs" align="flex-start" wrap="nowrap">
+                                <IconInfoCircle size={14} style={{ flexShrink: 0, marginTop: 2 }} />
+                                <Text size="xs" style={{ whiteSpace: 'normal', wordBreak: 'break-word' }}>
                                     {description}
                                 </Text>
                             </Group>
                         }
-                        position="top"
-                        withArrow
                     >
                         <Anchor href={wikiUrl} target="_blank" underline="never" style={{ flexShrink: 0 }}>
                             <Box style={{ position: 'relative', width: 64, height: 64, border: '2px solid #2d2d2f' }}>
@@ -190,33 +175,11 @@ export function SendItemModal({ opened, onClose, onConfirm, loading }: SendItemM
                     </Tooltip>
                 </Group>
 
-                <NumberInput
-                    label="Amount of items"
-                    description={`How many items to send (max ${maxItems.toLocaleString()})`}
-                    min={1}
-                    max={maxItems}
-                    value={amount}
-                    onChange={(val) => setAmount(Number(val) || 1)}
-                    required
-                />
+                <NumberInput label="Amount of items" description={`How many items to send (max ${maxItems.toLocaleString()})`} min={1} max={maxItems} value={amount} onChange={(val) => setAmount(Number(val) || 1)} required />
 
-                <Textarea
-                    label="Message"
-                    placeholder="Message attached to the delivery"
-                    rows={3}
-                    value={message}
-                    onChange={(e) => setMessage(e.currentTarget.value)}
-                />
+                <Textarea label="Message" placeholder="Message attached to the delivery" rows={3} value={message} onChange={(e) => setMessage(e.currentTarget.value)} />
 
-                <NumberInput
-                    label="Days until expiration"
-                    description="How many days until the message expires"
-                    min={1}
-                    max={31}
-                    value={expirationDays}
-                    onChange={(val) => setExpirationDays(Number(val) || 1)}
-                    required
-                />
+                <NumberInput label="Days until expiration" description="How many days until the message expires" min={1} max={31} value={expirationDays} onChange={(val) => setExpirationDays(Number(val) || 1)} required />
 
                 <Group mt="xs">
                     <Checkbox label="Found In Raid" checked={foundInRaid} onChange={(e) => setFoundInRaid(e.currentTarget.checked)} />
