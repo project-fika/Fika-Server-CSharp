@@ -25,7 +25,7 @@ public sealed class ProfilesController(
         try
         {
             var client = httpClientFactory.CreateClient();
-            var response = await client.GetFromJsonAsync<List<ProfileResponse>>("fika/api/profiles");
+            var response = await client.GetFromJsonAsync<List<ProfileResponse>>("fika/api/profiles/");
             return Ok(response ?? []);
         }
         catch (HttpRequestException httpEx)
@@ -225,14 +225,15 @@ public sealed class ProfilesController(
                 }
                 else if (cachedQuest.Objectives != null)
                 {
-                    activeQuest.Objectives = cachedQuest.Objectives.Select(staticObj => new QuestObjective
+                    activeQuest.Objectives = cachedQuest.Objectives
+                        .ConvertAll(staticObj => new QuestObjective
                     {
                         Id = staticObj.Id,
                         Description = staticObj.Description,
                         Progress = 0,
                         Target = 0,
                         State = EQuestState.Started
-                    }).ToList();
+                    });
                 }
             }
 
