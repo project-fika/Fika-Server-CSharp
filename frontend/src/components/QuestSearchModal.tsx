@@ -175,7 +175,9 @@ export function QuestSearchModal({ opened, onClose }: QuestSearchModalProps) {
                                                 <Stack gap="xs">
                                                     {objectives.map((obj) => (
                                                         <Paper key={`${resolvedQuest.name}-${obj.description || 'obj'}`} p="xs" withBorder style={{ backgroundColor: 'var(--mantine-color-dark-6)' }}>
-                                                            <Text size="sm">• {obj.description || 'No description'}</Text>
+                                                            <Text size="sm">
+                                                                • {obj.description || 'No description'} (0/{obj.target ?? 1})
+                                                            </Text>
                                                         </Paper>
                                                     ))}
                                                 </Stack>

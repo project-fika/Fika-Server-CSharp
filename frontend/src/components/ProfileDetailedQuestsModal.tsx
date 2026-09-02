@@ -1,6 +1,7 @@
-import { Accordion, Box, Checkbox, Group, LoadingOverlay, Modal, Paper, ScrollArea, Stack, Text } from '@mantine/core';
+import { Accordion, ActionIcon, Box, Button, Checkbox, Group, LoadingOverlay, Modal, Paper, ScrollArea, Stack, Text, Tooltip } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { useQuery } from '@tanstack/react-query';
+import { IconCheck } from '@tabler/icons-react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '../api/axiosClient';
@@ -13,7 +14,13 @@ interface ProfileDetailedQuestsModalProps {
     onClose: () => void;
 }
 
+interface CompleteQuestPayload {
+    questId: string;
+    objectiveId?: string;
+}
+
 export function ProfileDetailedQuestsModal({ profile, opened, onClose }: ProfileDetailedQuestsModalProps) {
+    const queryClient = useQueryClient();
     const [renderedQuests, setRenderedQuests] = useState<QuestData[]>([]);
     const [isRendering, setIsRendering] = useState(false);
 
@@ -33,6 +40,29 @@ export function ProfileDetailedQuestsModal({ profile, opened, onClose }: Profile
         enabled: !!profile?.profileId && opened,
     });
 
+    const completeMutation = useMutation({
+        mutationFn: async ({ questId, objectiveId }: CompleteQuestPayload) => {
+            if (!profile?.profileId) return;
+
+            let url = `/profiles/quests/complete?profileId=${encodeURIComponent(profile.profileId)}&questId=${encodeURIComponent(questId)}`;
+            if (objectiveId) {
+                url += `&objectiveId=${encodeURIComponent(objectiveId)}`;
+            }
+
+            const res = await api.post(url);
+            return res.data;
+        },
+        onSuccess: (data, variables) => {
+            const message = data?.message || (variables.objectiveId ? 'Objective completed' : 'Quest completed');
+            notifications.show({ color: 'green', message });
+            queryClient.invalidateQueries({ queryKey: ['profileDetailedQuests', profile?.profileId] });
+        },
+        onError: (err: unknown) => {
+            const message = err instanceof AxiosError ? err.response?.data?.message || 'Failed to complete quest action' : 'Failed to complete quest action';
+            notifications.show({ color: 'red', message });
+        },
+    });
+
     useEffect(() => {
         if (isError) {
             const message = error instanceof AxiosError ? error.response?.data?.message || 'Failed to load detailed profile quests' : 'Failed to load detailed profile quests';
@@ -43,7 +73,6 @@ export function ProfileDetailedQuestsModal({ profile, opened, onClose }: Profile
         }
     }, [isError, error]);
 
-    // Defer heavy DOM rendering when opening or when fresh data arrives
     useEffect(() => {
         if (opened && quests.length > 0) {
             setIsRendering(true);
@@ -91,14 +120,34 @@ export function ProfileDetailedQuestsModal({ profile, opened, onClose }: Profile
                 {questList.map((quest) => {
                     const questKey = quest.id || quest.name || 'quest';
                     const objectives = quest.objectives || [];
+                    const allObjectivesDone = objectives.length > 0 && objectives.every((obj) => obj.state === EQuestState.Completed);
+                    const isQuestCompleted = quest.completed ?? false;
 
                     return (
                         <Accordion.Item key={questKey} value={quest.name || questKey}>
                             <Accordion.Control>
-                                <Text fw={600} size="sm">
-                                    {quest.name || 'Unnamed Quest'}
-                                </Text>
+                                <Group justify="space-between" wrap="nowrap" pr="xs">
+                                    <Text fw={600} size="sm" truncate style={{ flex: 1 }}>
+                                        {quest.name || 'Unnamed Quest'}
+                                    </Text>
+
+                                    <Button
+                                        size="xs"
+                                        color="green"
+                                        variant="light"
+                                        leftSection={<IconCheck size={14} />}
+                                        disabled={!allObjectivesDone || isQuestCompleted}
+                                        loading={completeMutation.isPending && completeMutation.variables?.questId === questKey && !completeMutation.variables?.objectiveId}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            completeMutation.mutate({ questId: questKey });
+                                        }}
+                                    >
+                                        {isQuestCompleted ? 'Completed' : 'Finish Quest'}
+                                    </Button>
+                                </Group>
                             </Accordion.Control>
+
                             <Accordion.Panel>
                                 <Stack gap="xs">
                                     <Text size="sm" c="dimmed" style={{ whiteSpace: 'pre-line' }}>
@@ -120,18 +169,44 @@ export function ProfileDetailedQuestsModal({ profile, opened, onClose }: Profile
                                                                 const objKey = obj.id || obj.description || 'obj';
                                                                 const progress = obj.progress ?? 0;
                                                                 const target = obj.target ?? 0;
+                                                                const isObjComplete = obj.state === EQuestState.Completed;
 
                                                                 return (
-                                                                    <Group key={`${questKey}-${objKey}`} align="flex-start" wrap="nowrap">
-                                                                        <Checkbox checked={obj.state === EQuestState.Completed} readOnly size="xs" mt={2} />
-                                                                        <Text size="xs">
-                                                                            {obj.description || 'No description'}{' '}
-                                                                            {progress > 0 && (
-                                                                                <Text span c="dimmed">
-                                                                                    ({progress}/{target})
-                                                                                </Text>
-                                                                            )}
-                                                                        </Text>
+                                                                    <Group key={`${questKey}-${objKey}`} justify="space-between" align="center" wrap="nowrap">
+                                                                        <Group gap="xs" align="flex-start" wrap="nowrap" style={{ flex: 1 }}>
+                                                                            <Checkbox checked={isObjComplete} readOnly size="xs" mt={2} />
+                                                                            <Text size="xs">
+                                                                                {obj.description || 'No description'}{' '}
+                                                                                {progress > 0 && (
+                                                                                    <Text span c="dimmed">
+                                                                                        ({progress}/{target})
+                                                                                    </Text>
+                                                                                )}
+                                                                            </Text>
+                                                                        </Group>
+
+                                                                        {!isObjComplete ? (
+                                                                            <Tooltip label="Complete Objective" openDelay={200}>
+                                                                                <ActionIcon
+                                                                                    size="xs"
+                                                                                    color="green"
+                                                                                    variant="filled"
+                                                                                    loading={completeMutation.isPending && completeMutation.variables?.questId === questKey && completeMutation.variables?.objectiveId === objKey}
+                                                                                    onClick={() =>
+                                                                                        completeMutation.mutate({
+                                                                                            questId: questKey,
+                                                                                            objectiveId: objKey,
+                                                                                        })
+                                                                                    }
+                                                                                >
+                                                                                    <IconCheck size={12} />
+                                                                                </ActionIcon>
+                                                                            </Tooltip>
+                                                                        ) : (
+                                                                            <Text size="xs" c="green" fw={600}>
+                                                                                Done
+                                                                            </Text>
+                                                                        )}
                                                                     </Group>
                                                                 );
                                                             })}

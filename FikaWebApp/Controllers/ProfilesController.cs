@@ -206,14 +206,12 @@ public sealed class ProfilesController(
                     continue;
                 }
 
-                // Hydrate top-level quest metadata
                 activeQuest.Name = cachedQuest.Name;
                 activeQuest.Description = cachedQuest.Description;
                 activeQuest.ItemRewards = cachedQuest.ItemRewards;
                 activeQuest.TraderRewards = cachedQuest.TraderRewards;
                 activeQuest.ExperienceRewards = cachedQuest.ExperienceRewards;
 
-                // Hydrate objective descriptions or fallback if objectives list is empty
                 if (activeQuest.Objectives?.Count > 0)
                 {
                     foreach (var activeObj in activeQuest.Objectives)
@@ -227,7 +225,6 @@ public sealed class ProfilesController(
                 }
                 else if (cachedQuest.Objectives != null)
                 {
-                    // If API sent no objective progress data, populate default uncompleted objectives
                     activeQuest.Objectives = cachedQuest.Objectives.Select(staticObj => new QuestObjective
                     {
                         Id = staticObj.Id,

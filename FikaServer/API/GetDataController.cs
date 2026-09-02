@@ -96,7 +96,8 @@ public sealed class GetDataController(TemplateTable templateTable, LocaleService
                     objectives.Add(new QuestObjective()
                     {
                         Id = condition.Id,
-                        Description = conditionDescription
+                        Description = conditionDescription,
+                        Target = condition.Value
                     });
                 }
 
