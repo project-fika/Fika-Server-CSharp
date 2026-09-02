@@ -124,7 +124,7 @@ export function ProfileDetailedQuestsModal({ profile, opened, onClose }: Profile
                     const isQuestCompleted = quest.completed ?? false;
 
                     return (
-                        <Accordion.Item key={questKey} value={quest.name || questKey}>
+                        <Accordion.Item key={questKey} value={quest.name || questKey} style={{ border: '1px solid var(--mantine-color-dark-3)' }}>
                             <Accordion.Control>
                                 <Group justify="space-between" wrap="nowrap" pr="xs">
                                     <Text fw={600} size="sm" truncate style={{ flex: 1 }}>
@@ -133,11 +133,12 @@ export function ProfileDetailedQuestsModal({ profile, opened, onClose }: Profile
 
                                     <Button
                                         size="xs"
-                                        color="green"
-                                        variant="light"
                                         leftSection={<IconCheck size={14} />}
                                         disabled={!allObjectivesDone || isQuestCompleted}
                                         loading={completeMutation.isPending && completeMutation.variables?.questId === questKey && !completeMutation.variables?.objectiveId}
+                                        style={{
+                                            border: '1px solid var(--mantine-color-dark-3)',
+                                        }}
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             completeMutation.mutate({ questId: questKey });
@@ -236,7 +237,7 @@ export function ProfileDetailedQuestsModal({ profile, opened, onClose }: Profile
                     </Text>
                 ) : (
                     <ScrollArea.Autosize mah={550} type="auto">
-                        <Accordion multiple defaultValue={['active', 'completed']} variant="filled" radius="md">
+                        <Accordion multiple defaultValue={[]} variant="filled" radius="md" style={{ border: '1px solid var(--mantine-color-dark-3)' }}>
                             <Accordion.Item value="active">
                                 <Accordion.Control>
                                     <Text fw={700} size="sm">
