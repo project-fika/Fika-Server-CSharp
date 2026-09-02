@@ -8,6 +8,7 @@ using SPTarkov.Server.Core.Models.Eft.Quests;
 using SPTarkov.Server.Core.Models.Enums;
 using SPTarkov.Server.Core.Models.Spt.Tables;
 using SPTarkov.Server.Core.Servers;
+using SPTarkov.Server.Core.Servers.Ws;
 
 namespace FikaServer.API;
 
@@ -15,7 +16,7 @@ namespace FikaServer.API;
 [Route("fika/api/profile")]
 [RequireApiKey]
 public sealed class ProfileController(SaveServer saveServer,
-    TemplateTable templateTable, QuestHelper questHelper, ILogger<ProfileController> logger) : ControllerBase
+    TemplateTable templateTable, QuestHelper questHelper, SptWebSocketConnectionHandler connectionHandler) : ControllerBase
 {
     [HttpGet("quests")]
     public ActionResult<List<List<QuestData>>> GetQuests([FromQuery] string? profileId)
@@ -78,6 +79,15 @@ public sealed class ProfileController(SaveServer saveServer,
         if (string.IsNullOrWhiteSpace(profileId) || string.IsNullOrWhiteSpace(questId))
         {
             return BadRequest(new { message = "Both profileId and questId are required." });
+        }
+
+        if (connectionHandler.IsWebSocketConnected(profileId))
+        {
+            return Conflict(new
+            {
+                code = "ACTIVE_CONNECTION_CONFLICT",
+                message = "Profile cannot be modified while an active WebSocket connection exists. Log out first."
+            });
         }
 
         var profile = saveServer.GetProfile(profileId);
