@@ -115,12 +115,7 @@ export function QueuedItemsModal({ opened, onClose }: QueuedItemsModalProps) {
                                                     <b>Target Recipients ({item.profileIds?.length || 0}):</b> {item.profileIds?.join(', ')}
                                                 </Text>
                                                 <Group justify="flex-end" mt="xs">
-                                                    <Button
-                                                        color="red"
-                                                        size="xs"
-                                                        leftSection={<IconTrash size={14} />}
-                                                        onClick={() => deleteMutation.mutate(item.ticks)}
-                                                    >
+                                                    <Button color="red" size="xs" leftSection={<IconTrash size={14} />} onClick={() => deleteMutation.mutate(item.ticks)}>
                                                         Delete Delivery
                                                     </Button>
                                                 </Group>

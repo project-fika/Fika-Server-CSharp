@@ -9,7 +9,7 @@ public sealed record GetDataResponse
     public required Dictionary<string, ItemData> Items { get; init; } = [];
 
     [JsonPropertyName("quests")]
-    public required Dictionary<string, QuestData> Quests { get; set; }
+    public required Dictionary<string, QuestData> Quests { get; set; } = [];
 }
 
 public sealed record ItemData
@@ -24,32 +24,55 @@ public sealed record ItemData
     public required int StackAmount { get; init; }
 }
 
-
 public sealed record QuestData
 {
+    [JsonPropertyName("id")]
+    public string? Id { get; set; }
+
     [JsonPropertyName("name")]
-    public required string Name { get; set; }
+    public string? Name { get; set; }
 
     [JsonPropertyName("description")]
-    public required string Description { get; set; }
+    public string? Description { get; set; }
+
+    [JsonPropertyName("completed")]
+    public bool? Completed { get; set; }
 
     [JsonPropertyName("objectives")]
-    public required List<QuestObjective> Objectives { get; set; }
+    public List<QuestObjective>? Objectives { get; set; }
 
     [JsonPropertyName("itemRewards")]
-    public required List<ItemReward>? ItemRewards { get; set; }
+    public List<ItemReward>? ItemRewards { get; set; }
 
     [JsonPropertyName("traderRewards")]
-    public required List<TraderReward>? TraderRewards { get; set; }
+    public List<TraderReward>? TraderRewards { get; set; }
 
     [JsonPropertyName("experienceRewards")]
-    public required List<ExperienceReward>? ExperienceRewards { get; set; }
+    public List<ExperienceReward>? ExperienceRewards { get; set; }
+}
+
+public sealed record QuestObjective
+{
+    [JsonPropertyName("id")]
+    public string? Id { get; set; }
+
+    [JsonPropertyName("description")]
+    public string? Description { get; set; }
+
+    [JsonPropertyName("progress")]
+    public double? Progress { get; set; }
+
+    [JsonPropertyName("target")]
+    public double? Target { get; set; }
+
+    [JsonPropertyName("state")]
+    public EQuestState? State { get; set; }
 }
 
 public sealed record ItemReward
 {
     [JsonPropertyName("amount")]
-    public required double? Amount { get; set; }
+    public double? Amount { get; set; }
 
     [JsonPropertyName("itemId")]
     public required string ItemId { get; set; }
@@ -58,7 +81,7 @@ public sealed record ItemReward
 public sealed record TraderReward
 {
     [JsonPropertyName("amount")]
-    public required double? Amount { get; set; }
+    public double? Amount { get; set; }
 
     [JsonPropertyName("traderId")]
     public required string TraderId { get; set; }
@@ -67,37 +90,5 @@ public sealed record TraderReward
 public sealed record ExperienceReward
 {
     [JsonPropertyName("amount")]
-    public required double? Amount { get; set; }
+    public double? Amount { get; set; }
 }
-
-public sealed record ActiveQuestData(
-    [property: JsonPropertyName("id")] string Id,
-    [property: JsonPropertyName("completed")] bool Completed,
-    [property: JsonPropertyName("objectives")] List<ActiveObjectiveData> Objectives
-);
-
-public sealed record DetailedQuestData(
-    [property: JsonPropertyName("name")] string Name,
-    [property: JsonPropertyName("description")] string Description,
-    [property: JsonPropertyName("completed")] bool Completed,
-    [property: JsonPropertyName("objectives")] List<DetailedQuestObjective> Objectives
-);
-
-public sealed record QuestObjective(
-    [property: JsonPropertyName("id")] string Id,
-    [property: JsonPropertyName("description")] string Description
-);
-
-public sealed record ActiveObjectiveData(
-    [property: JsonPropertyName("id")] string Id,
-    [property: JsonPropertyName("progress")] int Progress,
-    [property: JsonPropertyName("target")] int Target,
-    [property: JsonPropertyName("state")] EQuestState State
-);
-
-public sealed record DetailedQuestObjective(
-    [property: JsonPropertyName("description")] string Description,
-    [property: JsonPropertyName("progress")] int Progress,
-    [property: JsonPropertyName("target")] int Target,
-    [property: JsonPropertyName("state")] EQuestState State
-);

@@ -93,7 +93,11 @@ public sealed class GetDataController(TemplateTable templateTable, LocaleService
                         continue;
                     }
 
-                    objectives.Add(new QuestObjective(condition.Id, conditionDescription));
+                    objectives.Add(new QuestObjective()
+                    {
+                        Id = condition.Id,
+                        Description = conditionDescription
+                    });
                 }
 
                 foreach (var condition in quest.Conditions.Fail!)
@@ -103,7 +107,11 @@ public sealed class GetDataController(TemplateTable templateTable, LocaleService
                         continue;
                     }
 
-                    objectives.Add(new QuestObjective(condition.Id, conditionDescription));
+                    objectives.Add(new QuestObjective()
+                    {
+                        Id = condition.Id,
+                        Description = conditionDescription
+                    });
                 }
             }
 

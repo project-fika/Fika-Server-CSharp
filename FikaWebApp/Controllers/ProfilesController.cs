@@ -181,7 +181,7 @@ public sealed class ProfilesController(
     }
 
     [HttpGet("quests")]
-    public async Task<ActionResult<List<ActiveQuestData>>> GetQuests([FromQuery] string? profileId)
+    public async Task<ActionResult<List<QuestData>>> GetQuests([FromQuery] string? profileId)
     {
         if (string.IsNullOrWhiteSpace(profileId))
         {
@@ -191,58 +191,55 @@ public sealed class ProfilesController(
         try
         {
             var client = httpClientFactory.CreateClient();
-            var activeQuests = await client.GetFromJsonAsync<List<ActiveQuestData>>($"fika/api/profile/quests?profileId={Uri.EscapeDataString(profileId)}");
-            if (activeQuests == null)
+            var activeQuests = await client.GetFromJsonAsync<List<QuestData>>($"fika/api/profile/quests?profileId={Uri.EscapeDataString(profileId)}");
+            if (activeQuests == null || activeQuests.Count == 0)
             {
                 return Ok(new List<QuestData>());
             }
 
-            var response = new List<DetailedQuestData>(activeQuests.Count);
-            foreach (var activeQuestData in activeQuests)
+            foreach (var activeQuest in activeQuests)
             {
-                if (dataCacheService.TryGetQuest(activeQuestData.Id, out var questData) && questData != null)
+                if (string.IsNullOrWhiteSpace(activeQuest.Id) ||
+                    !dataCacheService.TryGetQuest(activeQuest.Id, out var cachedQuest) ||
+                    cachedQuest == null)
                 {
-                    var detailedObjectives = new List<DetailedQuestObjective>();
+                    continue;
+                }
 
-                    foreach (var ac in activeQuestData.Objectives)
+                // Hydrate top-level quest metadata
+                activeQuest.Name = cachedQuest.Name;
+                activeQuest.Description = cachedQuest.Description;
+                activeQuest.ItemRewards = cachedQuest.ItemRewards;
+                activeQuest.TraderRewards = cachedQuest.TraderRewards;
+                activeQuest.ExperienceRewards = cachedQuest.ExperienceRewards;
+
+                // Hydrate objective descriptions or fallback if objectives list is empty
+                if (activeQuest.Objectives?.Count > 0)
+                {
+                    foreach (var activeObj in activeQuest.Objectives)
                     {
-                        var objective = questData.Objectives.FirstOrDefault(o => o.Id == ac.Id);
-                        if (objective == null)
+                        var staticObj = cachedQuest.Objectives?.FirstOrDefault(o => o.Id == activeObj.Id);
+                        if (staticObj != null)
                         {
-                            continue;
-                        }
-
-                        detailedObjectives.Add(new DetailedQuestObjective(
-                            objective.Description,
-                            ac.Progress,
-                            ac.Target,
-                            ac.State
-                        ));
-                    }
-
-                    if (detailedObjectives.Count == 0)
-                    {
-                        foreach (var obj in questData.Objectives)
-                        {
-                            detailedObjectives.Add(new DetailedQuestObjective(
-                                obj.Description,
-                                0,
-                                0,
-                                EQuestState.Started
-                            ));
+                            activeObj.Description = staticObj.Description;
                         }
                     }
-
-                    response.Add(new DetailedQuestData(
-                        questData.Name,
-                        questData.Description,
-                        activeQuestData.Completed,
-                        detailedObjectives
-                    ));
+                }
+                else if (cachedQuest.Objectives != null)
+                {
+                    // If API sent no objective progress data, populate default uncompleted objectives
+                    activeQuest.Objectives = cachedQuest.Objectives.Select(staticObj => new QuestObjective
+                    {
+                        Id = staticObj.Id,
+                        Description = staticObj.Description,
+                        Progress = 0,
+                        Target = 0,
+                        State = EQuestState.Started
+                    }).ToList();
                 }
             }
 
-            return Ok(response);
+            return Ok(activeQuests);
         }
         catch (HttpRequestException httpEx)
         {
@@ -263,6 +260,64 @@ public sealed class ProfilesController(
         catch (Exception ex)
         {
             logger.LogError(ex, "Error retrieving profiles.");
+            return StatusCode(StatusCodes.Status500InternalServerError, new ApiResponseDto($"An error occurred: {ex.Message}"));
+        }
+    }
+
+    [HttpPost("quests/complete")]
+    public async Task<ActionResult<ApiResponseDto>> CompleteQuest(
+        [FromQuery] string? profileId,
+        [FromQuery] string? questId,
+        [FromQuery] string? objectiveId = null)
+    {
+        if (string.IsNullOrWhiteSpace(profileId) || string.IsNullOrWhiteSpace(questId))
+        {
+            return BadRequest(new ApiResponseDto("Both profileId and questId are required."));
+        }
+
+        try
+        {
+            var client = httpClientFactory.CreateClient();
+            var targetUri = $"fika/api/profile/quests/complete?profileId={Uri.EscapeDataString(profileId)}&questId={Uri.EscapeDataString(questId)}";
+
+            if (!string.IsNullOrWhiteSpace(objectiveId))
+            {
+                targetUri += $"&objectiveId={Uri.EscapeDataString(objectiveId)}";
+            }
+
+            var result = await client.PostAsync(targetUri, null);
+
+            if (!result.IsSuccessStatusCode)
+            {
+                var error = await result.Content.ReadAsStringAsync();
+                return StatusCode((int)result.StatusCode, new ApiResponseDto(error));
+            }
+
+            var successMessage = string.IsNullOrWhiteSpace(objectiveId)
+                ? $"Quest [{questId}] completed successfully."
+                : $"Objective [{objectiveId}] completed successfully for quest [{questId}].";
+
+            return Ok(new ApiResponseDto(successMessage));
+        }
+        catch (HttpRequestException httpEx)
+        {
+            if (httpEx.StatusCode == HttpStatusCode.Forbidden)
+            {
+                logger.LogError("Error completing quest action: [403 Forbidden]. Missing or invalid API key.");
+                return StatusCode(StatusCodes.Status403Forbidden, new ApiResponseDto("Something went wrong when completing quest action: [403 Forbidden].\nAre you using the wrong API key?"));
+            }
+            if (httpEx.StatusCode == HttpStatusCode.NotFound)
+            {
+                logger.LogError("Error completing quest action: [404 NotFound]. Missing Fika server mod.");
+                return StatusCode(StatusCodes.Status404NotFound, new ApiResponseDto("Something went wrong when completing quest action: [404 NotFound].\nAre you missing the Fika server mod?"));
+            }
+
+            logger.LogError(httpEx, "HttpRequestException caught when completing quest action.");
+            return StatusCode(StatusCodes.Status500InternalServerError, new ApiResponseDto($"HttpRequestException: {httpEx.Message}"));
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error completing quest action for ProfileId: {ProfileId}, QuestId: {QuestId}", profileId, questId);
             return StatusCode(StatusCodes.Status500InternalServerError, new ApiResponseDto($"An error occurred: {ex.Message}"));
         }
     }

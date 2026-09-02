@@ -112,7 +112,8 @@ export function QuestSearchModal({ opened, onClose }: QuestSearchModalProps) {
         onClose();
     };
 
-    const hasObjectives = resolvedQuest?.objectives && resolvedQuest.objectives.length > 0;
+    const objectives = resolvedQuest?.objectives || [];
+    const hasObjectives = objectives.length > 0;
     const totalExp = resolvedQuest?.experienceRewards?.reduce((sum, item) => sum + (item.amount || 0), 0) || 0;
     const hasRewards = totalExp > 0 || (resolvedQuest?.traderRewards && resolvedQuest.traderRewards.length > 0) || (resolvedQuest?.itemRewards && resolvedQuest.itemRewards.length > 0);
 
@@ -155,7 +156,7 @@ export function QuestSearchModal({ opened, onClose }: QuestSearchModalProps) {
                     <Paper withBorder p="md" radius="sm" style={{ backgroundColor: 'var(--mantine-color-dark-7)' }}>
                         <Stack gap="sm">
                             <Box>
-                                <Title order={4}>{resolvedQuest.name}</Title>
+                                <Title order={4}>{resolvedQuest.name || 'Unnamed Quest'}</Title>
                                 <Text size="sm" c="dimmed" mt="xs" style={{ whiteSpace: 'pre-line' }}>
                                     {resolvedQuest.description || 'No description available.'}
                                 </Text>
@@ -166,15 +167,15 @@ export function QuestSearchModal({ opened, onClose }: QuestSearchModalProps) {
                                     <Accordion.Item value="objectives">
                                         <Accordion.Control icon={<IconListCheck size={18} />}>
                                             <Text size="sm" fw={600}>
-                                                Objectives ({resolvedQuest.objectives.length})
+                                                Objectives ({objectives.length})
                                             </Text>
                                         </Accordion.Control>
                                         <Accordion.Panel>
                                             <ScrollArea.Autosize mah={200} type="auto">
                                                 <Stack gap="xs">
-                                                    {resolvedQuest.objectives.map((obj) => (
-                                                        <Paper key={`${resolvedQuest.name}-${obj.description}`} p="xs" withBorder style={{ backgroundColor: 'var(--mantine-color-dark-6)' }}>
-                                                            <Text size="sm">• {obj.description}</Text>
+                                                    {objectives.map((obj) => (
+                                                        <Paper key={`${resolvedQuest.name}-${obj.description || 'obj'}`} p="xs" withBorder style={{ backgroundColor: 'var(--mantine-color-dark-6)' }}>
+                                                            <Text size="sm">• {obj.description || 'No description'}</Text>
                                                         </Paper>
                                                     ))}
                                                 </Stack>

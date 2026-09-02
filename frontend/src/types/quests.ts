@@ -1,21 +1,3 @@
-export interface QuestObjective {
-    description: string;
-}
-
-export interface QuestData {
-    name: string;
-    description: string;
-    objectives: QuestObjective[];
-    itemRewards?: ItemReward[] | null;
-    traderRewards?: TraderReward[] | null;
-    experienceRewards?: ExperienceReward[] | null;
-}
-
-export interface QuestSearchResultDto {
-    templateId: string;
-    name: string;
-}
-
 export const EQuestState = {
     Started: 0,
     InProgress: 1,
@@ -24,33 +6,12 @@ export const EQuestState = {
 
 export type EQuestState = (typeof EQuestState)[keyof typeof EQuestState];
 
-export interface DetailedQuestObjective {
-    description: string;
-    progress: number;
-    target: number;
-    state: EQuestState;
-}
-
-export interface DetailedQuestData {
-    name: string;
-    description: string;
-    completed: boolean;
-    objectives: DetailedQuestObjective[];
-}
-
 export interface QuestObjective {
-    description: string;
-}
-
-export interface QuestData {
-    name: string;
-    description: string;
-    objectives: QuestObjective[];
-}
-
-export interface QuestSearchResultDto {
-    templateId: string;
-    name: string;
+    id?: string;
+    description?: string;
+    progress?: number;
+    target?: number;
+    state?: EQuestState;
 }
 
 export interface ItemReward {
@@ -65,4 +26,20 @@ export interface TraderReward {
 
 export interface ExperienceReward {
     amount?: number | null;
+}
+
+export interface QuestData {
+    id?: string;
+    name?: string;
+    description?: string;
+    completed?: boolean;
+    objectives?: QuestObjective[];
+    itemRewards?: ItemReward[] | null;
+    traderRewards?: TraderReward[] | null;
+    experienceRewards?: ExperienceReward[] | null;
+}
+
+export interface QuestSearchResultDto {
+    templateId: string;
+    name: string;
 }

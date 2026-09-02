@@ -5,7 +5,7 @@ import { AxiosError } from 'axios';
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '../api/axiosClient';
 import type { ProfileResponse } from '../types/profiles';
-import { type DetailedQuestData, EQuestState } from '../types/quests';
+import { EQuestState, type QuestData, type QuestObjective } from '../types/quests';
 
 interface ProfileDetailedQuestsModalProps {
     profile: ProfileResponse | null;
@@ -14,7 +14,7 @@ interface ProfileDetailedQuestsModalProps {
 }
 
 export function ProfileDetailedQuestsModal({ profile, opened, onClose }: ProfileDetailedQuestsModalProps) {
-    const [renderedQuests, setRenderedQuests] = useState<DetailedQuestData[]>([]);
+    const [renderedQuests, setRenderedQuests] = useState<QuestData[]>([]);
     const [isRendering, setIsRendering] = useState(false);
 
     const {
@@ -23,11 +23,11 @@ export function ProfileDetailedQuestsModal({ profile, opened, onClose }: Profile
         isFetching,
         isError,
         error,
-    } = useQuery<DetailedQuestData[]>({
+    } = useQuery<QuestData[]>({
         queryKey: ['profileDetailedQuests', profile?.profileId],
         queryFn: async () => {
             if (!profile?.profileId) return [];
-            const res = await api.get<DetailedQuestData[]>(`/profiles/quests?profileId=${encodeURIComponent(profile.profileId)}`);
+            const res = await api.get<QuestData[]>(`/profiles/quests?profileId=${encodeURIComponent(profile.profileId)}`);
             return res.data;
         },
         enabled: !!profile?.profileId && opened,
@@ -77,7 +77,7 @@ export function ProfileDetailedQuestsModal({ profile, opened, onClose }: Profile
 
     const showLoader = isLoading || isRendering;
 
-    const renderQuestAccordionList = (questList: DetailedQuestData[]) => {
+    const renderQuestAccordionList = (questList: QuestData[]) => {
         if (questList.length === 0) {
             return (
                 <Text size="xs" c="dimmed" py="xs">
@@ -88,53 +88,64 @@ export function ProfileDetailedQuestsModal({ profile, opened, onClose }: Profile
 
         return (
             <Accordion variant="separated" radius="sm">
-                {questList.map((quest) => (
-                    <Accordion.Item key={quest.name} value={quest.name}>
-                        <Accordion.Control>
-                            <Text fw={600} size="sm">
-                                {quest.name}
-                            </Text>
-                        </Accordion.Control>
-                        <Accordion.Panel>
-                            <Stack gap="xs">
-                                <Text size="sm" c="dimmed" style={{ whiteSpace: 'pre-line' }}>
-                                    {quest.description || 'No description available.'}
-                                </Text>
+                {questList.map((quest) => {
+                    const questKey = quest.id || quest.name || 'quest';
+                    const objectives = quest.objectives || [];
 
-                                {quest.objectives && quest.objectives.length > 0 && (
-                                    <Paper withBorder p="xs" radius="sm" mt="xs" style={{ backgroundColor: 'var(--mantine-color-dark-6)' }}>
-                                        <Accordion variant="subtle" radius="xs">
-                                            <Accordion.Item value="objectives-list">
-                                                <Accordion.Control p={0}>
-                                                    <Text size="xs" fw={600}>
-                                                        Objectives ({quest.objectives.length})
-                                                    </Text>
-                                                </Accordion.Control>
-                                                <Accordion.Panel pt="xs">
-                                                    <Stack gap="xs">
-                                                        {quest.objectives.map((obj) => (
-                                                            <Group key={`${quest.name}-${obj.description}`} align="flex-start" wrap="nowrap">
-                                                                <Checkbox checked={obj.state === EQuestState.Completed} readOnly size="xs" mt={2} />
-                                                                <Text size="xs">
-                                                                    {obj.description}{' '}
-                                                                    {obj.progress > 0 && (
-                                                                        <Text span c="dimmed">
-                                                                            ({obj.progress}/{obj.target})
+                    return (
+                        <Accordion.Item key={questKey} value={quest.name || questKey}>
+                            <Accordion.Control>
+                                <Text fw={600} size="sm">
+                                    {quest.name || 'Unnamed Quest'}
+                                </Text>
+                            </Accordion.Control>
+                            <Accordion.Panel>
+                                <Stack gap="xs">
+                                    <Text size="sm" c="dimmed" style={{ whiteSpace: 'pre-line' }}>
+                                        {quest.description || 'No description available.'}
+                                    </Text>
+
+                                    {objectives.length > 0 && (
+                                        <Paper withBorder p="xs" radius="sm" mt="xs" style={{ backgroundColor: 'var(--mantine-color-dark-6)' }}>
+                                            <Accordion variant="subtle" radius="xs">
+                                                <Accordion.Item value="objectives-list">
+                                                    <Accordion.Control p={0}>
+                                                        <Text size="xs" fw={600}>
+                                                            Objectives ({objectives.length})
+                                                        </Text>
+                                                    </Accordion.Control>
+                                                    <Accordion.Panel pt="xs">
+                                                        <Stack gap="xs">
+                                                            {objectives.map((obj: QuestObjective) => {
+                                                                const objKey = obj.id || obj.description || 'obj';
+                                                                const progress = obj.progress ?? 0;
+                                                                const target = obj.target ?? 0;
+
+                                                                return (
+                                                                    <Group key={`${questKey}-${objKey}`} align="flex-start" wrap="nowrap">
+                                                                        <Checkbox checked={obj.state === EQuestState.Completed} readOnly size="xs" mt={2} />
+                                                                        <Text size="xs">
+                                                                            {obj.description || 'No description'}{' '}
+                                                                            {progress > 0 && (
+                                                                                <Text span c="dimmed">
+                                                                                    ({progress}/{target})
+                                                                                </Text>
+                                                                            )}
                                                                         </Text>
-                                                                    )}
-                                                                </Text>
-                                                            </Group>
-                                                        ))}
-                                                    </Stack>
-                                                </Accordion.Panel>
-                                            </Accordion.Item>
-                                        </Accordion>
-                                    </Paper>
-                                )}
-                            </Stack>
-                        </Accordion.Panel>
-                    </Accordion.Item>
-                ))}
+                                                                    </Group>
+                                                                );
+                                                            })}
+                                                        </Stack>
+                                                    </Accordion.Panel>
+                                                </Accordion.Item>
+                                            </Accordion>
+                                        </Paper>
+                                    )}
+                                </Stack>
+                            </Accordion.Panel>
+                        </Accordion.Item>
+                    );
+                })}
             </Accordion>
         );
     };

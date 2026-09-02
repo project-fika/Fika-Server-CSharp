@@ -14,7 +14,7 @@ namespace FikaServer.API;
 public sealed class ProfileController(SaveServer saveServer, TemplateTable templateTable) : ControllerBase
 {
     [HttpGet("quests")]
-    public ActionResult<List<List<ActiveQuestData>>> GetQuests([FromQuery] string? profileId)
+    public ActionResult<List<List<QuestData>>> GetQuests([FromQuery] string? profileId)
     {
         if (string.IsNullOrWhiteSpace(profileId))
         {
@@ -44,10 +44,21 @@ public sealed class ProfileController(SaveServer saveServer, TemplateTable templ
                             ?.Conditions?.AvailableForFinish
                             ?.FirstOrDefault(tc => tc?.Id == c?.Id)
                             ?.Value ?? 0;
-                        return new ActiveObjectiveData(c.Id!, (int)c.Value!, (int)target, state);
+                        return new QuestObjective()
+                        {
+                            Id = c.Id!,
+                            Progress = c.Value!,
+                            Target = target,
+                            State = state
+                        };
                     })
 ;
-                return new ActiveQuestData(q.QId, q.Status == QuestStatusEnum.Success, conditionsData);
+                return new QuestData()
+                {
+                    Id = q.QId,
+                    Completed = q.Status == QuestStatusEnum.Success,
+                    Objectives = conditionsData
+                };
             })
             .ToList();
 
