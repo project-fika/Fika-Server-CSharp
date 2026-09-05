@@ -1,7 +1,6 @@
 import { AppShell, Burger, Group, Image, Stack, Text, Title } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useState } from 'react';
-import { Outlet } from 'react-router-dom';
 import { AnimatedPageLayout } from '../components/AnimatedPageLayout';
 import { SideNav } from '../components/SideNav';
 
