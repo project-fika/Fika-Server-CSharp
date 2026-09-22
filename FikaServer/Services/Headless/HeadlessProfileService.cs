@@ -52,6 +52,12 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
         foreach (var headlessProfile in HeadlessProfiles)
         {
             coreConfig.Features.AchievementProfileIdBlacklist.Add(headlessProfile.ProfileInfo.ProfileId);
+
+            if (headlessProfile.SptData.TutorialCompleted != true)
+            {
+                headlessProfile.SptData.TutorialCompleted = true;
+                await saveServer.SaveProfileAsync(headlessProfile.ProfileInfo.ProfileId.Value);
+            }
         }
     }
 
@@ -169,6 +175,7 @@ public class HeadlessProfileService(ISptLogger<HeadlessProfileService> logger, S
         ClearUnecessaryHeadlessItems(profile.CharacterData.PmcData, profileId);
 
         profile.CharacterData.PmcData.Info.MemberCategory = MemberCategory.UnitTest;
+        profile.SptData.TutorialCompleted = true;
 
         await saveServer.SaveProfileAsync(profileId);
 

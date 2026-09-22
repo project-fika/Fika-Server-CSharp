@@ -10,9 +10,9 @@
       },
       "SPTushonka.Common": {
         "type": "Direct",
-        "requested": "[4.1.3, )",
-        "resolved": "4.1.3",
-        "contentHash": "vZ4dB0uYlO6PG7ErwzX4h4lpJbw/DFfwqT8atzpSQqBVNAXY9qOU1i0uHWaFHBwi62pZ++LdYxJoMsSnuw5XqQ==",
+        "requested": "[5.0.0-pre.202609141239, )",
+        "resolved": "5.0.0-pre.202609141239",
+        "contentHash": "NM6Kc0PXx/dcFx3Y18L69NH+yEwcFNRmLB9sUi2zR1r5QenhAPNJHQaumh1CHigz5H7ZAPih/1fkcdJQQauKKQ==",
         "dependencies": {
           "SemanticVersioning": "3.0.0",
           "Spectre.Console": "0.57.2",
@@ -23,45 +23,45 @@
       },
       "SPTushonka.DI": {
         "type": "Direct",
-        "requested": "[4.1.3, )",
-        "resolved": "4.1.3",
-        "contentHash": "wwe5RmWR7G2ZuV4MUsKlQI3nfi4Vq5pnQ/ZYr0Ov3fnZQrhuWpBL1mhLj8/4t5na/PnASEpSatFwXQYR4fM4dQ==",
+        "requested": "[5.0.0-pre.202609141239, )",
+        "resolved": "5.0.0-pre.202609141239",
+        "contentHash": "bdsgG/eEU/nlMRJL1RsAJMXXpfHkB/gQmp5/oREJ16kIyOFy+7vO2xjZw02zIUI4T2MfrRFlYjKJ4tDarplx2w==",
         "dependencies": {
           "JetBrains.Annotations": "2026.2.0"
         }
       },
       "SPTushonka.Reflection": {
         "type": "Direct",
-        "requested": "[4.1.3, )",
-        "resolved": "4.1.3",
-        "contentHash": "ATobehWrX8pHhtoh1gBAaObbmcFYrw5ucowaYBewf4XItkLUa9rw+33XxHiTH5NDoXc7bcMSuk8nBbU/8v8dMg==",
+        "requested": "[5.0.0-pre.202609141239, )",
+        "resolved": "5.0.0-pre.202609141239",
+        "contentHash": "5tPFwszDlhGtwfTkWNGyzNatQFKTwpHRLtc/5HztbHf9lXMGTm20pn8ir2g0+E9V8sU4Ewwio9BaeiS2ra/6hA==",
         "dependencies": {
           "HarmonyX": "2.16.1",
           "JetBrains.Annotations": "2026.2.0",
-          "SPTushonka.DI": "4.1.3"
+          "SPTushonka.DI": "5.0.0-pre.202609141239"
         }
       },
       "SPTushonka.Server.Core": {
         "type": "Direct",
-        "requested": "[4.1.3, )",
-        "resolved": "4.1.3",
-        "contentHash": "BGOjb4LBONpOGmngwRVA6H3flk9UY72n1+Jq9YWrSLCtI3aQBdHMRtHr0P5ywmLGIZ9NZOgfc6MM3YKbAKDqBQ==",
+        "requested": "[5.0.0-pre.202609141239, )",
+        "resolved": "5.0.0-pre.202609141239",
+        "contentHash": "WvzGIluNo6qpoi/gGhW6e2xI8FX2c4UH9pMM7nl8zS0IZAOfQaQroCcHrEl/Eh92p+mcCBe0kabLdHPVOp9EHA==",
         "dependencies": {
           "FastCloner": "3.5.5",
-          "SPTushonka.Common": "4.1.3",
-          "SPTushonka.DI": "4.1.3",
+          "SPTushonka.Common": "5.0.0-pre.202609141239",
+          "SPTushonka.DI": "5.0.0-pre.202609141239",
           "System.IO.Hashing": "10.0.9"
         }
       },
       "SPTushonka.Server.Web": {
         "type": "Direct",
-        "requested": "[4.1.3, )",
-        "resolved": "4.1.3",
-        "contentHash": "DEM1hSCpzvtSm1KmcIOSVoV6vEY7Pa+TtsM1r153mmI0Rc4p4licFv5Baj5GebsicytWYXpVZCKXAydlMrgb1w==",
+        "requested": "[5.0.0-pre.202609141239, )",
+        "resolved": "5.0.0-pre.202609141239",
+        "contentHash": "ErSN/65ym6z05SZ/0vWMgWnGW6nzAgti/7Aj5nh4Ln7pteSfQtIRIHRIiQhifLgRbX/OWYMoNQi6X33Y5MmgRw==",
         "dependencies": {
           "Argon2Sharp": "4.0.1",
           "MudBlazor": "9.7.0",
-          "SPTushonka.Server.Core": "4.1.3"
+          "SPTushonka.Server.Core": "5.0.0-pre.202609141239"
         }
       },
       "Argon2Sharp": {

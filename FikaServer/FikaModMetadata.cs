@@ -16,7 +16,7 @@ public sealed record FikaModMetadata : IModMetadata, IModBlazorMetadata
     public string License { get; init; } = "CC-BY-NC-SA-4.0";
     public string ModGuid { get; init; } = "Fika";
     public SemanticVersioning.Version Version { get; init; } = new(FikaVersion);
-    public SemanticVersioning.Range SptVersion { get; init; } = new("~4.1.3");
+    public SemanticVersioning.Range SptVersion { get; init; } = new("~5.0.0");
     public bool HasPrepatcher { get; init; } = false;
     public string? WWWRootUrl { get; init; } = null;
     public string? HomePage { get; init; } = null;

@@ -17,11 +17,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="SPTushonka.Common" Version="4.1.3" />
-		<PackageReference Include="SPTushonka.DI" Version="4.1.3" />
-		<PackageReference Include="SPTushonka.Reflection" Version="4.1.3" />
-		<PackageReference Include="SPTushonka.Server.Core" Version="4.1.3" />
-		<PackageReference Include="SPTushonka.Server.Web" Version="4.1.3" />
+		<PackageReference Include="SPTushonka.Common" Version="5.0.0-pre.202609141239" />
+		<PackageReference Include="SPTushonka.DI" Version="5.0.0-pre.202609141239" />
+		<PackageReference Include="SPTushonka.Reflection" Version="5.0.0-pre.202609141239" />
+		<PackageReference Include="SPTushonka.Server.Core" Version="5.0.0-pre.202609141239" />
+		<PackageReference Include="SPTushonka.Server.Web" Version="5.0.0-pre.202609141239" />
 	</ItemGroup>
 
 	<ItemGroup>
