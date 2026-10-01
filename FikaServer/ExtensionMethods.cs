@@ -2,7 +2,7 @@
 using SPTarkov.Server.Core.Models.Eft.Common;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Models.Enums;
-using static FikaShared.Enums;
+using FikaShared.Enums;
 
 namespace FikaServer;
 

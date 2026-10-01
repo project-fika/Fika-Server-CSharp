@@ -1,19 +1,17 @@
-﻿using ApexCharts;
-using Brism;
-using FikaWebApp.Components;
-using FikaWebApp.Components.Account;
+﻿using System.Net.Http.Headers;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 using FikaWebApp.Data;
 using FikaWebApp.Services;
-using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using MudBlazor.Services;
-using MudExtensions.Services;
+using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Serilog.Events;
-using System.Net.Http.Headers;
 
 namespace FikaWebApp;
 
@@ -22,93 +20,104 @@ public static class Program
     public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-        var silenceLogs = args.Contains("--quiet-logs");
+
+        var fikaConfigSection = builder.Configuration.GetSection("FikaConfig");
+        builder.Services.Configure<WebAppConfig>(fikaConfigSection);
+        var config = fikaConfigSection.Get<WebAppConfig>()
+            ?? throw new Exception("Missing WebApp variables in configuration.");
+
+        if (args.Contains("--quiet-logs"))
+        {
+            config.QuietLogs = true;
+        }
 
         Log.Logger = new LoggerConfiguration()
-            .MinimumLevel.Override("Microsoft", silenceLogs ? LogEventLevel.Warning : LogEventLevel.Information)
+            .MinimumLevel.Override("Microsoft", config.QuietLogs ? LogEventLevel.Warning : LogEventLevel.Information)
             .WriteTo.Console()
             .WriteTo.File($"{WebAppConfig.LogsPath}/log-.log", rollingInterval: RollingInterval.Day, retainedFileCountLimit: 7)
             .Enrich.FromLogContext()
             .CreateLogger();
 
         builder.Host.UseSerilog();
+        var logger = Log.ForContext(typeof(Program));
 
-        // Add MudBlazor services
-        builder.Services.AddMudServices();
-        builder.Services.AddMudExtensions();
+        if (config.QuietLogs)
+        {
+            logger.Information("Using QuietLogs");
+        }
 
-        // Add Brism
-        builder.Services.AddBrism();
+        var jwtSecret = builder.Configuration["Jwt:SecretKey"];
 
-        // Add services to the container.
-        builder.Services.AddRazorComponents()
-            .AddInteractiveServerComponents();
+        if (string.IsNullOrWhiteSpace(jwtSecret))
+        {
+            var dataDirectory = Path.Combine(AppContext.BaseDirectory, "Data");
+            var secretKeyPath = Path.Combine(dataDirectory, "jwt-secret.txt");
 
-        // Add Controllers
+            Directory.CreateDirectory(dataDirectory);
+
+            if (File.Exists(secretKeyPath))
+            {
+                jwtSecret = File.ReadAllText(secretKeyPath)
+                    .Trim();
+            }
+            else
+            {
+                var randomBytes = RandomNumberGenerator.GetBytes(32);
+                jwtSecret = Convert.ToBase64String(randomBytes);
+
+                File.WriteAllText(secretKeyPath, jwtSecret);
+                logger.Information($"[Security] Generated new persistent JWT secret at: {secretKeyPath}");
+            }
+
+            builder.Configuration["Jwt:SecretKey"] = jwtSecret;
+        }
+
+        // Add REST Controllers
         builder.Services.AddControllers();
 
-        builder.WebHost.UseStaticWebAssets();
-
-        builder.Services.AddCascadingAuthenticationState();
-        builder.Services.AddScoped<IdentityUserAccessor>();
-        builder.Services.AddScoped<IdentityRedirectManager>();
-        builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
-
-        builder.Services.AddApexCharts(e =>
+#if DEBUG
+        // Configure CORS for local Vite React development
+        builder.Services.AddCors(options =>
         {
-            e.GlobalOptions = new ApexChartBaseOptions
+            options.AddPolicy("AllowViteFrontend", policy =>
             {
-                Theme = new Theme
-                {
-                    Palette = PaletteType.Palette1,
-                    Mode = Mode.Dark
-                },
-                Chart = new Chart
-                {
-                    Background = "transparent",
-                    FontFamily = "bender"
-                },
-                Yaxis =
-                [
-                    new YAxis
-                    {
-                        DecimalsInFloat = 0,
-                        ForceNiceScale = true,
-                        Labels = new YAxisLabels
-                        {
-                            Style = new AxisLabelStyle
-                            {
-                                FontFamily = "bender"
-                            },
-                            Formatter = "function(val) { return Math.round(val).toLocaleString(); }"
-                        }
-                    }
-                ],
-                DataLabels = new DataLabels
-                {
-                    Enabled = true,
-                    Style = new DataLabelsStyle
-                    {
-                        FontFamily = "bender"
-                    }
-                },
-                Tooltip = new Tooltip
-                {
-                    Style = new TooltipStyle
-                    {
-                        FontFamily = "bender"
-                    },
-                    Y = new TooltipY
-                    {
-                        Formatter = "function (val) { " +
-                        "   return val === null || val === undefined ? val : Math.round(val).toLocaleString();" +
-                        "}"
-                    }
-                },
-                Legend = new Legend
-                {
-                    FontFamily = "bender"
-                }
+                policy.WithOrigins("http://localhost:5173")
+                      .AllowAnyHeader()
+                      .AllowAnyMethod()
+                      .AllowCredentials();
+            });
+        });
+#endif
+
+        // Configure JWT Secret Key
+        var jwtSecretKey = builder.Configuration["Jwt:SecretKey"];
+        if (string.IsNullOrWhiteSpace(jwtSecretKey))
+        {
+            throw new InvalidOperationException("Jwt:SecretKey is missing from configuration!");
+        }
+
+        builder.Services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+#if DEBUG
+            options.RequireHttpsMetadata = false;
+#else
+            options.RequireHttpsMetadata = true;
+#endif
+            options.SaveToken = true;
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecretKey)),
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ClockSkew = TimeSpan.FromMinutes(5),
+                RoleClaimType = ClaimTypes.Role
             };
         });
 
@@ -136,34 +145,32 @@ public static class Program
         .AddEntityFrameworkStores<ApplicationDbContext>()
         .AddDefaultTokenProviders();
 
+        // Configure Application Cookie for API-based authentication
         builder.Services.ConfigureApplicationCookie(options =>
         {
             options.ExpireTimeSpan = TimeSpan.FromDays(1);
             options.SlidingExpiration = false;
+
+            options.Events.OnRedirectToLogin = context =>
+            {
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                return Task.CompletedTask;
+            };
+
+            options.Events.OnRedirectToAccessDenied = context =>
+            {
+                context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                return Task.CompletedTask;
+            };
+
+            options.Cookie.SameSite = SameSiteMode.Lax;
+            options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
         });
 
-        builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
-
-#if DEBUG
+        // Bind WebAppConfig options section dynamically for both local runs & Docker
         builder.Services.Configure<WebAppConfig>(builder.Configuration.GetSection("FikaConfig"));
-
         builder.Services.AddSingleton(resolver =>
             resolver.GetRequiredService<IOptions<WebAppConfig>>().Value);
-#else
-        var apiKey = Environment.GetEnvironmentVariable("API_KEY")
-            ?? throw new Exception("Missing API_KEY");
-        var baseUrl = Environment.GetEnvironmentVariable("BASE_URL")
-            ?? throw new Exception("Missing BASE_URL");
-
-        var fikaConfig = new WebAppConfig()
-        {
-            APIKey = apiKey,
-            BaseUrl = new Uri(baseUrl),
-            HeartbeatInterval = 5
-        };
-
-        builder.Services.AddSingleton(fikaConfig);
-#endif
 
         builder.Services.AddHttpClient(Options.DefaultName, SetupHttpClient)
             .ConfigurePrimaryHttpMessageHandler(() =>
@@ -173,7 +180,7 @@ public static class Program
                 });
 
         builder.Services.AddSingleton<SendTimersService>();
-        builder.Services.AddSingleton<ItemCacheService>();
+        builder.Services.AddSingleton<DataCacheService>();
         builder.Services.AddSingleton<HeartbeatService>();
         builder.Services.AddHostedService<BackgroundInitializerService>();
 
@@ -183,7 +190,6 @@ public static class Program
 
         var app = builder.Build();
 
-        // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
             app.UseMigrationsEndPoint();
@@ -194,19 +200,20 @@ public static class Program
             app.UseHsts();
         }
 
-        //app.UseHttpsRedirection();
+        app.UseDefaultFiles();
+        app.UseStaticFiles();
 
-        app.UseAntiforgery();
+        app.UseRouting();
+
+        app.UseCors("AllowViteFrontend");
+
+        app.UseAuthentication();
+        app.UseAuthorization();
+
         app.MapControllers();
+        app.MapFallbackToFile("index.html");
 
-        app.MapStaticAssets();
-        app.MapRazorComponents<App>()
-            .AddInteractiveServerRenderMode();
-
-        // Add additional endpoints required by the Identity /Account Razor components.
-        app.MapAdditionalIdentityEndpoints();
-
-        using (var scope = app.Services.CreateScope())
+        await using (var scope = app.Services.CreateAsyncScope())
         {
             await InitializeDatabase(scope);
         }
@@ -216,28 +223,26 @@ public static class Program
 
         if (args.Contains("--reset-admin"))
         {
-            await ResetAdminPassword(app);
+            logger.Warning("Resetting admin password!");
+            await ResetAdminPassword(app, logger);
         }
 
         await app.RunAsync();
     }
 
-    private static async Task ResetAdminPassword(WebApplication app)
+    private static async Task ResetAdminPassword(WebApplication app, Serilog.ILogger logger)
     {
         using var scope = app.Services.CreateScope();
 
-        var logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>()
-                                          .CreateLogger("AdminReset");
-
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-        logger.LogInformation("Starting admin password reset...");
+        logger.Information("Starting admin password reset...");
 
         var admin = await userManager.FindByNameAsync("admin");
 
         if (admin == null)
         {
-            logger.LogWarning("Admin user not found!");
+            logger.Warning("Admin user not found!");
             return;
         }
 
@@ -248,17 +253,17 @@ public static class Program
 
         if (!result.Succeeded)
         {
-            logger.LogError("Admin password reset failed!");
+            logger.Error("Admin password reset failed!");
 
             foreach (var err in result.Errors)
             {
-                logger.LogError("ResetAdminPassword::{Error}", err.Description);
+                logger.Error("ResetAdminPassword::{Error}", err.Description);
             }
 
             return;
         }
 
-        logger.LogInformation("Admin password reset successful. New password: {Password}", newPassword);
+        logger.Information("Admin password reset successful. New password: {Password}", newPassword);
     }
 
     private static Task CheckForDataFolder()
@@ -287,7 +292,7 @@ public static class Program
     {
         var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-        await dbContext.Database.MigrateAsync(); // ensure DB and tables exist
+        await dbContext.Database.MigrateAsync();
         await dbContext.Database.EnsureCreatedAsync();
 
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();

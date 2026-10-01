@@ -8,7 +8,7 @@ using FikaShared.Responses;
 using Microsoft.AspNetCore.Mvc;
 using SPTarkov.Server.Core.Models.Eft.Profile;
 using SPTarkov.Server.Core.Servers;
-using static FikaShared.Enums;
+using FikaShared.Enums;
 
 namespace FikaServer.API;
 

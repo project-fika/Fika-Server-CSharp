@@ -9,9 +9,9 @@ namespace FikaServer.API;
 [ApiController]
 [Route("fika/api/profiles")]
 [RequireApiKey]
-public class ProfilesController(SaveServer saveServer) : ControllerBase
+public sealed class ProfilesController(SaveServer saveServer) : ControllerBase
 {
-    public IActionResult HandleRequest()
+    public ActionResult<List<ProfileResponse>> HandleRequest()
     {
         var profiles = saveServer.GetProfiles().Values;
         List<ProfileResponse> profilesResponse = [];

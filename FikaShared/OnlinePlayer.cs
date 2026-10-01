@@ -1,5 +1,5 @@
 ﻿using System.Text.Json.Serialization;
-using static FikaShared.Enums;
+using FikaShared.Enums;
 
 namespace FikaShared;
 

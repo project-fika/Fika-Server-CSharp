@@ -4,6 +4,11 @@ namespace FikaWebApp.Services;
 
 public class HeartbeatService
 {
+    private readonly ILogger<HeartbeatService> _logger;
+    private readonly HttpClient _client;
+    private readonly int _interval;
+    private Timer? _timer;
+
     public HeartbeatService(HttpClient client, WebAppConfig fikaConfig, ILogger<HeartbeatService> logger)
     {
         _client = client;
@@ -82,10 +87,4 @@ public class HeartbeatService
             LastRefresh = DateTime.Now;
         }, null, TimeSpan.Zero, TimeSpan.FromMinutes(_interval));
     }
-
-    private readonly ILogger<HeartbeatService> _logger;
-    private readonly HttpClient _client;
-    private readonly int _interval;
-    private Timer? _timer;
-
 }
