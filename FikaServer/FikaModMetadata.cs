@@ -5,7 +5,7 @@ namespace FikaServer;
 
 public sealed record FikaModMetadata : IModMetadata, IModBlazorMetadata
 {
-    public const string FikaVersion = "2.4.1";
+    public const string FikaVersion = "2.4.2";
 
     public string Name { get; init; } = "server";
     public string Author { get; init; } = "Fika";
